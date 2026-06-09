@@ -1,161 +1,98 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gaule Top Up Center</title>
-
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
-body{
-background:#0f172a;
-display:flex;
-justify-content:center;
-align-items:center;
-min-height:100vh;
-color:white;
-padding:20px;
-}
-
-.container{
-width:100%;
-max-width:400px;
-background:#1e293b;
-padding:25px;
-border-radius:15px;
-text-align:center;
-box-shadow:0 0 20px rgba(0,0,0,.4);
-}
-
-h1{
-margin-bottom:20px;
-}
-
-button{
-width:100%;
-padding:12px;
-border:none;
-border-radius:8px;
-cursor:pointer;
-font-size:16px;
-margin-top:10px;
-}
-
-.google-btn{
-background:white;
-color:black;
-font-weight:bold;
-}
-
-.logout-btn{
-background:#ef4444;
-color:white;
-}
-
-#user{
-margin-top:20px;
-word-break:break-word;
-}
-
-img{
-border-radius:50%;
-margin-bottom:10px;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaule Store | Top-Up Center</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #0f111a; color: #fff; }
+        
+        header { background: #161925; padding: 15px 20px; border-bottom: 2px solid #ff4757; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 32px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
+        .logo-red { color: #ff4757; }
+        .logo-white { color: #ffffff; }
+        
+        .auth-container { display: flex; align-items: center; gap: 10px; }
+        
+        .google-btn { 
+            background: white; color: #555; border: none; padding: 8px 16px; 
+            border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .google-icon { width: 18px; height: 18px; }
+        
+        .user-img { width: 35px; height: 35px; border-radius: 4px; border: 1px solid #ff4757; display: none; cursor: pointer; }
+        
+        .dropdown { display: none; position: absolute; right: 20px; top: 65px; background: #161925; border: 1px solid #333; border-radius: 4px; width: 140px; z-index: 1000; }
+        .dropdown div { padding: 10px; cursor: pointer; border-bottom: 1px solid #333; font-size: 14px; }
+        .dropdown div:hover { background: #ff4757; }
+    </style>
 </head>
 <body>
 
-<div class="container">
-
-<h1>🎮 Gaule Top Up Center</h1>
-
-<button class="google-btn" onclick="googleLogin()">
-🔵 Sign In With Google
-</button>
-
-<div id="user">
-Not Logged In
-</div>
-
-<button class="logout-btn" onclick="logout()">
-🚪 Logout
-</button>
-
-</div>
+<header>
+    <div class="logo"><span class="logo-red">GAULE</span> <span class="logo-white">STORE</span></div>
+    <div class="auth-container">
+        <button id="googleBtn" class="google-btn">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" class="google-icon">
+            Login
+        </button>
+        <img id="userImg" src="" class="user-img">
+    </div>
+    <div id="dropdown" class="dropdown">
+        <div id="logoutBtn">Logout</div>
+    </div>
+</header>
 
 <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    const firebaseConfig = {
+        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+        authDomain: "gaule-top-up-center.firebaseapp.com",
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+        projectId: "gaule-top-up-center",
+        storageBucket: "gaule-top-up-center.firebasestorage.app",
+        messagingSenderId: "645605489690",
+        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+    };
 
-import {
-getAuth,
-GoogleAuthProvider,
-signInWithPopup,
-signOut,
-onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-const firebaseConfig = {
-apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-authDomain: "gaule-top-up-center.firebaseapp.com",
-databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-projectId: "gaule-top-up-center",
-storageBucket: "gaule-top-up-center.firebasestorage.app",
-messagingSenderId: "645605489690",
-appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-};
+    document.getElementById('googleBtn').onclick = () => {
+        signInWithPopup(auth, provider)
+            .then(() => location.reload())
+            .catch((error) => {
+                alert("Login Error: " + error.message);
+                console.error(error);
+            });
+    };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+    onAuthStateChanged(auth, (user) => {
+        const btn = document.getElementById('googleBtn');
+        const img = document.getElementById('userImg');
+        if (user) {
+            btn.style.display = 'none';
+            img.style.display = 'block';
+            img.src = user.photoURL;
+        } else {
+            btn.style.display = 'flex';
+            img.style.display = 'none';
+        }
+    });
 
-window.googleLogin = async () => {
-try {
+    document.getElementById('userImg').onclick = (e) => {
+        e.stopPropagation();
+        const d = document.getElementById('dropdown');
+        d.style.display = (d.style.display === 'block') ? 'none' : 'block';
+    };
 
-const result = await signInWithPopup(auth, provider);
-
-alert("Welcome " + result.user.displayName);
-
-} catch (error) {
-
-alert(error.code + "\n" + error.message);
-
-}
-};
-
-window.logout = async () => {
-await signOut(auth);
-};
-
-onAuthStateChanged(auth, (user) => {
-
-if(user){
-
-document.getElementById("user").innerHTML = `
-<img src="${user.photoURL}" width="80">
-<br>
-<b>${user.displayName}</b>
-<br>
-${user.email}
-`;
-
-}else{
-
-document.getElementById("user").innerHTML =
-"Not Logged In";
-
-}
-
-});
-
+    document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => location.reload());
+    window.onclick = () => { document.getElementById('dropdown').style.display = 'none'; };
 </script>
-
 </body>
 </html>
