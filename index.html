@@ -1,84 +1,112 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Gaule Top-Up Center</title>
-    <style>
-        body { background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; }
-        .box { background: #1e293b; padding: 30px; border-radius: 15px; width: 320px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #334155; background: #0f172a; color: white; }
-        button { width: 100%; padding: 12px; margin-top: 10px; cursor: pointer; border-radius: 5px; border: none; font-weight: bold; }
-        
-        /* Buttons */
-        #signInBtn { background: #3b82f6; color: white; }
-        #signUpBtn { background: #10b981; color: white; }
-        
-        /* Google Real Icon Style */
-        .google-btn { 
-            background: white; color: black; display: flex; align-items: center; 
-            justify-content: center; gap: 10px; border: 1px solid #ddd;
-        }
-        .google-icon { width: 20px; height: 20px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaule Top Up Center</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+margin:0;
+background:#0f172a;
+color:white;
+}
+
+header{
+background:#1e293b;
+padding:20px;
+text-align:center;
+}
+
+.logo{
+font-size:30px;
+font-weight:bold;
+}
+
+.container{
+padding:20px;
+max-width:600px;
+margin:auto;
+}
+
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:12px;
+margin-top:20px;
+}
+
+input,select{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:8px;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:15px;
+border:none;
+border-radius:8px;
+background:#22c55e;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+
+footer{
+text-align:center;
+padding:20px;
+margin-top:30px;
+}
+</style>
 </head>
+
 <body>
 
-<div class="box">
-    <h2>Gaule Login</h2>
-    <input type="email" id="email" placeholder="Email Address">
-    <input type="password" id="password" placeholder="Password">
-    
-    <button id="signInBtn">Sign In</button>
-    <button id="signUpBtn">Create Account</button>
-    
-    <button id="googleBtn" class="google-btn">
-        <img class="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/480px-Google_%22G%22_logo.svg.png" alt="Google">
-        Sign in with Google
-    </button>
+<header>
+<div class="logo">🎮 Gaule Top Up Center</div>
+<p>Fast & Secure Gaming Top Up</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+<h2>💎 Free Fire Top Up</h2>
+
+<input type="text" placeholder="Enter UID">
+
+<select>
+<option>25 Diamond</option>
+<option>50 Diamond</option>
+<option>115 Diamond</option>
+<option>240 Diamond</option>
+<option>355 Diamond</option>
+<option>480 Diamond</option>
+<option>610 Diamond</option>
+<option>850 Diamond</option>
+</select>
+
+<button onclick="alert('Order Submitted')">
+Submit Order
+</button>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+<div class="card">
+<h2>📞 Contact</h2>
+<p>WhatsApp: +977XXXXXXXXXX</p>
+<p>Email: your@email.com</p>
+</div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-      authDomain: "gaule-top-up-center.firebaseapp.com",
-      projectId: "gaule-top-up-center",
-      storageBucket: "gaule-top-up-center.firebasestorage.app",
-      messagingSenderId: "645605489690",
-      appId: "1:645605489690:web:f31fb270d9fcc12dc1e5a3"
-    };
+</div>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-
-    // Sign In logic
-    document.getElementById('signInBtn').onclick = () => {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        signInWithEmailAndPassword(auth, email, password)
-            .then(() => alert("Successfully Signed In!"))
-            .catch((e) => alert("Error: " + e.message));
-    };
-
-    // Create Account logic
-    document.getElementById('signUpBtn').onclick = () => {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        createUserWithEmailAndPassword(auth, email, password)
-            .then(() => alert("Account Created Successfully!"))
-            .catch((e) => alert("Error: " + e.message));
-    };
-
-    // Google Sign in logic
-    document.getElementById('googleBtn').onclick = () => {
-        signInWithPopup(auth, provider)
-            .then(() => alert("Successfully Logged in with Google!"))
-            .catch((e) => alert("Error: " + e.message));
-    };
-</script>
+<footer>
+© 2026 Gaule Top Up Center
+</footer>
 
 </body>
 </html>
