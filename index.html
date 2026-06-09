@@ -7,106 +7,155 @@
 <title>Gaule Top Up Center</title>
 
 <style>
-body{
-font-family:Arial,sans-serif;
+*{
 margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
 background:#0f172a;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
 color:white;
-}
-
-header{
-background:#1e293b;
 padding:20px;
-text-align:center;
-}
-
-.logo{
-font-size:30px;
-font-weight:bold;
 }
 
 .container{
-padding:20px;
-max-width:600px;
-margin:auto;
-}
-
-.card{
-background:#1e293b;
-padding:20px;
-border-radius:12px;
-margin-top:20px;
-}
-
-input,select{
 width:100%;
-padding:12px;
-margin-top:10px;
-border:none;
-border-radius:8px;
+max-width:400px;
+background:#1e293b;
+padding:25px;
+border-radius:15px;
+text-align:center;
+box-shadow:0 0 20px rgba(0,0,0,.4);
+}
+
+h1{
+margin-bottom:20px;
 }
 
 button{
 width:100%;
 padding:12px;
-margin-top:15px;
 border:none;
 border-radius:8px;
-background:#22c55e;
-color:white;
-font-size:16px;
 cursor:pointer;
+font-size:16px;
+margin-top:10px;
 }
 
-footer{
-text-align:center;
-padding:20px;
-margin-top:30px;
+.google-btn{
+background:white;
+color:black;
+font-weight:bold;
+}
+
+.logout-btn{
+background:#ef4444;
+color:white;
+}
+
+#user{
+margin-top:20px;
+word-break:break-word;
+}
+
+img{
+border-radius:50%;
+margin-bottom:10px;
 }
 </style>
 </head>
-
 <body>
-
-<header>
-<div class="logo">🎮 Gaule Top Up Center</div>
-<p>Fast & Secure Gaming Top Up</p>
-</header>
 
 <div class="container">
 
-<div class="card">
-<h2>💎 Free Fire Top Up</h2>
+<h1>🎮 Gaule Top Up Center</h1>
 
-<input type="text" placeholder="Enter UID">
-
-<select>
-<option>25 Diamond</option>
-<option>50 Diamond</option>
-<option>115 Diamond</option>
-<option>240 Diamond</option>
-<option>355 Diamond</option>
-<option>480 Diamond</option>
-<option>610 Diamond</option>
-<option>850 Diamond</option>
-</select>
-
-<button onclick="alert('Order Submitted')">
-Submit Order
+<button class="google-btn" onclick="googleLogin()">
+🔵 Sign In With Google
 </button>
+
+<div id="user">
+Not Logged In
 </div>
 
-<div class="card">
-<h2>📞 Contact</h2>
-<p>WhatsApp: +977XXXXXXXXXX</p>
-<p>Email: your@email.com</p>
-</div>
+<button class="logout-btn" onclick="logout()">
+🚪 Logout
+</button>
 
 </div>
 
-<footer>
-© 2026 Gaule Top Up Center
-</footer>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getAuth,
+GoogleAuthProvider,
+signInWithPopup,
+signOut,
+onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+authDomain: "gaule-top-up-center.firebaseapp.com",
+databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+projectId: "gaule-top-up-center",
+storageBucket: "gaule-top-up-center.firebasestorage.app",
+messagingSenderId: "645605489690",
+appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+window.googleLogin = async () => {
+try {
+
+const result = await signInWithPopup(auth, provider);
+
+alert("Welcome " + result.user.displayName);
+
+} catch (error) {
+
+alert(error.code + "\n" + error.message);
+
+}
+};
+
+window.logout = async () => {
+await signOut(auth);
+};
+
+onAuthStateChanged(auth, (user) => {
+
+if(user){
+
+document.getElementById("user").innerHTML = `
+<img src="${user.photoURL}" width="80">
+<br>
+<b>${user.displayName}</b>
+<br>
+${user.email}
+`;
+
+}else{
+
+document.getElementById("user").innerHTML =
+"Not Logged In";
+
+}
+
+});
+
+</script>
 
 </body>
 </html>
