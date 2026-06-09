@@ -3,96 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaule Store | Top-Up Center</title>
+    <title>Gaule Store | Ultimate Top-Up Store</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #0f111a; color: #fff; }
+        body { background-color: #0f111a; color: #ffffff; }
         
-        header { background: #161925; padding: 15px 20px; border-bottom: 2px solid #ff4757; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .logo { font-size: 32px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
-        .logo-red { color: #ff4757; }
-        .logo-white { color: #ffffff; }
+        /* Header & Logo */
+        header { background: #161925; padding: 20px 5%; border-bottom: 2px solid #ff4757; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: auto; }
+        .logo { font-size: 28px; font-weight: bold; color: #ffffff; text-transform: uppercase; }
+        .logo span { color: #ff4757; }
         
-        .auth-container { display: flex; align-items: center; gap: 10px; }
-        
-        .google-btn { 
-            background: white; color: #555; border: none; padding: 8px 16px; 
-            border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .google-icon { width: 18px; height: 18px; }
-        
-        .user-img { width: 35px; height: 35px; border-radius: 4px; border: 1px solid #ff4757; display: none; cursor: pointer; }
-        
-        .dropdown { display: none; position: absolute; right: 20px; top: 65px; background: #161925; border: 1px solid #333; border-radius: 4px; width: 140px; z-index: 1000; }
-        .dropdown div { padding: 10px; cursor: pointer; border-bottom: 1px solid #333; font-size: 14px; }
-        .dropdown div:hover { background: #ff4757; }
+        /* Auth Styles */
+        .btn-auth { background: #ff4757; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .user-profile { display: flex; align-items: center; gap: 10px; }
+        .profile-img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #ff4757; }
+
+        /* Container & Grid */
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .game-card { background: #161925; padding: 20px; border-radius: 12px; border: 1px solid #2f3542; }
+        .game-img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; }
+        .topup-select, .player-id-input { width: 100%; padding: 10px; background: #0f111a; color: white; border: 1px solid #2f3542; border-radius: 5px; margin-bottom: 10px; }
+        .btn-buy { background: #ff4757; color: white; padding: 12px; width: 100%; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-free { background: #2ed573; color: white; padding: 12px; width: 100%; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo"><span class="logo-red">GAULE</span> <span class="logo-white">STORE</span></div>
-    <div class="auth-container">
-        <button id="googleBtn" class="google-btn">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" class="google-icon">
-            Login
-        </button>
-        <img id="userImg" src="" class="user-img">
-    </div>
-    <div id="dropdown" class="dropdown">
-        <div id="logoutBtn">Logout</div>
-    </div>
-</header>
+    <header>
+        <div class="navbar">
+            <div class="logo">GAULE<span>STORE</span></div>
+            <div id="authArea"><button id="loginBtn" class="btn-auth">Login</button></div>
+        </div>
+    </header>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    <main class="container">
+        <div class="games-grid">
+            <!-- PUBG -->
+            <div class="game-card">
+                <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500" class="game-img">
+                <h3>PUBG Mobile (UC)</h3>
+                <input type="text" placeholder="Enter Player ID" class="player-id-input">
+                <select class="topup-select">
+                    <option>60 UC - Rs. 150</option>
+                    <option>325 UC - Rs. 700</option>
+                </select>
+                <button class="btn-buy" onclick="alert('Proceeding to Checkout...')">Buy Now</button>
+                <button class="btn-free" onclick="alert('Free UC Claimed!')">Claim Free UC</button>
+            </div>
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-        authDomain: "gaule-top-up-center.firebaseapp.com",
-        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-        projectId: "gaule-top-up-center",
-        storageBucket: "gaule-top-up-center.firebasestorage.app",
-        messagingSenderId: "645605489690",
-        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-    };
+            <!-- Free Fire -->
+            <div class="game-card">
+                <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=500" class="game-img">
+                <h3>Free Fire</h3>
+                <input type="text" placeholder="Enter Player ID" class="player-id-input">
+                <select class="topup-select">
+                    <option>100 Diamonds - Rs. 120</option>
+                    <option>210 Diamonds - Rs. 240</option>
+                </select>
+                <button class="btn-buy" onclick="alert('Proceeding to Checkout...')">Buy Now</button>
+            </div>
+        </div>
+    </main>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
-    document.getElementById('googleBtn').onclick = () => {
-        signInWithPopup(auth, provider)
-            .then(() => location.reload())
-            .catch((error) => {
-                alert("Login Error: " + error.message);
-                console.error(error);
-            });
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+            authDomain: "gaule-top-up-center.firebaseapp.com",
+            projectId: "gaule-top-up-center",
+            storageBucket: "gaule-top-up-center.firebasestorage.app",
+            messagingSenderId: "645605489690",
+            appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+        };
 
-    onAuthStateChanged(auth, (user) => {
-        const btn = document.getElementById('googleBtn');
-        const img = document.getElementById('userImg');
-        if (user) {
-            btn.style.display = 'none';
-            img.style.display = 'block';
-            img.src = user.photoURL;
-        } else {
-            btn.style.display = 'flex';
-            img.style.display = 'none';
-        }
-    });
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        const authArea = document.getElementById("authArea");
 
-    document.getElementById('userImg').onclick = (e) => {
-        e.stopPropagation();
-        const d = document.getElementById('dropdown');
-        d.style.display = (d.style.display === 'block') ? 'none' : 'block';
-    };
-
-    document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => location.reload());
-    window.onclick = () => { document.getElementById('dropdown').style.display = 'none'; };
-</script>
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                authArea.innerHTML = `
+                    <div class="user-profile">
+                        <span style="color:white;">${user.displayName}</span>
+                        <img src="${user.photoURL}" class="profile-img">
+                        <button onclick="signOut(auth)" class="btn-auth" style="background:#555;">Logout</button>
+                    </div>
+                `;
+            } else {
+                authArea.innerHTML = `<button id="loginBtn" class="btn-auth">Login</button>`;
+                document.getElementById("loginBtn").onclick = () => signInWithPopup(auth, provider);
+            }
+        });
+    </script>
 </body>
 </html>
