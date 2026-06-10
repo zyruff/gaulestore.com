@@ -7,10 +7,16 @@
     <style>
         body { margin: 0; background: #0f0f1a; color: white; font-family: sans-serif; }
         header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 2px solid #2a2a40; }
-        .logo-text { font-size: 1.5rem; font-weight: bold; letter-spacing: 1px; }
+        .logo-text { font-size: 1.5rem; font-weight: bold; }
         .red { color: #ff0055; }
-        .login-btn { border: 1px solid #ff0055; padding: 8px 20px; border-radius: 20px; cursor: pointer; background: transparent; color: white; }
-        .user-profile { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #00d4ff; cursor: pointer; object-fit: cover; }
+        .user-profile { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #00d4ff; cursor: pointer; }
+        .btn { border: 1px solid #ff0055; padding: 8px 20px; border-radius: 20px; cursor: pointer; background: transparent; color: white; }
+        
+        /* Dropdown Style */
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content { display: none; position: absolute; right: 0; background-color: #1a1a2e; min-width: 200px; padding: 15px; border-radius: 10px; border: 1px solid #444; z-index: 1; }
+        .dropdown:hover .dropdown-content { display: block; }
+        
         #page-container { padding: 20px; }
         .order-card { background: #1a1a2e; padding: 15px; border-radius: 10px; margin-top: 10px; border: 1px solid #444; }
     </style>
@@ -20,19 +26,17 @@
     <header>
         <div class="logo-text"><span class="red">GAULE</span> STORE</div>
         <div id="auth-container">
-            <button class="login-btn" onclick="loginWithGoogle()">Login</button>
+            <button class="btn" onclick="loginWithGoogle()">Login</button>
         </div>
     </header>
 
-    <div id="page-container">
-        </div>
+    <div id="page-container"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
         import { getDatabase, ref, query, orderByChild, equalTo, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-        // Firebase Configuration (तपाईंको API Key र Database URL यहाँ जोडिएको छ)
         const firebaseConfig = {
             apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
             authDomain: "gaule-top-up-center.firebaseapp.com",
@@ -49,14 +53,24 @@
         const provider = new GoogleAuthProvider();
 
         window.loginWithGoogle = () => signInWithPopup(auth, provider);
+        window.logout = () => signOut(auth).then(() => location.reload());
 
         onAuthStateChanged(auth, (user) => {
             const authContainer = document.getElementById('auth-container');
             if (user) {
-                authContainer.innerHTML = `<img src="${user.photoURL}" class="user-profile" onclick="showMyOrders()">`;
+                authContainer.innerHTML = `
+                    <div class="dropdown">
+                        <img src="${user.photoURL}" class="user-profile">
+                        <div class="dropdown-content">
+                            <p><b>${user.displayName}</b></p>
+                            <p style="font-size: 0.8rem; color: #aaa;">${user.email}</p>
+                            <hr style="border: 0.5px solid #444;">
+                            <p onclick="showMyOrders()" style="cursor:pointer; color:#00d4ff;">My Orders</p>
+                            <p onclick="logout()" style="cursor:pointer; color:#ff0055;">Logout</p>
+                        </div>
+                    </div>`;
             } else {
-                authContainer.innerHTML = `<button class="login-btn" onclick="loginWithGoogle()">Login</button>`;
-                document.getElementById('page-container').innerHTML = ""; // लगआउट भएपछि खाली गर्ने
+                authContainer.innerHTML = `<button class="btn" onclick="loginWithGoogle()">Login</button>`;
             }
         });
 
@@ -66,22 +80,15 @@
             container.innerHTML = "<h3>My Order History</h3>";
             
             const ordersRef = query(ref(db, 'orders'), orderByChild('userId'), equalTo(user.uid));
-            
             get(ordersRef).then((snapshot) => {
                 if (snapshot.exists()) {
                     snapshot.forEach((child) => {
                         let data = child.val();
-                        container.innerHTML += `<div class="order-card">
-                            Item: ${data.item || 'N/A'}<br>
-                            Status: <span style="color:#00d4ff">${data.status || 'Pending'}</span>
-                        </div>`;
+                        container.innerHTML += `<div class="order-card">Item: ${data.item || 'N/A'} | Status: ${data.status}</div>`;
                     });
                 } else {
-                    container.innerHTML += "<p>कुनै अर्डर भेटिएन।</p>";
+                    container.innerHTML += "<p>No orders found.</p>";
                 }
-            }).catch((error) => {
-                console.error("Error fetching data: ", error);
-                container.innerHTML += "<p>डाटा लोड गर्न समस्या भयो।</p>";
             });
         };
     </script>
