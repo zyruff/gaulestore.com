@@ -94,3 +94,64 @@
     </script>
 </body>
 </html>
+<!-- Free Fire अर्डर फर्म -->
+<div style="background: #1a1a2e; padding: 20px; border-radius: 15px; width: 300px; color: white; text-align: center; font-family: sans-serif;">
+    <h3 style="color: #ff0055;">Free Fire Top-Up</h3>
+    <input type="text" id="uid" placeholder="Enter Player UID" style="width: 90%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none;">
+    <select id="diamond" style="width: 95%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: none;">
+        <option value="100 Diamonds">100 Diamonds</option>
+        <option value="310 Diamonds">310 Diamonds</option>
+        <option value="520 Diamonds">520 Diamonds</option>
+    </select>
+    <button onclick="saveOrder()" style="width: 95%; padding: 12px; background: #ff0055; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">PLACE ORDER</button>
+</div>
+
+<!-- अर्डर सूची (Status सँगै देखिन्छ) -->
+<div id="orderList" style="margin-top: 20px; color: white; font-family: sans-serif; width: 300px;"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+    const firebaseConfig = {
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // अर्डर सेभ गर्ने फंक्सन
+    window.saveOrder = () => {
+        const uid = document.getElementById('uid').value;
+        const diamond = document.getElementById('diamond').value;
+        
+        if(!uid) return alert("UID हाल्नुहोस्!");
+
+        push(ref(db, 'orders'), {
+            playerUid: uid,
+            diamond: diamond,
+            status: "Pending" // सुरुमा 'Pending' रहन्छ
+        }).then(() => {
+            alert("अर्डर सफल भयो!");
+            document.getElementById('uid').value = ""; // बक्स खाली गर्ने
+        });
+    };
+
+    // डाटाबेसमा केही फेरबदल हुने बित्तिकै यहाँ अपडेट हुन्छ
+    onValue(ref(db, 'orders'), (snapshot) => {
+        const listDiv = document.getElementById('orderList');
+        listDiv.innerHTML = "<h4>My Recent Orders:</h4>";
+        snapshot.forEach((child) => {
+            const data = child.val();
+            // यदि Status 'Completed' छ भने हरियो, नत्र पहेंलो
+            const color = (data.status === "Completed") ? "green" : "yellow";
+            
+            listDiv.innerHTML += `
+                <div style="border: 2px solid ${color}; padding: 10px; margin-bottom: 5px; border-radius: 5px; color: ${color};">
+                    UID: ${data.playerUid} | ${data.diamond} <br> 
+                    Status: <b>${data.status}</b>
+                </div>`;
+        });
+    });
+</script>
+
