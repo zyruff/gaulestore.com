@@ -93,65 +93,103 @@
         };
     </script>
 </body>
-</html>
-<!-- Free Fire अर्डर फर्म -->
-<div style="background: #1a1a2e; padding: 20px; border-radius: 15px; width: 300px; color: white; text-align: center; font-family: sans-serif;">
-    <h3 style="color: #ff0055;">Free Fire Top-Up</h3>
-    <input type="text" id="uid" placeholder="Enter Player UID" style="width: 90%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none;">
-    <select id="diamond" style="width: 95%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: none;">
-        <option value="100 Diamonds">100 Diamonds</option>
-        <option value="310 Diamonds">310 Diamonds</option>
-        <option value="520 Diamonds">520 Diamonds</option>
+<div class="diamond-order-box">
+    <h2>🔥 Free Fire Diamond Order</h2>
+
+    <input type="text" id="uid" placeholder="Enter Free Fire UID">
+
+    <select id="diamond">
+        <option value="25 Diamond">25 Diamond</option>
+        <option value="50 Diamond">50 Diamond</option>
+        <option value="115 Diamond">115 Diamond</option>
+        <option value="240 Diamond">240 Diamond</option>
+        <option value="610 Diamond">610 Diamond</option>
     </select>
-    <button onclick="saveOrder()" style="width: 95%; padding: 12px; background: #ff0055; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">PLACE ORDER</button>
+
+    <button onclick="submitOrder()">Order Now</button>
+
+    <p id="msg"></p>
 </div>
 
-<!-- अर्डर सूची (Status सँगै देखिन्छ) -->
-<div id="orderList" style="margin-top: 20px; color: white; font-family: sans-serif; width: 300px;"></div>
+<style>
+.diamond-order-box{
+    max-width:400px;
+    margin:20px auto;
+    background:#1e293b;
+    padding:20px;
+    border-radius:15px;
+    color:white;
+}
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+.diamond-order-box h2{
+    text-align:center;
+    margin-bottom:15px;
+}
 
-    const firebaseConfig = {
-        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
+.diamond-order-box input,
+.diamond-order-box select,
+.diamond-order-box button{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:8px;
+}
+
+.diamond-order-box button{
+    background:#ff6b00;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+#msg{
+    text-align:center;
+    margin-top:10px;
+}
+</style>
+
+<script>
+async function submitOrder() {
+
+    const uid = document.getElementById("uid").value;
+    const diamond = document.getElementById("diamond").value;
+
+    if(!uid){
+        alert("UID Required");
+        return;
+    }
+
+    const order = {
+        uid,
+        diamond,
+        status: "Pending",
+        createdAt: new Date().toISOString()
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    try{
+        const response = await fetch(
+            "https://gaule-top-up-center-default-rtdb.firebaseio.com/orders.json",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify(order)
+            }
+        );
 
-    // अर्डर सेभ गर्ने फंक्सन
-    window.saveOrder = () => {
-        const uid = document.getElementById('uid').value;
-        const diamond = document.getElementById('diamond').value;
-        
-        if(!uid) return alert("UID हाल्नुहोस्!");
-
-        push(ref(db, 'orders'), {
-            playerUid: uid,
-            diamond: diamond,
-            status: "Pending" // सुरुमा 'Pending' रहन्छ
-        }).then(() => {
-            alert("अर्डर सफल भयो!");
-            document.getElementById('uid').value = ""; // बक्स खाली गर्ने
-        });
-    };
-
-    // डाटाबेसमा केही फेरबदल हुने बित्तिकै यहाँ अपडेट हुन्छ
-    onValue(ref(db, 'orders'), (snapshot) => {
-        const listDiv = document.getElementById('orderList');
-        listDiv.innerHTML = "<h4>My Recent Orders:</h4>";
-        snapshot.forEach((child) => {
-            const data = child.val();
-            // यदि Status 'Completed' छ भने हरियो, नत्र पहेंलो
-            const color = (data.status === "Completed") ? "green" : "yellow";
-            
-            listDiv.innerHTML += `
-                <div style="border: 2px solid ${color}; padding: 10px; margin-bottom: 5px; border-radius: 5px; color: ${color};">
-                    UID: ${data.playerUid} | ${data.diamond} <br> 
-                    Status: <b>${data.status}</b>
-                </div>`;
-        });
-    });
+        if(response.ok){
+            document.getElementById("msg").innerHTML =
+            "✅ Order Submitted Successfully";
+            document.getElementById("uid").value = "";
+        }else{
+            document.getElementById("msg").innerHTML =
+            "❌ Submit Failed";
+        }
+    }catch(err){
+        document.getElementById("msg").innerHTML =
+        "❌ " + err.message;
+    }
+}
 </script>
-
