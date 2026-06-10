@@ -193,3 +193,108 @@ async function submitOrder() {
     }
 }
 </script>
+<div class="diamond-order-box">
+
+    <input type="text" id="uid" placeholder="Free Fire UID">
+
+    <select id="diamond">
+        <option value="25 Diamond">25 Diamond</option>
+        <option value="50 Diamond">50 Diamond</option>
+        <option value="115 Diamond">115 Diamond</option>
+        <option value="240 Diamond">240 Diamond</option>
+        <option value="610 Diamond">610 Diamond</option>
+    </select>
+
+    <button onclick="submitOrder()">Order Now</button>
+
+</div>
+
+<h3>My Orders</h3>
+<div id="myOrders"></div>
+
+<script>
+async function submitOrder() {
+
+    const user = auth.currentUser;
+
+    if (!user) {
+        alert("Please login first");
+        return;
+    }
+
+    const gameUid = document.getElementById("uid").value;
+    const diamond = document.getElementById("diamond").value;
+
+    if (!gameUid) {
+        alert("Enter UID");
+        return;
+    }
+
+    const order = {
+        gameUid: gameUid,
+        diamond: diamond,
+        status: "Pending",
+        userId: user.uid,
+        email: user.email,
+        createdAt: Date.now()
+    };
+
+    await fetch(
+        "https://gaule-top-up-center-default-rtdb.firebaseio.com/orders.json",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(order)
+        }
+    );
+
+    alert("Order Submitted");
+    loadMyOrders();
+}
+
+async function loadMyOrders() {
+
+    const user = auth.currentUser;
+
+    if (!user) return;
+
+    const res = await fetch(
+        "https://gaule-top-up-center-default-rtdb.firebaseio.com/orders.json"
+    );
+
+    const data = await res.json();
+
+    let html = "";
+
+    if (data) {
+        Object.keys(data).reverse().forEach(key => {
+
+            const order = data[key];
+
+            if (order.userId === user.uid) {
+
+                html += `
+                <div style="
+                    background:#1e293b;
+                    color:white;
+                    padding:10px;
+                    margin:10px 0;
+                    border-radius:10px;
+                ">
+                    <b>UID:</b> ${order.gameUid}<br>
+                    <b>Diamond:</b> ${order.diamond}<br>
+                    <b>Status:</b> ${order.status}
+                </div>
+                `;
+            }
+        });
+    }
+
+    document.getElementById("myOrders").innerHTML =
+        html || "No Orders Found";
+}
+
+setTimeout(loadMyOrders, 2000);
+</script>
