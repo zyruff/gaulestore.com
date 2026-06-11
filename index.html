@@ -99,45 +99,24 @@
     <title>Gaule Top-Up Center</title>
 </head>
 <body>
+<input type="text" id="game" placeholder="Game Name">
 
-    <h2>Free Fire Diamond Order</h2>
-    
-    <input type="text" id="pid" placeholder="Player ID"><br><br>
-    
-    <select id="diamond">
-        <option value="100">100 Diamonds</option>
-        <option value="310">310 Diamonds</option>
-        <option value="520">520 Diamonds</option>
-    </select><br><br>
-    
-    <button onclick="submitAndAutoHistory()">Submit Order</button>
+<input type="text" id="playerId" placeholder="Player ID">
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+<select id="package">
+    <option>100 Diamonds</option>
+    <option>310 Diamonds</option>
+    <option>520 Diamonds</option>
+</select>
 
-        const db = getDatabase(initializeApp({ databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com/" }));
+<button onclick="placeOrder()">Place Order</button>
+<script>
+async function placeOrder() {
+   // code
+}
+</script>
+<div id="orders"></div>
 
-        window.submitAndAutoHistory = async () => {
-            const pid = document.getElementById('pid').value;
-            const amt = document.getElementById('diamond').value;
-
-            if(!pid) return alert("Player ID lekhnus!");
-
-            // 1. History node ma naya entry banaune
-            const newOrderRef = push(ref(db, 'history'));
-            
-            // 2. Tyo entry ma data save garne (status pending sangai)
-            await set(newOrderRef, { 
-                playerId: pid, 
-                diamonds: amt, 
-                status: "pending", 
-                time: new Date().toLocaleString() 
-            });
-
-            alert("Order Submitted! Automatic History ma gayo.");
-            document.getElementById('pid').value = ""; // Form clear garne
-        };
-    </script>
-</body>
-</html>
+<script>
+   // My Orders code
+</script>
