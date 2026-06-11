@@ -1,43 +1,66 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <style>
-    body { background: #fff; color: #000; font-family: sans-serif; text-align: center; padding: 10px; }
-    .header-container { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-top: 10px; }
-    h1 { font-size: 1.8rem; margin: 0; font-weight: bold; }
-    .store-text { color: #dc2626; }
-    .login-icon { width: 40px; height: 40px; cursor: pointer; }
-    #profile-pic { width: 40px; height: 40px; border-radius: 50%; display: none; cursor: pointer; }
-    .line { width: 90%; height: 3px; background: #dc2626; margin: 15px auto 20px auto; }
-    .sub-text { color: #555; }
-  </style>
+<style>
+  body { background: #fff; color: #000; font-family: sans-serif; text-align: center; margin: 0; padding: 0; }
+  
+  .header-container { display: flex; align-items: center; padding: 15px 20px; }
+  .title-wrapper { margin-left: 15%; text-align: left; }
+  h1 { font-size: 1.8rem; margin: 0; font-weight: bold; }
+  .store-text { color: #dc2626; }
+  
+  .line { width: 95%; height: 3px; background: #dc2626; margin: 5px auto 20px auto; border-radius: 2px; }
+  .spacer { flex-grow: 1; }
+  
+  .profile-wrapper { position: relative; padding-right: 20px; }
+  .login-icon { width: 40px; height: 40px; cursor: pointer; }
+  #profile-pic { width: 40px; height: 40px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #ddd; }
+  
+  .dropdown-menu {
+    display: none; position: absolute; right: 20px; top: 55px; background: #fff; 
+    border: 1px solid #eee; border-radius: 8px; padding: 5px 0; width: 160px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 1000; text-align: left;
+  }
+  .dropdown-menu div { padding: 10px 15px; cursor: pointer; font-size: 14px; border-bottom: 1px solid #f0f0f0; }
+  .dropdown-menu div:hover { background: #f9f9f9; }
+</style>
 </head>
 <body>
 
   <div class="header-container">
-    <div></div>
-    <h1>GAULE <span class="store-text">STORE</span></h1>
+    <div class="title-wrapper">
+      <h1>GAULE <span class="store-text">STORE</span></h1>
+    </div>
     
-    <!-- Login Icon -->
-    <div id="login-section">
-      <div class="login-icon" id="login-btn" onclick="googleLogin()">
+    <div class="spacer"></div>
+    
+    <div class="profile-wrapper">
+      <!-- Login Icon -->
+      <div id="login-btn" class="login-icon" onclick="googleLogin()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
       </div>
-      <!-- प्रोफाइल फोटो यहाँ आउँछ -->
-      <img id="profile-pic" onclick="showProfile()">
+
+      <!-- Profile Photo -->
+      <img id="profile-pic" onclick="toggleMenu()">
+      
+      <!-- Dropdown Menu -->
+      <div id="profile-menu" class="dropdown-menu">
+        <div onclick="window.location.reload()">🏠 Home</div>
+        <div onclick="showProfile()">👤 Profile</div>
+        <div onclick="window.open('https://wa.me/9761081110', '_blank')">💬 Contact (WhatsApp)</div>
+        <div onclick="logoutUser()" style="color:red;">🚪 Logout</div>
+      </div>
     </div>
   </div>
 
   <div class="line"></div>
-  <p class="sub-text">Fast and secure top up service</p>
 
-  <!-- Firebase Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
@@ -48,27 +71,32 @@
       appId: "1:645605489690:web:10e333176acd07eec1e5a3"
     };
 
-    const app = initializeApp(firebaseConfig);
+    initializeApp(firebaseConfig);
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
-
     let currentUser = null;
 
-    window.googleLogin = () => {
-      signInWithPopup(auth, provider).then((result) => {
-        currentUser = result.user;
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
         document.getElementById("login-btn").style.display = "none";
-        const pic = document.getElementById("profile-pic");
-        pic.src = currentUser.photoURL;
-        pic.style.display = "block";
-      }).catch((error) => console.error(error));
+        document.getElementById("profile-pic").style.display = "block";
+        document.getElementById("profile-pic").src = user.photoURL;
+      }
+    });
+
+    window.googleLogin = () => signInWithPopup(auth, provider);
+    
+    window.toggleMenu = () => {
+      const menu = document.getElementById("profile-menu");
+      menu.style.display = (menu.style.display === "block") ? "none" : "block";
     };
 
     window.showProfile = () => {
-      if (currentUser) {
-        alert("Name: " + currentUser.displayName + "\nEmail: " + currentUser.email);
-      }
+      alert("Name: " + currentUser.displayName + "\nEmail: " + currentUser.email);
     };
+
+    window.logoutUser = () => signOut(auth).then(() => location.reload());
   </script>
 </body>
 </html>
