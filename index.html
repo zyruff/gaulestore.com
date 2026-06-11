@@ -1,194 +1,74 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>GauLe Store</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <style>
-    body{
-      margin:0;
-      font-family:Arial;
-      background: linear-gradient(180deg,#070b18,#0b1220);
-      color:white;
-      text-align:center;
-    }
-
-    .header{
-      background: linear-gradient(90deg,#ff0000,#ff8c00);
-      padding:18px;
-      font-size:22px;
-      font-weight:bold;
-      letter-spacing:1px;
-      box-shadow:0 4px 10px rgba(0,0,0,0.4);
-    }
-
-    .subtitle{
-      margin-top:10px;
-      color:#aaa;
-      font-size:14px;
-    }
-
-    /* GAME CARDS */
-    .games{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:12px;
-      padding:15px;
-    }
-
-    .game{
-      background: rgba(255,255,255,0.05);
-      border:1px solid rgba(255,255,255,0.1);
-      padding:25px;
-      border-radius:15px;
-      cursor:pointer;
-      transition:0.3s;
-      backdrop-filter: blur(6px);
-    }
-
-    .game:hover{
-      transform:scale(1.05);
-      background: rgba(255,255,255,0.1);
-    }
-
-    /* PRODUCT PAGE */
-    .box{
-      display:none;
-      padding:15px;
-    }
-
-    .title{
-      font-size:20px;
-      margin:10px 0;
-      color:#ffcc00;
-    }
-
-    .card{
-      background: rgba(255,255,255,0.05);
-      border:1px solid rgba(255,255,255,0.1);
-      padding:15px;
-      margin:10px;
-      border-radius:12px;
-      cursor:pointer;
-      transition:0.3s;
-    }
-
-    .card:hover{
-      background: rgba(255,255,255,0.15);
-      transform:scale(1.03);
-    }
-
-    button{
-      width:90%;
-      padding:12px;
-      margin-top:15px;
-      border:none;
-      border-radius:10px;
-      background: linear-gradient(90deg,#ff0000,#ff7b00);
-      color:white;
-      font-size:16px;
-      cursor:pointer;
-      transition:0.3s;
-    }
-
-    button:hover{
-      transform:scale(1.05);
-    }
-
-    .back{
-      margin-top:10px;
-      color:#aaa;
-      cursor:pointer;
-      font-size:14px;
-    }
+    body { background: #fff; color: #000; font-family: sans-serif; text-align: center; padding: 10px; }
+    .header-container { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-top: 10px; }
+    h1 { font-size: 1.8rem; margin: 0; font-weight: bold; }
+    .store-text { color: #dc2626; }
+    .login-icon { width: 40px; height: 40px; cursor: pointer; }
+    #profile-pic { width: 40px; height: 40px; border-radius: 50%; display: none; cursor: pointer; }
+    .line { width: 90%; height: 3px; background: #dc2626; margin: 15px auto 20px auto; }
+    .sub-text { color: #555; }
   </style>
 </head>
-
 <body>
 
-<div class="header">🔥 GAULE STORE</div>
-<div class="subtitle">Top Up Gaming Shop</div>
-
-<!-- GAME LIST -->
-<div id="home">
-
-  <h3>Select Your Game</h3>
-
-  <div class="games">
-
-    <div class="game" onclick="openGame('Free Fire')">
-      🔥 Free Fire
+  <div class="header-container">
+    <div></div>
+    <h1>GAULE <span class="store-text">STORE</span></h1>
+    
+    <!-- Login Icon -->
+    <div id="login-section">
+      <div class="login-icon" id="login-btn" onclick="googleLogin()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </div>
+      <!-- प्रोफाइल फोटो यहाँ आउँछ -->
+      <img id="profile-pic" onclick="showProfile()">
     </div>
-
-    <div class="game" onclick="openGame('PUBG Mobile')">
-      🎮 PUBG Mobile
-    </div>
-
-  </div>
-</div>
-
-<!-- PRODUCT PAGE -->
-<div class="box" id="product">
-
-  <div class="title" id="gameTitle"></div>
-
-  <div class="card" onclick="selectPack('100 Diamonds')">
-    💎 100 Diamonds
   </div>
 
-  <div class="card" onclick="selectPack('310 Diamonds')">
-    💎 310 Diamonds
-  </div>
+  <div class="line"></div>
+  <p class="sub-text">Fast and secure top up service</p>
 
-  <div class="card" onclick="selectPack('520 Diamonds')">
-    💎 520 Diamonds
-  </div>
+  <!-- Firebase Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
-  <div class="card" onclick="selectPack('1060 Diamonds')">
-    💎 1060 Diamonds
-  </div>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+      authDomain: "gaule-top-up-center.firebaseapp.com",
+      projectId: "gaule-top-up-center",
+      storageBucket: "gaule-top-up-center.firebasestorage.app",
+      messagingSenderId: "645605489690",
+      appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+    };
 
-  <button onclick="order()">ORDER NOW</button>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const provider = new GoogleAuthProvider();
 
-  <div class="back" onclick="goBack()">← Back to Games</div>
+    let currentUser = null;
 
-</div>
+    window.googleLogin = () => {
+      signInWithPopup(auth, provider).then((result) => {
+        currentUser = result.user;
+        document.getElementById("login-btn").style.display = "none";
+        const pic = document.getElementById("profile-pic");
+        pic.src = currentUser.photoURL;
+        pic.style.display = "block";
+      }).catch((error) => console.error(error));
+    };
 
-<script>
-
-let selectedGame = "";
-let selectedPack = "";
-
-function openGame(game){
-  selectedGame = game;
-  document.getElementById("home").style.display="none";
-  document.getElementById("product").style.display="block";
-  document.getElementById("gameTitle").innerText = game + " Top Up";
-}
-
-function selectPack(pack){
-  selectedPack = pack;
-  alert("Selected: " + pack);
-}
-
-function order(){
-  if(!selectedPack){
-    alert("Please select a pack");
-    return;
-  }
-
-  alert(
-    "🔥 Order Successful!\n\nGame: " + selectedGame +
-    "\nPack: " + selectedPack
-  );
-}
-
-function goBack(){
-  document.getElementById("product").style.display="none";
-  document.getElementById("home").style.display="block";
-}
-
-</script>
-
+    window.showProfile = () => {
+      if (currentUser) {
+        alert("Name: " + currentUser.displayName + "\nEmail: " + currentUser.email);
+      }
+    };
+  </script>
 </body>
 </html>
