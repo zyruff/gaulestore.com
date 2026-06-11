@@ -1,283 +1,192 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GAULE STORE</title>
-    <style>
-        body { margin: 0; background: #0f0f1a; color: white; font-family: sans-serif; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 2px solid #2a2a40; }
-        .logo-text { font-size: 1.5rem; font-weight: bold; }
-        .red { color: #ff0055; }
-        .user-profile { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #00d4ff; cursor: pointer; }
-        .btn { border: 1px solid #ff0055; padding: 8px 20px; border-radius: 20px; cursor: pointer; background: transparent; color: white; }
-        
-        /* Dropdown Style */
-        .dropdown { position: relative; display: inline-block; }
-        .dropdown-content { display: none; position: absolute; right: 0; background-color: #1a1a2e; min-width: 200px; padding: 15px; border-radius: 10px; border: 1px solid #444; z-index: 1; }
-        .dropdown:hover .dropdown-content { display: block; }
-        
-        #page-container { padding: 20px; }
-        .order-card { background: #1a1a2e; padding: 15px; border-radius: 10px; margin-top: 10px; border: 1px solid #444; }
-    </style>
-</head>
-<body>
-
-    <header>
-        <div class="logo-text"><span class="red">GAULE</span> STORE</div>
-        <div id="auth-container">
-            <button class="btn" onclick="loginWithGoogle()">Login</button>
-        </div>
-    </header>
-
-    <div id="page-container"></div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-        import { getDatabase, ref, query, orderByChild, equalTo, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-            authDomain: "gaule-top-up-center.firebaseapp.com",
-            databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-            projectId: "gaule-top-up-center",
-            storageBucket: "gaule-top-up-center.firebasestorage.app",
-            messagingSenderId: "645605489690",
-            appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
-        const provider = new GoogleAuthProvider();
-
-        window.loginWithGoogle = () => signInWithPopup(auth, provider);
-        window.logout = () => signOut(auth).then(() => location.reload());
-
-        onAuthStateChanged(auth, (user) => {
-            const authContainer = document.getElementById('auth-container');
-            if (user) {
-                authContainer.innerHTML = `
-                    <div class="dropdown">
-                        <img src="${user.photoURL}" class="user-profile">
-                        <div class="dropdown-content">
-                            <p><b>${user.displayName}</b></p>
-                            <p style="font-size: 0.8rem; color: #aaa;">${user.email}</p>
-                            <hr style="border: 0.5px solid #444;">
-                            <p onclick="showMyOrders()" style="cursor:pointer; color:#00d4ff;">My Orders</p>
-                            <p onclick="logout()" style="cursor:pointer; color:#ff0055;">Logout</p>
-                        </div>
-                    </div>`;
-            } else {
-                authContainer.innerHTML = `<button class="btn" onclick="loginWithGoogle()">Login</button>`;
-            }
-        });
-
-        window.showMyOrders = () => {
-            const user = auth.currentUser;
-            const container = document.getElementById('page-container');
-            container.innerHTML = "<h3>My Order History</h3>";
-            
-            const ordersRef = query(ref(db, 'orders'), orderByChild('userId'), equalTo(user.uid));
-            get(ordersRef).then((snapshot) => {
-                if (snapshot.exists()) {
-                    snapshot.forEach((child) => {
-                        let data = child.val();
-                        container.innerHTML += `<div class="order-card">Item: ${data.item || 'N/A'} | Status: ${data.status}</div>`;
-                    });
-                } else {
-                    container.innerHTML += "<p>No orders found.</p>";
-                }
-            });
-        };
-    </script>
-
-<a href="product.html">
-    <img src="freefire.png" alt="Free Fire" width="120">
-</a><a href="product.html">
-    <img src="freefire.png">
-</a>
-<!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Product - Diamonds</title>
+  <title>GauLe Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<style>
-body{
-    font-family: Arial;
-    background:#111;
-    color:white;
-    text-align:center;
-}
+  <style>
+    body{
+      margin:0;
+      font-family:Arial;
+      background: linear-gradient(180deg,#070b18,#0b1220);
+      color:white;
+      text-align:center;
+    }
 
-h2{
-    margin-top:20px;
-}
+    .header{
+      background: linear-gradient(90deg,#ff0000,#ff8c00);
+      padding:18px;
+      font-size:22px;
+      font-weight:bold;
+      letter-spacing:1px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.4);
+    }
 
-.card{
-    background:#1e1e1e;
-    margin:10px;
-    padding:15px;
-    border-radius:10px;
-    cursor:pointer;
-    transition:0.2s;
-}
+    .subtitle{
+      margin-top:10px;
+      color:#aaa;
+      font-size:14px;
+    }
 
-.card:hover{
-    background:#333;
-}
+    /* GAME CARDS */
+    .games{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+      padding:15px;
+    }
 
-.price{
-    color:#00ff99;
-    font-weight:bold;
-}
-</style>
+    .game{
+      background: rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.1);
+      padding:25px;
+      border-radius:15px;
+      cursor:pointer;
+      transition:0.3s;
+      backdrop-filter: blur(6px);
+    }
+
+    .game:hover{
+      transform:scale(1.05);
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* PRODUCT PAGE */
+    .box{
+      display:none;
+      padding:15px;
+    }
+
+    .title{
+      font-size:20px;
+      margin:10px 0;
+      color:#ffcc00;
+    }
+
+    .card{
+      background: rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.1);
+      padding:15px;
+      margin:10px;
+      border-radius:12px;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    .card:hover{
+      background: rgba(255,255,255,0.15);
+      transform:scale(1.03);
+    }
+
+    button{
+      width:90%;
+      padding:12px;
+      margin-top:15px;
+      border:none;
+      border-radius:10px;
+      background: linear-gradient(90deg,#ff0000,#ff7b00);
+      color:white;
+      font-size:16px;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    button:hover{
+      transform:scale(1.05);
+    }
+
+    .back{
+      margin-top:10px;
+      color:#aaa;
+      cursor:pointer;
+      font-size:14px;
+    }
+  </style>
 </head>
 
-<a href="product.html">
-    <img src="freefire.png" alt="Free Fire" width="120">
-</a><a href="product.html">
-    <img src="freefire.png">
-</a>
 <body>
 
-<h2>💎 Free Fire Diamond List</h2>
+<div class="header">🔥 GAULE STORE</div>
+<div class="subtitle">Top Up Gaming Shop</div>
 
-<div class="card" onclick="buy(25,35)">
-25 Diamonds <div class="price">Rs. 35</div>
+<!-- GAME LIST -->
+<div id="home">
+
+  <h3>Select Your Game</h3>
+
+  <div class="games">
+
+    <div class="game" onclick="openGame('Free Fire')">
+      🔥 Free Fire
+    </div>
+
+    <div class="game" onclick="openGame('PUBG Mobile')">
+      🎮 PUBG Mobile
+    </div>
+
+  </div>
 </div>
 
-<div class="card" onclick="buy(50,70)">
-50 Diamonds <div class="price">Rs. 70</div>
-</div>
+<!-- PRODUCT PAGE -->
+<div class="box" id="product">
 
-<div class="card" onclick="buy(115,140)">
-115 Diamonds <div class="price">Rs. 140</div>
-</div>
+  <div class="title" id="gameTitle"></div>
 
-<div class="card" onclick="buy(240,280)">
-240 Diamonds <div class="price">Rs. 280</div>
-</div>
+  <div class="card" onclick="selectPack('100 Diamonds')">
+    💎 100 Diamonds
+  </div>
 
-<div class="card" onclick="buy(610,700)">
-610 Diamonds <div class="price">Rs. 700</div>
-</div>
+  <div class="card" onclick="selectPack('310 Diamonds')">
+    💎 310 Diamonds
+  </div>
 
-<div class="card" onclick="buy(1240,1400)">
-1240 Diamonds <div class="price">Rs. 1400</div>
+  <div class="card" onclick="selectPack('520 Diamonds')">
+    💎 520 Diamonds
+  </div>
+
+  <div class="card" onclick="selectPack('1060 Diamonds')">
+    💎 1060 Diamonds
+  </div>
+
+  <button onclick="order()">ORDER NOW</button>
+
+  <div class="back" onclick="goBack()">← Back to Games</div>
+
 </div>
 
 <script>
-function buy(diamond, price){
-    window.location.href = "order.html?diamond=" + diamond + "&price=" + price;
+
+let selectedGame = "";
+let selectedPack = "";
+
+function openGame(game){
+  selectedGame = game;
+  document.getElementById("home").style.display="none";
+  document.getElementById("product").style.display="block";
+  document.getElementById("gameTitle").innerText = game + " Top Up";
 }
-</script>
 
-</body>
-</html>
+function selectPack(pack){
+  selectedPack = pack;
+  alert("Selected: " + pack);
+}
 
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Admin Panel - TopUp</title>
-</head>
-<body>
-
-<h2>🔥 Admin Panel</h2>
-
-<div id="status">Loading...</div>
-<div id="orders"></div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-// 🔥 Firebase Config
-const firebaseConfig = {
-  apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-  authDomain: "gaule-top-up-center.firebaseapp.com",
-  databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-  projectId: "gaule-top-up-center",
-  storageBucket: "gaule-top-up-center.firebasestorage.app",
-  messagingSenderId: "645605489690",
-  appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
-
-// 🔐 Login function (Google)
-window.login = function () {
-  const provider = new GoogleAuthProvider();
-  signInWithPopup(auth, provider);
-};
-
-// 🔐 Auth check
-onAuthStateChanged(auth, (user) => {
-
-  if (!user) {
-    document.getElementById("status").innerHTML = `
-      <button onclick="login()">Login with Google</button>
-    `;
+function order(){
+  if(!selectedPack){
+    alert("Please select a pack");
     return;
   }
 
-  // 🚫 Only admin allowed
-  if (user.email !== "ffzyru@gmail.com") {
-    document.body.innerHTML = "<h2>Access Denied ❌</h2>";
-    return;
-  }
-
-  document.getElementById("status").innerHTML = "Welcome Admin ✔";
-
-  loadOrders();
-});
-
-// 📦 Load Orders
-function loadOrders() {
-  const ordersRef = ref(db, "orders");
-
-  onValue(ordersRef, (snapshot) => {
-
-    let html = "";
-
-    snapshot.forEach((child) => {
-
-      const data = child.val();
-      const id = child.key;
-
-      html += `
-        <div style="border:1px solid #000;padding:10px;margin:10px;">
-          <p><b>UID:</b> ${data.uid}</p>
-          <p><b>Diamond:</b> ${data.diamond}</p>
-          <p><b>Status:</b> ${data.status}</p>
-
-          <button onclick="completeOrder('${id}')">✔ Complete</button>
-          <button onclick="deleteOrder('${id}')">❌ Delete</button>
-        </div>
-      `;
-    });
-
-    document.getElementById("orders").innerHTML = html;
-  });
+  alert(
+    "🔥 Order Successful!\n\nGame: " + selectedGame +
+    "\nPack: " + selectedPack
+  );
 }
 
-// ✔ Complete order
-window.completeOrder = function(id){
-  update(ref(db, "orders/" + id), {
-    status: "Completed"
-  });
-};
-
-// ❌ Delete order
-window.deleteOrder = function(id){
-  remove(ref(db, "orders/" + id));
-};
+function goBack(){
+  document.getElementById("product").style.display="none";
+  document.getElementById("home").style.display="block";
+}
 
 </script>
 
