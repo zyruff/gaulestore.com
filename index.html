@@ -113,7 +113,10 @@
                     const game = data.gameName || "Unknown";
                     const amount = data.amount || "N/A";
                     const status = data.status || "Pending";
-                    const statusColor = (status.toLowerCase() === 'completed' || status.toLowerCase() === 'complete') ? 'green' : '#eab308';
+                    
+                    // Status रङ: Complete हरियो, Rejected रातो, अरू पहेँलो
+                    const statusColor = (status.toLowerCase() === 'completed' || status.toLowerCase() === 'complete') ? 'green' : 
+                                        (status.toLowerCase() === 'rejected') ? 'red' : '#eab308';
                     
                     area.innerHTML += `
                         <div class="order-card">
@@ -140,6 +143,7 @@
 </script>
 </body>
 </html>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
