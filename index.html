@@ -142,186 +142,47 @@
     });
 </script>
 </body>
-</html>
-<div style="max-width: 400px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-    <h3>Free Fire Top-Up</h3>
-    <input type="text" id="playerId" placeholder="Enter Player ID" style="width: 100%; padding: 10px; margin-bottom: 10px;">
-    <select id="amount" style="width: 100%; padding: 10px; margin-bottom: 10px;">
+
+<div class="box">
+    <h2>Diamond Order Form</h2>
+    <!-- Name ra Email ko input hataiyeko cha -->
+    <input type="text" id="playerId" placeholder="Enter Free Fire Player ID" required>
+    
+    <select id="amount">
         <option value="115 Diamonds">115 Diamonds</option>
-        <option value="240 Diamonds">240 Diamonds</option>
+        <option value="230 Diamonds">230 Diamonds</option>
     </select>
     
-    <button id="orderBtn" style="width: 100%; padding: 12px; background: #dc2626; color: white; border: none; cursor: pointer;">PLACE ORDER</button>
+    <button onclick="submitOrder()">Submit Order</button>
 </div>
 
 <script type="module">
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    const auth = getAuth();
     const db = getDatabase();
-    const provider = new GoogleAuthProvider();
+    const auth = getAuth();
 
-    document.getElementById("orderBtn").onclick = async () => {
+    window.submitOrder = () => {
         const user = auth.currentUser;
+        if (!user) { alert("Please login first!"); return; }
 
-        // १. यदि युजर लगइन छैन भने
-        if (!user) {
-            alert("Please login first to place an order!");
-            try {
-                await signInWithPopup(auth, provider);
-                alert("Login Successful! Now you can order.");
-            } catch (error) {
-                console.error("Login failed", error);
-            }
-            return; // अर्डर हुन दिँदैन
-        }
+        // Firebase Authentication bata auto data line
+        const orderData = {
+            userId: user.uid,
+            name: user.displayName || "Anonymous", // Auth bata name
+            email: user.email || "No Email",       // Auth bata email
+            playerId: document.getElementById("playerId").value,
+            amount: document.getElementById("amount").value,
+            status: "Pending" // Database ma status automatic Pending huncha
+        };
 
-        // २. यदि युजर लगइन छ भने अर्डर सबमिट गर्ने
-        const pid = document.getElementById("playerId").value;
-        const amt = document.getElementById("amount").value;
-
-        if(!pid) { alert("Please enter Player ID"); return; }
-
-        push(ref(db, 'orders'), {
-            name: user.displayName,
-            email: user.email,
-            playerId: pid,
-            amount: amt,
-            status: "Pending"
-        }).then(() => {
-            alert("Order Submitted!");
-            document.getElementById("playerId").value = "";
+        const newOrderRef = push(ref(db, 'orders'));
+        set(newOrderRef, orderData).then(() => {
+            alert("Order Submitted Successfully!");
+            document.getElementById("playerId").value = ""; // Form clear garne
+        }).catch((error) => {
+            alert("Error: " + error.message);
         });
     };
 </script>
-
-
-
-<div style="max-width: 400px; margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 10px; background: #fff;">
-    <h3 style="text-align: center; color: #dc2626; margin-top: 0;">Live Order Status</h3>
-    <div id="live-status-list">Loading...</div>
-</div>
-
-<script type="module">
-    import { getDatabase, ref, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-    
-    const db = getDatabase();
-    const ordersRef = query(ref(db, 'orders'), limitToLast(10));
-
-    onValue(ordersRef, (snapshot) => {
-        const listDiv = document.getElementById("live-status-list");
-        listDiv.innerHTML = ""; 
-
-        if (snapshot.exists()) {
-            const orders = [];
-            snapshot.forEach((s) => { orders.push(s.val()); });
-            
-            orders.reverse().forEach((data) => {
-                const name = data.name || "Unknown";
-                const amount = data.amount || "N/A";
-                const status = (data.status || "Pending").toUpperCase();
-                
-                let color = '#eab308'; // पहेँलो (Pending)
-                if (status === 'COMPLETED' || status === 'COMPLETE') color = 'green';
-                else if (status === 'REJECTED') color = 'red';
-
-                listDiv.innerHTML += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 13px;">
-                        <div style="width: 40%; font-weight: bold;">${name}</div>
-                        <div style="width: 30%; color: #555;">${amount}</div>
-                        <div style="width: 30%; text-align: right; font-weight: bold; color: ${color};">${status}</div>
-                    </div>
-                `;
-            });
-        } else {
-            listDiv.innerHTML = "<p style='text-align:center;'>No orders yet.</p>";
-        }
-    });
-</script>
-<!DOCTYPE html>
-<html lang="ne">
-<head>
-    <meta charset="UTF-8">
-    <title>Gaule Store - Order System</title>
-</head>
-<body>
-
-    <div style="max-width: 400px; margin: 20px auto; padding: 20px; border: 1px solid #ccc;">
-        <h3>Free Fire Diamond Order</h3>
-        <input type="text" id="playerId" placeholder="Player ID" style="width: 100%; margin-bottom: 10px;">
-        <select id="amount" style="width: 100%; margin-bottom: 10px;">
-            <option value="115 Diamonds">115 Diamonds</option>
-            <option value="240 Diamonds">240 Diamonds</option>
-        </select>
-        <button id="orderBtn" style="width: 100%; padding: 10px; background: red; color: white;">ORDER NOW</button>
-    </div>
-
-    <div style="max-width: 400px; margin: 20px auto; padding: 20px; border: 1px solid #ccc;">
-        <h3>My Order History</h3>
-        <div id="my-orders-list">लगइन गर्नुहोस्...</div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-            authDomain: "gaule-top-up-center.firebaseapp.com",
-            databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-            projectId: "gaule-top-up-center",
-            storageBucket: "gaule-top-up-center.firebasestorage.app",
-            messagingSenderId: "645605489690",
-            appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
-        const provider = new GoogleAuthProvider();
-
-        // अर्डर गर्ने काम
-        document.getElementById("orderBtn").onclick = async () => {
-            let user = auth.currentUser;
-            if (!user) {
-                await signInWithPopup(auth, provider);
-                user = auth.currentUser;
-            }
-            if (user) {
-                push(ref(db, 'orders'), {
-                    email: user.email,
-                    playerId: document.getElementById("playerId").value,
-                    amount: document.getElementById("amount").value,
-                    status: "Pending"
-                }).then(() => alert("अर्डर सफल भयो!"));
-            }
-        };
-
-        // अर्डर हिस्ट्री तान्ने काम
-        onAuthStateChanged(auth, (user) => {
-            const listDiv = document.getElementById("my-orders-list");
-            if (user) {
-                const ordersRef = ref(db, 'orders');
-                onValue(ordersRef, (snapshot) => {
-                    listDiv.innerHTML = "";
-                    let found = false;
-                    snapshot.forEach((child) => {
-                        const d = child.val();
-                        if (d.email === user.email) {
-                            found = true;
-                            listDiv.innerHTML += `<div style="border-bottom:1px solid #ccc; padding:5px;">
-                                ID: ${d.playerId} | Status: <b>${d.status}</b>
-                            </div>`;
-                        }
-                    });
-                    if (!found) listDiv.innerHTML = "अर्डर भेटिएन।";
-                });
-            } else {
-                listDiv.innerHTML = "लगइन गर्नुहोस्।";
-            }
-        });
-    </script>
-</body>
-</html>
