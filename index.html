@@ -17,8 +17,13 @@
         
         .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
         #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; }
-        /* प्रोफाइल क्लिक गर्दा आउने लगआउट बटन */
-        #logout-btn { display: none; position: absolute; top: 45px; right: 0; background: #dc2626; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; }
+        
+        /* प्रोफाइल ड्रपडाउन */
+        #profile-dropdown { display: none; position: absolute; top: 50px; right: 0; background: white; border: 1px solid #ccc; padding: 15px; width: 200px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); border-radius: 8px; text-align: center; z-index: 1000; }
+        .user-name { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+        .user-email { font-size: 12px; color: #666; margin-bottom: 10px; }
+        .change-name { font-size: 11px; color: #dc2626; text-decoration: none; display: block; margin-bottom: 15px; }
+        .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 100%; cursor: pointer; border-radius: 4px; }
         
         #nav-menu a { display: block; padding: 12px 0; color: black; text-decoration: none; border-bottom: 1px solid #eee; }
         .order-card { background: white; border-left: 5px solid #dc2626; padding: 15px; margin-bottom: 10px; border-radius: 5px; box-shadow: 0 2px 5px #ddd; }
@@ -36,8 +41,15 @@
         <div id="login-container" onclick="googleLogin()">
             <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
-        <img id="profile-pic" onclick="toggleLogout()">
-        <button id="logout-btn" onclick="logoutUser()">Logout</button>
+        <img id="profile-pic" onclick="toggleProfile()">
+        
+        <!-- प्रोफाइल ड्रपडाउन -->
+        <div id="profile-dropdown">
+            <div id="display-name" class="user-name"></div>
+            <div id="display-email" class="user-email"></div>
+            <a href="https://myaccount.google.com/personal-info" target="_blank" class="change-name">Change Name</a>
+            <button class="logout-btn" onclick="logoutUser()">Logout</button>
+        </div>
     </div>
 </div>
 
@@ -80,8 +92,7 @@
     const provider = new GoogleAuthProvider();
 
     window.toggleMenu = () => { const m = document.getElementById("nav-menu"); m.style.display = (m.style.display === "block") ? "none" : "block"; };
-    // प्रोफाइल क्लिक गर्दा लगआउट बटन देखाउने/लुकाउने
-    window.toggleLogout = () => { const b = document.getElementById("logout-btn"); b.style.display = (b.style.display === "block") ? "none" : "block"; };
+    window.toggleProfile = () => { const d = document.getElementById("profile-dropdown"); d.style.display = (d.style.display === "block") ? "none" : "block"; };
     
     window.googleLogin = () => signInWithPopup(auth, provider);
     window.logoutUser = () => signOut(auth).then(() => location.reload());
@@ -115,6 +126,8 @@
             document.getElementById("login-container").style.display = "none";
             document.getElementById("profile-pic").style.display = "block";
             document.getElementById("profile-pic").src = user.photoURL;
+            document.getElementById("display-name").innerText = user.displayName;
+            document.getElementById("display-email").innerText = user.email;
         }
     });
 </script>
