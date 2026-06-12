@@ -134,82 +134,43 @@
     });
 </script>
 </body>
-</html>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaule Store - Shop</title>
-    <style>
-        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
-        .box { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px #ddd; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #dc2626; color: white; border: none; cursor: pointer; border-radius: 5px; font-weight: bold; }
-        h2 { text-align: center; color: #333; }
-    </style>
-</head>
-<body>
-
-<div class="box">
-    <h2>Select Product</h2>
-    <input type="text" id="playerId" placeholder="Enter Player ID" required>
-    
-    <select id="amount">
-        <option value="115 Diamonds">115 Diamonds</option>
-        <option value="230 Diamonds">230 Diamonds</option>
-        <option value="500 Diamonds">500 Diamonds</option>
-        <option value="Weekly Membership">Weekly Membership</option>
-    </select>
-    
-    <button onclick="submitOrder()">Submit Order</button>
-    <a href="index.html" style="display:block; text-align:center; margin-top:15px; color:#dc2626; text-decoration:none;">Go Back to Home</a>
+<!-- Green Theme Instant Delivery Banner (Moved Up) -->
+<div style="text-align: center; padding: 15px; margin-top: -50px;">
+    <p style="margin: 0; color: rgb(21, 128, 61); font-size: 6px; font-weight: bold; border: 1px solid rgb(187, 247, 208); background: rgb(220, 252, 231); display: inline-block; padding: 6px 15px; border-radius: 20px;">
+        ⚡ Instant Delivery 
+    </p>
+<div style="position: relative; margin-top: -0px; margin-left: -250px; display: inline-block;">
+    <span style="background: #dcfce7; color: #166534; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px;">
+        <span style="animation: blink-animation 1.5s infinite;">●</span> Online
+    </span>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-    import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+<style>
+    @keyframes blink-animation {
+        0% { opacity: 1; }
+        50% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+</style>
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-        authDomain: "gaule-top-up-center.firebaseapp.com",
-        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-        projectId: "gaule-top-up-center",
-        storageBucket: "gaule-top-up-center.firebasestorage.app",
-        messagingSenderId: "645605489690",
-        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-    };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
+</div>
 
-    window.submitOrder = () => {
-        const user = auth.currentUser;
-        if (!user) { alert("Please login first!"); return; }
+<div style="text-align: center; font-family: sans-serif; padding: 20px; margin-top: -50px;">
+    
+    <!-- Unique Header Text -->
+    <h2 style="color: #1f2937; margin-bottom: 5px; letter-spacing: 1px;">
+         GAMING TOP-UP STORE
+<div style="display: flex; align-items: center; justify-content: center; gap: 8px; font-family: sans-serif; font-size: 10px; font-weight: 600; color: #6b7280; width: 100%;">
+    <svg width="20" height="15" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        <path d="M9 12l2 2 4-4"></path>
+    </svg>
+    FAST & SECURE DELIVERY GUARENTEED
+</div>
 
-        const pId = document.getElementById("playerId").value;
-        if(!pId) { alert("Please enter Player ID"); return; }
 
-        const orderData = {
-            userId: user.uid,
-            name: user.displayName || "User",
-            email: user.email || "No Email",
-            playerId: pId,
-            amount: document.getElementById("amount").value,
-            status: "Pending",
-            timestamp: Date.now()
-        };
-
-        push(ref(db, 'orders'), orderData).then(() => {
-            alert("Order Submitted Successfully!");
-            document.getElementById("playerId").value = "";
-        }).catch((error) => {
-            alert("Error: " + error.message);
-        });
-    };
-</script>
-</body>
-</html>
+    </p>
+<div style="height: 1px; width: 1
+200px; background-color: #d1d5db; margin: 15px auto;"></div>
