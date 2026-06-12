@@ -100,11 +100,17 @@
             let orderArray = [];
             snapshot.forEach((s) => { orderArray.push(s.val()); });
             
-            orderArray.reverse(); // पछिको अर्डर माथि ल्याउन
+            orderArray.reverse(); 
 
             if (orderArray.length > 0) {
                 orderArray.forEach((o) => {
-                    const statusColor = (o.status === 'Complete') ? 'green' : '#eab308';
+                    let statusColor = '#eab308'; // Default: Pending (Yellow)
+                    if (o.status === 'Complete') {
+                        statusColor = 'green';
+                    } else if (o.status === 'Rejected') {
+                        statusColor = 'red';
+                    }
+
                     area.innerHTML += `
                         <div class="order-card">
                             <p style="font-size: 14px; margin: 3px 0;">Game: <b>${o.amount || "N/A"}</b></p>
@@ -129,6 +135,7 @@
 </script>
 </body>
 </html>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
