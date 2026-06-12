@@ -240,40 +240,41 @@
     });
 </script>
 <!DOCTYPE html>
-<html>
+<html lang="ne">
 <head>
-    <title>Free Fire Top-Up</title>
+    <meta charset="UTF-8">
+    <title>Gaule Store - Order System</title>
 </head>
 <body>
 
-    <div style="max-width: 400px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px;">
+    <div style="max-width: 400px; margin: 20px auto; padding: 20px; border: 1px solid #ccc;">
         <h3>Free Fire Diamond Order</h3>
-        
-        <input type="text" id="playerId" placeholder="Player ID" style="width: 100%; padding: 10px; margin-bottom: 10px;">
-        
-        <select id="amount" style="width: 100%; padding: 10px; margin-bottom: 10px;">
+        <input type="text" id="playerId" placeholder="Player ID" style="width: 100%; margin-bottom: 10px;">
+        <select id="amount" style="width: 100%; margin-bottom: 10px;">
             <option value="115 Diamonds">115 Diamonds</option>
             <option value="240 Diamonds">240 Diamonds</option>
-            <option value="580 Diamonds">580 Diamonds</option>
         </select>
+        <button id="orderBtn" style="width: 100%; padding: 10px; background: red; color: white;">ORDER NOW</button>
+    </div>
 
-        <button id="orderBtn" style="width: 100%; padding: 10px; background: red; color: white; border: none; cursor: pointer;">ORDER NOW</button>
+    <div style="max-width: 400px; margin: 20px auto; padding: 20px; border: 1px solid #ccc;">
+        <h3>My Order History</h3>
+        <div id="my-orders-list">लगइन गर्नुहोस्...</div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-        // तपाईंको कन्फिगरेसन
         const firebaseConfig = {
-          apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-          authDomain: "gaule-top-up-center.firebaseapp.com",
-          databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-          projectId: "gaule-top-up-center",
-          storageBucket: "gaule-top-up-center.firebasestorage.app",
-          messagingSenderId: "645605489690",
-          appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+            apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+            authDomain: "gaule-top-up-center.firebaseapp.com",
+            databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+            projectId: "gaule-top-up-center",
+            storageBucket: "gaule-top-up-center.firebasestorage.app",
+            messagingSenderId: "645605489690",
+            appId: "1:645605489690:web:10e333176acd07eec1e5a3"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -281,32 +282,46 @@
         const db = getDatabase(app);
         const provider = new GoogleAuthProvider();
 
+        // अर्डर गर्ने काम
         document.getElementById("orderBtn").onclick = async () => {
             let user = auth.currentUser;
-
-            // १. यदि लगइन छैन भने Google लगइन गराउने
             if (!user) {
-                try {
-                    const result = await signInWithPopup(auth, provider);
-                    user = result.user;
-                } catch (error) {
-                    alert("लगइन गर्न आवश्यक छ!");
-                    return;
-                }
+                await signInWithPopup(auth, provider);
+                user = auth.currentUser;
             }
-
-            // २. डेटाबेसको 'orders' मा पठाउने
-            push(ref(db, 'orders'), {
-                email: user.email, // यही इमेलले गर्दा "My Order" मा मिल्छ
-                playerId: document.getElementById("playerId").value,
-                amount: document.getElementById("amount").value,
-                status: "Pending",
-                timestamp: Date.now()
-            }).then(() => {
-                alert("अर्डर सफल भयो!");
-            });
+            if (user) {
+                push(ref(db, 'orders'), {
+                    email: user.email,
+                    playerId: document.getElementById("playerId").value,
+                    amount: document.getElementById("amount").value,
+                    status: "Pending"
+                }).then(() => alert("अर्डर सफल भयो!"));
+            }
         };
+
+        // अर्डर हिस्ट्री तान्ने काम
+        onAuthStateChanged(auth, (user) => {
+            const listDiv = document.getElementById("my-orders-list");
+            if (user) {
+                const ordersRef = ref(db, 'orders');
+                onValue(ordersRef, (snapshot) => {
+                    listDiv.innerHTML = "";
+                    let found = false;
+                    snapshot.forEach((child) => {
+                        const d = child.val();
+                        if (d.email === user.email) {
+                            found = true;
+                            listDiv.innerHTML += `<div style="border-bottom:1px solid #ccc; padding:5px;">
+                                ID: ${d.playerId} | Status: <b>${d.status}</b>
+                            </div>`;
+                        }
+                    });
+                    if (!found) listDiv.innerHTML = "अर्डर भेटिएन।";
+                });
+            } else {
+                listDiv.innerHTML = "लगइन गर्नुहोस्।";
+            }
+        });
     </script>
 </body>
 </html>
-
