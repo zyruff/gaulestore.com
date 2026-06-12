@@ -53,7 +53,116 @@
     <div class="title-wrapper">
       <h1>GAULE <span class="store-text">STORE</span></h1>
     </div>
-    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gaule Top-Up</title>
+    <style>
+        .menu-container { 
+            position: fixed; 
+            top: 3px; 
+            left: 5px; 
+            z-index: 1000; 
+        }
+        
+        .menu-icon { 
+            font-size: 30px; 
+            cursor: pointer; 
+            padding: 10px; 
+        }
+        
+        #nav-menu { 
+            display: none; 
+            position: absolute; 
+            top: 50px; 
+            left: 0;   
+            background: #fff; 
+            border: 1px solid #ccc; 
+            padding: 15px; 
+            width: 220px; 
+            box-shadow: 2px 2px 5px #ccc; 
+            z-index: 1000; 
+        }
+        
+        /* Search box style */
+        .search-box { display: flex; gap: 5px; margin-bottom: 15px; }
+        #gameSearch { width: 120px; padding: 8px; border: 1px solid #ccc; }
+        .search-btn { padding: 8px 10px; background-color: #ff4757; color: white; border: none; cursor: pointer; }
+        
+        /* Links style */
+        #nav-menu a { 
+            display: block; 
+            padding: 10px 0; 
+            color: black; 
+            text-decoration: none; 
+            font-size: 16px; 
+            border-bottom: 1px solid #eee; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu-container">
+        <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+        
+        <div id="nav-menu">
+            <!-- Close icon -->
+            <span onclick="toggleMenu()" style="cursor:pointer; float:right; font-size:24px; font-weight:bold;">&times;</span>
+            
+            <!-- Search bar -->
+            <div class="search-box">
+                <input type="text" id="gameSearch" placeholder="Search...">
+                <button class="search-btn" onclick="performSearch()">Search</button>
+            </div>
+
+            <!-- Links -->
+            <a href="index.html">Home</a>
+            <a href="shop.html">Shop</a>
+            <a href="contact.html">Contact Us</a>
+            
+            <div id="my-orders-link" style="display:none;">
+                <a href="my-orders.html">My Orders</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+            authDomain: "gaule-top-up-center.firebaseapp.com",
+            databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+            projectId: "gaule-top-up-center",
+            storageBucket: "gaule-top-up-center.firebasestorage.app",
+            messagingSenderId: "645605489690",
+            appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+        };
+
+        initializeApp(firebaseConfig);
+        const auth = getAuth();
+
+        window.toggleMenu = function() {
+            var menu = document.getElementById("nav-menu");
+            menu.style.display = (menu.style.display === "block") ? "none" : "block";
+        };
+
+        window.performSearch = function() {
+            let query = document.getElementById("gameSearch").value;
+            if(query) alert("Searching: " + query);
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            const orderLink = document.getElementById('my-orders-link');
+            if (user) orderLink.style.display = 'block';
+            else orderLink.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
+
     <div class="profile-wrapper">
       <div id="login-btn" class="login-icon" onclick="googleLogin()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -71,7 +180,7 @@
         </div>
         <div class="menu-item" onclick="window.location.reload()">🏠 Home</div>
         <div class="menu-item" onclick="window.open('https://wa.me/9761081110', '_blank')">💬 Contact: 9761081110</div>
-        <div class="menu-item" onclick="logoutUser()" style="color:red;">🚪 Logout</div>
+        <div class="menu-item" onclick="logoutUser()" style="color:red;"> Logout</div>
       </div>
     </div>
   </div>
@@ -114,118 +223,16 @@
   </script>
 </body>
 </html>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Admin Panel</title>
-
-<style>
-body{
-background:#111;
-color:white;
-font-family:Arial;
-padding:20px;
-}
-
-h1{
-text-align:center;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:20px;
-}
-
-th,td{
-border:1px solid #444;
-padding:10px;
-text-align:center;
-}
-
-button{
-padding:8px 12px;
-border:none;
-cursor:pointer;
-margin:2px;
-border-radius:5px;
-}
-
-.complete{
-background:green;
-color:white;
-}
-
-.delete{
-background:red;
-color:white;
-}
-</style>
-
-</head>
-<body>
-
-
-<h2>Free Fire Diamond Order</h2>
-
-<input type="text" id="uid" placeholder="Free Fire UID">
-
-<select id="product">
-<option>25 Diamond</option>
-<option>50 Diamond</option>
-<option>115 Diamond</option>
-<option>240 Diamond</option>
-<option>610 Diamond</option>
-</select>
-
-<button onclick="placeOrder()">Order Now</button>
-
 <script type="module">
+import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+const db = getDatabase();
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-  authDomain: "gaule-top-up-center.firebaseapp.com",
-  databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-  projectId: "gaule-top-up-center",
-  storageBucket: "gaule-top-up-center.firebasestorage.app",
-  messagingSenderId: "645605489690",
-  appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+window.complete = (id) => {
+update(ref(db,"orders/"+id), { status:"Completed" });
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const auth = getAuth(app);
-
-window.placeOrder = async () => {
-
-const user = auth.currentUser;
-
-if(!user){
-alert("Please Login First");
-return;
-}
-
-const uid = document.getElementById("uid").value;
-const product = document.getElementById("product").value;
-
-await push(ref(db,"orders"),{
-uid: uid,
-product: product,
-email: user.email,
-userId: user.uid,
-status: "Pending",
-time: Date.now()
-});
-
-alert("Order Submitted Successfully");
+window.reject = (id) => {
+update(ref(db,"orders/"+id), { status:"Rejected" });
 };
-
 </script>
-
-</body>
-</html>
