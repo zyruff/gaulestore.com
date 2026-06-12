@@ -158,8 +158,22 @@
 </head>
 <body>
 
+<<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <title>Gaule Store - Shop</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 400px; margin: auto; }
+        .box { border: 1px solid #ddd; padding: 20px; border-radius: 10px; background: #fff; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #dc2626; color: white; border: none; cursor: pointer; border-radius: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
 <div class="box">
-    <h2>Diamond Order Form</h2>
+    <h2>Diamond Top-Up</h2>
     <input type="text" id="playerId" placeholder="Enter Free Fire Player ID" required>
     
     <select id="amount">
@@ -171,12 +185,10 @@
     <button onclick="submitOrder()">Submit Order</button>
 </div>
 
-<div id="order-list"></div>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, push, set, query, orderByChild, equalTo, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
@@ -192,55 +204,28 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
 
-    // Order Submit गर्ने
     window.submitOrder = () => {
         const user = auth.currentUser;
         if (!user) { alert("Please login first!"); return; }
+
+        const pId = document.getElementById("playerId").value;
+        if(!pId) { alert("Player ID हाल्नुहोस्!"); return; }
 
         const orderData = {
             userId: user.uid,
             name: user.displayName || "Anonymous",
             email: user.email || "No Email",
-            playerId: document.getElementById("playerId").value,
-            amount: document.getElementById("amount").value, // यो नै डेटाबेसमा 'amount' बन्छ
+            playerId: pId,
+            amount: document.getElementById("amount").value,
             status: "Pending",
             timestamp: Date.now()
         };
 
-        if(!orderData.playerId) { alert("Player ID हाल्नुहोस्!"); return; }
-
         push(ref(db, 'orders'), orderData).then(() => {
-            alert("Order Successfully Submitted!");
+            alert("Order Submitted Successfully!");
             document.getElementById("playerId").value = "";
-        });
+        }).catch((e) => alert(e.message));
     };
-
-    // Orders लोड गर्ने
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            const list = document.getElementById("order-list");
-            const ordersRef = query(ref(db, 'orders'), orderByChild('userId'), equalTo(user.uid));
-            
-            onValue(ordersRef, (snapshot) => {
-                list.innerHTML = "<h3>My Orders</h3>";
-                let orders = [];
-                snapshot.forEach((s) => { 
-                    orders.push(s.val()); 
-                });
-
-                // नयाँ अर्डर माथि देखाउन reverse गर्ने
-                orders.reverse().forEach((o) => {
-                    const color = (o.status === 'Complete') ? 'green' : '#eab308';
-                    list.innerHTML += `
-                        <div class="order-card">
-                            <p>Game: <b>${o.amount}</b></p>
-                            <p>Player ID: <b>${o.playerId}</b></p>
-                            <p>Status: <b style="color:${color}">${o.status}</b></p>
-                        </div>`;
-                });
-            });
-        }
-    });
 </script>
 </body>
 </html>
