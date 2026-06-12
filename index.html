@@ -5,19 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gaule Store</title>
     <style>
-        body { font-family: sans-serif; margin: 0; }
-        .header { display: flex; align-items: center; padding: 15px; border-bottom: 2px solid #dc2626; justify-content: space-between; }
+        body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; }
+        .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #dc2626; justify-content: space-between; }
         .menu-icon { font-size: 28px; cursor: pointer; }
-        #nav-menu { display: none; position: absolute; top: 60px; left: 0; background: #fff; border: 3px solid #ccc; padding: 20px; width: 220px; z-index: 1000; box-shadow: 2px 2px 10px #ccc; }
-        .search-box { display: flex; gap: 5px; margin-bottom: 15px; }
-        #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; }
-        .search-btn { padding: 8px; background-color: #dc2626; color: white; border: none; cursor: pointer; }
-        .close-btn { float: right; font-size: 24px; cursor: pointer; font-weight: bold; }
+        #nav-menu { display: none; position: absolute; top: 0; left: 0; background: #fff; border: 1px solid #ccc; padding: 20px; width: 250px; height: 100%; z-index: 1000; box-shadow: 2px 2px 10px #ccc; }
+        
+        .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-btn { font-size: 30px; cursor: pointer; color: #dc2626; }
+        .search-box { display: flex; gap: 5px; margin-bottom: 20px; }
+        #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        
+        .profile-section { background: #eee; padding: 10px; margin-bottom: 15px; border-radius: 5px; text-align: center; }
+        .user-name { font-weight: bold; font-size: 14px; }
+        .user-email { font-size: 12px; color: #555; margin-bottom: 10px; }
+        .logout-btn { background: #dc2626; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 4px; }
+        
         #nav-menu a { display: block; padding: 12px 0; color: black; text-decoration: none; border-bottom: 1px solid #eee; }
+        .order-card { background: white; border-left: 5px solid #dc2626; padding: 15px; margin-bottom: 10px; border-radius: 5px; box-shadow: 0 2px 5px #ddd; }
         .store-title { font-size: 1.5rem; font-weight: bold; }
         .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
         #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; }
-        .order-card { border: 1px solid #eee; padding: 10px; margin-top: 10px; border-radius: 5px; background: #f9f9f9; }
     </style>
 </head>
 <body>
@@ -25,34 +32,39 @@
 <div class="header">
     <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
     <div class="store-title">GAULE <span style="color:#dc2626;">STORE</span></div>
-    
     <div id="login-container" onclick="googleLogin()">
         <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
     </div>
-    <img id="profile-pic" onclick="location.reload()">
+    <img id="profile-pic" onclick="toggleMenu()">
 </div>
 
 <div id="nav-menu">
-    <span class="close-btn" onclick="toggleMenu()">&times;</span>
+    <div class="menu-header">
+        <span style="font-weight:bold;">Menu</span>
+        <span class="close-btn" onclick="toggleMenu()">&times;</span>
+    </div>
+    
     <div class="search-box">
-        <input type="text" id="gameSearch" placeholder="Search...">
-        <button class="search-btn" onclick="performSearch()">🔍</button>
+        <input type="text" id="gameSearch" placeholder="Search games...">
     </div>
+
+    <div id="user-profile" class="profile-section" style="display:none;">
+        <div id="display-name" class="user-name"></div>
+        <div id="display-email" class="user-email"></div>
+        <button class="logout-btn" onclick="logoutUser()">Logout</button>
+    </div>
+    
     <a href="index.html">Home</a>
-    <div id="my-orders-link" style="display:none;">
-        <a href="#" onclick="showOrders()">My Orders</a>
-    </div>
+    <div id="my-orders-link" style="display:none;"><a href="#" onclick="showOrders()">My Orders</a></div>
     <a href="shop.html">Shop</a>
-    <a href="contact.html">Contact Us</a>
+    <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
 </div>
 
-<div id="content-area" style="padding: 20px;">
-    <!-- यहाँ अर्डर वा अन्य कन्टेन्ट देखिन्छ -->
-</div>
+<div id="content-area" style="padding: 20px;"></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getDatabase, ref, query, orderByChild, equalTo, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
@@ -70,25 +82,30 @@
     const db = getDatabase(app);
     const provider = new GoogleAuthProvider();
 
-    window.toggleMenu = () => { document.getElementById("nav-menu").style.display = (document.getElementById("nav-menu").style.display === "block") ? "none" : "block"; };
+    window.toggleMenu = () => { const m = document.getElementById("nav-menu"); m.style.display = (m.style.display === "block") ? "none" : "block"; };
     window.googleLogin = () => signInWithPopup(auth, provider);
-    window.performSearch = () => alert("Searching: " + document.getElementById("gameSearch").value);
+    window.logoutUser = () => signOut(auth).then(() => location.reload());
 
-    // My Orders Logic (युजरको आफ्नो अर्डर मात्र देखाउने)
     window.showOrders = () => {
         toggleMenu();
         const user = auth.currentUser;
         if (!user) return;
         
         const area = document.getElementById("content-area");
-        area.innerHTML = `<h2>My Orders</h2><p>Logged in as: <b>${user.email}</b></p>`;
+        area.innerHTML = `<h2>My Orders</h2>`;
         
         const ordersRef = query(ref(db, 'orders'), orderByChild('userId'), equalTo(user.uid));
         onValue(ordersRef, (snapshot) => {
+            area.innerHTML = `<h2>My Orders</h2>`;
             if (snapshot.exists()) {
                 snapshot.forEach((s) => {
                     const data = s.val();
-                    area.innerHTML += `<div class="order-card">Game: ${data.gameName} <br> Status: <b>${data.status}</b></div>`;
+                    area.innerHTML += `
+                        <div class="order-card">
+                            <p>Game: <b>${data.gameName}</b></p>
+                            <p>Amount: <b>${data.amount || 'N/A'}</b></p>
+                            <p>Status: <b style="color:${data.status === 'Completed' ? 'green' : 'orange'}">${data.status}</b></p>
+                        </div>`;
                 });
             } else { area.innerHTML += "<p>कुनै अर्डर भेटिएन।</p>"; }
         });
@@ -96,6 +113,9 @@
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            document.getElementById("user-profile").style.display = "block";
+            document.getElementById("display-name").innerText = user.displayName;
+            document.getElementById("display-email").innerText = user.email;
             document.getElementById("my-orders-link").style.display = "block";
             document.getElementById("login-container").style.display = "none";
             document.getElementById("profile-pic").style.display = "block";
