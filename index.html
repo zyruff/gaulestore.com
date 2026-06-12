@@ -1,238 +1,107 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; }
-  
-  .header-container { 
-    display: flex; align-items: center; justify-content: space-between; 
-    padding: 15px 5%; 
-  }
-
-  /* डेस्कटपको लागि ४२% मार्जिन */
-  .title-wrapper { 
-    margin-left: 42%; 
-    text-align: left; 
-  }
-  
-  h1 { font-size: 1.8rem; margin: 0; font-weight: bold; }
-  .store-text { color: #dc2626; }
-  
-  .line { width: 90%; height: 3px; background: #dc2626; margin: 5px auto 20px auto; border-radius: 2px; }
-  
-  .profile-wrapper { position: relative; }
-  .login-icon { width: 40px; height: 40px; cursor: pointer; }
-  #profile-pic { width: 40px; height: 40px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #ddd; }
-  
-  .dropdown-menu {
-    display: none; position: absolute; right: 0; top: 50px; background: #fff; 
-    border: 1px solid #eee; border-radius: 12px; padding: 10px; width: 220px; 
-    box-shadow: 0 8px 16px rgba(0,0,0,0.15); z-index: 1000;
-  }
-  
-  .user-info-card { padding: 10px; background: #fdfdfd; border-bottom: 2px solid #eee; margin-bottom: 5px; }
-  .user-name { font-weight: bold; font-size: 16px; color: #333; }
-  .user-email { font-size: 12px; color: #666; margin-top: 4px; }
-  
-  .menu-item { padding: 10px; cursor: pointer; font-size: 14px; border-bottom: 1px solid #f0f0f0; }
-  .menu-item:hover { background: #f9f9f9; }
-
-  /* मोबाइल भर्सनको लागि १५% मार्जिन */
-  @media only screen and (max-width: 600px) {
-    .title-wrapper { 
-      margin-left: 15%; 
-    }
-    h1 { font-size: 1.3rem; }
-  }
-</style>
-</head>
-<body>
-
-  <div class="header-container">
-    <div class="title-wrapper">
-      <h1>GAULE <span class="store-text">STORE</span></h1>
-    </div>
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Gaule Top-Up</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaule Store</title>
     <style>
-        .menu-container { 
-            position: fixed; 
-            top: 3px; 
-            left: 5px; 
-            z-index: 1000; 
-        }
-        
-        .menu-icon { 
-            font-size: 30px; 
-            cursor: pointer; 
-            padding: 10px; 
-        }
-        
-        #nav-menu { 
-            display: none; 
-            position: absolute; 
-            top: 50px; 
-            left: 0;   
-            background: #fff; 
-            border: 1px solid #ccc; 
-            padding: 15px; 
-            width: 220px; 
-            box-shadow: 2px 2px 5px #ccc; 
-            z-index: 1000; 
-        }
-        
-        /* Search box style */
+        body { font-family: sans-serif; margin: 0; }
+        .header { display: flex; align-items: center; padding: 15px; border-bottom: 2px solid #dc2626; justify-content: space-between; }
+        .menu-icon { font-size: 28px; cursor: pointer; }
+        #nav-menu { display: none; position: absolute; top: 60px; left: 0; background: #fff; border: 3px solid #ccc; padding: 20px; width: 220px; z-index: 1000; box-shadow: 2px 2px 10px #ccc; }
         .search-box { display: flex; gap: 5px; margin-bottom: 15px; }
-        #gameSearch { width: 120px; padding: 8px; border: 1px solid #ccc; }
-        .search-btn { padding: 8px 10px; background-color: #ff4757; color: white; border: none; cursor: pointer; }
-        
-        /* Links style */
-        #nav-menu a { 
-            display: block; 
-            padding: 10px 0; 
-            color: black; 
-            text-decoration: none; 
-            font-size: 16px; 
-            border-bottom: 1px solid #eee; 
-        }
+        #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; }
+        .search-btn { padding: 8px; background-color: #dc2626; color: white; border: none; cursor: pointer; }
+        .close-btn { float: right; font-size: 24px; cursor: pointer; font-weight: bold; }
+        #nav-menu a { display: block; padding: 12px 0; color: black; text-decoration: none; border-bottom: 1px solid #eee; }
+        .store-title { font-size: 1.5rem; font-weight: bold; }
+        .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
+        #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; }
+        .order-card { border: 1px solid #eee; padding: 10px; margin-top: 10px; border-radius: 5px; background: #f9f9f9; }
     </style>
 </head>
 <body>
 
-    <div class="menu-container">
-        <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
-        
-        <div id="nav-menu">
-            <!-- Close icon -->
-            <span onclick="toggleMenu()" style="cursor:pointer; float:right; font-size:24px; font-weight:bold;">&times;</span>
-            
-            <!-- Search bar -->
-            <div class="search-box">
-                <input type="text" id="gameSearch" placeholder="Search...">
-                <button class="search-btn" onclick="performSearch()">Search</button>
-            </div>
-
-            <!-- Links -->
-            <a href="index.html">Home</a>
-            <a href="shop.html">Shop</a>
-            <a href="contact.html">Contact Us</a>
-            
-            <div id="my-orders-link" style="display:none;">
-                <a href="my-orders.html">My Orders</a>
-            </div>
-        </div>
+<div class="header">
+    <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+    <div class="store-title">GAULE <span style="color:#dc2626;">STORE</span></div>
+    
+    <div id="login-container" onclick="googleLogin()">
+        <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
     </div>
+    <img id="profile-pic" onclick="location.reload()">
+</div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-            authDomain: "gaule-top-up-center.firebaseapp.com",
-            databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-            projectId: "gaule-top-up-center",
-            storageBucket: "gaule-top-up-center.firebasestorage.app",
-            messagingSenderId: "645605489690",
-            appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-        };
-
-        initializeApp(firebaseConfig);
-        const auth = getAuth();
-
-        window.toggleMenu = function() {
-            var menu = document.getElementById("nav-menu");
-            menu.style.display = (menu.style.display === "block") ? "none" : "block";
-        };
-
-        window.performSearch = function() {
-            let query = document.getElementById("gameSearch").value;
-            if(query) alert("Searching: " + query);
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            const orderLink = document.getElementById('my-orders-link');
-            if (user) orderLink.style.display = 'block';
-            else orderLink.style.display = 'none';
-        });
-    </script>
-</body>
-</html>
-
-    <div class="profile-wrapper">
-      <div id="login-btn" class="login-icon" onclick="googleLogin()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-      </div>
-
-      <img id="profile-pic" onclick="toggleMenu()">
-      
-      <div id="profile-menu" class="dropdown-menu">
-        <div class="user-info-card">
-          <div id="name-display" class="user-name"></div>
-          <div id="email-display" class="user-email"></div>
-        </div>
-        <div class="menu-item" onclick="window.location.reload()">🏠 Home</div>
-        <div class="menu-item" onclick="window.open('https://wa.me/9761081110', '_blank')">💬 Contact: 9761081110</div>
-        <div class="menu-item" onclick="logoutUser()" style="color:red;"> Logout</div>
-      </div>
+<div id="nav-menu">
+    <span class="close-btn" onclick="toggleMenu()">&times;</span>
+    <div class="search-box">
+        <input type="text" id="gameSearch" placeholder="Search...">
+        <button class="search-btn" onclick="performSearch()">🔍</button>
     </div>
-  </div>
+    <a href="index.html">Home</a>
+    <div id="my-orders-link" style="display:none;">
+        <a href="#" onclick="showOrders()">My Orders</a>
+    </div>
+    <a href="shop.html">Shop</a>
+    <a href="contact.html">Contact Us</a>
+</div>
 
-  <div class="line"></div>
+<div id="content-area" style="padding: 20px;">
+    <!-- यहाँ अर्डर वा अन्य कन्टेन्ट देखिन्छ -->
+</div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, query, orderByChild, equalTo, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-      authDomain: "gaule-top-up-center.firebaseapp.com",
-      projectId: "gaule-top-up-center",
-      storageBucket: "gaule-top-up-center.firebasestorage.app",
-      messagingSenderId: "645605489690",
-      appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+        authDomain: "gaule-top-up-center.firebaseapp.com",
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+        projectId: "gaule-top-up-center",
+        storageBucket: "gaule-top-up-center.firebasestorage.app",
+        messagingSenderId: "645605489690",
+        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
     };
 
-    initializeApp(firebaseConfig);
-    const auth = getAuth();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
     const provider = new GoogleAuthProvider();
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        document.getElementById("login-btn").style.display = "none";
-        document.getElementById("profile-pic").style.display = "block";
-        document.getElementById("profile-pic").src = user.photoURL;
-        document.getElementById("name-display").innerText = user.displayName;
-        document.getElementById("email-display").innerText = user.email;
-      }
-    });
-
+    window.toggleMenu = () => { document.getElementById("nav-menu").style.display = (document.getElementById("nav-menu").style.display === "block") ? "none" : "block"; };
     window.googleLogin = () => signInWithPopup(auth, provider);
-    window.toggleMenu = () => {
-      const menu = document.getElementById("profile-menu");
-      menu.style.display = (menu.style.display === "block") ? "none" : "block";
+    window.performSearch = () => alert("Searching: " + document.getElementById("gameSearch").value);
+
+    // My Orders Logic (युजरको आफ्नो अर्डर मात्र देखाउने)
+    window.showOrders = () => {
+        toggleMenu();
+        const user = auth.currentUser;
+        if (!user) return;
+        
+        const area = document.getElementById("content-area");
+        area.innerHTML = `<h2>My Orders</h2><p>Logged in as: <b>${user.email}</b></p>`;
+        
+        const ordersRef = query(ref(db, 'orders'), orderByChild('userId'), equalTo(user.uid));
+        onValue(ordersRef, (snapshot) => {
+            if (snapshot.exists()) {
+                snapshot.forEach((s) => {
+                    const data = s.val();
+                    area.innerHTML += `<div class="order-card">Game: ${data.gameName} <br> Status: <b>${data.status}</b></div>`;
+                });
+            } else { area.innerHTML += "<p>कुनै अर्डर भेटिएन।</p>"; }
+        });
     };
-    window.logoutUser = () => signOut(auth).then(() => location.reload());
-  </script>
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById("my-orders-link").style.display = "block";
+            document.getElementById("login-container").style.display = "none";
+            document.getElementById("profile-pic").style.display = "block";
+            document.getElementById("profile-pic").src = user.photoURL;
+        }
+    });
+</script>
 </body>
 </html>
-<script type="module">
-import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-const db = getDatabase();
-
-window.complete = (id) => {
-update(ref(db,"orders/"+id), { status:"Completed" });
-};
-
-window.reject = (id) => {
-update(ref(db,"orders/"+id), { status:"Rejected" });
-};
-</script>
