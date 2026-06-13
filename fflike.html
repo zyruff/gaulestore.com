@@ -39,15 +39,13 @@
     <div class="step">Step 2: Enter UID</div>
     <input type="text" id="uid" placeholder="Enter Free Fire UID">
 
-    <!-- Payment Section - यो २२० लाइकमा मात्र देखिन्छ -->
+    <!-- Payment Section -->
     <div id="paymentSection" style="display: none;">
         <div class="step">Step 3: Scan QR Code</div>
         <div class="qr-container">
             <img src="qr_code.png" class="qr-img" alt="QR Code">
         </div>
-<div style="font-family: sans-serif; padding: 10px; width: 100%; box-sizing: border-box;">
-    <h1 style="font-size: clamp(1.2rem, 4vw, 1.8rem); color: #333; margin: 0 0 8px 0; line-height: 1.2;">
-        Write your real name in the remarks
+        <div class="step" style="font-size: 14px; color: #555;">Write your real name in the remarks</div>
         <div class="step">Step 4: Enter Transaction ID</div>
         <input type="text" id="transactionId" placeholder="Enter Transaction ID">
     </div>
@@ -79,7 +77,6 @@
     let currentUser = null;
     onAuthStateChanged(auth, (user) => { currentUser = user; });
 
-    // Payment Section देखाउने वा लुकाउने function
     window.togglePayment = (show) => {
         document.getElementById("paymentSection").style.display = show ? "block" : "none";
     };
@@ -96,7 +93,6 @@
             return;
         }
 
-        // २३० लाइकको लागि Transaction ID अनिवार्य चेक
         if (product === "220 Like Rs.30" && transId === "") {
             alert("Please Enter Transaction ID");
             return;
@@ -134,4 +130,3 @@
 
 </body>
 </html>
-    
