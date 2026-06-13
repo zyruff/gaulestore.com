@@ -325,3 +325,53 @@
 <div class="footer-copyright">
     &copy; 2026 Gaule Store. All rights reserved.
 </div>
+<div id="adminPanel" style="display: none;">
+    <h2>Admin Dashboard</h2>
+    <div id="orderContainer"></div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+    // तपाईंको Firebase Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+        authDomain: "gaule-top-up-center.firebaseapp.com",
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+        projectId: "gaule-top-up-center",
+        storageBucket: "gaule-top-up-center.firebasestorage.app",
+        messagingSenderId: "645605489690",
+        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    onAuthStateChanged(auth, (user) => {
+        // यहाँ आफ्नो सहि ईमेल राख्नुहोस्
+        if (user && user.email === "gaulestore.np@gmail.com") {
+            document.getElementById('adminPanel').style.display = 'block';
+            loadOrders();
+        } else {
+            // ग्राहक वा अन्य कसैलाई केही पनि देखिँदैन (खाली रहन्छ)
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+    });
+
+    function loadOrders() {
+        const ordersRef = ref(db, 'orders/');
+        onValue(ordersRef, (snapshot) => {
+            const data = snapshot.val();
+            const container = document.getElementById('orderContainer');
+            container.innerHTML = "";
+            if (data) {
+                Object.values(data).slice(-10).reverse().forEach(order => {
+                    container.innerHTML += `<div class="order-card">${order.name} - ${order.amount}</div>`;
+                });
+            }
+        });
+    }
+</script>
