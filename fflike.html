@@ -1,226 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Free Fire Likes</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Fire Likes</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
+        body { background:#f4f4f4; padding:20px; }
+        .container { max-width:450px; margin:auto; background:#fff; padding:20px; border-radius:15px; box-shadow:0 0 15px rgba(0,0,0,0.1); }
+        .back-btn { display: inline-block; padding: 8px 15px; background: #eee; color: #333; text-decoration: none; border-radius: 5px; margin-bottom: 15px; font-weight: bold; }
+        h1 { text-align:center; color:#ff6600; margin-bottom:20px; }
+        .step { margin-top:20px; font-size:18px; font-weight:bold; color:#333; }
+        .product { display:block; padding:12px; margin-top:10px; background:#fafafa; border:2px solid #eee; border-radius:10px; cursor:pointer; }
+        
+        /* QR Code Style */
+        .qr-container { display: flex; justify-content: center; margin-top: 15px; }
+        .qr-img { width: 200px; height: 200px; object-fit: cover; border: 2px solid #ccc; border-radius: 10px; }
 
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
-body{
-background:#f4f4f4;
-padding:20px;
-}
-
-.container{
-max-width:450px;
-margin:auto;
-background:#fff;
-padding:20px;
-border-radius:15px;
-box-shadow:0 0 15px rgba(0,0,0,0.1);
-}
-
-/* Back Button Style */
-.back-btn {
-    display: inline-block;
-    padding: 8px 15px;
-    background: #eee;
-    color: #333;
-    text-decoration: none;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    font-size: 14px;
-    font-weight: bold;
-}
-.back-btn:hover { background: #ddd; }
-
-h1{
-text-align:center;
-color:#ff6600;
-margin-bottom:20px;
-}
-
-.step{
-margin-top:20px;
-font-size:18px;
-font-weight:bold;
-color:#333;
-}
-
-.product{
-display:block;
-padding:12px;
-margin-top:10px;
-background:#fafafa;
-border:2px solid #eee;
-border-radius:10px;
-cursor:pointer;
-}
-
-.product:hover{
-border-color:#ff6600;
-}
-
-input[type=text]{
-width:100%;
-padding:12px;
-margin-top:10px;
-border:1px solid #ccc;
-border-radius:8px;
-font-size:16px;
-}
-
-button{
-width:100%;
-padding:14px;
-margin-top:20px;
-background:#ff6600;
-color:white;
-border:none;
-border-radius:8px;
-font-size:16px;
-cursor:pointer;
-font-weight:bold;
-}
-
-button:hover{
-opacity:0.9;
-}
-
-.status{
-margin-top:15px;
-text-align:center;
-font-weight:bold;
-}
-</style>
+        input[type=text], input[type=file] { width:100%; padding:12px; margin-top:10px; border:1px solid #ccc; border-radius:8px; }
+        button { width:100%; padding:14px; margin-top:20px; background:#ff6600; color:white; border:none; border-radius:8px; font-size:16px; cursor:pointer; font-weight:bold; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .status { margin-top:15px; text-align:center; font-weight:bold; color: #333; }
+    </style>
 </head>
 <body>
 
 <div class="container">
+    <a href="index.html" class="back-btn">← Back</a>
+    <h1>🔥 FREE FIRE LIKES</h1>
 
-<a href="index.html" class="back-btn">← Back</a>
+    <div class="step">Step 1: Select Product</div>
+    <label class="product"><input type="radio" name="product" value="20 Like Free Daily" checked> 20 Like Free Daily</label>
+    <label class="product"><input type="radio" name="product" value="230 Like Rs.30"> 230 Like Rs.30</label>
 
-<h1>🔥 FREE FIRE LIKES</h1>
+    <div class="step">Step 2: Enter UID</div>
+    <input type="text" id="uid" placeholder="Enter Free Fire UID">
 
-<div class="step">Step 1: Select Product</div>
+    <div class="step">Step 3: Scan QR Code</div>
+    <div class="qr-container">
+        <img src="qr_code.png" class="qr-img" alt="QR Code">
+    </div>
 
-<label class="product">
-<input type="radio" name="product" value="20 Like Free Daily" checked>
-20 Like Free Daily
-</label>
+    <div class="step">Step 4: Attach Payment Screenshot</div>
+    <input type="file" id="screenshotFile" accept="image/*">
 
-<label class="product">
-<input type="radio" name="product" value="230 Like Rs.30">
-230 Like Rs.30
-</label>
-
-<div class="step">Step 2: Enter UID</div>
-
-<input type="text" id="uid" placeholder="Enter Free Fire UID">
-
-<div class="step">Step 3: Submit Order</div>
-
-<button onclick="submitOrder()">
-Submit Order
-</button>
-
-<div class="status" id="status"></div>
-
+    <div class="step">Step 5: Submit Order</div>
+    <button id="submitBtn" onclick="submitOrder()">Submit Order</button>
+    <div class="status" id="status"></div>
 </div>
 
 <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    const firebaseConfig = {
+        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+        authDomain: "gaule-top-up-center.firebaseapp.com",
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+        projectId: "gaule-top-up-center",
+        storageBucket: "gaule-top-up-center.firebasestorage.app",
+        messagingSenderId: "645605489690",
+        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+    };
 
-import {
-getAuth,
-onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const storage = getStorage(app);
 
-import {
-getDatabase,
-ref,
-push
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    let currentUser = null;
+    onAuthStateChanged(auth, (user) => { currentUser = user; });
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-  authDomain: "gaule-top-up-center.firebaseapp.com",
-  databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-  projectId: "gaule-top-up-center",
-  storageBucket: "gaule-top-up-center.firebasestorage.app",
-  messagingSenderId: "645605489690",
-  appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-};
+    window.submitOrder = async () => {
+        if (!currentUser) { alert("Please Login First"); return; }
+        const uid = document.getElementById("uid").value.trim();
+        const fileInput = document.getElementById("screenshotFile");
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
+        if (uid === "" || fileInput.files.length === 0) {
+            alert("Please Enter UID and Attach Screenshot");
+            return;
+        }
 
-let currentUser = null;
+        const btn = document.getElementById("submitBtn");
+        btn.disabled = true;
+        btn.innerText = "Uploading...";
 
-onAuthStateChanged(auth,(user)=>{
-if(user){
-currentUser = user;
-}else{
-document.getElementById("status").innerHTML =
-"⚠ Please Login First";
-}
-});
+        try {
+            const file = fileInput.files[0];
+            const storageRef = sRef(storage, 'screenshots/' + Date.now() + "_" + file.name);
+            const snapshot = await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(snapshot.ref);
 
-window.submitOrder = async () => {
+            await push(ref(db, "orders"), {
+                product: document.querySelector('input[name="product"]:checked').value,
+                uid: uid,
+                screenshotUrl: downloadURL,
+                name: currentUser.displayName || "No Name",
+                email: currentUser.email,
+                userId: currentUser.uid,
+                status: "Pending",
+                timestamp: Date.now(),
+                date: new Date().toLocaleString()
+            });
 
-if(!currentUser){
-alert("Please Login First");
-return;
-}
-
-const uid = document.getElementById("uid").value.trim();
-
-if(uid === ""){
-alert("Please Enter UID");
-return;
-}
-
-const product =
-document.querySelector('input[name="product"]:checked').value;
-
-try{
-
-await push(ref(db,"orders"),{
-
-product: product,
-uid: uid,
-name: currentUser.displayName || "No Name",
-email: currentUser.email,
-userId: currentUser.uid,
-status: "Pending",
-timestamp: Date.now(),
-date: new Date().toLocaleString()
-
-});
-
-document.getElementById("status").innerHTML =
-"✅ Order Submitted Successfully";
-
-document.getElementById("uid").value="";
-
-}catch(error){
-
-document.getElementById("status").innerHTML =
-"❌ " + error.message;
-
-}
-
-}
-
+            document.getElementById("status").innerHTML = "✅ Order Submitted Successfully";
+            btn.disabled = false;
+            btn.innerText = "Submit Order";
+            document.getElementById("uid").value = "";
+            document.getElementById("screenshotFile").value = "";
+        } catch (error) {
+            document.getElementById("status").innerHTML = "❌ " + error.message;
+            btn.disabled = false;
+            btn.innerText = "Submit Order";
+        }
+    }
 </script>
 
 </body>
