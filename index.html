@@ -91,36 +91,52 @@
         toggleMenu();
         const user = auth.currentUser;
         if (!user) return;
+        
         const area = document.getElementById("content-area");
-        area.innerHTML = `<h2>My Orders</h2>`;
+        
+        // पछाडि फर्किने बटन र हेडिङ
+        area.innerHTML = `
+            <button onclick="location.reload()" style="margin-bottom:15px; padding:8px 15px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer;">
+                ← Back
+            </button>
+            <h2>My Orders</h2>
+        `;
+
         const ordersRef = query(ref(db, 'orders'), orderByChild('userId'), equalTo(user.uid));
         
         onValue(ordersRef, (snapshot) => {
-            area.innerHTML = `<h2>My Orders</h2>`;
+            // अर्डर सूची देखाउनु अघि 'Back' बटन यथावत राख्न
+            let orderHtml = `
+                <button onclick="location.reload()" style="margin-bottom:15px; padding:8px 15px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer;">
+                    ← Back
+                </button>
+                <h2>My Orders</h2>
+            `;
+            
             let orderArray = [];
             snapshot.forEach((s) => { orderArray.push(s.val()); });
-            
             orderArray.reverse(); 
 
             if (orderArray.length > 0) {
                 orderArray.forEach((o) => {
-                    let statusColor = '#eab308'; // Default: Pending (Yellow)
-                    if (o.status === 'Complete') {
-                        statusColor = 'green';
-                    } else if (o.status === 'Rejected') {
-                        statusColor = 'red';
-                    }
+                    let statusColor = '#eab308';
+                    if (o.status === 'Complete') statusColor = 'green';
+                    else if (o.status === 'Rejected') statusColor = 'red';
 
-                    area.innerHTML += `
+                    orderHtml += `
                         <div class="order-card">
                             <p style="font-size: 14px; margin: 3px 0;">Product: <b>${o.product || "N/A"}</b></p>
-                            <p style="font-size: 14px; margin: 3px 0;">Player ID: <b>${o.uid}</b></p>
+                            <p style="font-size: 14px; margin: 3px 0;">Player ID: <b>${o.uid || "N/A"}</b></p>
                             <p style="font-size: 14px; margin: 3px 0;">Status: <b style="color:${statusColor}">${o.status}</b></p>
                         </div>`;
                 });
-            } else { area.innerHTML += "<p>No Order History</p>"; }
+                area.innerHTML = orderHtml;
+            } else { 
+                area.innerHTML = orderHtml + "<p>No Order History</p>"; 
+            }
         });
     };
+
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
