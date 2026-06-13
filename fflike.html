@@ -39,7 +39,7 @@
     <div class="step">Step 2: Enter UID</div>
     <input type="text" id="uid" placeholder="Enter Free Fire UID">
 
-    <!-- Payment Section - यो २३० लाइकमा मात्र देखिन्छ -->
+    <!-- Payment Section - यो २२० लाइकमा मात्र देखिन्छ -->
     <div id="paymentSection" style="display: none;">
         <div class="step">Step 3: Scan QR Code</div>
         <div class="qr-container">
@@ -97,7 +97,7 @@
         }
 
         // २३० लाइकको लागि Transaction ID अनिवार्य चेक
-        if (product === "230 Like Rs.30" && transId === "") {
+        if (product === "220 Like Rs.30" && transId === "") {
             alert("Please Enter Transaction ID");
             return;
         }
@@ -110,7 +110,7 @@
             await push(ref(db, "orders"), {
                 product: product,
                 uid: uid,
-                transactionId: product === "230 Like Rs.30" ? transId : "N/A",
+                transactionId: product === "220 Like Rs.30" ? transId : "N/A",
                 name: currentUser.displayName || "No Name",
                 email: currentUser.email,
                 userId: currentUser.uid,
