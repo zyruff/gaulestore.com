@@ -1,2 +1,2 @@
-# Gaule Store
-Gaule Top Up Center
+# Gaule Store Np
+Gaule Top Up Center Nepal
