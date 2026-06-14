@@ -149,16 +149,13 @@
         }
     });
 </script>
-</body>
-<!DOCTYPE html>
+</body><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gaule Store - Official Custom Dashboard</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -454,8 +451,6 @@
     </style>
 </head>
 <body>
-
-    <!-- Top Info Section -->
     <div class="banner-container">
         <div class="badges-wrapper">
             <div class="badge instant"><i class="fa-solid fa-bolt"></i> Instant Delivery</div>
@@ -469,13 +464,11 @@
         </div>
     </div>
 
-    <!-- Category Tabs Navigation -->
     <div class="tabs-container">
         <div class="tab active">Diamonds</div>
         <div class="tab">Membership</div>
     </div>
 
-    <!-- GAME ID Section -->
     <div class="section-box">
         <div class="section-header-flex">
             <div class="box-title">Game ID <span style="color: #e53e3e;">*</span></div>
@@ -495,7 +488,6 @@
         </div>
     </div>
 
-    <!-- DIAMONDS Packs Section -->
     <div class="section-box">
         <div class="section-header-flex">
             <div class="box-title">Diamonds <span style="color: #e53e3e;">*</span></div>
@@ -520,7 +512,6 @@
         </div>
     </div>
 
-    <!-- STICKY BOTTOM DRAWER -->
     <div class="bottom-drawer">
         <div class="drawer-inner">
             <div class="row-detail">
@@ -538,7 +529,6 @@
         </div>
     </div>
 
-    <!-- DYNAMIC QR CODE POPUP MODAL -->
     <div class="qr-modal" id="qrModal">
         <div class="qr-card">
             <i class="fa-solid fa-xmark close-modal" onclick="closePaymentModal()"></i>
@@ -551,7 +541,7 @@
             </div>
 
             <div class="qr-image-wrapper">
-                <img src="qr.png" alt="Payment QR Code">
+                <img src="qr_code.png" alt="Payment QR Code">
             </div>
 
             <div class="txid-container">
@@ -584,7 +574,6 @@
         </div>
     </div>
 
-    <!-- SUCCESS ANIMATION MODAL -->
     <div class="success-modal" id="successModal">
         <div class="success-card">
             <div class="success-checkmark">
@@ -616,10 +605,11 @@
         </div>
     </div>
 
-    <!-- FIREBASE AND CORE LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        // यहाँ Firebase Database को लागि import थपियो:
+        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
@@ -633,6 +623,7 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getDatabase(app); // Database इनिसियलाइज भयो
         const provider = new GoogleAuthProvider();
 
         let currentUser = null;
@@ -734,6 +725,7 @@
             document.getElementById('qrModal').classList.remove('show');
         };
 
+        // अर्डर Firebase मा पठाउने फंक्सन
         window.submitPayment = function() {
             let txidValue = txidInput.value.trim();
             let uidValue = gameUidInput.value.trim();
@@ -745,23 +737,35 @@
                 return;
             }
 
-            closePaymentModal();
-
-            document.getElementById('receipt-uid').innerText = uidValue;
-            document.getElementById('receipt-item').innerText = selectedItemName;
-            document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
+            const now = new Date();
+            const orderRef = push(ref(db, 'orders'));
             
-            document.getElementById('successModal').classList.add('show');
+            set(orderRef, {
+                date: now.toLocaleDateString(),
+                time: now.toLocaleTimeString(),
+                timestamp: Date.now(),
+                email: currentUser.email,
+                name: currentUser.displayName || "User",
+                userId: currentUser.uid,
+                product: selectedItemName,
+                amountDue: selectedItemPrice,
+                uid: uidValue,
+                transactionId: txidValue,
+                status: "Pending"
+            }).then(() => {
+                closePaymentModal();
+                document.getElementById('receipt-uid').innerText = uidValue;
+                document.getElementById('receipt-item').innerText = selectedItemName;
+                document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
+                document.getElementById('successModal').classList.add('show');
+            }).catch((error) => {
+                alert("अर्डर पठाउन समस्या भयो: " + error.message);
+            });
         };
 
         window.closeSuccessModal = function() {
             document.getElementById('successModal').classList.remove('show');
-            gameUidInput.value = "";
-            selectedItemName = "";
-            selectedItemPrice = "";
-            document.getElementById('summary-item').innerText = "-";
-            document.getElementById('summary-total').innerText = "Rs 0.00";
-            document.querySelectorAll('.pack-card').forEach(card => card.classList.remove('selected'));
+            location.reload();
         };
     </script>
 </body>
