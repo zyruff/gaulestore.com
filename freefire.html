@@ -451,13 +451,6 @@
     </style>
 </head>
 <body>
-<!-- ब्यानर भन्दा माथि ब्याक बटन -->
-<div style="padding: 16px 16px 0 16px;">
-    <a href="index.html" style="text-decoration: none; color: #4a5568; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px;">
-        <i class="fa-solid fa-arrow-left"></i> Home
-    </a>
-</div>
-
     <div class="banner-container">
         <div class="badges-wrapper">
             <div class="badge instant"><i class="fa-solid fa-bolt"></i> Instant Delivery</div>
@@ -766,6 +759,17 @@
                 document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
                 document.getElementById('successModal').classList.add('show');
             }).catch((error) => {
+                alert("अर्डर पठाउन समस्या भयो: " + error.message);
+            });
+        };
+
+        window.closeSuccessModal = function() {
+            document.getElementById('successModal').classList.remove('show');
+            location.reload();
+        };
+    </script>
+</body>
+</html>tch((error) => {
                 alert("अर्डर पठाउन समस्या भयो: " + error.message);
             });
         };
