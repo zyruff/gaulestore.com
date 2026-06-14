@@ -3,158 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaule Store</title>
-    <style>
-        body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; }
-        .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #dc2626; justify-content: space-between; }
-        .menu-icon { font-size: 28px; cursor: pointer; }
-        #nav-menu { display: none; position: absolute; top: 0; left: 0; background: #fff; border: 1px solid #ccc; padding: 20px; width: 250px; height: 100%; z-index: 1000; box-shadow: 2px 2px 10px #ccc; }
-        .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .close-btn { font-size: 30px; cursor: pointer; color: #dc2626; }
-        .search-box { display: flex; gap: 5px; margin-bottom: 20px; }
-        #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
-        #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; }
-        #profile-dropdown { display: none; position: absolute; top: 50px; right: 0; background: white; border: 1px solid #ccc; padding: 15px; width: 200px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); border-radius: 8px; text-align: center; z-index: 1000; }
-        .user-name { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
-        .user-email { font-size: 12px; color: #666; margin-bottom: 10px; }
-        .change-name { font-size: 11px; color: #dc2626; text-decoration: none; display: block; margin-bottom: 15px; }
-        .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; cursor: pointer; border-radius: 4px; }
-        #nav-menu a { display: block; padding: 12px 0; color: black; text-decoration: none; border-bottom: 1px solid #eee; }
-        .order-card { background: white; border-left: 5px solid #dc2626; padding: 10px; margin-bottom: 8px; border-radius: 5px; box-shadow: 0 2px 5px #ddd; }
-        .store-title { font-size: 1.5rem; font-weight: bold; }
-        .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
-    </style>
-</head>
-<body>
-
-<div class="header">
-    <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
-    <div class="store-title">GAULE <span style="color:#dc2626;">STORE</span></div>
-    <div class="header-right">
-        <div id="login-container" onclick="googleLogin()">
-            <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-        </div>
-        <img id="profile-pic" onclick="toggleProfile()">
-        <div id="profile-dropdown">
-            <div id="display-name" class="user-name"></div>
-            <div id="display-email" class="user-email"></div>
-            <a href="https://myaccount.google.com/personal-info" target="_blank" class="change-name">Change Name</a>
-            <button class="logout-btn" onclick="logoutUser()">Logout</button>
-        </div>
-    </div>
-</div>
-
-<div id="nav-menu">
-    <div class="menu-header">
-        <span style="font-weight:bold;">Menu</span>
-        <span class="close-btn" onclick="toggleMenu()">&times;</span>
-    </div>
-    <div class="search-box">
-        <input type="text" id="gameSearch" placeholder="Search games...">
-        <button onclick="alert('Searching...')">Search</button>
-    </div>
-    <a href="index.html">Home</a>
-    <div id="my-orders-link" style="display:none;"><a href="#" onclick="showOrders()">My Orders</a></div>
-    <a href="shop.html">Shop</a>
-    <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
-</div>
-
-<div id="content-area" style="padding: 20px;"></div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, query, orderByChild, equalTo, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-        authDomain: "gaule-top-up-center.firebaseapp.com",
-        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-        projectId: "gaule-top-up-center",
-        storageBucket: "gaule-top-up-center.firebasestorage.app",
-        messagingSenderId: "645605489690",
-        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    const provider = new GoogleAuthProvider();
-
-    window.toggleMenu = () => { const m = document.getElementById("nav-menu"); m.style.display = (m.style.display === "block") ? "none" : "block"; };
-    window.toggleProfile = () => { const d = document.getElementById("profile-dropdown"); d.style.display = (d.style.display === "block") ? "none" : "block"; };
-    window.googleLogin = () => signInWithPopup(auth, provider);
-    window.logoutUser = () => signOut(auth).then(() => location.reload());
-
-    window.showOrders = () => {
-        toggleMenu();
-        const user = auth.currentUser;
-        if (!user) return;
-        
-        const area = document.getElementById("content-area");
-        
-        // पछाडि फर्किने बटन र हेडिङ
-        area.innerHTML = `
-            <button onclick="location.reload()" style="margin-bottom:15px; padding:8px 15px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer;">
-                ← Back
-            </button>
-            <h2>My Orders</h2>
-        `;
-
-        const ordersRef = query(ref(db, 'orders'), orderByChild('userId'), equalTo(user.uid));
-        
-        onValue(ordersRef, (snapshot) => {
-            // अर्डर सूची देखाउनु अघि 'Back' बटन यथावत राख्न
-            let orderHtml = `
-                <button onclick="location.reload()" style="margin-bottom:15px; padding:8px 15px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer;">
-                    ← Back
-                </button>
-                <h2>My Orders</h2>
-            `;
-            
-            let orderArray = [];
-            snapshot.forEach((s) => { orderArray.push(s.val()); });
-            orderArray.reverse(); 
-
-            if (orderArray.length > 0) {
-                orderArray.forEach((o) => {
-                    let statusColor = '#eab308';
-                    if (o.status === 'Complete') statusColor = 'green';
-                    else if (o.status === 'Rejected') statusColor = 'red';
-
-                    orderHtml += `
-                        <div class="order-card">
-                            <p style="font-size: 14px; margin: 3px 0;">Product: <b>${o.product || "N/A"}</b></p>
-                            <p style="font-size: 14px; margin: 3px 0;">Player ID: <b>${o.uid || "N/A"}</b></p>
-                            <p style="font-size: 14px; margin: 3px 0;">Status: <b style="color:${statusColor}">${o.status}</b></p>
-                        </div>`;
-                });
-                area.innerHTML = orderHtml;
-            } else { 
-                area.innerHTML = orderHtml + "<p>No Order History</p>"; 
-            }
-        });
-    };
-
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.getElementById("my-orders-link").style.display = "block";
-            document.getElementById("login-container").style.display = "none";
-            document.getElementById("profile-pic").style.display = "block";
-            document.getElementById("profile-pic").src = user.photoURL;
-            document.getElementById("display-name").innerText = user.displayName;
-            document.getElementById("display-email").innerText = user.email;
-        }
-    });
-</script>
-</body>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gaule Store - Official Custom Dashboard</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -205,6 +53,7 @@
             align-items: center;
         }
 
+        /* Free Fire Logo strictly inside a perfect circle */
         .avatar-img {
             width: 60px;
             height: 60px;
@@ -293,6 +142,7 @@
             transition: all 0.2s;
         }
 
+        /* Required Error States */
         .uid-input.error-border {
             border: 1px solid #e53e3e !important;
             background-color: #fff5f5 !important;
@@ -302,7 +152,7 @@
             color: #e53e3e;
             font-size: 12px;
             margin-bottom: 10px;
-            display: none;
+            display: none; /* Controlled by JS */
             align-items: center;
             gap: 6px;
             font-weight: 500;
@@ -327,6 +177,7 @@
             transition: all 0.2s ease;
         }
 
+        /* Required Card Border State */
         .cards-grid.error-border {
             border: 2px solid #e53e3e !important;
             background-color: #fff5f5;
@@ -344,11 +195,35 @@
             transition: transform 0.1s, border-color 0.2s;
         }
 
-        .pack-card:active { transform: scale(0.98); }
-        .pack-card.selected { border: 2px solid #ffb300 !important; background-color: #fffdf5; }
-        .pack-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1a202c; }
-        .pack-price { font-size: 15px; font-weight: 700; color: #ffb300; }
-        .diamond-icon { position: absolute; bottom: 14px; right: 14px; color: #3182ce; font-size: 20px; }
+        .pack-card:active {
+            transform: scale(0.98);
+        }
+
+        .pack-card.selected {
+            border: 2px solid #ffb300 !important;
+            background-color: #fffdf5;
+        }
+
+        .pack-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1a202c;
+        }
+
+        .pack-price {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffb300;
+        }
+
+        .diamond-icon {
+            position: absolute;
+            bottom: 14px;
+            right: 14px;
+            color: #3182ce;
+            font-size: 20px;
+        }
 
         /* --- DRAWER --- */
         .bottom-drawer {
@@ -364,93 +239,343 @@
             z-index: 100;
         }
 
-        .drawer-inner { max-width: 600px; margin: 0 auto; }
-        .row-detail { display: flex; justify-content: space-between; font-size: 13px; color: #4a5568; margin-bottom: 8px; }
-        .row-detail .val-white { color: #1a202c; font-weight: 500; }
-        .total-row { margin-top: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
-        .total-price { font-size: 20px; font-weight: 700; color: #ffb300; }
+        .drawer-inner {
+            max-width: 600px;
+            margin: 0 auto;
+        }
 
-        /* बटनको लम्बाई (Width) र उचाई (Padding) मात्र घटाइएको ओरिजिनल क्लास */
+        .row-detail {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .row-detail .val-white {
+            color: #1a202c;
+            font-weight: 500;
+        }
+
+        .total-row {
+            margin-top: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffb300;
+        }
+
         .action-btn {
+            width: 100%;
+            border: none;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-            color: #ffffff;
             background-color: #ffb300;
-            transition: background 0.2s;
-            
-            /* यहाँबाट बटन छोटो बनाइएको छ */
-            width: 200px;            /* पूरा चौडाईको साटो मात्र २०० पिक्सल लम्बाई */
-            height: 42px;            /* फिक्स आकर्षक उचाई */
-            font-size: 14px;         
-            border-radius: 25px;     /* क्याप्सुल गोलो लुक्स */
-            margin: 0 auto;          /* बटनलाई एकदम बीच (Center) मा राख्न */
-        }
-        
-        .action-btn.login-needed {
-            background-color: #dc2626;
+            color: #ffffff;
         }
 
         /* --- QR MODAL --- */
         .qr-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center;
-            z-index: 200; opacity: 0; pointer-events: none; transition: all 0.3s ease; padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            padding: 20px;
         }
-        .qr-modal.show { opacity: 1; pointer-events: auto; }
+
+        .qr-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         .qr-card {
-            background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px;
-            max-width: 380px; width: 100%; text-align: center; position: relative; transform: scale(0.8);
-            transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 380px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            transform: scale(0.8);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
-        .qr-modal.show .qr-card { transform: scale(1); }
-        .close-modal { position: absolute; top: 15px; right: 15px; font-size: 20px; color: #718096; cursor: pointer; }
-        .qr-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; color: #1a202c; }
-        .qr-subtitle { font-size: 13px; color: #4a5568; margin-bottom: 12px; }
-        .account-details-box { background: #fffdf5; border: 1px solid #ffb300; padding: 10px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; text-align: left; line-height: 1.5; }
-        .qr-image-wrapper { background-color: #f7fafc; padding: 12px; border-radius: 12px; display: inline-block; margin-bottom: 15px; border: 1px solid #e2e8f0; }
-        .qr-image-wrapper img { width: 180px; height: 180px; display: block; object-fit: contain; margin: 0 auto; }
+
+        .qr-modal.show .qr-card {
+            transform: scale(1);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 20px;
+            color: #718096;
+            cursor: pointer;
+        }
+
+        .qr-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #1a202c;
+        }
+
+        .qr-subtitle {
+            font-size: 13px;
+            color: #4a5568;
+            margin-bottom: 12px;
+        }
+
+        .account-details-box {
+            background: #fffdf5; 
+            border: 1px solid #ffb300; 
+            padding: 10px; 
+            border-radius: 8px; 
+            margin-bottom: 14px; 
+            font-size: 13px; 
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .qr-image-wrapper {
+            background-color: #f7fafc;
+            padding: 12px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .qr-image-wrapper img {
+            width: 180px;
+            height: 180px;
+            display: block;
+            object-fit: contain;
+            margin: 0 auto;
+        }
+
+        .txid-container {
+            text-align: left;
+            margin-bottom: 5px;
+        }
+
+        .txid-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .txid-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .txid-input-wrapper i {
+            position: absolute;
+            left: 12px;
+            color: #a0aec0;
+        }
+
+        .txid-input {
+            width: 100%;
+            background-color: #f7fafc;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            padding: 12px 12px 12px 38px;
+            color: #1a202c;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .txid-input.error-border {
+            border: 1px solid #e53e3e !important;
+            background-color: #fff5f5 !important;
+        }
+
+        .txid-error-message {
+            color: #e53e3e;
+            font-size: 11px;
+            margin-top: 4px;
+            margin-bottom: 10px;
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .payment-summary-box {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: left;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .pay-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
         
-        .txid-container { text-align: left; margin-bottom: 5px; }
-        .txid-label { font-size: 12px; font-weight: 600; color: #4a5568; margin-bottom: 6px; display: block; }
-        .txid-input-wrapper { position: relative; display: flex; align-items: center; }
-        .txid-input-wrapper i { position: absolute; left: 12px; color: #a0aec0; }
-        .txid-input { width: 100%; background-color: #f7fafc; border: 1px solid #cbd5e0; border-radius: 8px; padding: 12px 12px 12px 38px; color: #1a202c; font-size: 14px; outline: none; transition: all 0.2s; }
-        .txid-input.error-border { border: 1px solid #e53e3e !important; background-color: #fff5f5 !important; }
-        .txid-error-message { color: #e53e3e; font-size: 11px; margin-top: 4px; margin-bottom: 10px; display: none; align-items: center; gap: 4px; }
-        
-        .payment-summary-box { background-color: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; text-align: left; margin-top: 10px; margin-bottom: 15px; }
-        .pay-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
         .pay-row span:first-child { color: #4a5568; }
         .pay-row span:last-child { color: #1a202c; font-weight: 500; }
         .pay-row .highlight-total { color: #ffb300 !important; font-weight: 700; }
-        .done-btn { background-color: #ffb300; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; }
+
+        .done-btn {
+            background-color: #ffb300;
+            color: #ffffff;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+        }
 
         /* --- SUCCESS MODAL --- */
         .success-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6);
-            backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 300; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(26, 32, 44, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease-in-out;
         }
-        .success-modal.show { opacity: 1; pointer-events: auto; }
-        .success-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(30px); transition: all 0.3s ease-in-out; }
-        .success-modal.show .success-card { transform: translateY(0); }
-        .success-checkmark { width: 72px; height: 72px; background: #2ed573; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; animation: pulseCircle 1.6s infinite cubic-bezier(0.66, 0, 0, 1); }
-        .success-checkmark i { color: white; font-size: 32px; transform: scale(0); animation: scaleCheck 0.4s 0.2s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        
-        @keyframes pulseCircle { 0% { box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(46, 213, 115, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 213, 115, 0); } }
-        @keyframes scaleCheck { 0% { transform: scale(0); } 100% { transform: scale(1); } }
-        
-        .success-title { font-size: 22px; font-weight: 700; color: #1a202c; margin-bottom: 8px; }
-        .success-msg { font-size: 14px; color: #4a5568; line-height: 1.5; margin-bottom: 18px; }
-        .success-receipt-info { background-color: #f7fafc; border: 1px dashed #cbd5e0; border-radius: 8px; padding: 12px; text-align: left; font-size: 13px; margin-bottom: 20px; }
-        .receipt-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+
+        .success-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .success-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 360px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: translateY(30px);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .success-modal.show .success-card {
+            transform: translateY(0);
+        }
+
+        .success-checkmark {
+            width: 72px;
+            height: 72px;
+            background: #2ed573;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.4);
+            animation: pulseCircle 1.6s infinite cubic-bezier(0.66, 0, 0, 1);
+        }
+
+        .success-checkmark i {
+            color: white;
+            font-size: 32px;
+            transform: scale(0);
+            animation: scaleCheck 0.4s 0.2s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes pulseCircle {
+            0% { box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(46, 213, 115, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 213, 115, 0); }
+        }
+
+        @keyframes scaleCheck {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        .success-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .success-msg {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+
+        .success-receipt-info {
+            background-color: #f7fafc;
+            border: 1px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .receipt-row:last-child { margin-bottom: 0; }
         .receipt-row span:first-child { color: #718096; }
         .receipt-row span:last-child { color: #2d3748; font-weight: 600; }
-        .success-close-btn { background-color: #1a202c; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; }
+
+        .success-close-btn {
+            background-color: #1a202c;
+            color: #ffffff;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
     </style>
 </head>
 <body>
@@ -462,6 +587,7 @@
             <div class="badge official"><i class="fa-solid fa-circle-check"></i> Official Supply</div>
         </div>
         <div class="banner-flex">
+            <!-- Free Fire Logo Inside a Perfect Circle -->
             <img class="avatar-img" src="Free_Fire_Logo.png" alt="Free Fire Logo">
             <div>
                 <p class="banner-desc">Buy Garena Free Fire Diamonds in Nepal at the cheapest price with Gaule Store.</p>
@@ -484,6 +610,7 @@
             <div class="input-label">User ID</div>
             <input type="text" id="game-uid" class="uid-input" placeholder="Enter User ID" oninput="validateUIDLive()">
             
+            <!-- Error message for Game ID -->
             <div class="error-message" id="uid-error">
                 <i class="fa-solid fa-circle-exclamation"></i> <span>Game UID is required to make a purchase!</span>
             </div>
@@ -501,6 +628,7 @@
             <div class="box-title">Diamonds <span style="color: #e53e3e;">*</span></div>
         </div>
         
+        <!-- Error message for Packs -->
         <div class="error-message" id="pack-error" style="margin-bottom: 8px;">
             <i class="fa-solid fa-circle-exclamation"></i> <span>Please select a Diamond pack to proceed!</span>
         </div>
@@ -532,7 +660,7 @@
                 <span class="total-price" id="summary-total">Rs 0.00</span>
             </div>
             
-            <button id="main-action-btn" class="action-btn">
+            <button id="main-action-btn" class="action-btn" onclick="handleMainAction()">
                 <i class="fa-solid fa-basket-shopping"></i> Buy Now
             </button>
         </div>
@@ -545,26 +673,31 @@
             <div class="qr-title">Scan to Pay</div>
             <div class="qr-subtitle">Please scan the QR code via Khalti, eSewa or Fonepay</div>
             
+            <!-- Account Info Box -->
             <div class="account-details-box">
-                <strong><i class="fa-solid fa-user"></i> Name:</strong> Gaule Store <br>
-                <strong><i class="fa-solid fa-phone"></i> Number:</strong> ९७XXXXXXXX
+                <strong><i class="fa-solid fa-user"></i> Name:</strong> तपाईंको नाम यहाँ <br>
+                <strong><i class="fa-solid fa-phone"></i> Number:</strong> ९८XXXXXXXX
             </div>
 
+            <!-- Local QR Code -->
             <div class="qr-image-wrapper">
                 <img src="qr.png" alt="Payment QR Code">
             </div>
 
+            <!-- Transaction ID Input Field -->
             <div class="txid-container">
                 <label class="txid-label" for="txid">Transaction ID / Ref ID <span style="color: #e53e3e;">*</span></label>
                 <div class="txid-input-wrapper">
                     <i class="fa-solid fa-receipt"></i>
                     <input type="text" id="txid" class="txid-input" placeholder="Enter transaction ID after payment" oninput="validateTxIDLive()">
                 </div>
+                <!-- Error message for Transaction ID -->
                 <div class="txid-error-message" id="txid-error">
                     <i class="fa-solid fa-circle-exclamation"></i> <span>Transaction ID is required to verify payment!</span>
                 </div>
             </div>
 
+            <!-- Live Bill Summary -->
             <div class="payment-summary-box">
                 <div class="pay-row">
                     <span>Game UID:</span>
@@ -616,26 +749,7 @@
         </div>
     </div>
 
-    <!-- FIREBASE AND CORE LOGIC -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-            authDomain: "gaule-top-up-center.firebaseapp.com",
-            databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-            projectId: "gaule-top-up-center",
-            storageBucket: "gaule-top-up-center.firebasestorage.app",
-            messagingSenderId: "645605489690",
-            appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-
-        let currentUser = null;
+    <script>
         let selectedItemName = "";
         let selectedItemPrice = "";
 
@@ -647,30 +761,41 @@
         const txidInput = document.getElementById('txid');
         const txidError = document.getElementById('txid-error');
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                mainActionBtn.innerHTML = `<i class="fa-solid fa-basket-shopping"></i> Buy Now`;
-                mainActionBtn.classList.remove('login-needed');
-            } else {
-                currentUser = null;
-                mainActionBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login to Buy`;
-                mainActionBtn.classList.add('login-needed');
-            }
-        });
+        function selectPack(element, name, price) {
+            diamondsWrapper.classList.remove('error-border');
+            packError.style.display = "none";
 
-        mainActionBtn.onclick = function() {
-            if (!currentUser) {
-                signInWithPopup(auth, provider).then((result) => {
-                    console.log("Logged in!");
-                }).catch((error) => {
-                    alert("लगइन असफल भयो: " + error.message);
-                });
-                return;
-            }
+            document.querySelectorAll('.pack-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            
+            selectedItemName = name;
+            selectedItemPrice = price;
 
+            document.getElementById('summary-item').innerText = name;
+            document.getElementById('summary-total').innerText = 'Rs ' + price;
+        }
+
+        function validateUIDLive() {
+            if (gameUidInput.value.trim() !== "") {
+                gameUidInput.classList.remove('error-border');
+                uidError.style.display = "none";
+            }
+        }
+
+        // Live typing checks for popup validation
+        function validateTxIDLive() {
+            if (txidInput.value.trim() !== "") {
+                txidInput.classList.remove('error-border');
+                txidError.style.display = "none";
+            }
+        }
+
+        function handleMainAction() {
             let isFormValid = true;
 
+            // 1. Pack validation
             if (!selectedItemName) {
                 diamondsWrapper.classList.add('error-border');
                 packError.style.display = "flex";
@@ -678,6 +803,7 @@
                 isFormValid = false;
             }
 
+            // 2. Game UID validation
             let uidValue = gameUidInput.value.trim();
             if (uidValue === "") {
                 gameUidInput.classList.add('error-border');
@@ -688,35 +814,7 @@
 
             if(!isFormValid) return;
             openPaymentModal(uidValue);
-        };
-
-        window.selectPack = function(element, name, price) {
-            diamondsWrapper.classList.remove('error-border');
-            packError.style.display = "none";
-
-            document.querySelectorAll('.pack-card').forEach(card => card.classList.remove('selected'));
-            element.classList.add('selected');
-            
-            selectedItemName = name;
-            selectedItemPrice = price;
-
-            document.getElementById('summary-item').innerText = name;
-            document.getElementById('summary-total').innerText = 'Rs ' + price;
-        };
-
-        window.validateUIDLive = function() {
-            if (gameUidInput.value.trim() !== "") {
-                gameUidInput.classList.remove('error-border');
-                uidError.style.display = "none";
-            }
-        };
-
-        window.validateTxIDLive = function() {
-            if (txidInput.value.trim() !== "") {
-                txidInput.classList.remove('error-border');
-                txidError.style.display = "none";
-            }
-        };
+        }
 
         function openPaymentModal(uid) {
             document.getElementById('modal-uid').innerText = uid;
@@ -730,14 +828,15 @@
             document.getElementById('qrModal').classList.add('show');
         }
 
-        window.closePaymentModal = function() {
+        function closePaymentModal() {
             document.getElementById('qrModal').classList.remove('show');
-        };
+        }
 
-        window.submitPayment = function() {
+        function submitPayment() {
             let txidValue = txidInput.value.trim();
             let uidValue = gameUidInput.value.trim();
             
+            // Transaction ID Validation Inside Popup
             if (txidValue === "") {
                 txidInput.classList.add('error-border');
                 txidError.style.display = "flex";
@@ -752,17 +851,19 @@
             document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
             
             document.getElementById('successModal').classList.add('show');
-        };
+        }
 
-        window.closeSuccessModal = function() {
+        function closeSuccessModal() {
             document.getElementById('successModal').classList.remove('show');
+            
+            // Reset fields
             gameUidInput.value = "";
             selectedItemName = "";
             selectedItemPrice = "";
             document.getElementById('summary-item').innerText = "-";
             document.getElementById('summary-total').innerText = "Rs 0.00";
             document.querySelectorAll('.pack-card').forEach(card => card.classList.remove('selected'));
-        };
+        }
     </script>
 </body>
 </html>
