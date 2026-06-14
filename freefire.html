@@ -762,7 +762,7 @@
                 document.getElementById('receipt-item').innerText = selectedItemName;
                 document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
                 document.getElementById('successModal').classList.add('show');
-            }).catch((error) => {
+            }) catch((error) => {
                 alert("अर्डर पठाउन समस्या भयो: " + error.message);
             });
         };
