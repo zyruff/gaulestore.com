@@ -148,8 +148,7 @@
             document.getElementById("display-email").innerText = user.email;
         }
     });
-</script>
-</body><!DOCTYPE html>
+</script><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -157,18 +156,26 @@
     <title>Free Fire Likes</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
-        body { background:#f4f4f4; padding:20px; }
-        .container { max-width:450px; margin:auto; background:#fff; padding:20px; border-radius:15px; box-shadow:0 0 15px rgba(0,0,0,0.1); }
+        body { background:#f4f4f4; }
+        
+        /* यहाँ परिवर्तन गरिएको छ: width 100% र margin-top मात्र राखिएको छ */
+        .container { 
+            width: 100%; 
+            min-height: 100vh;
+            background:#fff; 
+            padding: 20px; 
+        }
+        
         .back-btn { display: inline-block; padding: 8px 15px; background: #eee; color: #333; text-decoration: none; border-radius: 5px; margin-bottom: 15px; font-weight: bold; }
         h1 { text-align:center; color:#ff6600; margin-bottom:20px; }
         .step { margin-top:20px; font-size:18px; font-weight:bold; color:#333; }
-        .product { display:block; padding:12px; margin-top:10px; background:#fafafa; border:2px solid #eee; border-radius:10px; cursor:pointer; }
+        .product { display:block; padding:15px; margin-top:10px; background:#fafafa; border:2px solid #eee; border-radius:10px; cursor:pointer; }
         
         .qr-container { display: flex; justify-content: center; margin-top: 15px; }
-        .qr-img { width: 200px; height: 200px; object-fit: cover; border: 2px solid #ccc; border-radius: 10px; }
+        .qr-img { width: 250px; height: 250px; object-fit: cover; border: 2px solid #ccc; border-radius: 10px; }
 
-        input[type=text] { width:100%; padding:12px; margin-top:10px; border:1px solid #ccc; border-radius:8px; }
-        button { width:100%; padding:14px; margin-top:20px; background:#ff6600; color:white; border:none; border-radius:8px; font-size:16px; cursor:pointer; font-weight:bold; }
+        input[type=text] { width:100%; padding:15px; margin-top:10px; border:1px solid #ccc; border-radius:8px; font-size: 16px; }
+        button { width:100%; padding:18px; margin-top:20px; background:#ff6600; color:white; border:none; border-radius:8px; font-size:18px; cursor:pointer; font-weight:bold; }
         button:disabled { background: #ccc; cursor: not-allowed; }
         .status { margin-top:15px; text-align:center; font-weight:bold; color: #333; }
     </style>
@@ -196,7 +203,7 @@
         <div class="qr-container">
             <img src="qr_code.png" class="qr-img" alt="QR Code">
         </div>
-        <div class="step" style="font-size: 14px; color: #555;">Write your real name in the remarks</div>
+        <div class="step" style="font-size: 14px; color: #555; text-align: center;">Write your real name in the remarks</div>
         <div class="step">Step 4: Enter Transaction ID</div>
         <input type="text" id="transactionId" placeholder="Enter Transaction ID">
     </div>
@@ -281,4 +288,3 @@
 
 </body>
 </html>
-    
