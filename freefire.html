@@ -46,9 +46,34 @@
 </div>
 
 
+
+<!-- यो बटनको कोड हो -->
 <a href="index.html" class="elegant-back-btn">
   &#8592; Back Home
 </a>
+
+<!-- यो बटनलाई सुन्दर बनाउने स्टाइल हो -->
+<style>
+  .elegant-back-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #e74c3c; /* रातो रङ */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    transition: background 0.3s, transform 0.2s;
+  }
+
+  .elegant-back-btn:hover {
+    background-color: #c0392b; /* माउस राख्दाको गाढा रातो */
+    transform: translateY(-2px);
+  }
+</style>
+
 
 
 
@@ -864,19 +889,6 @@
                 document.getElementById('receipt-uid').innerText = uidValue;
                 document.getElementById('receipt-item').innerText = selectedItemName;
                 document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
-                document.getElementById('successModal').classList.add('show');
-            }).catch((error) => {
-                alert("अर्डर पठाउन समस्या भयो: " + error.message);
-            });
-        };
-
-        window.closeSuccessModal = function() {
-            document.getElementById('successModal').classList.remove('show');
-            location.reload();
-        };
-    </script>
-</body>
-</html>  document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
                 document.getElementById('successModal').classList.add('show');
             }).catch((error) => {
                 alert("अर्डर पठाउन समस्या भयो: " + error.message);
