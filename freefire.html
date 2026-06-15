@@ -47,110 +47,9 @@
 
 
 
-<div class="notify" id="notifyBox">
-    <div class="title">⚠ Under Maintenance</div>
-    <div class="msg">​"Website maintenance in progress. Orders are temporarily closed. Please check back later."
-​You can choose the one that best fits your website's tone! Do you need help adding any of these to your page?.</div>
-
-    <span class="close" onclick="document.getElementById('notifyBox').style.display='none'">✕</span>
-
-    <div class="timeline"></div>
-</div>
-
-<style>
-/* 🖥 Desktop default */
-.notify{
-    position: fixed;
-    top: 20px;
-    left: 20px;
-
-    width: 280px;
-
-    background: linear-gradient(135deg, rgba(255,30,30,0.25), rgba(0,0,0,0.35));
-    backdrop-filter: blur(10px);
-
-    color: white;
-    padding: 12px 14px;
-    border-radius: 12px;
-
-    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-
-    animation: fadeOut 1s ease forwards;
-    animation-delay: 10s;
-}
-
-/* title */
-.title{
-    font-weight: bold;
-    font-size: 15px;
-    color: #ff4b4b;
-}
-
-/* message */
-.msg{
-    font-size: 13px;
-    margin-top: 5px;
-    opacity: 0.9;
-}
-
-/* close button */
-.close{
-    position: absolute;
-    top: 8px;
-    right: 10px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-/* timeline */
-.timeline{
-    height:3px;
-    background: linear-gradient(90deg, #ff1e1e, #ff4b4b);
-    margin-top:10px;
-
-    animation: load 10s linear forwards;
-}
-
-/* ⏱ progress */
-@keyframes load{
-    from{ width:100%; }
-    to{ width:0%; }
-}
-
-/* ⬇ auto hide */
-@keyframes fadeOut{
-    to{
-        opacity:0;
-        transform: translateY(20px);
-        visibility:hidden;
-    }
-}
-
-/* 📱 Mobile version */
-@media (max-width: 600px){
-    .notify{
-        width: 90%;
-        left: 5%;
-        top: 15px;
-        border-radius: 10px;
-    }
-
-    .title{
-        font-size: 14px;
-    }
-
-    .msg{
-        font-size: 12px;
-    }
-}
-</style>
-
-
-
-
 <!-- यो बटनको कोड हो -->
 <a href="index.html" class="elegant-back-btn">
-  &#8592; Back  Home
+  &#8592; Back Home
 </a>
 
 <!-- यो बटनलाई सुन्दर बनाउने स्टाइल हो -->
@@ -1003,6 +902,3 @@
     </script>
 </body>
 </html>
-
-
-
