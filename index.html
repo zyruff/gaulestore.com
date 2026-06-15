@@ -301,6 +301,131 @@
     .rotate-right { transform: rotate(45deg); }
 </style>
 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Order Status</title>
+    <style>
+        body { font-family: sans-serif; padding: 10px; background: #f9f9f9; }
+        
+        .table-container { 
+            width: 100%; 
+            max-width: 450px; 
+            margin: 0 auto; /* यो कोडले टेबललाई सधैं सेन्टरमा राख्छ */
+            overflow-x: auto; 
+            background: white; 
+            padding: 8px; 
+            border-radius: 6px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+        }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th { background: #333; color: white; padding: 8px 5px; text-align: left; white-space: nowrap; }
+        td { padding: 8px 5px; border-bottom: 1px solid #eee; white-space: nowrap; }
+        
+        h3 { 
+            text-align: center; 
+            color: #333; 
+            font-size: 16px; 
+        }
+    </style>
+</head>
+<body>
+
+<h3>Order Status</h3>
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Product</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="orderTableBody">
+            </tbody>
+    </table>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+        authDomain: "gaule-top-up-center.firebaseapp.com",
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+        projectId: "gaule-top-up-center",
+        storageBucket: "gaule-top-up-center.firebasestorage.app",
+        messagingSenderId: "645605489690",
+        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    
+    onValue(ref(db, 'orders'), (snapshot) => {
+        const data = snapshot.val();
+        const tbody = document.getElementById('orderTableBody');
+        tbody.innerHTML = '';
+        
+        if (!data) return;
+
+        // १. सबै अर्डरलाई लिस्टमा बदल्ने
+        const ordersArray = Object.keys(data).map(key => data[key]);
+        
+        // २. अर्डरलाई उल्टो पार्ने (नयाँ अर्डर माथि आउँछ) र १० वटा मात्र काट्ने (slice)
+        const recentOrders = ordersArray.reverse().slice(0, 10);
+        
+        recentOrders.forEach(o => {
+            let statusColor = '#999';
+            if (o.status.toLowerCase() === 'pending') statusColor = '#FFC107';
+            else if (o.status.toLowerCase() === 'rejected') statusColor = '#F44336';
+            else if (o.status.toLowerCase() === 'complete') statusColor = '#4CAF50';
+            
+            tbody.innerHTML += `
+                <tr>
+                    <td>${o.name}</td>
+                    <td>${o.product}</td>
+                    <td>${o.date}</td>
+                    <td style="color: ${statusColor}; font-weight: bold;">${o.status.toUpperCase()}</td>
+                </tr>
+            `;
+        });
+    });
+</script>
+</body>
+</html>
+
+
+
+<br>
+
+
+
+<!-- Login भएको user लाई मात्र देखाउने -->
+<div id="reviewForm" style="display:none;">
+  <h3>⭐ Customer Review</h3>
+
+  <div class="rating">
+    <!-- stars -->
+  </div>
+
+  <textarea placeholder="Write your review..."></textarea>
+  <button>Submit Review</button>
+</div>
+
+<!-- सबैले देख्ने reviews -->
+<div id="reviewsList">
+  <!-- Reviews here -->
+</div>
+
+
+
 <h3 style="text-align: center; font-family: sans-serif; color: black;">Contact Us</h3>
 
 <div class="contact-container">
@@ -439,3 +564,13 @@
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
