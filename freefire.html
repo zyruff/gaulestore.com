@@ -46,36 +46,31 @@
 </div>
 
 
-
-<button class="modern-back-btn" onclick="window.location.href='../index.html'">
-  &#8592; Back
-</button>
+<a href="/index.html" class="elegant-back-btn">
+  &#8592; Back Home
+</a>
 
 <style>
-  .modern-back-btn {
-    /* Gradient Color */
-    background: linear-gradient(135deg, #ff5f6d, #ff2a2a);
-    color: white;
+  .elegant-back-btn {
+    display: inline-block;
     padding: 8px 16px;
-    border: none;
-    border-radius: 20px; /* गोलो कुना */
+    background-color: #e74c3c; /* रातो रङ */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-family: sans-serif;
     font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2); /* हल्का छायाँ */
-    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: bold;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    transition: background 0.3s, transform 0.2s;
   }
 
-  /* माउस लैजाँदाको इफेक्ट */
-  .modern-back-btn:hover {
-    transform: translateY(-2px); /* बटन माथि उठ्छ */
-    box-shadow: 0 6px 10px rgba(255, 42, 42, 0.4);
-  }
-
-  .modern-back-btn:active {
-    transform: translateY(0); /* क्लिक गर्दा थोरै दबिए जस्तो हुन्छ */
+  .elegant-back-btn:hover {
+    background-color: #c0392b; /* अलि गाढा रातो */
+    transform: translateY(-2px);
   }
 </style>
+
 
 
 
