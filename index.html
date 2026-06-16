@@ -552,10 +552,8 @@
 
 
 
-<!-- Review Section HTML -->
 <div class="container" style="margin-top: 20px;">
     <h2>CUSTOMER REVIEWS</h2>
-    <!-- यहाँ 'write-btn' ले अब सिधै तपाईंको गूगल लगइन फंक्सन कल गर्छ -->
     <button class="btn-write" id="write-review-btn" style="background:#000; color:#fff; padding:10px; width:100%; border:none; cursor:pointer;">
         Write a Review
     </button>
@@ -569,38 +567,52 @@
             <input type="radio" id="s1" name="rating" value="1"><label for="s1">★</label>
         </div>
         <textarea id="review-text" style="width:100%; height:60px; margin-top:10px;" placeholder="तपाईंको अनुभव लेख्नुहोस्..."></textarea>
-        <button onclick="postReview()" style="width:100%; padding:10px; margin-top:10px; background:#dc2626; color:white; border:none; cursor:pointer;">Submit Review</button>
+        <button id="submit-review-btn" style="width:100%; padding:10px; margin-top:10px; background:#dc2626; color:white; border:none; cursor:pointer;">Submit Review</button>
     </div>
 
     <div id="review-list" style="margin-top:20px;"></div>
 </div>
 
 <script type="module">
-    // (तपाईंको पहिलेकै imports यहाँ राख्नुहोस्)
-    import { push, ref as dbRef, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    // सबै इम्पोटहरू एउटै ठाउँमा
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    // 'Write a Review' बटनको लजिक
-    document.getElementById("write-review-btn").addEventListener("click", () => {
-        if (auth.currentUser) {
-            // लगइन छ भने फर्म खोल्ने
-            document.getElementById("review-form").style.display = "block";
-        } else {
-            // लगइन छैन भने गुगल लगइन गराउने
-            googleLogin().then(() => {
-                document.getElementById("review-form").style.display = "block";
-            });
+    const firebaseConfig = {
+        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+        authDomain: "gaule-top-up-center.firebaseapp.com",
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+        projectId: "gaule-top-up-center",
+        storageBucket: "gaule-top-up-center.firebasestorage.app",
+        messagingSenderId: "645605489690",
+        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const provider = new GoogleAuthProvider();
+
+    // १. Write Button को लजिक
+    document.getElementById("write-review-btn").addEventListener("click", async () => {
+        if (!auth.currentUser) {
+            try { await signInWithPopup(auth, provider); } 
+            catch (e) { alert("Login Error!"); return; }
         }
+        document.getElementById("review-form").style.display = "block";
     });
 
-    // रिभ्यू सबमिट गर्ने
-    window.postReview = () => {
+    // २. Submit Button को लजिक
+    document.getElementById("submit-review-btn").addEventListener("click", () => {
         const user = auth.currentUser;
         const rating = document.querySelector('input[name="rating"]:checked');
         const text = document.getElementById("review-text").value;
 
-        if (!rating || !text) return alert("स्टार र म्यासेज भर्नुहोस्!");
+        if (!user) { alert("Please login first!"); return; }
+        if (!rating || !text) { alert("स्टार र म्यासेज भर्नुहोस्!"); return; }
 
-        push(dbRef(db, 'reviews/'), {
+        push(ref(db, 'reviews/'), {
             userId: user.uid,
             name: user.displayName,
             photo: user.photoURL,
@@ -610,18 +622,19 @@
         }).then(() => {
             alert("धन्यवाद!");
             document.getElementById("review-form").style.display = "none";
+            document.getElementById("review-text").value = "";
         });
-    };
+    });
 
-    // रिभ्यू लिस्ट देखाउने
-    onValue(dbRef(db, 'reviews/'), (snapshot) => {
+    // ३. रिभ्यू लिस्ट लोड गर्ने
+    onValue(ref(db, 'reviews/'), (snapshot) => {
         const list = document.getElementById("review-list");
         list.innerHTML = "";
         snapshot.forEach((child) => {
             const data = child.val();
             list.innerHTML += `
                 <div class="order-card" style="padding:10px; border-bottom:1px solid #eee;">
-                    <b>${data.name}</b> <span style="color:#f4b400">${'★'.repeat(data.stars)}</span>
+                    <b>${data.name}</b> <span style="color:#f4b400">${'★'.repeat(data.stars || 0)}</span>
                     <p style="margin:5px 0;">${data.comment}</p>
                 </div>
             `;
