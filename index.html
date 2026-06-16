@@ -406,84 +406,87 @@
 
 <br>
 
-<div id="reviews-list"></div> <!-- यहाँ रिव्युहरू देखिन्छन् -->
+
+
 
 <div class="container" id="review-container" style="margin-top: 20px;">
     <h2>CUSTOMER REVIEWS</h2>
-    <button class="btn-write" id="write-review-btn" style="background:#000; color:#fff; padding:10px; width:100%; border:none; cursor:pointer;">Write a Review</button>
+    
+    <!-- Write Review बटन सधैं देखिन्छ -->
+    <button id="write-review-btn" style="background:#000; color:#fff; padding:10px; width:100%; border:none; cursor:pointer;">
+        Write a Review
+    </button>
 
-    <div id="review-form" style="display:none; margin-top:20px; border-top:1px solid #ccc; padding-top:10px;">
-        <!-- स्टार र टेक्स्ट एरिया यहाँ रहन्छ -->
-        <div class="stars" id="star-group">
-            <input type="radio" id="s5" name="rating" value="5"><label for="s5">★</label>
-            <input type="radio" id="s4" name="rating" value="4"><label for="s4">★</label>
-            <input type="radio" id="s3" name="rating" value="3"><label for="s3">★</label>
-            <input type="radio" id="s2" name="rating" value="2"><label for="s2">★</label>
-            <input type="radio" id="s1" name="rating" value="1"><label for="s1">★</label>
+    <!-- रिव्यु फर्म -->
+    <div id="review-form" style="display:none; margin-top:20px; border:1px solid #eee; padding:15px; border-radius:10px;">
+        <textarea id="review-text" style="width:100%; height:60px;" placeholder="तपाईंको अनुभव लेख्नुहोस्..."></textarea>
+        
+        <!-- यो केवल एडमिनको लागि देखिन्छ -->
+        <div id="admin-admin-options" style="display:none; margin: 10px 0; background: #f0f7ff; padding: 10px;">
+            <input type="checkbox" id="verify-checkbox"> 
+            <label for="verify-checkbox" style="font-weight:bold; color:#065fd4;">Verified Badge दिने?</label>
         </div>
-        <textarea id="review-text" style="width:100%; height:60px; margin-top:10px;" placeholder="तपाईंको अनुभव लेख्नुहोस्..."></textarea>
+
         <button id="submit-review-btn" style="width:100%; padding:10px; margin-top:10px; background:#dc2626; color:white; border:none; cursor:pointer;">Submit Review</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, push, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    const firebaseConfig = { /* तपाईंको उही पुरानो config */ };
+    const firebaseConfig = {
+        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+        authDomain: "gaule-top-up-center.firebaseapp.com",
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+        projectId: "gaule-top-up-center",
+        storageBucket: "gaule-top-up-center.firebasestorage.app",
+        messagingSenderId: "645605489690",
+        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+    };
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
     const provider = new GoogleAuthProvider();
-    const ADMIN_EMAIL = "gaulestore.np@gmail.com";
 
-    // एडमिन टगल फंक्सन
-    window.toggleVerify = (id, currentStatus) => {
-        update(ref(db, 'reviews/' + id), { orderCompleted: !currentStatus });
+    // लगइन हुँदा एडमिन हो कि होइन चेक गर्ने
+    onAuthStateChanged(auth, (user) => {
+        if (user && user.email === "gaulestore.np@gmail.com") {
+            document.getElementById("admin-admin-options").style.display = "block";
+        }
+    });
+
+    // Write Review बटन थिच्दा
+    document.getElementById("write-review-btn").onclick = async () => {
+        if (!auth.currentUser) {
+            try { await signInWithPopup(auth, provider); } 
+            catch (e) { alert("Login failed!"); return; }
+        }
+        document.getElementById("review-form").style.display = "block";
+        document.getElementById("write-review-btn").style.display = "none";
     };
 
-    // रिव्यु लिस्ट रन्डर गर्ने
-    onValue(ref(db, 'reviews'), (snapshot) => {
-        const list = document.getElementById('reviews-list');
-        list.innerHTML = "";
-        snapshot.forEach((child) => {
-            const data = child.val();
-            const id = child.key;
-            const isAdmin = auth.currentUser?.email === ADMIN_EMAIL;
+    // सबमिट बटन
+    document.getElementById("submit-review-btn").onclick = () => {
+        const text = document.getElementById("review-text").value;
+        const isVerified = document.getElementById("verify-checkbox").checked;
 
-            list.innerHTML += `
-            <div style="background:#f9f9f9; padding:10px; margin:5px 0; border-radius:8px;">
-                <strong>${data.name}</strong> 
-                ${data.orderCompleted ? '<span style="color:#065fd4;">✔ (Verified)</span>' : ''}
-                <p>${data.comment}</p>
-                ${isAdmin ? `
-                    <button onclick="toggleVerify('${id}', ${!!data.orderCompleted})" style="background:${data.orderCompleted ? '#dc2626' : '#2563eb'}; color:white; border:none; padding:3px 8px; cursor:pointer; border-radius:4px;">
-                        ${data.orderCompleted ? 'Remove Badge' : 'Add Badge'}
-                    </button>
-                ` : ''}
-            </div>`;
-        });
-    });
+        if (!text.trim()) return alert("केही लेख्नुहोस्!");
 
-    // अरु बाँकी क्लिक र सबमिट फंक्सन यहाँ राख्नुहोस्...
-    document.getElementById("write-review-btn").addEventListener("click", async () => {
-        if (!auth.currentUser) { await signInWithPopup(auth, provider); }
-        document.getElementById("review-form").style.display = "block";
-    });
-
-    document.getElementById("submit-review-btn").addEventListener("click", () => {
-        const user = auth.currentUser;
-        const rating = document.querySelector('input[name="rating"]:checked');
-        const text = document.getElementById("review-text");
-        
         push(ref(db, 'reviews/'), {
-            name: user.displayName,
-            comment: text.value,
-            orderCompleted: false // नयाँ रिव्यु सधैं अनभेरिफाई हुन्छ
-        }).then(() => { alert("Thank you!"); });
-    });
+            name: auth.currentUser.displayName,
+            comment: text,
+            orderCompleted: isVerified,
+            timestamp: new Date().toLocaleString()
+        }).then(() => {
+            alert("Thank you!");
+            location.reload(); // पेज रिफ्रेश गर्ने
+        });
+    };
 </script>
+
 
 
 
@@ -632,196 +635,114 @@
 
 
 
+<div id="reviews"></div>
 
-<div id="reviews"></div>  <div style="text-align:center;margin-top:10px;">  
-    <button id="moreBtn"  
-    <div style="  
-    background:#fff;  
-    padding:10px;  
-    margin:6px 0;  
-    border-radius:10px;  
-    box-shadow:0 1px 4px rgba(0,0,0,.08);  
-">  
-        More Reviews  
-    </button>  
-</div>  <script type="module">  
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";  
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";  
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";  
-  
-const firebaseConfig = {  
-  apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",  
-  authDomain: "gaule-top-up-center.firebaseapp.com",  
-  databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",  
-  projectId: "gaule-top-up-center",  
-  storageBucket: "gaule-top-up-center.firebasestorage.app",  
-  messagingSenderId: "645605489690",  
-  appId: "1:645605489690:web:10e333176acd07eec1e5a3"  
-};  
-  
-const app = initializeApp(firebaseConfig);  
-const db = getDatabase(app);  
-const auth = getAuth(app);  
-  
-let isAdmin = false;  
-let showAll = false;  
-let allReviews = [];  
-  
-onAuthStateChanged(auth, (user) => {  
-    isAdmin = user?.email === "gaulestore.np@gmail.com";  
-    renderReviews();  
-});  
-  
-function timeAgo(timestamp) {  
-    if (!timestamp) return "Just now";  
-  
-    try {  
-        const [datePart, timePart] = timestamp.split(", ");  
-        const [day, month, year] = datePart.split("/");  
-        const [hour, minute, second] = timePart.split(":");  
-  
-        const reviewDate = new Date(  
-            year,  
-            month - 1,  
-            day,  
-            hour,  
-            minute,  
-            second  
-        );  
-  
-        const diff = Date.now() - reviewDate.getTime();  
-  
-        const minutes = Math.floor(diff / 60000);  
-        const hours = Math.floor(diff / 3600000);  
-        const days = Math.floor(diff / 86400000);  
-        const months = Math.floor(days / 30);  
-        const years = Math.floor(days / 365);  
-  
-        if (minutes < 1) return "Just now";  
-        if (minutes < 60) return `${minutes}m ago`;  
-        if (hours < 24) return `${hours}h ago`;  
-        if (days < 30) return `${days}d ago`;  
-        if (months < 12) return `${months}mo ago`;  
-  
-        return `${years}y ago`;  
-  
-    } catch {  
-        return timestamp;  
-    }  
-}  
-  
-function renderReviews() {  
-    const reviewsDiv = document.getElementById("reviews");  
-    const moreBtn = document.getElementById("moreBtn");  
-  
-    reviewsDiv.innerHTML = "";  
-  
-    const reviewsToShow = showAll ? allReviews : allReviews.slice(0, 3);  
-  
-    reviewsToShow.forEach(review => {  
-  
-        const photo =  
-            review.photo ||  
-            review.photoURL ||  
-            `https://ui-avatars.com/api/?name=${encodeURIComponent(review.name || "U")}`;  
-  
-        reviewsDiv.innerHTML += `  
-        <div style="  
-            background:#fff;  
-            padding:10px;  
-            margin:6px 0;  
-            border-radius:10px;  
-            box-shadow:0 1px 4px rgba(0,0,0,.08);  
-        ">  
-            <div style="  
-                display:flex;  
-                align-items:center;  
-                gap:8px;  
-            ">  
-                <img  
-                    src="${photo}"  
-                    onerror="this.src='https://ui-avatars.com/api/?name=U'"  
-                    style="  
-                        width:35px;  
-                        height:35px;  
-                        border-radius:50%;  
-                        object-fit:cover;  
-                    "  
-                >  
-  
-                <div>  
-                    <div style="  
-                        font-size:13px;  
-                        font-weight:bold;  
-                    ">  
-                        ${review.name || "User"}  
-                    </div>  
-  
-                    <div style="  
-                        font-size:11px;  
-                        color:#777;  
-                    ">  
-                        ${timeAgo(review.timestamp)}  
-                    </div>  
-                </div>  
-            </div>  
-  
-            <div style="  
-                color:#f4b400;  
-                margin-top:4px;  
-                font-size:13px;  
-            ">  
-                ${"★".repeat(Number(review.stars || 5))}  
-            </div>  
-  
-            <div style="  
-                margin-top:4px;  
-                color:#444;  
-                font-size:13px;  
-                line-height:1.3;  
-            ">  
-                ${review.comment || ""}  
-            </div>  
-  
-            ${isAdmin ? `  
-            <button style="  
-                margin-top:8px;  
-                padding:4px 10px;  
-                border:none;  
-                border-radius:6px;  
-                background:#000;  
-                color:#fff;  
-                font-size:11px;  
-                cursor:pointer;  
-            ">  
-                Reply  
-            </button>  
-            ` : ""}  
-        </div>  
-        `;  
-    });  
-  
-    if (allReviews.length > 3) {  
-        moreBtn.style.display = "inline-block";  
-        moreBtn.innerText = showAll ? "Less Reviews" : "More Reviews";  
-    } else {  
-        moreBtn.style.display = "none";  
-    }  
-}  
-  
-document.getElementById("moreBtn").onclick = () => {  
-    showAll = !showAll;  
-    renderReviews();  
-};  
-  
-onValue(ref(db, "reviews"), (snapshot) => {  
-    allReviews = [];  
-  
-    snapshot.forEach(child => {  
-        allReviews.push(child.val());  
-    });  
-  
-    allReviews.reverse();  
-    renderReviews();  
-});  
+<div style="text-align:center;margin-top:10px;">
+    <button id="moreBtn" style="background:#fff; padding:10px; margin:6px 0; border-radius:10px; border:none; box-shadow:0 1px 4px rgba(0,0,0,.08); cursor:pointer; display:none;">
+        More Reviews
+    </button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+  authDomain: "gaule-top-up-center.firebaseapp.com",
+  databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+  projectId: "gaule-top-up-center",
+  storageBucket: "gaule-top-up-center.firebasestorage.app",
+  messagingSenderId: "645605489690",
+  appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+let isAdmin = false;
+let showAll = false;
+let allReviews = [];
+
+onAuthStateChanged(auth, (user) => {
+    isAdmin = user?.email === "gaulestore.np@gmail.com";
+    renderReviews();
+});
+
+function timeAgo(timestamp) {
+    if (!timestamp) return "Just now";
+    try {
+        const [datePart, timePart] = timestamp.split(", ");
+        const [day, month, year] = datePart.split("/");
+        const [hour, minute, second] = timePart.split(":");
+        const reviewDate = new Date(year, month - 1, day, hour, minute, second);
+        const diff = Date.now() - reviewDate.getTime();
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(diff / 3600000);
+        const days = Math.floor(diff / 86400000);
+        const months = Math.floor(days / 30);
+        const years = Math.floor(days / 365);
+        if (minutes < 1) return "Just now";
+        if (minutes < 60) return `${minutes}m ago`;
+        if (hours < 24) return `${hours}h ago`;
+        if (days < 30) return `${days}d ago`;
+        if (months < 12) return `${months}mo ago`;
+        return `${years}y ago`;
+    } catch { return timestamp; }
+}
+
+function renderReviews() {
+    const reviewsDiv = document.getElementById("reviews");
+    const moreBtn = document.getElementById("moreBtn");
+    reviewsDiv.innerHTML = "";
+    const reviewsToShow = showAll ? allReviews : allReviews.slice(0, 3);
+
+    reviewsToShow.forEach(review => {
+        const photo = review.photo || review.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.name || "U")}`;
+        
+        // Verified Badge Logic
+        const verifiedBadge = review.orderCompleted ? `
+        <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:#065fd4; margin-left:4px;" title="Verified">
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zM9.8 17.3l-4.2-4.2 1.4-1.4 2.8 2.8 7.3-7.3 1.4 1.4-8.7 8.7z"></path>
+        </svg>` : "";
+
+        reviewsDiv.innerHTML += `
+        <div style="background:#fff; padding:10px; margin:6px 0; border-radius:10px; box-shadow:0 1px 4px rgba(0,0,0,.08);">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <img src="${photo}" onerror="this.src='https://ui-avatars.com/api/?name=U'" style="width:35px; height:35px; border-radius:50%; object-fit:cover;">
+                <div>
+                    <div style="font-size:13px; font-weight:bold; display:flex; align-items:center;">
+                        ${review.name || "User"} ${verifiedBadge}
+                    </div>
+                    <div style="font-size:11px; color:#777;">${timeAgo(review.timestamp)}</div>
+                </div>
+            </div>
+            <div style="color:#f4b400; margin-top:4px; font-size:13px;">${"★".repeat(Number(review.stars || 5))}</div>
+            <div style="margin-top:4px; color:#444; font-size:13px; line-height:1.3;">${review.comment || ""}</div>
+            ${isAdmin ? `<button style="margin-top:8px; padding:4px 10px; border:none; border-radius:6px; background:#000; color:#fff; font-size:11px; cursor:pointer;">Reply</button>` : ""}
+        </div>
+        `;
+    });
+
+    if (allReviews.length > 3) {
+        moreBtn.style.display = "inline-block";
+        moreBtn.innerText = showAll ? "Less Reviews" : "More Reviews";
+    } else {
+        moreBtn.style.display = "none";
+    }
+}
+
+document.getElementById("moreBtn").onclick = () => {
+    showAll = !showAll;
+    renderReviews();
+};
+
+onValue(ref(db, "reviews"), (snapshot) => {
+    allReviews = [];
+    snapshot.forEach(child => { allReviews.push(child.val()); });
+    allReviews.reverse();
+    renderReviews();
+});
 </script>
