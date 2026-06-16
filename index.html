@@ -484,7 +484,6 @@
 
         let isError = false;
 
-        // स्टार छान्नुपर्ने अनिवार्य
         if (!rating) {
             document.getElementById("star-group").classList.add("shake-error");
             isError = true;
@@ -492,7 +491,6 @@
             document.getElementById("star-group").classList.remove("shake-error");
         }
 
-        // टेक्स्ट लेख्नुपर्ने अनिवार्य
         if (!text.value.trim()) {
             text.classList.add("shake-error");
             isError = true;
@@ -506,6 +504,7 @@
         btn.innerText = "Submitting...";
         btn.disabled = true;
 
+        // डेटाबेसमा नयाँ फिल्डहरू थपिएको छ
         push(ref(db, 'reviews/'), {
             userId: user.uid,
             name: user.displayName,
@@ -513,12 +512,15 @@
             email: user.email,
             stars: rating.value,
             comment: text.value,
-            timestamp: new Date().toLocaleString()
+            timestamp: new Date().toLocaleString(),
+            orderCompleted: false, // सुरुमा false (Not Verified)
+            reply: ""              // सुरुमा खाली (No Reply)
         }).then(() => {
-            document.getElementById("review-container").innerHTML = `<div class="success-animation">Thank You For Revew✨</div>`;
+            document.getElementById("review-container").innerHTML = `<div class="success-animation">Thank You For Review✨</div>`;
         });
     });
 </script>
+
 
 
 
