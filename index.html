@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -551,19 +552,15 @@
 
 
 
-
-
 <!DOCTYPE html>
 <html lang="ne">
 <head>
     <meta charset="UTF-8">
-    <title>AGR STORE - Reviews</title>
+    <title>GAULE STORE - Reviews</title>
     <style>
         body { font-family: sans-serif; background: #f8f9fa; padding: 20px; }
         .container { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .btn-write { background: #000; color: #fff; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
-        
-        /* रिभ्यू फर्म (सुरुमा लुकेको) */
         #review-form { display: none; margin-top: 20px; border-top: 2px solid #eee; padding-top: 20px; }
         .stars { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 5px; margin-bottom: 10px; }
         .stars input { display: none; }
@@ -576,10 +573,8 @@
 
 <div class="container">
     <h2>CUSTOMER REVIEWS</h2>
-    <!-- Write Review बटन -->
     <button class="btn-write" id="write-btn">Write a Review</button>
 
-    <!-- रिभ्यू लेख्ने फर्म -->
     <div id="review-form">
         <div class="stars">
             <input type="radio" id="s5" name="rating" value="5"><label for="s5">★</label>
@@ -614,19 +609,41 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    // बटन क्लिक गर्दा
     document.getElementById('write-btn').addEventListener('click', () => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('review-form').style.display = 'block';
             } else {
                 alert("रिभ्यू दिन पहिला लगइन गर्नुहोस्!");
-                window.location.href = "login.html"; // तपाईंको लगइन पेजको लिंक
+                window.location.href = "login.html";
             }
         });
     });
 
-    // सबमिट गर्ने फंक्सन
+    const reviewList = document.getElementById('review-list');
+    onValue(ref(db, 'reviews/'), (snapshot) => {
+        reviewList.innerHTML = "";
+        snapshot.forEach((childSnapshot) => {
+            const data = childSnapshot.val();
+            const div = document.createElement('div');
+            div.style.borderBottom = "1px solid #eee";
+            div.style.padding = "15px 0";
+            div.style.display = "flex";
+            div.style.alignItems = "start";
+            div.style.gap = "15px";
+            div.innerHTML = `
+                <img src="${data.photo || 'https://ui-avatars.com/api/?name=' + data.name}" style="width:50px; height:50px; border-radius:50%;">
+                <div style="flex-grow: 1;">
+                    <div style="font-weight:bold;">${data.name}</div>
+                    <div style="color: #f4b400; font-size: 12px;">${'★'.repeat(data.stars)}</div>
+                    <div style="font-size:14px; margin: 5px 0;">${data.comment}</div>
+                    <div style="font-size: 11px; color: #888;">${data.date || 'हालै'}</div>
+                </div>
+            `;
+            reviewList.appendChild(div);
+        });
+    });
+
     window.postReview = () => {
         const user = auth.currentUser;
         const rating = document.querySelector('input[name="rating"]:checked');
@@ -636,8 +653,10 @@
 
         push(ref(db, 'reviews/'), {
             name: user.displayName || "User",
+            photo: user.photoURL || "",
             stars: rating.value,
-            comment: text
+            comment: text,
+            date: new Date().toLocaleDateString('ne-NP')
         }).then(() => {
             alert("धन्यवाद!");
             location.reload();
@@ -647,7 +666,4 @@
 
 </body>
 </html>
-
-
-
 
