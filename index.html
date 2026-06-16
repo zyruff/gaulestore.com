@@ -315,7 +315,7 @@
         .table-container { 
             width: 100%; 
             max-width: 450px; 
-            margin: 0 auto; /* यो कोडले टेबललाई सधैं सेन्टरमा राख्छ */
+            margin: 0 auto; 
             overflow-x: auto; 
             background: white; 
             padding: 8px; 
@@ -327,11 +327,7 @@
         th { background: #333; color: white; padding: 8px 5px; text-align: left; white-space: nowrap; }
         td { padding: 8px 5px; border-bottom: 1px solid #eee; white-space: nowrap; }
         
-        h3 { 
-            text-align: center; 
-            color: #333; 
-            font-size: 16px; 
-        }
+        h3 { text-align: center; color: #333; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -348,7 +344,7 @@
             </tr>
         </thead>
         <tbody id="orderTableBody">
-            </tbody>
+        </tbody>
     </table>
 </div>
 
@@ -366,6 +362,30 @@
         appId: "1:645605489690:web:10e333176acd07eec1e5a3"
     };
 
+    // Firebase को timestamp लाई "ago" मा बदल्ने फङ्सन
+    function getTimeAgo(timestamp) {
+        if (!timestamp) return "";
+        const now = new Date().getTime();
+        const seconds = Math.floor((now - timestamp) / 1000);
+
+        if (seconds < 60) return "Just now";
+        
+        let interval = Math.floor(seconds / 31536000);
+        if (interval >= 1) return interval + " year" + (interval > 1 ? "s" : "") + " ago";
+        
+        interval = Math.floor(seconds / 2592000);
+        if (interval >= 1) return interval + " month" + (interval > 1 ? "s" : "") + " ago";
+        
+        interval = Math.floor(seconds / 86400);
+        if (interval >= 1) return interval + " day" + (interval > 1 ? "s" : "") + " ago";
+        
+        interval = Math.floor(seconds / 3600);
+        if (interval >= 1) return interval + " hour" + (interval > 1 ? "s" : "") + " ago";
+        
+        interval = Math.floor(seconds / 60);
+        return interval + " minute" + (interval > 1 ? "s" : "") + " ago";
+    }
+
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     
@@ -376,10 +396,7 @@
         
         if (!data) return;
 
-        // १. सबै अर्डरलाई लिस्टमा बदल्ने
         const ordersArray = Object.keys(data).map(key => data[key]);
-        
-        // २. अर्डरलाई उल्टो पार्ने (नयाँ अर्डर माथि आउँछ) र १० वटा मात्र काट्ने (slice)
         const recentOrders = ordersArray.reverse().slice(0, 10);
         
         recentOrders.forEach(o => {
@@ -388,11 +405,12 @@
             else if (o.status.toLowerCase() === 'rejected') statusColor = '#F44336';
             else if (o.status.toLowerCase() === 'complete') statusColor = '#4CAF50';
             
+            // यहाँ o.timestamp को प्रयोग गरिएको छ
             tbody.innerHTML += `
                 <tr>
                     <td>${o.name}</td>
                     <td>${o.product}</td>
-                    <td>${o.date}</td>
+                    <td>${getTimeAgo(o.timestamp)}</td>
                     <td style="color: ${statusColor}; font-weight: bold;">${o.status.toUpperCase()}</td>
                 </tr>
             `;
