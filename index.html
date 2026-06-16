@@ -813,3 +813,50 @@ onValue(ref(db, "reviews"), (snapshot) => {
 
 
 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+  <style>
+    /* YouTube ko 16:9 aspect ratio milayeko */
+    .swiper { 
+      width: 100%; 
+      max-width: 800px; 
+      aspect-ratio: 16 / 9; 
+      margin: auto;
+      border-radius: 10px;
+    }
+    .swiper-slide img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+    }
+  </style>
+</head>
+<body>
+
+  <div class="swiper">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide"><img src="image1.png" alt="Slide 1"></div>
+      <div class="swiper-slide"><img src="image2.png" alt="Slide 2"></div>
+      <div class="swiper-slide"><img src="image3.png" alt="Slide 3"></div>
+    </div>
+    
+    <!-- Navigation arrows hataidiyo -->
+    <!-- Pagination matra rakheko -->
+    <div class="swiper-pagination"></div>
+  </div>
+
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script>
+    const swiper = new Swiper('.swiper', {
+      loop: true,
+      autoplay: { delay: 3000, disableOnInteraction: false },
+      // Navigation section hatayeko
+      pagination: { el: '.swiper-pagination', clickable: true },
+    });
+  </script>
+</body>
+</html>
+
