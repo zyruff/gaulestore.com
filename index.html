@@ -569,15 +569,12 @@
         <textarea id="review-text" style="width:100%; height:60px; margin-top:10px;" placeholder="तपाईंको अनुभव लेख्नुहोस्..."></textarea>
         <button id="submit-review-btn" style="width:100%; padding:10px; margin-top:10px; background:#dc2626; color:white; border:none; cursor:pointer;">Submit Review</button>
     </div>
-
-    <div id="review-list" style="margin-top:20px;"></div>
 </div>
 
 <script type="module">
-    // सबै इम्पोटहरू एउटै ठाउँमा
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
@@ -594,16 +591,16 @@
     const db = getDatabase(app);
     const provider = new GoogleAuthProvider();
 
-    // १. Write Button को लजिक
+    // बटन क्लिक गरेर लगइन र फर्म खोल्ने
     document.getElementById("write-review-btn").addEventListener("click", async () => {
         if (!auth.currentUser) {
             try { await signInWithPopup(auth, provider); } 
-            catch (e) { alert("Login Error!"); return; }
+            catch (e) { alert("Login failed!"); return; }
         }
         document.getElementById("review-form").style.display = "block";
     });
 
-    // २. Submit Button को लजिक
+    // सबमिट गर्दा डाटा Firebase मा पठाउने (सबै जानकारी सहित)
     document.getElementById("submit-review-btn").addEventListener("click", () => {
         const user = auth.currentUser;
         const rating = document.querySelector('input[name="rating"]:checked');
@@ -616,28 +613,18 @@
             userId: user.uid,
             name: user.displayName,
             photo: user.photoURL,
+            email: user.email, // ईमेल पनि थपियो
             stars: rating.value,
             comment: text,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toLocaleString() // यो समय Firebase मा जान्छ
         }).then(() => {
-            alert("धन्यवाद!");
+            alert("धन्यवाद! तपाईंको रिभ्यू पठाएकोमा।");
             document.getElementById("review-form").style.display = "none";
             document.getElementById("review-text").value = "";
-        });
-    });
-
-    // ३. रिभ्यू लिस्ट लोड गर्ने
-    onValue(ref(db, 'reviews/'), (snapshot) => {
-        const list = document.getElementById("review-list");
-        list.innerHTML = "";
-        snapshot.forEach((child) => {
-            const data = child.val();
-            list.innerHTML += `
-                <div class="order-card" style="padding:10px; border-bottom:1px solid #eee;">
-                    <b>${data.name}</b> <span style="color:#f4b400">${'★'.repeat(data.stars || 0)}</span>
-                    <p style="margin:5px 0;">${data.comment}</p>
-                </div>
-            `;
+            // स्टार चेक हटाइदिने
+            document.querySelectorAll('input[name="rating"]').forEach(el => el.checked = false);
+        }).catch((err) => {
+            alert("त्रुटि भयो: " + err.message);
         });
     });
 </script>
