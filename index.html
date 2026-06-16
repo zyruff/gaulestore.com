@@ -409,31 +409,48 @@
 
 
 
+<style>
+    /* स्टार सेलेक्सन र एनिमेशन */
+    .stars { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 8px; margin: 10px 0; transition: 0.3s; padding: 5px; }
+    .stars input { display: none; }
+    .stars label { font-size: 35px; color: #ccc; cursor: pointer; transition: transform 0.2s, color 0.2s; }
+    .stars input:checked ~ label, .stars label:hover, .stars label:hover ~ label { color: #f4b400; transform: scale(1.3); }
+
+    /* रातो भएर हल्लिने (Shake) एनिमेशन */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+    .shake-error { animation: shake 0.4s ease-in-out; border: 2px solid red !important; border-radius: 5px; }
+
+    /* सक्सेस पप-अप */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .success-animation { animation: fadeIn 0.5s ease-out; color: #166534; font-weight: bold; text-align: center; padding: 20px; background: #dcfce7; border-radius: 8px; margin-top: 10px; }
+</style>
+
 <div class="container" id="review-container" style="margin-top: 20px;">
     <h2>CUSTOMER REVIEWS</h2>
-    
-    <!-- Write Review बटन सधैं देखिन्छ -->
-    <button id="write-review-btn" style="background:#000; color:#fff; padding:10px; width:100%; border:none; cursor:pointer;">
+    <button class="btn-write" id="write-review-btn" style="background:#000; color:#fff; padding:10px; width:100%; border:none; cursor:pointer;">
         Write a Review
     </button>
 
-    <!-- रिव्यु फर्म -->
-    <div id="review-form" style="display:none; margin-top:20px; border:1px solid #eee; padding:15px; border-radius:10px;">
-        <textarea id="review-text" style="width:100%; height:60px;" placeholder="तपाईंको अनुभव लेख्नुहोस्..."></textarea>
-        
-        <!-- यो केवल एडमिनको लागि देखिन्छ -->
-        <div id="admin-admin-options" style="display:none; margin: 10px 0; background: #f0f7ff; padding: 10px;">
-            <input type="checkbox" id="verify-checkbox"> 
-            <label for="verify-checkbox" style="font-weight:bold; color:#065fd4;">Verified Badge दिने?</label>
+    <div id="review-form" style="display:none; margin-top:20px; border-top:1px solid #ccc; padding-top:10px;">
+        <div class="stars" id="star-group">
+            <input type="radio" id="s5" name="rating" value="5"><label for="s5">★</label>
+            <input type="radio" id="s4" name="rating" value="4"><label for="s4">★</label>
+            <input type="radio" id="s3" name="rating" value="3"><label for="s3">★</label>
+            <input type="radio" id="s2" name="rating" value="2"><label for="s2">★</label>
+            <input type="radio" id="s1" name="rating" value="1"><label for="s1">★</label>
         </div>
-
-        <button id="submit-review-btn" style="width:100%; padding:10px; margin-top:10px; background:#dc2626; color:white; border:none; cursor:pointer;">Submit Review</button>
+        <textarea id="review-text" style="width:100%; height:60px; margin-top:10px; transition:0.3s;" placeholder="तपाईंको अनुभव लेख्नुहोस्..."></textarea>
+        <button id="submit-review-btn" style="width:100%; padding:10px; margin-top:10px; background:#dc2626; color:white; border:none; cursor:pointer; transition: 0.3s;">Submit Review</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
@@ -451,42 +468,57 @@
     const db = getDatabase(app);
     const provider = new GoogleAuthProvider();
 
-    // लगइन हुँदा एडमिन हो कि होइन चेक गर्ने
-    onAuthStateChanged(auth, (user) => {
-        if (user && user.email === "gaulestore.np@gmail.com") {
-            document.getElementById("admin-admin-options").style.display = "block";
-        }
-    });
-
-    // Write Review बटन थिच्दा
-    document.getElementById("write-review-btn").onclick = async () => {
+    document.getElementById("write-review-btn").addEventListener("click", async () => {
         if (!auth.currentUser) {
             try { await signInWithPopup(auth, provider); } 
             catch (e) { alert("Login failed!"); return; }
         }
         document.getElementById("review-form").style.display = "block";
         document.getElementById("write-review-btn").style.display = "none";
-    };
+    });
 
-    // सबमिट बटन
-    document.getElementById("submit-review-btn").onclick = () => {
-        const text = document.getElementById("review-text").value;
-        const isVerified = document.getElementById("verify-checkbox").checked;
+    document.getElementById("submit-review-btn").addEventListener("click", () => {
+        const user = auth.currentUser;
+        const rating = document.querySelector('input[name="rating"]:checked');
+        const text = document.getElementById("review-text");
 
-        if (!text.trim()) return alert("केही लेख्नुहोस्!");
+        let isError = false;
+
+        // स्टार छान्नुपर्ने अनिवार्य
+        if (!rating) {
+            document.getElementById("star-group").classList.add("shake-error");
+            isError = true;
+        } else {
+            document.getElementById("star-group").classList.remove("shake-error");
+        }
+
+        // टेक्स्ट लेख्नुपर्ने अनिवार्य
+        if (!text.value.trim()) {
+            text.classList.add("shake-error");
+            isError = true;
+        } else {
+            text.classList.remove("shake-error");
+        }
+
+        if (isError) return;
+
+        const btn = document.getElementById("submit-review-btn");
+        btn.innerText = "Submitting...";
+        btn.disabled = true;
 
         push(ref(db, 'reviews/'), {
-            name: auth.currentUser.displayName,
-            comment: text,
-            orderCompleted: isVerified,
+            userId: user.uid,
+            name: user.displayName,
+            photo: user.photoURL,
+            email: user.email,
+            stars: rating.value,
+            comment: text.value,
             timestamp: new Date().toLocaleString()
         }).then(() => {
-            alert("Thank you!");
-            location.reload(); // पेज रिफ्रेश गर्ने
+            document.getElementById("review-container").innerHTML = `<div class="success-animation">Thank You For Revew✨</div>`;
         });
-    };
+    });
 </script>
-
 
 
 
