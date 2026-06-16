@@ -567,6 +567,10 @@
         .stars label { font-size: 30px; color: #ccc; cursor: pointer; }
         .stars input:checked ~ label, .stars label:hover, .stars label:hover ~ label { color: #f4b400; }
         textarea { width: 100%; height: 80px; padding: 10px; box-sizing: border-box; border-radius: 5px; border: 1px solid #ccc; }
+        .review-card { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; align-items: center; gap: 10px; }
+        .review-avatar { width: 40px; height: 40px; border-radius: 50%; }
+        .review-content { flex-grow: 1; }
+        #more-btn { background: #f0f0f0; border: none; padding: 10px; width: 100%; cursor: pointer; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
@@ -588,11 +592,12 @@
     </div>
 
     <div id="review-list" style="margin-top:20px;"></div>
+    <button id="more-btn" onclick="showMore()">View More</button>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
@@ -609,61 +614,72 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    document.getElementById('write-btn').addEventListener('click', () => {
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('review-form').style.display = 'block';
-            } else {
-                alert("रिभ्यू दिन पहिला लगइन गर्नुहोस्!");
-                window.location.href = "login.html";
-            }
-        });
+    let allReviews = [];
+    let displayCount = 5;
+
+    function timeAgo(dateString) {
+        const seconds = Math.floor((new Date() - new Date(dateString)) / 1000);
+        let interval = seconds / 86400;
+        if (interval >= 1) return Math.floor(interval) + " days ago";
+        interval = seconds / 3600;
+        if (interval >= 1) return Math.floor(interval) + " hours ago";
+        interval = seconds / 60;
+        if (interval >= 1) return Math.floor(interval) + " minutes ago";
+        return "Just now";
+    }
+
+    onValue(ref(db, 'reviews/'), (snapshot) => {
+        allReviews = [];
+        snapshot.forEach((child) => { allReviews.unshift(child.val()); });
+        renderReviews();
     });
 
-    const reviewList = document.getElementById('review-list');
-    onValue(ref(db, 'reviews/'), (snapshot) => {
+    function renderReviews() {
+        const reviewList = document.getElementById('review-list');
+        const moreBtn = document.getElementById('more-btn');
         reviewList.innerHTML = "";
-        snapshot.forEach((childSnapshot) => {
-            const data = childSnapshot.val();
+        
+        allReviews.slice(0, displayCount).forEach(data => {
             const div = document.createElement('div');
-            div.style.borderBottom = "1px solid #eee";
-            div.style.padding = "15px 0";
-            div.style.display = "flex";
-            div.style.alignItems = "start";
-            div.style.gap = "15px";
+            div.className = 'review-card';
             div.innerHTML = `
-                <img src="${data.photo || 'https://ui-avatars.com/api/?name=' + data.name}" style="width:50px; height:50px; border-radius:50%;">
-                <div style="flex-grow: 1;">
-                    <div style="font-weight:bold;">${data.name}</div>
-                    <div style="color: #f4b400; font-size: 12px;">${'★'.repeat(data.stars)}</div>
-                    <div style="font-size:14px; margin: 5px 0;">${data.comment}</div>
-                    <div style="font-size: 11px; color: #888;">${data.date || 'हालै'}</div>
+                <img src="${data.photo || 'https://ui-avatars.com/api/?name=' + data.name}" class="review-avatar">
+                <div class="review-content">
+                    <div style="font-size:13px; font-weight:bold;">${data.name}</div>
+                    <div style="color: #f4b400; font-size: 11px;">${'★'.repeat(data.stars)}</div>
+                    <div style="font-size:13px;">${data.comment}</div>
+                    <div style="font-size: 10px; color: #999;">${timeAgo(data.timestamp)}</div>
                 </div>
             `;
             reviewList.appendChild(div);
         });
+
+        moreBtn.style.display = allReviews.length > displayCount ? 'block' : 'none';
+    }
+
+    window.showMore = () => {
+        displayCount += 5;
+        renderReviews();
+    };
+
+    document.getElementById('write-btn').addEventListener('click', () => {
+        auth.currentUser ? document.getElementById('review-form').style.display = 'block' : window.location.href = "login.html";
     });
 
     window.postReview = () => {
         const user = auth.currentUser;
         const rating = document.querySelector('input[name="rating"]:checked');
         const text = document.getElementById('review-text').value;
-
-        if (!rating || !text) return alert("कृपया स्टार र रिभ्यू दुवै भर्नुहोस्!");
-
+        if (!rating || !text) return alert("कृपया स्टार र रिभ्यू भर्नुहोस्!");
         push(ref(db, 'reviews/'), {
             name: user.displayName || "User",
             photo: user.photoURL || "",
             stars: rating.value,
             comment: text,
-            date: new Date().toLocaleDateString('ne-NP')
-        }).then(() => {
-            alert("धन्यवाद!");
-            location.reload();
-        });
+            timestamp: new Date().toISOString()
+        }).then(() => { location.reload(); });
     };
 </script>
 
 </body>
 </html>
-
