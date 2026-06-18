@@ -161,7 +161,7 @@
                         <div class="order-card">
                             <p style="font-size: 14px; margin: 3px 0;">Product: <b>${o.product || "N/A"}</b></p>
                             <p style="font-size: 14px; margin: 3px 0;">Your ID: <b>${o.uid || "N/A"}</b></p>
-                            <p style="font-size: 14px; margin: 3px 0;">Your Code: <b>${o.cod || "N/A"}</b></p>
+                            <p style="font-size: 14px; margin: 3px 0;">Your Code: <b>${o.code || "N/A"}</b></p>
                             <p style="font-size: 14px; margin: 3px 0;">Status: <b style="color:${statusColor}">${o.status}</b></p>
                         </div>`;
                 });
@@ -1017,7 +1017,7 @@
                 product: selectedItemName,
                 amountDue: selectedItemPrice,
                 uid: uidValue,
-                code:waiting,
+                code: "waiting"
                 transactionId: txidValue,
                 status: "Pending"
             }).then(() => {
