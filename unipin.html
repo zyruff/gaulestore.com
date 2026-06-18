@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaule Store</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; }
+        .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #dc2626; justify-content: space-between; }
+        .menu-icon { font-size: 28px; cursor: pointer; }
+        #nav-menu { display: none; position: absolute; top: 0; left: 0; background: #fff; border: 1px solid #ccc; padding: 20px; width: 250px; height: 100%; z-index: 1000; box-shadow: 2px 2px 10px #ccc; }
+        .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-btn { font-size: 30px; cursor: pointer; color: #dc2626; }
+        .search-box { display: flex; gap: 5px; margin-bottom: 20px; }
+        #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
+        #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; }
+        #profile-dropdown { display: none; position: absolute; top: 50px; right: 0; background: white; border: 1px solid #ccc; padding: 15px; width: 200px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); border-radius: 8px; text-align: center; z-index: 1000; }
+        .user-name { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+        .user-email { font-size: 12px; color: #666; margin-bottom: 10px; }
+        .change-name { font-size: 11px; color: #dc2626; text-decoration: none; display: block; margin-bottom: 15px; }
+        .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; cursor: pointer; border-radius: 4px; }
+        #nav-menu a { display: block; padding: 12px 0; color: black; text-decoration: none; border-bottom: 1px solid #eee; }
+        .order-card { background: white; border-left: 5px solid #dc2626; padding: 10px; margin-bottom: 8px; border-radius: 5px; box-shadow: 0 2px 5px #ddd; }
+        .store-title { font-size: 1.5rem; font-weight: bold; }
+        .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+    <div class="store-title">GAULE <span style="color:#dc2626;">STORE</span></div>
+    <div class="header-right">
+        <div id="login-container" onclick="googleLogin()">
+            <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <img id="profile-pic" onclick="toggleProfile()">
+        <div id="profile-dropdown">
+            <div id="display-name" class="user-name"></div>
+            <div id="display-email" class="user-email"></div>
+            <a href="https://myaccount.google.com/personal-info" target="_blank" class="change-name">Change Name</a>
+            <button class="logout-btn" onclick="logoutUser()">Logout</button>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- यो बटनको कोड हो -->
+<a href="index.html" class="elegant-back-btn">
+  &#8592; Back Home
+</a>
+
+<!-- यो बटनलाई सुन्दर बनाउने स्टाइल हो -->
+<style>
+  .elegant-back-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #e74c3c; /* रातो रङ */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    transition: background 0.3s, transform 0.2s;
+  }
+
+  .elegant-back-btn:hover {
+    background-color: #c0392b; /* माउस राख्दाको गाढा रातो */
+    transform: translateY(-2px);
+  }
+</style>
+
+
+
+
+
+
+<div id="nav-menu">
+    <div class="menu-header">
+        <span style="font-weight:bold;">Menu</span>
+        <span class="close-btn" onclick="toggleMenu()">&times;</span>
+    </div>
+    <div class="search-box">
+        <input type="text" id="gameSearch" placeholder="Search games...">
+        <button onclick="alert('Searching...')">Search</button>
+    </div>
+    <a href="index.html">Home</a>
+    <div id="my-orders-link" style="display:none;"><a href="#" onclick="showOrders()">My Orders</a></div>
+    <a href="shop.html">Shop</a>
+    <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
+</div>
+
+<div id="content-area" style="padding: 20px;"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, query, orderByChild, equalTo, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+        authDomain: "gaule-top-up-center.firebaseapp.com",
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+        projectId: "gaule-top-up-center",
+        storageBucket: "gaule-top-up-center.firebasestorage.app",
+        messagingSenderId: "645605489690",
+        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const provider = new GoogleAuthProvider();
+
+    window.toggleMenu = () => { const m = document.getElementById("nav-menu"); m.style.display = (m.style.display === "block") ? "none" : "block"; };
+    window.toggleProfile = () => { const d = document.getElementById("profile-dropdown"); d.style.display = (d.style.display === "block") ? "none" : "block"; };
+    window.googleLogin = () => signInWithPopup(auth, provider);
+    window.logoutUser = () => signOut(auth).then(() => location.reload());
+
+    window.showOrders = () => {
+        toggleMenu();
+        const user = auth.currentUser;
+        if (!user) return;
+        
+        const area = document.getElementById("content-area");
+        
+        // पछाडि फर्किने बटन र हेडिङ
+        area.innerHTML = `
+            <button onclick="location.reload()" style="margin-bottom:15px; padding:8px 15px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer;">
+                ← Back
+            </button>
+            <h2>My Orders</h2>
+        `;
+
+        const ordersRef = query(ref(db, 'orders'), orderByChild('userId'), equalTo(user.uid));
+        
+        onValue(ordersRef, (snapshot) => {
+            // अर्डर सूची देखाउनु अघि 'Back' बटन यथावत राख्न
+            let orderHtml = `
+                <button onclick="location.reload()" style="margin-bottom:15px; padding:8px 15px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer;">
+                    ← Back
+                </button>
+                <h2>My Orders</h2>
+            `;
+            
+            let orderArray = [];
+            snapshot.forEach((s) => { orderArray.push(s.val()); });
+            orderArray.reverse(); 
+
+            if (orderArray.length > 0) {
+                orderArray.forEach((o) => {
+                    let statusColor = '#eab308';
+                    if (o.status === 'Complete') statusColor = 'green';
+                    else if (o.status === 'Rejected') statusColor = 'red';
+
+                    orderHtml += `
+                        <div class="order-card">
+                            <p style="font-size: 14px; margin: 3px 0;">Product: <b>${o.product || "N/A"}</b></p>
+                            <p style="font-size: 14px; margin: 3px 0;">Email ID: <b>${o.uid || "N/A"}</b></p>
+                            <p style="font-size: 14px; margin: 3px 0;">Your Code: <b>${o.code || "N/A"}</b></p>
+                            <p style="font-size: 14px; margin: 3px 0;">Status: <b style="color:${statusColor}">${o.status}</b></p>
+                        </div>`;
+                });
+                area.innerHTML = orderHtml;
+            } else { 
+                area.innerHTML = orderHtml + "<p>No Order History</p>"; 
+            }
+        });
+    };
+
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById("my-orders-link").style.display = "block";
+            document.getElementById("login-container").style.display = "none";
+            document.getElementById("profile-pic").style.display = "block";
+            document.getElementById("profile-pic").src = user.photoURL;
+            document.getElementById("display-name").innerText = user.displayName;
+            document.getElementById("display-email").innerText = user.email;
+        }
+    });
+</script>
+
+
+
+</body>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaule Store - Official Custom Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: #f7fafc; 
+            color: #2d3748; 
+            padding-bottom: 160px; 
+        }
+
+        /* --- BANNER SECTION --- */
+        .banner-container {
+            padding: 16px;
+            background: linear-gradient(180deg, #ffffff 0%, #f7fafc 100%);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .badges-wrapper {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .badge.instant { background-color: rgba(255, 179, 0, 0.15); color: #b7791f; }
+        .badge.official { background-color: rgba(46, 213, 115, 0.15); color: #1e7e34; }
+        
+        .banner-flex {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .avatar-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid #ffb300;
+            object-fit: cover;
+        }
+
+        .banner-desc {
+            font-size: 13px;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+
+        /* --- TABS --- */
+        .tabs-container {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        .tab {
+            background-color: #edf2f7;
+            color: #4a5568;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            background-color: #ffffff;
+            color: #1a202c;
+            border: 1px solid #cbd5e0;
+        }
+
+        /* --- INPUT CARD PANEL --- */
+        .section-box {
+            margin: 0 16px 20px 16px;
+        }
+
+        .section-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .box-title {
+            font-size: 15px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .input-card-panel {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .input-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #718096;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .uid-input {
+            width: 100%;
+            background-color: #f7fafc;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            padding: 14px;
+            color: #1a202c;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+
+        .uid-input.error-border {
+            border: 1px solid #e53e3e !important;
+            background-color: #fff5f5 !important;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 12px;
+            margin-bottom: 10px;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .instruction-text {
+            font-size: 11px;
+            color: #718096;
+            display: flex;
+            gap: 8px;
+            line-height: 1.4;
+        }
+
+        /* --- PACKS GRID --- */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 4px;
+            border-radius: 14px;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .cards-grid.error-border {
+            border: 2px solid #e53e3e !important;
+            background-color: #fff5f5;
+            padding: 8px;
+        }
+
+        .pack-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            transition: transform 0.1s, border-color 0.2s;
+        }
+
+        .pack-card:active { transform: scale(0.98); }
+        .pack-card.selected { border: 2px solid #ffb300 !important; background-color: #fffdf5; }
+        .pack-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1a202c; }
+        .pack-price { font-size: 15px; font-weight: 700; color: #ffb300; }
+        .diamond-icon { position: absolute; bottom: 14px; right: 14px; color: #3182ce; font-size: 20px; }
+
+        /* --- DRAWER --- */
+        .bottom-drawer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            border-radius: 16px 16px 0 0;
+            padding: 16px;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        .drawer-inner { max-width: 600px; margin: 0 auto; }
+        .row-detail { display: flex; justify-content: space-between; font-size: 13px; color: #4a5568; margin-bottom: 8px; }
+        .row-detail .val-white { color: #1a202c; font-weight: 500; }
+        .total-row { margin-top: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .total-price { font-size: 20px; font-weight: 700; color: #ffb300; }
+
+        /* बटनको लम्बाई (Width) र उचाई (Padding) मात्र घटाइएको ओरिजिनल क्लास */
+        .action-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            color: #ffffff;
+            background-color: #ffb300;
+            transition: background 0.2s;
+            
+            /* यहाँबाट बटन छोटो बनाइएको छ */
+            width: 200px;            /* पूरा चौडाईको साटो मात्र २०० पिक्सल लम्बाई */
+            height: 42px;            /* फिक्स आकर्षक उचाई */
+            font-size: 14px;         
+            border-radius: 25px;     /* क्याप्सुल गोलो लुक्स */
+            margin: 0 auto;          /* बटनलाई एकदम बीच (Center) मा राख्न */
+        }
+        
+        .action-btn.login-needed {
+            background-color: #dc2626;
+        }
+
+        /* --- QR MODAL --- */
+        .qr-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center;
+            z-index: 200; opacity: 0; pointer-events: none; transition: all 0.3s ease; padding: 20px;
+        }
+        .qr-modal.show { opacity: 1; pointer-events: auto; }
+        .qr-card {
+            background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px;
+            max-width: 380px; width: 100%; text-align: center; position: relative; transform: scale(0.8);
+            transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .qr-modal.show .qr-card { transform: scale(1); }
+        .close-modal { position: absolute; top: 15px; right: 15px; font-size: 20px; color: #718096; cursor: pointer; }
+        .qr-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; color: #1a202c; }
+        .qr-subtitle { font-size: 13px; color: #4a5568; margin-bottom: 12px; }
+        .account-details-box { background: #fffdf5; border: 1px solid #ffb300; padding: 10px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; text-align: left; line-height: 1.5; }
+        .qr-image-wrapper { background-color: #f7fafc; padding: 12px; border-radius: 12px; display: inline-block; margin-bottom: 15px; border: 1px solid #e2e8f0; }
+        .qr-image-wrapper img { width: 180px; height: 180px; display: block; object-fit: contain; margin: 0 auto; }
+        
+        .txid-container { text-align: left; margin-bottom: 5px; }
+        .txid-label { font-size: 12px; font-weight: 600; color: #4a5568; margin-bottom: 6px; display: block; }
+        .txid-input-wrapper { position: relative; display: flex; align-items: center; }
+        .txid-input-wrapper i { position: absolute; left: 12px; color: #a0aec0; }
+        .txid-input { width: 100%; background-color: #f7fafc; border: 1px solid #cbd5e0; border-radius: 8px; padding: 12px 12px 12px 38px; color: #1a202c; font-size: 14px; outline: none; transition: all 0.2s; }
+        .txid-input.error-border { border: 1px solid #e53e3e !important; background-color: #fff5f5 !important; }
+        .txid-error-message { color: #e53e3e; font-size: 11px; margin-top: 4px; margin-bottom: 10px; display: none; align-items: center; gap: 4px; }
+        
+        .payment-summary-box { background-color: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; text-align: left; margin-top: 10px; margin-bottom: 15px; }
+        .pay-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+        .pay-row span:first-child { color: #4a5568; }
+        .pay-row span:last-child { color: #1a202c; font-weight: 500; }
+        .pay-row .highlight-total { color: #ffb300 !important; font-weight: 700; }
+        .done-btn { background-color: #ffb300; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; }
+
+        /* --- SUCCESS MODAL --- */
+        .success-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6);
+            backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 300; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out;
+        }
+        .success-modal.show { opacity: 1; pointer-events: auto; }
+        .success-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(30px); transition: all 0.3s ease-in-out; }
+        .success-modal.show .success-card { transform: translateY(0); }
+        .success-checkmark { width: 72px; height: 72px; background: #2ed573; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; animation: pulseCircle 1.6s infinite cubic-bezier(0.66, 0, 0, 1); }
+        .success-checkmark i { color: white; font-size: 32px; transform: scale(0); animation: scaleCheck 0.4s 0.2s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        @keyframes pulseCircle { 0% { box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(46, 213, 115, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 213, 115, 0); } }
+        @keyframes scaleCheck { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        
+        .success-title { font-size: 22px; font-weight: 700; color: #1a202c; margin-bottom: 8px; }
+        .success-msg { font-size: 14px; color: #4a5568; line-height: 1.5; margin-bottom: 18px; }
+        .success-receipt-info { background-color: #f7fafc; border: 1px dashed #cbd5e0; border-radius: 8px; padding: 12px; text-align: left; font-size: 13px; margin-bottom: 20px; }
+        .receipt-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .receipt-row span:first-child { color: #718096; }
+        .receipt-row span:last-child { color: #2d3748; font-weight: 600; }
+        .success-close-btn { background-color: #1a202c; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; }
+    </style>
+</head>
+<body>
+ 
+   <div class="banner-container">
+        <div class="badges-wrapper">
+            <div class="badge instant"> 1 min - 5 min Delivery</div>
+            <div class="badge official"><i class="fa-solid fa-circle-check"></i> Official Supply</div>
+        </div>
+        <div class="banner-flex">
+            <img class="avatar-img" src="Free_Fire_Logo.png" alt="Free Fire Logo">
+            <div>
+<div class="badge Region">Nepal/Bangladesh </div>
+                <p class="banner-desc">Buy Unipin Voucher in Nepal at the cheapest price with Gaule Store.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="tabs-container">
+        <div class="tab active">Unipin Voucher</div>
+ </div>
+
+   
+ <div class="section-box">
+        <div class="section-header-flex">
+            <div class="box-title">Email ID <span style="color: #e53e3e;">*</span></div>
+        </div>
+        <div class="input-card-panel">
+            <div class="input-label">Your Email</div>
+            <input type="text" id="game-uid" class="uid-input" placeholder="Enter Your Email" oninput="validateUIDLive()">
+            
+            <div class="error-message" id="uid-error">
+                <i class="fa-solid fa-circle-exclamation"></i> <span>Email ID is required to make a purchase!</span>
+            </div>
+            
+            <div class="instruction-text">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Please enter your real email ID.</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-box">
+        <div class="section-header-flex">
+            <div class="box-title">Unipin Voucher <span style="color: #e53e3e;">*</span></div>
+        </div>
+        
+        <div class="error-message" id="pack-error" style="margin-bottom: 8px;">
+            <i class="fa-solid fa-circle-exclamation"></i> <span>Please select a Diamond pack to proceed!</span>
+        </div>
+
+
+<style>
+    .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .pack-card { 
+        background: white; border: 1px solid #ddd; padding: 15px; border-radius: 10px; 
+        display: flex; justify-content: space-between; align-items: center; position: relative; 
+    }
+    .text-content { display: flex; flex-direction: column; }
+    .pack-title { font-weight: bold; font-size: 14px; }
+    .pack-price { font-weight: bold; margin: 4px 0; }
+    
+    /* Status Styles */
+    .status { font-size: 12px; font-weight: 600; margin-top: 2px; }
+    .in-stock { color: #2e7d32; } /* Green */
+    .out-stock { color: #d32f2f; } /* Red */
+    
+    .unipin-icon { width: 40px; height: 40px; object-fit: contain; }
+    .pack-card.out { opacity: 0.7; background: #f9f9f9; }
+</style>
+
+
+
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <style>
+        /* CSS जसले फोटो र कार्डलाई मिलाउँछ */
+        .cards-grid {
+            display: grid;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .pack-card {
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f9f9f9;
+            cursor: pointer;
+        }
+
+        .unipin-icon {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .out {
+            opacity: 0.6;
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+
+<style>
+    /* यो स्टाइलले टेक्स्टलाई एकै लाइनमा राख्छ */
+    .pack-title {
+        white-space: nowrap;
+    }
+    .pack-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+</style>
+
+
+<style>
+    .cards-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* दुई बराबर भागमा बाँड्छ */
+        gap: 10px; /* कार्ड बीचको दुरी */
+        padding: 10px;
+    }
+
+    .pack-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background: #fff;
+    }
+
+    .pack-title {
+        white-space: nowrap; /* टेक्स्ट एकै लाइनमा राख्न */
+        font-size: 12px;     /* सानो स्क्रिनका लागि साइज मिलाइएको */
+        font-weight: bold;
+    }
+    
+    .pack-price {
+        font-size: 14px;
+        color: orange;
+    }
+
+    .unipin-icon {
+        width: 30px; /* आइकनको साइज */
+        height: 30px;
+    }
+</style>
+
+<div class="cards-grid" id="diamonds-wrapper">
+    
+    <div class="pack-card" onclick="selectPack(this, '25 💎 Unipin Code', '28')">
+        <div class="text-content">
+            <div class="pack-title">25 💎 Unipin Code</div>
+            <div class="pack-price">Rs 28</div>
+            <div class="status in-stock">• In Stock</div>
+        </div>
+        <img src="unipin.png" alt="UniPin" class="unipin-icon">
+    </div>
+
+
+    <div class="pack-card out">
+        <div class="text-content">
+            <div class="pack-title">50 💎 Unipin Code</div>
+            <div class="pack-price">Rs 150</div>
+            <div class="status out-stock">• In stoke</div>
+        </div>
+        <img src="unipin.png" alt="UniPin" class="unipin-icon">
+    </div>
+
+</div>
+
+
+
+<div class="cards-grid" id="diamonds-wrapper">
+    
+    <div class="pack-card" onclick="selectPack(this, '115 💎 Unipin Code', '99')">
+        <div class="text-content">
+            <div class="pack-title">115 💎 Unipin Code</div>
+            <div class="pack-price">Rs 99</div>
+            <div class="status in-stock">• In Stock</div>
+        </div>
+        <img src="unipin.png" alt="UniPin" class="unipin-icon">
+    </div>
+
+
+    <div class="pack-card out">
+        <div class="text-content">
+            <div class="pack-title">240 💎 Unipin Code</div>
+            <div class="pack-price">Rs 150</div>
+            <div class="status out-stock">• out of stock</div>
+        </div>
+        <img src="unipin.png" alt="UniPin" class="unipin-icon">
+    </div>
+
+</div>
+
+<div class="cards-grid" id="diamonds-wrapper">
+    
+    <div class="pack-card" onclick="selectPack(this, '610 💎 Unipin Code', '56')">
+        <div class="text-content">
+            <div class="pack-title">610 💎 Unipin Code</div>
+            <div class="pack-price">Rs 56</div>
+            <div class="status in-stock">• In Stock</div>
+        </div>
+        <img src="unipin.png" alt="UniPin" class="unipin-icon">
+    </div>
+
+
+    <div class="pack-card out">
+        <div class="text-content">
+            <div class="pack-title">1240 💎 Unipin Code</div>
+            <div class="pack-price">Rs 150</div>
+            <div class="status out-stock">• out of stock</div>
+        </div>
+        <img src="unipin.png" alt="UniPin" class="unipin-icon">
+    </div>
+
+</div>
+
+
+<div class="cards-grid" id="diamonds-wrapper">
+    
+    <div class="pack-card" onclick="selectPack(this, '2530 💎 Unipin Code', '56')">
+        <div class="text-content">
+            <div class="pack-title">2530 💎 Unipin Code</div>
+            <div class="pack-price">Rs 56</div>
+            <div class="status in-stock">• In Stock</div>
+        </div>
+        <img src="unipin.png" alt="UniPin" class="unipin-icon">
+    </div>
+
+
+    <div class="pack-card out">
+        <div class="text-content">
+            <div class="pack-title">Weekly Unipin Code</div>
+            <div class="pack-price">Rs 150</div>
+            <div class="status out-stock">• out of stock</div>
+        </div>
+        <img src="unipin.png" alt="UniPin" class="unipin-icon">
+    </div>
+
+</div>
+
+
+<div class="cards-grid" id="diamonds-wrapper">
+    
+    <div class="pack-card" onclick="selectPack(this, '50 💎 Unipin Code', '56')">
+        <div class="text-content">
+            <div class="pack-title">Monthly Unipin Code</div>
+            <div class="pack-price">Rs 56</div>
+            <div class="status in-stock">• In Stock</div>
+        </div>
+        <img src="unipin.png" alt="UniPin" class="unipin-icon">
+    </div>
+
+
+<div class="pack-card" onclick="selectPack(this, '2000 💎 Unipin Code', '2450')">
+    
+        <div class="text-content">
+            <div class="pack-title">2000 Unipin Code <br>Load Wallet</div>
+            <div class="pack-price">Rs 2450</div>
+            <div class="status in-stock">• In 2 Stock</div>
+        </div>
+        <img src="unipin.png" alt="UniPin" class="unipin-icon">
+    </div>
+
+</div>
+
+
+
+</div>
+
+</body>
+</html>
+
+
+
+
+</div>
+    </div>
+
+    <div class="bottom-drawer">
+        <div class="drawer-inner">
+            <div class="row-detail">
+                <span>Item</span>
+                <span class="val-white" id="summary-item">-</span>
+            </div>
+            <div class="total-row">
+                <span class="total-label">Total</span>
+                <span class="total-price" id="summary-total">Rs 0.00</span>
+            </div>
+            
+            <button id="main-action-btn" class="action-btn">
+                <i class="fa-solid fa-basket-shopping"></i> Buy Now
+            </button>
+        </div>
+    </div>
+
+    <div class="qr-modal" id="qrModal">
+        <div class="qr-card">
+            <i class="fa-solid fa-xmark close-modal" onclick="closePaymentModal()"></i>
+            <div class="qr-title">Scan to Pay</div>
+            <div class="qr-subtitle">Please scan the QR code via Khalti, eSewa or Fonepay</div>
+            
+            <div class="account-details-box">
+                <strong> Notice:</strong> Gaule Store <br>
+                <strong> Remark:</strong> Please write your real name in the remarks. Do not write Free Fire Top Up.
+            </div>
+
+            <div class="qr-image-wrapper">
+                <img src="qr_code.png" alt="Payment QR Code">
+            </div>
+
+            <div class="txid-container">
+                <label class="txid-label" for="txid">Transaction ID / Ref ID <span style="color: #e53e3e;">*</span></label>
+                <div class="txid-input-wrapper">
+                    <i class="fa-solid fa-receipt"></i>
+                    <input type="text" id="txid" class="txid-input" placeholder="Enter transaction ID after payment" oninput="validateTxIDLive()">
+                </div>
+                <div class="txid-error-message" id="txid-error">
+                    <i class="fa-solid fa-circle-exclamation"></i> <span>Transaction ID is required to verify payment!</span>
+                </div>
+            </div>
+
+            <div class="payment-summary-box">
+                <div class="pay-row">
+                    <span>Game UID:</span>
+                    <span id="modal-uid" style="font-weight: bold; color: #1a202c;">-</span>
+                </div>
+                <div class="pay-row">
+                    <span>Selected Pack:</span>
+                    <span id="modal-item">-</span>
+                </div>
+                <div class="pay-row">
+                    <span>Amount Due:</span>
+                    <span class="highlight-total" id="modal-total">Rs 0.00</span>
+                </div>
+            </div>
+
+            <button class="done-btn" onclick="submitPayment()">Submit Payment</button>
+        </div>
+    </div>
+
+    <div class="success-modal" id="successModal">
+        <div class="success-card">
+            <div class="success-checkmark">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <div class="success-title">Order Submitted!</div>
+            <p class="success-msg">Your order has been received. Our team will verify and top-up your diamonds instantly.</p>
+            
+            <div class="success-receipt-info">
+                <div class="receipt-row">
+                    <span>Email ID:</span>
+                    <span id="receipt-uid">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Item:</span>
+                    <span id="receipt-item">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Price:</span>
+                    <span id="receipt-price" style="color: #2ed573;">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Status:</span>
+                    <span style="color: #ffb300;">Pending Verification</span>
+                </div>
+            </div>
+
+            <button class="success-close-btn" onclick="closeSuccessModal()">Great, Thanks!</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        // यहाँ Firebase Database को लागि import थपियो:
+        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+            authDomain: "gaule-top-up-center.firebaseapp.com",
+            databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+            projectId: "gaule-top-up-center",
+            storageBucket: "gaule-top-up-center.firebasestorage.app",
+            messagingSenderId: "645605489690",
+            appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app); // Database इनिसियलाइज भयो
+        const provider = new GoogleAuthProvider();
+
+        let currentUser = null;
+        let selectedItemName = "";
+        let selectedItemPrice = "";
+
+        const mainActionBtn = document.getElementById('main-action-btn');
+        const gameUidInput = document.getElementById('game-uid');
+        const uidError = document.getElementById('uid-error');
+        const packError = document.getElementById('pack-error');
+        const diamondsWrapper = document.getElementById('diamonds-wrapper');
+        const txidInput = document.getElementById('txid');
+        const txidError = document.getElementById('txid-error');
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                mainActionBtn.innerHTML = `<i class="fa-solid fa-basket-shopping"></i> Buy Now`;
+                mainActionBtn.classList.remove('login-needed');
+            } else {
+                currentUser = null;
+                mainActionBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login to Buy`;
+                mainActionBtn.classList.add('login-needed');
+            }
+        });
+
+        mainActionBtn.onclick = function() {
+            if (!currentUser) {
+                signInWithPopup(auth, provider).then((result) => {
+                    console.log("Logged in!");
+                }).catch((error) => {
+                    alert("लगइन असफल भयो: " + error.message);
+                });
+                return;
+            }
+
+            let isFormValid = true;
+
+            if (!selectedItemName) {
+                diamondsWrapper.classList.add('error-border');
+                packError.style.display = "flex";
+                diamondsWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                isFormValid = false;
+            }
+
+            let uidValue = gameUidInput.value.trim();
+            if (uidValue === "") {
+                gameUidInput.classList.add('error-border');
+                uidError.style.display = "flex";
+                if(isFormValid) gameUidInput.focus();
+                isFormValid = false;
+            }
+
+            if(!isFormValid) return;
+            openPaymentModal(uidValue);
+        };
+
+        window.selectPack = function(element, name, price) {
+            diamondsWrapper.classList.remove('error-border');
+            packError.style.display = "none";
+
+            document.querySelectorAll('.pack-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            selectedItemName = name;
+            selectedItemPrice = price;
+
+            document.getElementById('summary-item').innerText = name;
+            document.getElementById('summary-total').innerText = 'Rs ' + price;
+        };
+
+        window.validateUIDLive = function() {
+            if (gameUidInput.value.trim() !== "") {
+                gameUidInput.classList.remove('error-border');
+                uidError.style.display = "none";
+            }
+        };
+
+        window.validateTxIDLive = function() {
+            if (txidInput.value.trim() !== "") {
+                txidInput.classList.remove('error-border');
+                txidError.style.display = "none";
+            }
+        };
+
+        function openPaymentModal(uid) {
+            document.getElementById('modal-uid').innerText = uid;
+            document.getElementById('modal-item').innerText = selectedItemName;
+            document.getElementById('modal-total').innerText = 'Rs ' + selectedItemPrice;
+            
+            txidInput.value = ""; 
+            txidInput.classList.remove('error-border');
+            txidError.style.display = "none";
+
+            document.getElementById('qrModal').classList.add('show');
+        }
+
+        window.closePaymentModal = function() {
+            document.getElementById('qrModal').classList.remove('show');
+        };
+
+        // अर्डर Firebase मा पठाउने फंक्सन
+        window.submitPayment = function() {
+            let txidValue = txidInput.value.trim();
+            let uidValue = gameUidInput.value.trim();
+            
+            if (txidValue === "") {
+                txidInput.classList.add('error-border');
+                txidError.style.display = "flex";
+                txidInput.focus();
+                return;
+            }
+
+            const now = new Date();
+            const orderRef = push(ref(db, 'orders'));
+            
+            set(orderRef, {
+                date: now.toLocaleDateString(),
+                time: now.toLocaleTimeString(),
+                timestamp: Date.now(),
+                email: currentUser.email,
+                name: currentUser.displayName || "User",
+                userId: currentUser.uid,
+                product: selectedItemName,
+                amountDue: selectedItemPrice,
+                uid: uidValue,
+                code: uidValue,
+                transactionId: txidValue,
+                status: "Pending"
+            }).then(() => {
+                closePaymentModal();
+                document.getElementById('receipt-uid').innerText = uidValue;
+                document.getElementById('receipt-item').innerText = selectedItemName;
+                document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
+                document.getElementById('successModal').classList.add('show');
+            }).catch((error) => {
+                alert("अर्डर पठाउन समस्या भयो: " + error.message);
+            });
+        };
+
+        window.closeSuccessModal = function() {
+            document.getElementById('successModal').classList.remove('show');
+            location.reload();
+        };
+    </script>
+</body>
+</html>
