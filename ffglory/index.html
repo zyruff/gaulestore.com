@@ -540,58 +540,6 @@
     </div>
 </div>
 
-<script>
-    let debounceTimer;
-    const apiKey = "YbH-F9KJeND12uwO2dWMhQSL7UAFcQ6gih1LpQ8AcEo";
-
-    function validateUIDAuto() {
-        const uid = document.getElementById("game-uid").value;
-        const display = document.getElementById("player-name-display");
-        const nameSpan = document.getElementById("player-name");
-        const uidError = document.getElementById("uid-error");
-
-        // ८ अंक भन्दा कम भएमा बक्स लुकाउने
-        if (uid.length < 8) {
-            display.style.display = "none";
-            uidError.style.display = "none";
-            return;
-        }
-
-        // ७०० मिलिसेकेन्डको पर्खाइ (Debounce) ताकि धेरै रिक्वेस्ट नजाओस्
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(async () => {
-            display.style.display = "block";
-            nameSpan.innerText = "Searching...";
-            uidError.style.display = "none";
-
-            try {
-                const response = await fetch(`https://api.gameskinbo.com/ff-info/get?uid=${uid}&region=BD`, {
-                    headers: { 'x-api-key': apiKey }
-                });
-                const data = await response.json();
-
-                if (data.AccountInfo && data.AccountInfo.AccountName) {
-                    nameSpan.innerText = "Player: " + data.AccountInfo.AccountName;
-                    display.style.background = "#f0fff4";
-                    display.style.borderColor = "#9ae6b4";
-                } else {
-                    nameSpan.innerText = "Invalid ID";
-                    display.style.background = "#fff5f5";
-                    display.style.borderColor = "#feb2b2";
-                }
-            } catch (error) {
-                display.style.display = "none";
-                uidError.style.display = "block";
-            }
-        }, 700);
-    }
-</script>
-
-
-
-
-
-
 
 
 
