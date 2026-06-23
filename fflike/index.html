@@ -65,7 +65,7 @@
 <div id="limitModal" class="modal-overlay">
     <div class="modal" style="border: 3px solid #dc2626;">
         <h3 style="color: #dc2626;">Limit Reached!</h3>
-        <p>You have already requested an order for this UID today. New orders are available after 4:00 AM.</p>
+        <p>You have already claimed your free likes for today. Please come back after 4:00 AM.</p>
         <button class="modal-btn" onclick="document.getElementById('limitModal').style.display='none'">OK</button>
     </div>
 </div>
@@ -124,7 +124,7 @@
             setTimeout(() => uidInput.classList.remove("shake-animation"), 500);
             return;
         }
-        if (product === "220 Like Rs.30" && transId === "") {
+        if (product === "200-220 Like" && transId === "") {
             transInput.classList.add("shake-animation");
             setTimeout(() => transInput.classList.remove("shake-animation"), 500);
             return;
@@ -137,13 +137,19 @@
         try {
             const today = getFormattedDate();
             const ordersRef = ref(db, "orders");
-            const q = query(ordersRef, orderByChild("uid"), equalTo(uid));
-            const snapshot = await get(q);
-
+            
             let alreadyOrdered = false;
-            snapshot.forEach((child) => {
-                if (child.val().dateString === today) { alreadyOrdered = true; }
-            });
+            
+            // Limit check only for Free Likes
+            if (product === "20 Like Free Daily") {
+                const q = query(ordersRef, orderByChild("email"), equalTo(currentUser.email));
+                const snapshot = await get(q);
+                snapshot.forEach((child) => {
+                    if (child.val().dateString === today && child.val().product === "20 Like Free Daily") { 
+                        alreadyOrdered = true; 
+                    }
+                });
+            }
 
             if (alreadyOrdered) {
                 document.getElementById("limitModal").style.display = "block";
@@ -155,7 +161,7 @@
             await push(ref(db, "orders"), {
                 product: product,
                 uid: uid,
-                transactionId: product === "220 Like Rs.30" ? transId : "N/A",
+                transactionId: product === "200-220 Like" ? transId : "N/A",
                 name: currentUser.displayName || "No Name",
                 email: currentUser.email,
                 userId: currentUser.uid,
