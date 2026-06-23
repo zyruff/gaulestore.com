@@ -522,10 +522,15 @@
     </div>
     <div class="input-card-panel">
         <div class="input-label">Your Guild Id</div>
-        
-        <input type="text" id="game-uid" class="uid-input" placeholder="Enter Guild ID" oninput="validateUIDAuto()">
+            <input type="text" id="game-uid" class="uid-input" placeholder="Enter Guild ID" oninput="validateUIDAuto()">
 
+        <div id="player-name-display" style="margin-top: 10px; padding: 10px; border-radius: 8px; background: #f0fff4; border: 1px solid #9ae6b4; display: none;">
+            <i class="fa-solid fa-user-check" style="color: #22543d;"></i> 
+            
+        </div>
         
+        <div class="error-message" id="uid-error" style="display: none; color: #e53e3e; font-size: 12px; margin-top: 8px;">
+               </div>
         
         <div class="instruction-text" style="margin-top: 10px;">
             <i class="fa-solid fa-circle-info"></i>
@@ -533,7 +538,6 @@
         </div>
     </div>
 </div>
-
 
 
 
