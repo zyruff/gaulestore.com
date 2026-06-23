@@ -60,7 +60,7 @@
 <div id="limitModal" class="modal-overlay">
     <div class="modal" style="border: 3px solid #dc2626;">
         <h3 style="color: #dc2626;">Limit Reached!</h3>
-        <p id="limitText">You have reached the limit for this order today.</p>
+        <p>You have already claimed your daily limit. Please try again after 4:00 AM.</p>
         <button class="modal-btn" onclick="document.getElementById('limitModal').style.display='none'">OK</button>
     </div>
 </div>
@@ -77,7 +77,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, push, query, orderByChild, equalTo, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, push, get, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
@@ -121,18 +121,26 @@
 
         try {
             const today = getFormattedDate();
-            const ordersRef = ref(db, "orders");
+            const snapshot = await get(ref(db, "orders"));
             let alreadyOrdered = false;
 
-            if (product === "20 Like Free Daily") {
-                const q = query(ordersRef, orderByChild("email"), equalTo(currentUser.email));
-                const snapshot = await get(q);
-                snapshot.forEach((child) => { if (child.val().dateString === today && child.val().product === "20 Like Free Daily") { alreadyOrdered = true; } });
-            } else {
-                const q = query(ordersRef, orderByChild("uid"), equalTo(uid));
-                const snapshot = await get(q);
-                snapshot.forEach((child) => { if (child.val().dateString === today && child.val().product === "200-220 Like") { alreadyOrdered = true; } });
-            }
+            snapshot.forEach((child) => {
+                const data = child.val();
+                if (data.dateString === today) {
+                    // 20 Like को लागि नियम: Email वा UID दुवै प्रयोग भए limit लाग्छ
+                    if (product === "20 Like Free Daily" && data.product === "20 Like Free Daily") {
+                        if (data.email === currentUser.email || data.uid === uid) {
+                            alreadyOrdered = true;
+                        }
+                    } 
+                    // 200-220 Like को लागि नियम: केवल UID को limit
+                    else if (product === "200-220 Like" && data.product === "200-220 Like") {
+                        if (data.uid === uid) {
+                            alreadyOrdered = true;
+                        }
+                    }
+                }
+            });
 
             if (alreadyOrdered) {
                 document.getElementById("limitModal").style.display = "block";
