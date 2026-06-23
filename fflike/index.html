@@ -18,12 +18,10 @@
         button { width:100%; padding:18px; margin-top:20px; background:#ff6600; color:white; border:none; border-radius:8px; font-size:18px; cursor:pointer; font-weight:bold; }
         button:disabled { background: #ccc; cursor: not-allowed; }
         
-        /* Modal Styles */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
         .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 350px; background: #fff; padding: 25px; border-radius: 20px; text-align: center; }
         .modal-btn { background: #333; color: white; border: none; padding: 10px 25px; margin-top: 20px; border-radius: 8px; cursor: pointer; }
         
-        /* Animations */
         .success-icon { width: 60px; height: 60px; stroke: #22c55e; stroke-width: 4; fill: none; margin: 0 auto 15px; display: block; stroke-dasharray: 166; stroke-dashoffset: 166; animation: stroke .6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
         @keyframes stroke { 100% { stroke-dashoffset: 0; } }
         .shake-animation { animation: shake 0.3s linear; border: 2px solid #dc2626 !important; }
@@ -49,9 +47,7 @@
 
     <div id="paymentSection" style="display: none;">
         <div class="step">Step 3: Scan QR Code</div>
-        <div class="qr-container">
-            <img src="qr_code.png" class="qr-img" alt="QR Code">
-        </div>
+        <div class="qr-container"><img src="qr_code.png" class="qr-img" alt="QR Code"></div>
         <div class="step" style="font-size: 14px; color: #555; text-align: center;">Write your real name in the remarks</div>
         <div class="step">Step 4: Enter Transaction ID</div>
         <input type="text" id="transactionId" placeholder="Enter Transaction ID">
@@ -61,16 +57,14 @@
     <button id="submitBtn" onclick="submitOrder()">Submit Order</button>
 </div>
 
-<!-- Limit Reached Modal -->
 <div id="limitModal" class="modal-overlay">
     <div class="modal" style="border: 3px solid #dc2626;">
         <h3 style="color: #dc2626;">Limit Reached!</h3>
-        <p>You have already claimed your free likes for today. Please come back after 4:00 AM.</p>
+        <p id="limitText">You have reached the limit for this order today.</p>
         <button class="modal-btn" onclick="document.getElementById('limitModal').style.display='none'">OK</button>
     </div>
 </div>
 
-<!-- Success Modal -->
 <div id="successModal" class="modal-overlay">
     <div class="modal" style="border: 3px solid #22c55e;">
         <svg class="success-icon" viewBox="0 0 52 52"><circle cx="26" cy="26" r="25"/><path d="M14.1 27.2l7.1 7.2 16.7-16.8"/></svg>
@@ -101,7 +95,6 @@
     let currentUser = null;
 
     onAuthStateChanged(auth, (user) => { currentUser = user; });
-
     window.togglePayment = (show) => { document.getElementById("paymentSection").style.display = show ? "block" : "none"; };
 
     const getFormattedDate = () => {
@@ -119,16 +112,8 @@
         const uid = uidInput.value.trim();
         const transId = transInput.value.trim();
 
-        if (uid === "") {
-            uidInput.classList.add("shake-animation");
-            setTimeout(() => uidInput.classList.remove("shake-animation"), 500);
-            return;
-        }
-        if (product === "200-220 Like" && transId === "") {
-            transInput.classList.add("shake-animation");
-            setTimeout(() => transInput.classList.remove("shake-animation"), 500);
-            return;
-        }
+        if (uid === "") { uidInput.classList.add("shake-animation"); setTimeout(() => uidInput.classList.remove("shake-animation"), 500); return; }
+        if (product === "200-220 Like" && transId === "") { transInput.classList.add("shake-animation"); setTimeout(() => transInput.classList.remove("shake-animation"), 500); return; }
 
         const btn = document.getElementById("submitBtn");
         btn.disabled = true;
@@ -137,49 +122,33 @@
         try {
             const today = getFormattedDate();
             const ordersRef = ref(db, "orders");
-            
             let alreadyOrdered = false;
-            
-            // Limit check only for Free Likes
+
             if (product === "20 Like Free Daily") {
                 const q = query(ordersRef, orderByChild("email"), equalTo(currentUser.email));
                 const snapshot = await get(q);
-                snapshot.forEach((child) => {
-                    if (child.val().dateString === today && child.val().product === "20 Like Free Daily") { 
-                        alreadyOrdered = true; 
-                    }
-                });
+                snapshot.forEach((child) => { if (child.val().dateString === today && child.val().product === "20 Like Free Daily") { alreadyOrdered = true; } });
+            } else {
+                const q = query(ordersRef, orderByChild("uid"), equalTo(uid));
+                const snapshot = await get(q);
+                snapshot.forEach((child) => { if (child.val().dateString === today && child.val().product === "200-220 Like") { alreadyOrdered = true; } });
             }
 
             if (alreadyOrdered) {
                 document.getElementById("limitModal").style.display = "block";
-                btn.disabled = false;
-                btn.innerText = "Submit Order";
-                return;
+                btn.disabled = false; btn.innerText = "Submit Order"; return;
             }
 
             await push(ref(db, "orders"), {
-                product: product,
-                uid: uid,
-                transactionId: product === "200-220 Like" ? transId : "N/A",
-                name: currentUser.displayName || "No Name",
-                email: currentUser.email,
-                userId: currentUser.uid,
-                status: "Pending",
-                timestamp: Date.now(),
-                dateString: today
+                product: product, uid: uid, transactionId: product === "200-220 Like" ? transId : "N/A",
+                name: currentUser.displayName || "No Name", email: currentUser.email,
+                userId: currentUser.uid, status: "Pending", timestamp: Date.now(), dateString: today
             });
 
             document.getElementById("successModal").style.display = "block";
-            btn.disabled = false;
-            btn.innerText = "Submit Order";
-        } catch (error) {
-            alert("Error: " + error.message);
-            btn.disabled = false;
-            btn.innerText = "Submit Order";
-        }
+            btn.disabled = false; btn.innerText = "Submit Order";
+        } catch (error) { alert("Error: " + error.message); btn.disabled = false; btn.innerText = "Submit Order"; }
     }
 </script>
-
 </body>
 </html>
