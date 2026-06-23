@@ -18,6 +18,11 @@
         button { width:100%; padding:18px; margin-top:20px; background:#ff6600; color:white; border:none; border-radius:8px; font-size:18px; cursor:pointer; font-weight:bold; }
         button:disabled { background: #ccc; cursor: not-allowed; }
         .status { margin-top:15px; text-align:center; font-weight:bold; color: #333; }
+
+        /* Custom Modal Styles */
+        #custom-modal { display: none; position: fixed; top: 30%; left: 10%; width: 80%; background: #fff; border: 3px solid #dc2626; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3); z-index: 1000; text-align: center; animation: shake 0.5s; }
+        @keyframes shake { 0% { transform: translateX(-2%); } 50% { transform: translateX(2%); } 100% { transform: translateX(0); } }
+        .modal-btn { background: #dc2626; color: white; border: none; padding: 10px 20px; margin-top: 15px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -52,6 +57,13 @@
     <div class="status" id="status"></div>
 </div>
 
+<!-- Custom Modal Box -->
+<div id="custom-modal">
+    <h3 style="color: #dc2626;">Limit Reached!</h3>
+    <p style="margin-top: 10px; font-size: 15px;">You have already requested an order for this UID today. New orders are available after 4:00 AM.</p>
+    <button class="modal-btn" onclick="document.getElementById('custom-modal').style.display='none'">OK</button>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -80,10 +92,7 @@
 
     const getFormattedDate = () => {
         let now = new Date();
-        // यदि ४ बजे भन्दा अघि छ भने, अघिल्लो दिनको मिति लिने
-        if (now.getHours() < 4) {
-            now.setDate(now.getDate() - 1);
-        }
+        if (now.getHours() < 4) { now.setDate(now.getDate() - 1); }
         return now.toDateString();
     };
 
@@ -109,13 +118,11 @@
 
             let alreadyOrdered = false;
             snapshot.forEach((child) => {
-                if (child.val().dateString === today) {
-                    alreadyOrdered = true;
-                }
+                if (child.val().dateString === today) { alreadyOrdered = true; }
             });
 
             if (alreadyOrdered) {
-                alert("यो UID बाट आजको अर्डर भइसक्यो। कृपया भोलि बिहान ४ बजे पछि प्रयास गर्नुहोस्।");
+                document.getElementById("custom-modal").style.display = "block";
                 btn.disabled = false;
                 btn.innerText = "Submit Order";
                 return;
