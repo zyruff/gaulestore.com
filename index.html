@@ -498,75 +498,69 @@
 <br>
 
 
+  
 
-         
-
-    <style>
-    /* Premium Modern Design */
+<style>
+    /* डिजाइन मात्र परिवर्तन गरिएको छ */
     #review-container { 
-        background: #ffffff; 
-        padding: 30px; 
-        border-radius: 24px; 
-        box-shadow: 0 15px 35px rgba(0,0,0,0.08); 
-        border: 1px solid #f8f8f8; 
-        font-family: 'Segoe UI', sans-serif;
+        background: #fff; 
+        padding: 25px; 
+        border-radius: 20px; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.06); 
+        margin-top: 20px; 
+        border: 1px solid #f5f5f5;
     }
     
-    h2 { text-align: center; color: #111; margin-bottom: 25px; font-weight: 800; }
+    #review-container h2 { text-align: center; color: #1a1a1a; margin-bottom: 20px; }
 
-    /* Button Style */
     .btn-write { 
-        background: linear-gradient(135deg, #000000, #333333) !important; 
+        background: #000 !important; 
         color: #fff !important; 
-        padding: 15px !important; 
+        padding: 14px !important; 
         width: 100%; 
         border: none !important; 
-        border-radius: 16px !important; 
-        font-size: 16px; 
-        font-weight: 600; 
+        border-radius: 12px !important; 
         cursor: pointer; 
-        transition: 0.3s ease; 
+        font-weight: 600; 
+        transition: 0.3s;
     }
-    .btn-write:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    .btn-write:hover { background: #333 !important; }
 
-    /* Star Rating */
+    /* स्टार सेलेक्सन र एनिमेशन */
     .stars { display: flex; flex-direction: row-reverse; justify-content: center; gap: 8px; margin: 15px 0; }
     .stars input { display: none; }
-    .stars label { font-size: 40px; color: #e0e0e0; cursor: pointer; transition: 0.2s; }
-    .stars input:checked ~ label, .stars label:hover, .stars label:hover ~ label { color: #ffb800; transform: scale(1.2); }
+    .stars label { font-size: 38px; color: #ddd; cursor: pointer; transition: 0.2s; }
+    .stars input:checked ~ label, .stars label:hover, .stars label:hover ~ label { color: #f4b400; transform: scale(1.1); }
 
-    /* Textarea */
     #review-text { 
         width: 100%; 
-        height: 100px; 
-        padding: 15px; 
+        height: 70px; 
+        padding: 12px; 
         border: 2px solid #eee; 
-        border-radius: 16px; 
-        resize: none; 
-        font-size: 14px; 
-        transition: 0.3s; 
-        box-sizing: border-box;
+        border-radius: 12px; 
+        box-sizing: border-box; 
+        transition: 0.3s;
     }
     #review-text:focus { border-color: #000; outline: none; }
 
-    /* Submit Button */
     #submit-review-btn { 
         width: 100%; 
-        padding: 15px; 
+        padding: 14px; 
         margin-top: 15px; 
         background: #dc2626; 
         color: white; 
         border: none; 
-        border-radius: 16px; 
+        border-radius: 12px; 
         cursor: pointer; 
         font-weight: bold; 
-        font-size: 16px;
     }
 
-    .shake-error { animation: shake 0.4s ease-in-out; border: 2px solid #dc2626 !important; }
+    /* रातो भएर हल्लिने (Shake) एनिमेशन */
     @keyframes shake { 0%,100% {transform:translateX(0)} 25% {transform:translateX(-5px)} 75% {transform:translateX(5px)} }
-    
-    .success-animation { padding: 25px; text-align: center; background: #f0fdf4; border: 2px dashed #22c55e; border-radius: 16px; color: #166534; font-weight: bold; font-size: 18px; }
+    .shake-error { animation: shake 0.4s ease-in-out; border: 2px solid red !important; }
+
+    /* सक्सेस पप-अप */
+    .success-animation { color: #166534; font-weight: bold; text-align: center; padding: 25px; background: #f0fdf4; border-radius: 15px; margin-top: 10px; border: 2px dashed #22c55e; }
 </style>
 
 <div class="container" id="review-container">
@@ -576,7 +570,7 @@
         Write a Review
     </button>
 
-    <div id="review-form" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+    <div id="review-form" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
         <div class="stars" id="star-group">
             <input type="radio" id="s5" name="rating" value="5"><label for="s5">★</label>
             <input type="radio" id="s4" name="rating" value="4"><label for="s4">★</label>
@@ -584,7 +578,7 @@
             <input type="radio" id="s2" name="rating" value="2"><label for="s2">★</label>
             <input type="radio" id="s1" name="rating" value="1"><label for="s1">★</label>
         </div>
-        <textarea id="review-text" placeholder="तपाईंको अनुभव यहाँ लेख्नुहोस्..."></textarea>
+        <textarea id="review-text" placeholder="तपाईंको अनुभव लेख्नुहोस्..."></textarea>
         <button id="submit-review-btn">Submit Review</button>
     </div>
 </div>
@@ -596,6 +590,7 @@
 
     const firebaseConfig = {
         apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+        authDomain: "gaule-top-up-center.firebaseapp.com",
         databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
         projectId: "gaule-top-up-center",
         storageBucket: "gaule-top-up-center.firebasestorage.app",
@@ -655,11 +650,10 @@
             orderCompleted: false,
             reply: ""
         }).then(() => {
-            document.getElementById("review-container").innerHTML = `<div class="success-animation">Thank You For Review! ✨</div>`;
+            document.getElementById("review-container").innerHTML = `<div class="success-animation">Thank You For Review✨</div>`;
         });
     });
 </script>
-
 
 
 
