@@ -525,10 +525,9 @@
     <button class="btn-write" id="write-review-btn" style="background:#000; color:#fff; padding:10px; width:100%; border:none; cursor:pointer;">
         Write a Review
     </button>
-
 <!-- Rating Banner -->
 <div id="rating-banner" style="text-align:center; padding:15px; background:#f9f9f9; border-radius:10px; margin-bottom:10px; display:none;">
-    
+    <div style="font-size:14px; font-weight:bold;">हाम्रा ग्राहकहरूको रेटिङ</div>
     <div id="rating-stars" style="color:#f4b400; font-size:20px; margin:5px 0;"></div>
     <div id="rating-text" style="font-size:14px; font-weight:bold;"></div>
 </div>
@@ -579,16 +578,16 @@ function updateRatingBanner(reviews) {
     const banner = document.getElementById("rating-banner");
     if (reviews.length === 0) { banner.style.display = "none"; return; }
     
-    // औसत रेटिङ गणना
+    // १. सबै रिभ्युको स्टार जोडेर औसत निकाल्ने
     const totalStars = reviews.reduce((sum, r) => sum + Number(r.stars || 0), 0);
     const avgRating = (totalStars / reviews.length).toFixed(1);
     
-    // स्टार र टेक्स्ट अपडेट
+    // २. औसत अनुसार स्टार र टेक्स्ट देखाउने
     document.getElementById("rating-stars").innerHTML = "★".repeat(Math.round(avgRating));
-    document.getElementById("rating-text").innerText = `${avgRating}/5 (${reviews.length} Reviews)`;
+    document.getElementById("rating-text").innerText = `${avgRating}/5 (${reviews.length} रिभ्युहरू)`;
     banner.style.display = "block";
     
-    // Schema मा पनि वास्तविक औसत पठाउने
+    // ३. Google Schema लाई वास्तविक औसत पठाउने
     const schema = {
         "@context": "https://schema.org/",
         "@type": "Product",
@@ -612,6 +611,7 @@ window.renderReviews = () => {
     
     reviewsToShow.forEach(review => {
         const photo = review.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.name || "U")}`;
+        // प्रत्येक रिभ्युमा ग्राहकले दिएको स्टार देखिने
         const starsDisplay = `<span style="color:#f4b400; font-size:14px;">${"★".repeat(Number(review.stars || 5))}</span>`;
         
         reviewsDiv.innerHTML += `
@@ -637,6 +637,7 @@ onValue(ref(db, "reviews"), (snapshot) => {
     renderReviews();
 });
 </script>
+
 
 
      
