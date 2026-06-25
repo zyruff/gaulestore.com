@@ -722,6 +722,19 @@ onValue(ref(db, "reviews"), (snapshot) => {
 });
 </script>
 
+<!-- यो कोडले गुगललाई तपाईंको रेटिङको बारेमा जानकारी दिन्छ -->
+<script type="application/ld+json" id="schema-script">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "Gaule Top Up Center",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5.0", 
+    "reviewCount": "1"
+  }
+}
+</script>
 
 
 
