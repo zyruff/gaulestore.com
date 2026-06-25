@@ -564,39 +564,36 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
     const provider = new GoogleAuthProvider();
-
-    document.getElementById("write-review-btn").addEventListener("click", async () => {
-        if (!auth.currentUser) {
-            try { await signInWithPopup(auth, provider); } 
-            catch (e) { alert("Login failed!"); return; }
 <style>
     /* Premium Design Styles */
-    #review-container { background: #fff; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; margin-top: 20px; }
+    #review-container { background: #fff; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; margin-top: 20px; font-family: sans-serif; }
+    h2 { text-align: center; color: #1a1a1a; }
     .btn-write { background: linear-gradient(135deg, #000, #333); color: #fff; padding: 14px; width: 100%; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; }
     .btn-write:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    
+    /* Star Rating */
     .stars { display: flex; flex-direction: row-reverse; justify-content: center; gap: 10px; margin: 15px 0; }
     .stars input { display: none; }
-    .stars label { font-size: 40px; color: #e0e0e0; cursor: pointer; transition: 0.2s; }
+    .stars label { font-size: 35px; color: #e0e0e0; cursor: pointer; transition: 0.2s; }
     .stars input:checked ~ label, .stars label:hover, .stars label:hover ~ label { color: #ffb800; transform: scale(1.1); }
-    #review-text { width: 100%; padding: 15px; border: 2px solid #f0f0f0; border-radius: 15px; box-sizing: border-box; transition: 0.3s; }
-    #review-text:focus { outline: none; border-color: #000; }
-    #submit-review-btn { width: 100%; padding: 14px; margin-top: 15px; background: #dc2626; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; }
+    
+    #review-text { width: 100%; padding: 15px; border: 2px solid #f0f0f0; border-radius: 15px; box-sizing: border-box; resize: none; margin-top: 10px; }
+    #submit-review-btn { width: 100%; padding: 14px; margin-top: 10px; background: #dc2626; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; }
     .shake-error { animation: shake 0.4s ease-in-out; border: 2px solid #dc2626 !important; }
     @keyframes shake { 0%,100% {transform:translateX(0)} 25% {transform:translateX(-5px)} 75% {transform:translateX(5px)} }
-    .success-animation { padding: 30px; text-align: center; background: #f8fff9; border: 2px dashed #22c55e; border-radius: 15px; color: #166534; font-weight: bold; }
+    .success-animation { padding: 20px; text-align: center; background: #f8fff9; border: 2px dashed #22c55e; border-radius: 15px; color: #166534; font-weight: bold; }
 </style>
 
-<!-- रिभ्यु सेक्सन -->
 <div class="container" id="review-container">
     <h2>CUSTOMER REVIEWS</h2>
-    <div id="rating-banner" style="text-align:center; padding:15px; background:#f9f9f9; border-radius:10px; margin-bottom:10px; display:none;">
-        <div id="rating-stars" style="color:#f4b400; font-size:25px;">★★★★★</div>
-        <div id="rating-text" style="font-weight:bold;">5.0/5 (0 रिभ्युहरू)</div>
+    <div id="rating-banner" style="text-align:center; padding:15px; background:#f9f9f9; border-radius:15px; margin-bottom:15px; display:none;">
+        <div style="color:#ffb800; font-size:25px;">★★★★★</div>
+        <div id="rating-text" style="font-weight:bold; font-size:14px;">5.0/5 (0 रिभ्युहरू)</div>
     </div>
     
     <button class="btn-write" id="write-review-btn">Write a Review</button>
 
-    <div id="review-form" style="display:none; margin-top:20px; border-top:1px solid #ccc; padding-top:10px;">
+    <div id="review-form" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
         <div class="stars" id="star-group">
             <input type="radio" id="s5" name="rating" value="5"><label for="s5">★</label>
             <input type="radio" id="s4" name="rating" value="4"><label for="s4">★</label>
@@ -607,7 +604,7 @@
         <textarea id="review-text" placeholder="तपाईंको अनुभव लेख्नुहोस्..."></textarea>
         <button id="submit-review-btn">Submit Review</button>
     </div>
-    <div id="reviews"></div>
+    <div id="reviews-list" style="margin-top:20px;"></div>
 </div>
 
 <script type="module">
@@ -630,41 +627,40 @@
     const db = getDatabase(app);
     const provider = new GoogleAuthProvider();
 
-    // रिभ्यु पठाउने
-    document.getElementById("write-review-btn").addEventListener("click", async () => {
-        if (!auth.currentUser) { try { await signInWithPopup(auth, provider); } catch (e) { alert("Login failed!"); return; } }
+    document.getElementById("write-review-btn").onclick = async () => {
+        if (!auth.currentUser) { try { await signInWithPopup(auth, provider); } catch(e) { alert("Login failed!"); return; } }
         document.getElementById("review-form").style.display = "block";
         document.getElementById("write-review-btn").style.display = "none";
-    });
+    };
 
-    document.getElementById("submit-review-btn").addEventListener("click", () => {
+    document.getElementById("submit-review-btn").onclick = () => {
         const user = auth.currentUser;
-        const rating = document.querySelector('input[name="rating"]:checked');
         const text = document.getElementById("review-text");
-        if (!rating || !text.value.trim()) { alert("कृपया रेटिङ र सन्देश दिनुहोस्!"); return; }
-
-        push(ref(db, 'reviews/'), { name: user.displayName, photo: user.photoURL, comment: text.value, stars: "5" })
+        if (!text.value.trim()) { text.classList.add("shake-error"); return; }
+        
+        push(ref(db, 'reviews/'), { name: user.displayName, comment: text.value })
         .then(() => { document.getElementById("review-container").innerHTML = `<div class="success-animation">Thank You For Review! ✨</div>`; });
-    });
+    };
 
-    // रिभ्यु देखाउने
     onValue(ref(db, "reviews"), (snapshot) => {
-        const reviewsDiv = document.getElementById("reviews");
+        const list = document.getElementById("reviews-list");
         const banner = document.getElementById("rating-banner");
-        let html = "";
+        list.innerHTML = "";
+        let count = 0;
         snapshot.forEach(child => {
             const r = child.val();
-            html += `<div style="background:#fff; padding:15px; margin:10px 0; border-radius:15px; border:1px solid #eee;">
-                        <div style="font-weight:bold;">${r.name}</div>
-                        <div style="color:#ffb800;">★★★★★</div>
-                        <div>${r.comment}</div>
-                     </div>`;
+            list.innerHTML += `<div style="padding:15px; margin:10px 0; background:#f9f9f9; border-radius:12px;">
+                                <div style="font-weight:bold; font-size:14px;">${r.name}</div>
+                                <div style="color:#ffb800; font-size:12px;">★★★★★</div>
+                                <div style="font-size:13px; margin-top:5px;">${r.comment}</div>
+                               </div>`;
+            count++;
         });
-        reviewsDiv.innerHTML = html;
         banner.style.display = "block";
-        document.getElementById("rating-text").innerText = `5.0/5 (${snapshot.size} रिभ्युहरू)`;
+        document.getElementById("rating-text").innerText = `5.0/5 (${count} रिभ्युहरू)`;
     });
 </script>
+
 
 
 
