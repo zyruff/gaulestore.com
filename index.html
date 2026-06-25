@@ -499,75 +499,9 @@
 
 
 
+         
 
-
-            <input type="radio" id="s5" name="rating" value="5"><label for="s5">★</label>
-            <input type="radio" id="s4" name="rating" v<style>
-    /* स्टार सेलेक्सन र एनिमेशन */
-    .stars { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 8px; margin: 10px 0; transition: 0.3s; padding: 5px; }
-    .stars input { display: none; }
-    .stars label { font-size: 35px; color: #ccc; cursor: pointer; transition: transform 0.2s, color 0.2s; }
-    .stars input:checked ~ label, .stars label:hover, .stars label:hover ~ label { color: #f4b400; transform: scale(1.3); }
-
-    /* रातो भएर हल्लिने (Shake) एनिमेशन */
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-5px); }
-        75% { transform: translateX(5px); }
-    }
-    .shake-error { animation: shake 0.4s ease-in-out; border: 2px solid red !important; border-radius: 5px; }
-
-    /* सक्सेस पप-अप */
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .success-animation { animation: fadeIn 0.5s ease-out; color: #166534; font-weight: bold; text-align: center; padding: 20px; background: #dcfce7; border-radius: 8px; margin-top: 10px; }
-</style>
-
-<div class="container" id="review-container" style="margin-top: 20px;">
-    <h2>CUSTOMER REVIEWS</h2>
-    
-    
-    
-    <button class="btn-write" id="write-review-btn" style="background:#000; color:#fff; padding:10px; width:100%; border:none; cursor:pointer;">
-        Write a Review
-    </button>
-
-
-
-
-    <div id="review-form" style="display:none; margin-top:20px; border-top:1px solid #ccc; padding-top:10px;">
-        <div class="stars" id="star-group">
-            <input type="radio" id="s5" name="rating" value="5"><label for="s5">★</label>
-            <input type="radio" id="s4" name="rating" value="4"><label for="s4">★</label>
-            <input type="radio" id="s3" name="rating" value="3"><label for="s3">★</label>
-            <input type="radio" id="s2" name="rating" value="2"><label for="s2">★</label>
-            <input type="radio" id="s1" name="rating" value="1"><label for="s1">★</label>
-        </div>
-        <textarea id="review-text" style="width:100%; height:60px; margin-top:10px; transition:0.3s;" placeholder="तपाईंको अनुभव लेख्नुहोस्..."></textarea>
-        <button id="submit-review-btn" style="width:100%; padding:10px; margin-top:10px; background:#dc2626; color:white; border:none; cursor:pointer; transition: 0.3s;">Submit Review</button>
-    </div>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-        authDomain: "gaule-top-up-center.firebaseapp.com",
-        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-        projectId: "gaule-top-up-center",
-        storageBucket: "gaule-top-up-center.firebasestorage.app",
-        messagingSenderId: "645605489690",
-        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    const provider = new GoogleAuthProvider();
-<style>
-<style>
+    <style>
     /* Premium Modern Design */
     #review-container { 
         background: #ffffff; 
@@ -621,39 +555,28 @@
         padding: 15px; 
         margin-top: 15px; 
         background: #dc2626; 
-<style>
-    /* स्टार सेलेक्सन र एनिमेशन */
-    .stars { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 8px; margin: 10px 0; transition: 0.3s; padding: 5px; }
-    .stars input { display: none; }
-    .stars label { font-size: 35px; color: #ccc; cursor: pointer; transition: transform 0.2s, color 0.2s; }
-    .stars input:checked ~ label, .stars label:hover, .stars label:hover ~ label { color: #f4b400; transform: scale(1.3); }
-
-    /* रातो भएर हल्लिने (Shake) एनिमेशन */
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-5px); }
-        75% { transform: translateX(5px); }
+        color: white; 
+        border: none; 
+        border-radius: 16px; 
+        cursor: pointer; 
+        font-weight: bold; 
+        font-size: 16px;
     }
-    .shake-error { animation: shake 0.4s ease-in-out; border: 2px solid red !important; border-radius: 5px; }
 
-    /* सक्सेस पप-अप */
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .success-animation { animation: fadeIn 0.5s ease-out; color: #166534; font-weight: bold; text-align: center; padding: 20px; background: #dcfce7; border-radius: 8px; margin-top: 10px; }
+    .shake-error { animation: shake 0.4s ease-in-out; border: 2px solid #dc2626 !important; }
+    @keyframes shake { 0%,100% {transform:translateX(0)} 25% {transform:translateX(-5px)} 75% {transform:translateX(5px)} }
+    
+    .success-animation { padding: 25px; text-align: center; background: #f0fdf4; border: 2px dashed #22c55e; border-radius: 16px; color: #166534; font-weight: bold; font-size: 18px; }
 </style>
 
-<div class="container" id="review-container" style="margin-top: 20px;">
+<div class="container" id="review-container">
     <h2>CUSTOMER REVIEWS</h2>
     
-    
-    
-    <button class="btn-write" id="write-review-btn" style="background:#000; color:#fff; padding:10px; width:100%; border:none; cursor:pointer;">
+    <button class="btn-write" id="write-review-btn">
         Write a Review
     </button>
 
-
-
-
-    <div id="review-form" style="display:none; margin-top:20px; border-top:1px solid #ccc; padding-top:10px;">
+    <div id="review-form" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
         <div class="stars" id="star-group">
             <input type="radio" id="s5" name="rating" value="5"><label for="s5">★</label>
             <input type="radio" id="s4" name="rating" value="4"><label for="s4">★</label>
@@ -661,8 +584,8 @@
             <input type="radio" id="s2" name="rating" value="2"><label for="s2">★</label>
             <input type="radio" id="s1" name="rating" value="1"><label for="s1">★</label>
         </div>
-        <textarea id="review-text" style="width:100%; height:60px; margin-top:10px; transition:0.3s;" placeholder="तपाईंको अनुभव लेख्नुहोस्..."></textarea>
-        <button id="submit-review-btn" style="width:100%; padding:10px; margin-top:10px; background:#dc2626; color:white; border:none; cursor:pointer; transition: 0.3s;">Submit Review</button>
+        <textarea id="review-text" placeholder="तपाईंको अनुभव यहाँ लेख्नुहोस्..."></textarea>
+        <button id="submit-review-btn">Submit Review</button>
     </div>
 </div>
 
@@ -673,80 +596,6 @@
 
     const firebaseConfig = {
         apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-        authDomain: "gaule-top-up-center.firebaseapp.com",
-        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-        projectId: "gaule-top-up-center",
-        storageBucket: "gaule-top-up-center.firebasestorage.app",
-        messagingSenderId: "645605489690",
-        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    const provider = new GoogleAuthProvider();
-
-    document.getElementById("write-review-btn").addEventListener("click", async () => {
-        if (!auth.currentUser) {
-            try { await signInWithPopup(auth, provider); } 
-            catch (e) { alert("Login failed!"); return; }
-        }
-        document.getElementById("review-form").style.display = "block";
-        document.getElementById("write-review-btn").style.display = "none";
-    });
-<style>
-    /* स्टार सेलेक्सन र एनिमेशन */
-    .stars { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 8px; margin: 10px 0; transition: 0.3s; padding: 5px; }
-    .stars input { display: none; }
-    .stars label { font-size: 35px; color: #ccc; cursor: pointer; transition: transform 0.2s, color 0.2s; }
-    .stars input:checked ~ label, .stars label:hover, .stars label:hover ~ label { color: #f4b400; transform: scale(1.3); }
-
-    /* रातो भएर हल्लिने (Shake) एनिमेशन */
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-5px); }
-        75% { transform: translateX(5px); }
-    }
-    .shake-error { animation: shake 0.4s ease-in-out; border: 2px solid red !important; border-radius: 5px; }
-
-    /* सक्सेस पप-अप */
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .success-animation { animation: fadeIn 0.5s ease-out; color: #166534; font-weight: bold; text-align: center; padding: 20px; background: #dcfce7; border-radius: 8px; margin-top: 10px; }
-</style>
-
-<div class="container" id="review-container" style="margin-top: 20px;">
-    <h2>CUSTOMER REVIEWS</h2>
-    
-    
-    
-    <button class="btn-write" id="write-review-btn" style="background:#000; color:#fff; padding:10px; width:100%; border:none; cursor:pointer;">
-        Write a Review
-    </button>
-
-
-
-
-    <div id="review-form" style="display:none; margin-top:20px; border-top:1px solid #ccc; padding-top:10px;">
-        <div class="stars" id="star-group">
-            <input type="radio" id="s5" name="rating" value="5"><label for="s5">★</label>
-            <input type="radio" id="s4" name="rating" value="4"><label for="s4">★</label>
-            <input type="radio" id="s3" name="rating" value="3"><label for="s3">★</label>
-            <input type="radio" id="s2" name="rating" value="2"><label for="s2">★</label>
-            <input type="radio" id="s1" name="rating" value="1"><label for="s1">★</label>
-        </div>
-        <textarea id="review-text" style="width:100%; height:60px; margin-top:10px; transition:0.3s;" placeholder="तपाईंको अनुभव लेख्नुहोस्..."></textarea>
-        <button id="submit-review-btn" style="width:100%; padding:10px; margin-top:10px; background:#dc2626; color:white; border:none; cursor:pointer; transition: 0.3s;">Submit Review</button>
-    </div>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-        authDomain: "gaule-top-up-center.firebaseapp.com",
         databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
         projectId: "gaule-top-up-center",
         storageBucket: "gaule-top-up-center.firebasestorage.app",
@@ -795,7 +644,6 @@
         btn.innerText = "Submitting...";
         btn.disabled = true;
 
-        // डेटाबेसमा नयाँ फिल्डहरू थपिएको छ
         push(ref(db, 'reviews/'), {
             userId: user.uid,
             name: user.displayName,
@@ -804,13 +652,17 @@
             stars: rating.value,
             comment: text.value,
             timestamp: new Date().toLocaleString(),
-            orderCompleted: false, // सुरुमा false (Not Verified)
-            reply: ""              // सुरुमा खाली (No Reply)
+            orderCompleted: false,
+            reply: ""
         }).then(() => {
-            document.getElementById("review-container").innerHTML = `<div class="success-animation">Thank You For Review✨</div>`;
+            document.getElementById("review-container").innerHTML = `<div class="success-animation">Thank You For Review! ✨</div>`;
         });
     });
 </script>
+
+
+
+
 
 
 
