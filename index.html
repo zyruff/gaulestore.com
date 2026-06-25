@@ -524,13 +524,10 @@
          
 <div class="container" id="review-container" style="margin-top: 20px;">
     <h2>CUSTOMER REVIEWS</h2>
-    <button class="btn-write" id="write-review-btn" style="background:#000; color:#fff; padding:10px; width:100%; border:none; cursor:pointer;">
-        Write a Review
-    </button>
 
-<!-- Rating Banner -->
+     <!-- Rating Banner -->
 <div id="rating-banner" style="text-align:center; padding:15px; background:#f9f9f9; border-radius:10px; margin-bottom:10px; display:none;">
-    <div style="font-size:14px; font-weight:bold;">हाम्रा ग्राहकहरूको रेटिङ</div>
+
     <div id="rating-stars" style="color:#f4b400; font-size:20px; margin:5px 0;"></div>
     <div id="rating-text" style="font-size:14px; font-weight:bold;"></div>
 </div>
@@ -587,7 +584,7 @@ function updateRatingBanner(reviews) {
     
     // २. औसत अनुसार स्टार र टेक्स्ट देखाउने
     document.getElementById("rating-stars").innerHTML = "★".repeat(Math.round(avgRating));
-    document.getElementById("rating-text").innerText = `${avgRating}/5 (${reviews.length} रिभ्युहरू)`;
+    document.getElementById("rating-text").innerText = `${avgRating}/5 (${reviews.length} Review)`;
     banner.style.display = "block";
     
     // ३. Google Schema लाई वास्तविक औसत पठाउने
@@ -640,6 +637,11 @@ onValue(ref(db, "reviews"), (snapshot) => {
     renderReviews();
 });
 </script>
+    <button class="btn-write" id="write-review-btn" style="background:#000; color:#fff; padding:10px; width:100%; border:none; cursor:pointer;">
+        Write a Review
+    </button>
+
+
      
      
     <div id="review-form" style="display:none; margin-top:20px; border-top:1px solid #ccc; padding-top:10px;">
