@@ -573,6 +573,7 @@
     <button class="btn-write" id="write-review-btn">
         Write a Review
     </button>
+     
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -581,21 +582,25 @@
 <title>Live Rating</title>
 
 <style>
-.rating-box{
-    display:none;
+body{
+    margin:0;
     font-family:Arial,sans-serif;
+}
+
+.rating-box{
+    display:inline-block;
     text-align:center;
 }
 
 .star-wrap{
     position:relative;
     display:inline-block;
-    font-size:28px;
+    font-size:32px;
     line-height:1;
 }
 
 .star-bg{
-    color:#ddd;
+    color:#e0e0e0;
 }
 
 .star-fill{
@@ -606,23 +611,31 @@
     overflow:hidden;
     white-space:nowrap;
     width:0%;
+    transition:width .5s ease;
 }
 
 #ratingText{
-    margin-top:6px;
-    font-size:18px;
+    margin-top:8px;
+    font-size:22px;
     font-weight:bold;
     color:#222;
+}
+
+#ratingText span{
+    font-size:15px;
+    color:#666;
+    font-weight:500;
 }
 </style>
 </head>
 <body>
 
-<div class="rating-box" id="ratingBox">
+<div class="rating-box">
     <div class="star-wrap">
         <div class="star-bg">★★★★★</div>
         <div class="star-fill" id="fill">★★★★★</div>
     </div>
+
     <div id="ratingText"></div>
 </div>
 
@@ -637,39 +650,46 @@ const firebaseConfig = {
   projectId: "gaule-top-up-center",
   storageBucket: "gaule-top-up-center.firebasestorage.app",
   messagingSenderId: "645605489690",
-  appId: "1:645605489690:web:0b0f2898d295be03c1e5a3"
+  appId: "1:645605489690:web:10e333176acd07eec1e5a3"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-onValue(ref(db, "reviews"), (snapshot) => {
+const fill = document.getElementById("fill");
+const ratingText = document.getElementById("ratingText");
 
-    if (!snapshot.exists()) return;
+onValue(ref(db,"reviews"),(snapshot)=>{
+
+    if(!snapshot.exists()){
+        ratingText.innerHTML = "<span>No Reviews</span>";
+        fill.style.width = "0%";
+        return;
+    }
 
     let total = 0;
     let sum = 0;
 
-    Object.values(snapshot.val()).forEach(review => {
+    snapshot.forEach(child=>{
+        const review = child.val();
         sum += Number(review.stars || 0);
         total++;
     });
 
-    if (total === 0) return;
+    const avg = total ? (sum / total) : 0;
 
-    const avg = sum / total;
+    fill.style.width = ((avg / 5) * 100) + "%";
 
-    document.getElementById("fill").style.width = (avg / 5 * 100) + "%";
-    document.getElementById("ratingText").textContent =
-        `${avg.toFixed(1)} (${total} Reviews)`;
-
-    document.getElementById("ratingBox").style.display = "inline-block";
+    ratingText.innerHTML = `
+        ${avg.toFixed(1)}
+        <span>(${total} Reviews)</span>
+    `;
 });
 </script>
 
 </body>
 </html>
-
+     
      
     <div id="review-form" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
         <div class="stars" id="star-group">
