@@ -573,7 +573,104 @@
     <button class="btn-write" id="write-review-btn">
         Write a Review
     </button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Rating</title>
 
+<style>
+.rating-box{
+    display:none;
+    font-family:Arial,sans-serif;
+    text-align:center;
+}
+
+.star-wrap{
+    position:relative;
+    display:inline-block;
+    font-size:28px;
+    line-height:1;
+}
+
+.star-bg{
+    color:#ddd;
+}
+
+.star-fill{
+    position:absolute;
+    top:0;
+    left:0;
+    color:#FFC107;
+    overflow:hidden;
+    white-space:nowrap;
+    width:0%;
+}
+
+#ratingText{
+    margin-top:6px;
+    font-size:18px;
+    font-weight:bold;
+    color:#222;
+}
+</style>
+</head>
+<body>
+
+<div class="rating-box" id="ratingBox">
+    <div class="star-wrap">
+        <div class="star-bg">★★★★★</div>
+        <div class="star-fill" id="fill">★★★★★</div>
+    </div>
+    <div id="ratingText"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+  authDomain: "gaule-top-up-center.firebaseapp.com",
+  databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+  projectId: "gaule-top-up-center",
+  storageBucket: "gaule-top-up-center.firebasestorage.app",
+  messagingSenderId: "645605489690",
+  appId: "1:645605489690:web:0b0f2898d295be03c1e5a3"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+onValue(ref(db, "reviews"), (snapshot) => {
+
+    if (!snapshot.exists()) return;
+
+    let total = 0;
+    let sum = 0;
+
+    Object.values(snapshot.val()).forEach(review => {
+        sum += Number(review.stars || 0);
+        total++;
+    });
+
+    if (total === 0) return;
+
+    const avg = sum / total;
+
+    document.getElementById("fill").style.width = (avg / 5 * 100) + "%";
+    document.getElementById("ratingText").textContent =
+        `${avg.toFixed(1)} (${total} Reviews)`;
+
+    document.getElementById("ratingBox").style.display = "inline-block";
+});
+</script>
+
+</body>
+</html>
+
+     
     <div id="review-form" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
         <div class="stars" id="star-group">
             <input type="radio" id="s5" name="rating" value="5"><label for="s5">★</label>
