@@ -12,7 +12,6 @@
         h1 { text-align:center; color:#ff6600; margin-bottom:20px; }
         .step { margin-top:20px; font-size:18px; font-weight:bold; color:#333; }
         
-        /* नयाँ बक्स स्टाइल (Side-by-side) */
         .product-grid { display: flex; gap: 10px; margin-top: 10px; }
         .product-box { 
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
@@ -21,6 +20,9 @@
         }
         .product-box input { margin-bottom: 8px; }
         .product-box:has(input:checked) { border-color: #ff6600; background: #fff5eb; }
+        
+        /* Sold out style */
+        .product-box:has(input:disabled) { opacity: 0.5; cursor: not-allowed; background: #eee; }
 
         .qr-container { display: flex; justify-content: center; margin-top: 15px; }
         .qr-img { width: 250px; height: 250px; object-fit: cover; border: 2px solid #ccc; border-radius: 10px; }
@@ -45,20 +47,19 @@
     <h1>🔥 FREE FIRE LIKES</h1>
     
     <div class="step">Step 1: Select Product</div>
-    <!-- दुईवटा बक्स लहरै -->
     <div class="product-grid">
         <label class="product-box">
-            <input type="radio" name="product" value="20 Like Free Daily" onclick="togglePayment(false)" checked> 20 Like<br>Free Daily
+            <input type="radio" name="product" value="20 Like Free Daily" onclick="togglePayment(false)" disabled> 20 Like<br>(Sold Out)
         </label>
         <label class="product-box">
-            <input type="radio" name="product" value="200-220 Like" onclick="togglePayment(true)"> 200-220 Like<br>Rs.25
+            <input type="radio" name="product" value="200-220 Like" onclick="togglePayment(true)" checked> 200-220 Like<br>Rs.25
         </label>
     </div>
 
     <div class="step">Step 2: Enter UID</div>
     <input type="text" id="uid" placeholder="Enter Free Fire UID">
 
-    <div id="paymentSection" style="display: none;">
+    <div id="paymentSection" style="display: block;">
         <div class="step">Step 3: Scan QR Code</div>
         <div class="qr-container"><img src="qr_code.png" class="qr-img" alt="QR Code"></div>
         <div class="step" style="font-size: 14px; color: #555; text-align: center;">Write your real name in the remarks</div>
@@ -70,7 +71,6 @@
     <button id="submitBtn" onclick="submitOrder()">Submit Order</button>
 </div>
 
-<!-- Modals -->
 <div id="limitModal" class="modal-overlay">
     <div class="modal" style="border: 3px solid #dc2626;">
         <h3 style="color: #dc2626;">Limit Reached!</h3>
@@ -120,9 +120,12 @@
     window.submitOrder = async () => {
         if (!currentUser) { alert("Please Login First"); return; }
         
+        const selectedProduct = document.querySelector('input[name="product"]:checked');
+        if (selectedProduct.disabled) { alert("This product is currently Sold Out."); return; }
+
         const uidInput = document.getElementById("uid");
         const transInput = document.getElementById("transactionId");
-        const product = document.querySelector('input[name="product"]:checked').value;
+        const product = selectedProduct.value;
         const uid = uidInput.value.trim();
         const transId = transInput.value.trim();
 
