@@ -162,6 +162,7 @@
                         <div class="order-card">
                             <p style="font-size: 14px; margin: 3px 0;">Product: <b>${o.product || "N/A"}</b></p>
                             <p style="font-size: 14px; margin: 3px 0;">Player ID: <b>${o.uid || "N/A"}</b></p>
+                            <p style="font-size: 14px; margin: 3px 0;">Zone ID: <b>${o.zoneid || "N/A"}</b></p>
                             <p style="font-size: 14px; margin: 3px 0;">Status: <b style="color:${statusColor}">${o.status}</b></p>
                         </div>`;
                 });
@@ -863,6 +864,8 @@
             <div class="payment-summary-box">
                 <div class="pay-row">
                     <span>Player ID:</span>
+                <div class="pay-row">
+                    <span>Zone ID:</span>
                     <span id="modal-uid" style="font-weight: bold; color: #1a202c;">-</span>
                 </div>
                 <div class="pay-row">
