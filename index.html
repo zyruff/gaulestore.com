@@ -1009,7 +1009,6 @@ onValue(ref(db, "reviews"), (snapshot) => {
 </div>
 
 
-
 <hr style="border:0; border-top:1px solid #ddd; margin:15px 0 0px;">
 
 <footer class="footer">
@@ -1018,50 +1017,45 @@ onValue(ref(db, "reviews"), (snapshot) => {
     </p>
 
     <div class="footer-links">
-        <a href="faq/">FAQ</a>
-        <span>|</span>
-        <a href="about/">About</a>
-        <span>|</span>
-        <a href="refund/">Refund Policy</a>
-        <span>|</span>
-        <a href="terms/">Terms and Conditions</a>
-        <span>|</span>
+        <a href="faq/">FAQ</a> <span>|</span> 
+        <a href="about/">About</a> <span>|</span> 
+        <a href="refund/">Refund Policy</a> <span>|</span>
+        <br>
+        <a href="terms/">Terms and Conditions</a> <span>|</span>
+        <br>
         <a href="privacy/">Privacy Policy</a>
     </div>
 </footer>
 
 <style>
-.footer{
-    text-align:center;
-    padding:1px 48px;
-    font-family:Arial,sans-serif;
+.footer {
+    text-align: center;
+    padding: 15px 20px;
+    font-family: Arial, sans-serif;
 }
 
-.copyright{
-    color:#777;
-    font-size:14px;
-    margin-bottom:15px;
+.copyright {
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 15px;
 }
 
-.footer-links{
-    display:flex;
-    justify-content:center;
-    flex-wrap:wrap;
-    gap:10px;
+.footer-links {
+    font-size: 14px;
+    line-height: 2.2; /* लाइनहरू बीचमा स्क्रिनसटको जस्तै प्रस्ट ग्याप राख्न */
 }
 
-.footer-links a{
-    color:#777;
-    text-decoration:none;
-    font-size:14px;
+.footer-links a {
+    color: #777;
+    text-decoration: none;
 }
 
-.footer-links a:hover{
-    color:#000;
+.footer-links a:hover {
+    color: #000;
 }
 
-.footer-links span{
-    color:#ccc;
+.footer-links span {
+    color: #ccc;
+    margin: 0 8px; /* डन्डी (|) को दायाँ-बायाँ स्पेस राख्न */
 }
 </style>
-         
