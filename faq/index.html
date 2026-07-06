@@ -1,138 +1,295 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FAQ | Gaule Store</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQs - Gaule Store</title>
+    <style>
+        :root {
+            --primary-color: #ff6b00;
+            --secondary-color: #1a1a2e;
+            --text-color: #333;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --accent-bg: #f8f9fa;
+        }
 
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-body{
-    font-family:Arial,sans-serif;
-    background:#f5f5f5;
-    color:#333;
-}
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
 
-.container{
-    width:95%;
-    max-width:850px;
-    margin:30px auto;
-}
+        .container {
+            max-width: 850px;
+            margin: 40px auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-top: 5px solid var(--primary-color);
+            position: relative;
+        }
 
-.back-btn{
-    display:inline-block;
-    margin-bottom:20px;
-    text-decoration:none;
-    color:#333;
-    font-size:16px;
-    font-weight:bold;
-}
+        /* --- Back Button Styling --- */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            background-color: var(--accent-bg);
+            border: 1px solid #e0e0e0;
+            margin-bottom: 25px;
+            transition: all 0.2s ease;
+        }
 
-.back-btn:hover{
-    color:#007bff;
-}
+        .back-btn:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            background-color: #fff4ed;
+            transform: translateX(-3px);
+        }
 
-h1{
-    text-align:center;
-    margin-bottom:30px;
-    font-size:32px;
-}
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+        }
 
-details{
-    background:#fff;
-    border:1px solid #e5e5e5;
-    border-radius:12px;
-    margin-bottom:15px;
-    overflow:hidden;
-}
+        .header h1 {
+            color: var(--secondary-color);
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
 
-summary{
-    padding:18px 20px;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
-    list-style:none;
-}
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
 
-summary::-webkit-details-marker{
-    display:none;
-}
+        .store-name {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
 
-details p{
-    padding:0 20px 20px;
-    color:#555;
-    line-height:1.7;
-}
+        /* FAQ Styling */
+        .faq-item {
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--card-bg);
+            transition: all 0.3s ease;
+        }
 
-@media (max-width:768px){
+        details summary {
+            padding: 18px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--secondary-color);
+            cursor: pointer;
+            list-style: none;
+            position: relative;
+            outline: none;
+            user-select: none;
+        }
 
-.container{
-    width:95%;
-    margin:20px auto;
-}
+        /* Custom Arrow */
+        details summary::after {
+            content: "▼";
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #aaa;
+            transition: transform 0.3s ease;
+        }
 
-h1{
-    font-size:26px;
-}
+        details[open] summary::after {
+            transform: translateY(-50%) rotate(180deg);
+            color: var(--primary-color);
+        }
 
-summary{
-    font-size:16px;
-    padding:16px;
-}
+        details[open] summary {
+            border-bottom: 1px solid #eee;
+            background-color: var(--accent-bg);
+        }
 
-details p{
-    font-size:15px;
-    padding:0 16px 16px;
-}
+        .faq-content {
+            padding: 20px;
+            background: #fff;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
 
-}
-</style>
+        @media (max-width: 768px) {
+            .faq-content {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .lang-divider {
+                border-bottom: 1px dashed #ddd;
+                padding-bottom: 15px;
+            }
+        }
+
+        .lang-en h4, .lang-np h4 {
+            color: var(--primary-color);
+            font-size: 14px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .lang-en p, .lang-np p {
+            color: #555;
+            font-size: 14.5px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 13px;
+            color: #888;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px auto;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+            details summary {
+                font-size: 14px;
+                padding: 15px;
+                padding-right: 35px;
+            }
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="container">
+    <div class="container">
+        
+        <!-- Back Button -->
+        <a href="../index.html" class="back-btn">
+            <span>←</span> Back
+        </a>
 
-<a href="index.html" class="back-btn">← Back</a>
+        <div class="header">
+            <h1>Frequently Asked Questions (FAQs)</h1>
+            <p>सधैं सोधिने प्रश्नहरू - <span class="store-name">Gaule Store</span></p>
+        </div>
 
-<h1>Frequently Asked Questions</h1>
+        <!-- FAQ 1 -->
+        <div class="faq-item">
+            <details>
+                <summary>How long does a Free Fire UID Top-Up take? / UID टप-अप हुन कति समय लाग्छ?</summary>
+                <div class="faq-content">
+                    <div class="lang-en lang-divider">
+                        <h4>English</h4>
+                        <p>UID Top-Up is super fast! It typically takes only 5 to 15 minutes after payment verification. During high traffic or server updates, it might take a bit longer.</p>
+                    </div>
+                    <div class="lang-np">
+                        <h4>नेपाली</h4>
+                        <p>UID टप-अप एकदमै चाँडो हुन्छ! पेमेन्ट चेक गरिसकेपछि सामान्यतया ५ देखि १५ मिनेट भित्र तपाईंको अकाउन्टमा डाइमण्ड पुग्छ। गेम सर्भर अपडेट वा चाप बढी भएको बेला केही समय थप लाग्न सक्छ।</p>
+                    </div>
+                </div>
+            </details>
+        </div>
 
-<details>
-<summary>How long does Free Fire Top Up take?</summary>
-<p>Most orders are completed within 1–5 minutes after successful payment.</p>
-</details>
+        <!-- FAQ 2 -->
+        <div class="faq-item">
+            <details>
+                <summary>I entered the wrong UID. Can I change it? / मैले गलत UID हालेँ, के सच्याउन मिल्छ?</summary>
+                <div class="faq-content">
+                    <div class="lang-en lang-divider">
+                        <h4>English</h4>
+                        <p>If the top-up has already been processed to the wrong UID, we cannot cancel, change, or refund it. Please check your Player UID carefully before placing the order.</p>
+                    </div>
+                    <div class="lang-np">
+                        <h4>नेपाली</h4>
+                        <p>यदि अर्डर प्रोसेस भएर गलत UID मा डाइमण्ड गइसकेको छ भने, त्यसलाई रद्द गर्न, सच्याउन वा रिफन्ड गर्न मिल्दैन। त्यसैले अर्डर गर्नु अघि आफ्नो UID फेरि ध्यान दिएर चेक गर्नुहोस्।</p>
+                    </div>
+                </div>
+            </details>
+        </div>
 
-<details>
-<summary>What information do I need to place an order?</summary>
-<p>Please provide your correct Free Fire UID and Server before placing the order.</p>
-</details>
+        <!-- FAQ 3 -->
+        <div class="faq-item">
+            <details>
+                <summary>Do you need my ID/Password for Top-Up? / टप-अपको लागि मलाई आईडि/पासवर्ड चाहिन्छ?</summary>
+                <div class="faq-content">
+                    <div class="lang-en lang-divider">
+                        <h4>English</h4>
+                        <p>No, we do NOT need your login details. Gaule Store only requires your Free Fire Player UID to top up. Your account remains 100% safe as no passwords are shared.</p>
+                    </div>
+                    <div class="lang-np">
+                        <h4>नेपाली</h4>
+                        <p>चाहिँदैन, हामीलाई तपाईंको फेसबुक वा गुगल लगइन विवरण आवश्यक पर्दैन। Gaule Store मा केवल Free Fire Player UID भए पुग्छ। पासवर्ड सेयर गर्नु नपर्ने हुनाले तपाईंको अकाउन्ट १००% सुरक्षित रहन्छ।</p>
+                    </div>
+                </div>
+            </details>
+        </div>
 
-<details>
-<summary>What payment methods do you accept?</summary>
-<p>We accept eSewa, Khalti, IME Pay, Bank Transfer and other available payment methods.</p>
-</details>
+        <!-- FAQ 4 -->
+        <div class="faq-item">
+            <details>
+                <summary>What payment methods do you accept? / पेमेन्ट कसरी गर्ने?</summary>
+                <div class="faq-content">
+                    <div class="lang-en lang-divider">
+                        <h4>English</h4>
+                        <p>We accept secure payments through eSewa, Khalti, IME Pay, and Direct Bank Transfer. Always send a screenshot of the payment receipt after paying.</p>
+                    </div>
+                    <div class="lang-np">
+                        <h4>नेपाली</h4>
+                        <p>हामी eSewa, Khalti, IME Pay र सिधै Bank Transfer मार्फत सुरक्षित पेमेन्ट स्वीकार गर्दछौं। पेमेन्ट गरिसकेपछि रसिदको स्क्रिनसट पठाउन अनिवार्य छ।</p>
+                    </div>
+                </div>
+            </details>
+        </div>
 
-<details>
-<summary>What if my order is delayed?</summary>
-<p>If your order is delayed, please contact us with your payment proof. We will check and resolve it as soon as possible.</p>
-</details>
+        <!-- FAQ 5 -->
+        <div class="faq-item">
+            <details>
+                <summary>Can this top-up fix my Diamond Minus/Ban? / के यो टप-अपले मेरो डाइमण्ड माइनस वा ब्यान हट्छ?</summary>
+                <div class="faq-content">
+                    <div class="lang-en lang-divider">
+                        <h4>English</h4>
+                        <p>If your account has a restriction due to negative diamonds, top-up will only clear the negative balance if you buy the required amount. However, we cannot guarantee unbanning if your account is permanently blocked by Garena.</p>
+                    </div>
+                    <div class="lang-np">
+                        <h4>नेपाली</h4>
+                        <p>यदि तपाईंको अकाउन्टमा डाइमण्ड माइनस लागेको छ भने, आवश्यक संख्यामा टप-अप गर्दा माइनस हट्नेछ। तर, गेरेना (Garena) ले स्थायी रूपमा प्रतिबन्ध (Ban) गरेको अकाउन्ट खुलाउने ग्यारेन्टी Gaule Store ले लिन सक्दैन।</p>
+                    </div>
+                </div>
+            </details>
+        </div>
 
-<details>
-<summary>Can I cancel my order?</summary>
-<p>Orders cannot be cancelled once they have been processed.</p>
-</details>
-
-<details>
-<summary>How can I contact Gaule Store?</summary>
-<p>You can contact us through WhatsApp, Facebook, TikTok or Email during our service hours (7:00 AM – 10:00 PM).</p>
-</details>
-
-</div>
+        <div class="footer">
+            <p>© 2026 Gaule Store. All Rights Reserved.</p>
+        </div>
+    </div>
 
 </body>
 </html>
