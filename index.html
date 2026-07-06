@@ -1009,7 +1009,9 @@ onValue(ref(db, "reviews"), (snapshot) => {
 </div>
 
 
-<hr style="border:0; border-top:1px solid #ddd; margin:15px 0 0px;">
+         
+         
+  <hr style="border:0; border-top:1px solid #ddd; margin:15px 0 0px;">
 
 <footer class="footer">
     <p class="copyright">
@@ -1017,12 +1019,12 @@ onValue(ref(db, "reviews"), (snapshot) => {
     </p>
 
     <div class="footer-links">
-        <a href="faq/">FAQ</a> <span>|</span> 
-        <a href="about/">About</a> <span>|</span> 
-        <a href="refund/">Refund Policy</a> <span>|</span>
-        <br>
-        <a href="terms/">Terms and Conditions</a> <span>|</span>
-        <br>
+        <a href="faq/">FAQ</a> <span class="pipe">|</span> 
+        <a href="about/">About</a> <span class="pipe">|</span> 
+        <a href="refund/">Refund Policy</a> <span class="pipe">|</span>
+        <br class="mobile-break">
+        <a href="terms/">Terms and Conditions</a> <span class="pipe">|</span>
+        <br class="mobile-break">
         <a href="privacy/">Privacy Policy</a>
     </div>
 </footer>
@@ -1042,7 +1044,7 @@ onValue(ref(db, "reviews"), (snapshot) => {
 
 .footer-links {
     font-size: 14px;
-    line-height: 2.2; /* लाइनहरू बीचमा स्क्रिनसटको जस्तै प्रस्ट ग्याप राख्न */
+    line-height: 2.2; 
 }
 
 .footer-links a {
@@ -1054,8 +1056,20 @@ onValue(ref(db, "reviews"), (snapshot) => {
     color: #000;
 }
 
-.footer-links span {
+.footer-links .pipe {
     color: #ccc;
-    margin: 0 8px; /* डन्डी (|) को दायाँ-बायाँ स्पेस राख्न */
+    margin: 0 8px;
+}
+
+/* 💻 PC (Desktop) को लागि SPECIFIC DESIGN */
+@media (min-width: 768px) {
+    .footer-links {
+        line-height: 1.5; /* PC मा टम्म मिलेको ग्याप */
+    }
+    
+    /* PC मा मोबाइलको लाइन ब्रेक (<br>) लाई गायब बनाइदिने */
+    .mobile-break {
+        display: none;
+    }
 }
 </style>
