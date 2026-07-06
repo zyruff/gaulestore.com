@@ -1011,19 +1011,55 @@ onValue(ref(db, "reviews"), (snapshot) => {
 
 
 
+<hr style="border:0; border-top:1px solid #ddd; margin:15px 0 0px;">
+
+<footer class="footer">
+    <p class="copyright">
+        &copy; 2026 Gaule Store. All rights reserved.
+    </p>
+
+    <div class="footer-links">
+        <a href="faq/">FAQ</a>
+        <span>|</span>
+        <a href="help/">Refund Policy</a>
+        <span>|</span>
+        <a href="terms/">Terms and Conditions</a>
+        <span>|</span>
+        <a href="privacy/">Privacy Policy</a>
+    </div>
+</footer>
 
 <style>
-    .footer-copyright {
-        text-align: center;
-        font-family: Arial, sans-serif;
-        color: #888;
-        font-size: 12px;
-        padding: 20px;
-        border-top: 1px solid #333;
-        margin-top: 20px;
-    }
-</style>
+.footer{
+    text-align:center;
+    padding:1px 15px;
+    font-family:Arial,sans-serif;
+}
 
-<div class="footer-copyright">
-    &copy; 2026 Gaule Store. All rights reserved.
-</div>
+.copyright{
+    color:#777;
+    font-size:14px;
+    margin-bottom:15px;
+}
+
+.footer-links{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.footer-links a{
+    color:#777;
+    text-decoration:none;
+    font-size:14px;
+}
+
+.footer-links a:hover{
+    color:#000;
+}
+
+.footer-links span{
+    color:#ccc;
+}
+</style>
