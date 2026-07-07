@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Gaule Store</title>
+    <style>
+        :root {
+            --primary-color: #ff6b00;
+            --secondary-color: #1a1a2e;
+            --text-color: #333;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --accent-bg: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-top: 5px solid var(--primary-color);
+            position: relative;
+        }
+
+        /* --- Back Button Styling --- */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            background-color: var(--accent-bg);
+            border: 1px solid #e0e0e0;
+            margin-bottom: 25px;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            background-color: #fff4ed;
+            transform: translateX(-3px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            color: var(--secondary-color);
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .store-name {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .policy-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .policy-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                /* ❌ डबल धर्का हटाउन यहाँबाट मोबाइल बर्डर फालियो */
+                border-bottom: none; 
+                padding-bottom: 0px;
+            }
+        }
+
+        .lang-block h2 {
+            color: var(--secondary-color);
+            font-size: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .lang-block h2::before {
+            content: "•";
+            color: var(--primary-color);
+            font-size: 25px;
+            margin-right: 10px;
+            line-height: 1;
+        }
+
+        p, ul {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        ul {
+            list-style-type: none;
+        }
+
+        li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+        }
+
+        li::before {
+            content: "➔";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* Highlight / Feature Grid Box */
+        .highlight-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            background-color: #fff4ed;
+            border-left: 5px solid var(--primary-color);
+            padding: 20px;
+            border-radius: 4px;
+            margin: 30px 0;
+            color: #555;
+        }
+
+        @media (max-width: 768px) {
+            .highlight-box {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+
+        /* --- Footer Styles --- */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee; /* केवल यो एउटा सिंगल धर्को मात्र बस्छ */
+            font-family: Arial, sans-serif;
+        }
+
+        .copyright {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .footer-links {
+            font-size: 14px;
+            line-height: 2.2; 
+        }
+
+        .footer-links a {
+            color: #777;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: #000;
+        }
+
+        .footer-links .pipe {
+            color: #ccc;
+            margin: 0 8px;
+        }
+
+        @media (min-width: 768px) {
+            .footer-links {
+                line-height: 1.5;
+            }
+            .mobile-break {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px auto;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Back Button -->
+        <a href="../index.html" class="back-btn">
+            <span>←</span> Back
+        </a>
+
+        <div class="header">
+            <h1>About Us</h1>
+            <p>Get to Know Us Better / हाम्रो बारेमा जान्नुहोस्</p>
+            <p>Welcome to <span class="store-name">Gaule Store</span></p>
+        </div>
+
+        <!-- Intro Section -->
+        <div class="policy-section">
+            <div class="lang-block">
+                <h2>Who We Are</h2>
+                <p>Welcome to Gaule Store, your most trusted destination for instant game top-ups and digital vouchers in Nepal. We are committed to providing premium gaming services with maximum speed, security, and the best rates in the market.</p>
+            </div>
+            <div class="lang-block">
+                <h2>हाम्रो परिचय</h2>
+                <p>Gaule Store मा तपाईंलाई स्वागत छ! हामी नेपालभरिका गेमर्सका लागि सबैभन्दा भरपर्दो र द्रुत गेम टप-अप तथा डिजिटल भौचर सेवा प्रदान गर्ने आधिकारिक प्ल्याटफर्म हौं। सुलभ मूल्य र सुरक्षित डेलिभरी नै हाम्रो मुख्य विशेषता हो।</p>
+            </div>
+        </div>
+
+        <!-- Games Supported Section -->
+        <div class="policy-section">
+            <div class="lang-block">
+                <h2>Supported Games & Vouchers</h2>
+                <p>We officially provide top-ups, coins, and premium credits for all your favorite mobile and PC titles:</p>
+                <ul>
+                    <li>Free Fire (Diamonds Top Up)</li>
+                    <li>PUBG Mobile (UC Top Up)</li>
+                    <li>Mobile Legends (Diamonds)</li>
+                    <li>Roblox (Robux Credits)</li>
+                    <li>eFootball (Coins Recharge)</li>
+                    <li>Delta Force Services</li>
+                    <li>Glory Bot Premium Services</li>
+                    <li>UniPin Vouchers (Global & Local)</li>
+                </ul>
+            </div>
+            <div class="lang-block">
+                <h2>सपोर्टेड गेम र भौचरहरू</h2>
+                <p>हामी यहाँ उपलब्ध भएका सबै लोकप्रिय गेमहरूको टप-अप र डिजिटल भौचरहरू आधिकारिक रूपमा उपलब्ध गराउँछौं:</p>
+                <ul>
+                    <li>Free Fire (डाइमण्ड टप-अप)</li>
+                    <li>PUBG Mobile (UC टप-अप)</li>
+                    <li>Mobile Legends (डाइमण्ड्स)</li>
+                    <li>Roblox (रोबक्स क्रेडिट)</li>
+                    <li>eFootball (क्वाइन रिचार्ज)</li>
+                    <li>Delta Force सेवाहरू</li>
+                    <li>Glory Bot प्रिमियम सेवाहरू</li>
+                    <li>UniPin भौचरहरू (ग्लोबल र लोकल)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Highlight Box (Feature Box Style) -->
+        <div class="highlight-box">
+            <div>
+                <strong>Our Mission:</strong><br>
+                To empower Nepalese gamers by making top-up services smooth and simple. No credit cards needed—just use your local wallets and bank transfers to get your game loaded instantly.
+            </div>
+            <div>
+                <strong>हाम्रो लक्ष्य:</strong><br>
+                नेपाली गेमर्सका लागि टप-अप प्रकृयालाई सरल र झन्झटमुक्त बनाउनु नै हाम्रो लक्ष्य हो। कुनै क्रेडिट कार्ड चाहिँदैन—आफ्नो mobile वालेट वा बैंकबाट सजिलै नेपालमै बसेर गेमिङको मज्जा लिनुहोस्।
+            </div>
+        </div>
+
+        <!-- Why Choose Us -->
+        <div class="policy-section">
+            <div class="lang-block">
+                <h2>Why Choose Gaule Store?</h2>
+                <ul>
+                    <li>Super fast delivery within 5-15 minutes.</li>
+                    <li>100% legal, safe, and official game currency.</li>
+                    <li>Easy payment with eSewa, Khalti, IME Pay, & Bank.</li>
+                </ul>
+            </div>
+            <div class="lang-block">
+                <h2>हामीलाई नै किन रोज्ने?</h2>
+                <ul>
+                    <li>५ देखि १५ मिनेट भित्र सुपर फास्ट डेलिभरी।</li>
+                    <li>१००% कानुनी र आधिकारिक गेम टप-अप।</li>
+                    <li>eSewa, Khalti, IME Pay र बैंक मार्फत सहज भुक्तानी।</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Single Line Footer Integration -->
+        <footer class="footer">
+            <p class="copyright">
+                &copy; 2026 Gaule Store. All rights reserved.
+            </p>
+
+            <div class="footer-links">
+                <a href="../faq/">FAQ</a> <span class="pipe">|</span> 
+                <a href="../about/">About</a> <span class="pipe">|</span> 
+                <a href="../refund/">Refund Policy</a> <span class="pipe">|</span>
+                <br class="mobile-break">
+                <a href="../terms/">Terms and Conditions</a> <span class="pipe">|</span>
+                <br class="mobile-break">
+                <a href="../privacy/">Privacy Policy</a>
+            </div>
+        </footer>
+
+    </div>
+
+</body>
+</html>
