@@ -460,6 +460,154 @@
 </head>
 <body>
 
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaule Store - White Gaming Counters</title>
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: transparent;
+            padding: 5px 0;
+        }
+        .stats-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+        }
+        /* Paila ko jastai Clean White Card */
+        .single-stat-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 340px; 
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            padding: 14px 10px;
+            margin: 0 auto;
+        }
+        .stat-block {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+        .stat-block:first-child::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 15%;
+            height: 70%;
+            width: 1px;
+            background-color: #edf2f7;
+        }
+        .stat-block h3 {
+            font-size: 0.65rem;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        /* Numbers ONLY - Premium Gaming Neon Vibe */
+        .count-value {
+            font-size: 1.6rem;
+            font-weight: 900;
+            letter-spacing: -0.3px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        /* Customer Number - Neon Purple/Indigo Glow */
+        #customer-counter {
+            color: #6366f1;
+            text-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
+        }
+        /* Order Number - Cyber Cyan Glow */
+        #order-counter {
+            color: #06b6d4;
+            text-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="stats-container">
+        <div class="single-stat-card">
+            
+            <div class="stat-block">
+                <h3>Total Customers</h3>
+                <div id="customer-counter" class="count-value">...</div>
+            </div>
+            
+            <div class="stat-block">
+                <h3>Total Orders</h3>
+                <div id="order-counter" class="count-value">...</div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+            authDomain: "gaule-top-up-center.firebaseapp.com",
+            databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+            projectId: "gaule-top-up-center",
+            storageBucket: "gaule-top-up-center.firebasestorage.app",
+            messagingSenderId: "645605489690",
+            appId: "1:645605489690:web:0b0f2898d295be03c1e5a3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        const customerCounterEl = document.getElementById('customer-counter');
+        const orderCounterEl = document.getElementById('order-counter');
+
+        const ordersRef = ref(database, 'orders');
+
+        onValue(ordersRef, (snapshot) => {
+            if (snapshot.exists()) {
+                orderCounterEl.innerText = snapshot.size;
+
+                const uniqueUsers = new Set();
+                snapshot.forEach((childSnapshot) => {
+                    const orderData = childSnapshot.val();
+                    if (orderData.uid) {
+                        uniqueUsers.add(orderData.uid);
+                    }
+                });
+                customerCounterEl.innerText = uniqueUsers.size;
+            } else {
+                customerCounterEl.innerText = "0";
+                orderCounterEl.innerText = "0";
+            }
+        }, (error) => {
+            console.error(error);
+            customerCounterEl.innerText = "Err";
+            orderCounterEl.innerText = "Err";
+        });
+    </script>
+</body>
+</html>
+
+     
+
+     
 <h3>Order Status</h3>
 <div class="table-container">
     <table>
