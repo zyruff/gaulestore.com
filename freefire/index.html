@@ -515,8 +515,6 @@
 
 
 
-
-
 <div class="section-box">
     <div class="section-header-flex">
         <div class="box-title">Game ID <span style="color: #e53e3e;">*</span></div>
@@ -552,14 +550,12 @@
         const nameSpan = document.getElementById("player-name");
         const uidError = document.getElementById("uid-error");
 
-        // ८ अंक भन्दा कम भएमा बक्स लुकाउने
         if (uid.length < 8) {
             display.style.display = "none";
             uidError.style.display = "none";
             return;
         }
 
-        // ७०० मिलिसेकेन्डको पर्खाइ (Debounce) ताकि धेरै रिक्वेस्ट नजाओस्
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(async () => {
             display.style.display = "block";
@@ -589,386 +585,386 @@
     }
 </script>
 
+<div class="section-box">
+    <div class="section-header-flex">
+        <div class="box-title">Diamonds <span style="color: #e53e3e;">*</span></div>
+    </div>
+    
+    <div class="error-message" id="pack-error" style="margin-bottom: 8px; display: none;">
+        <i class="fa-solid fa-circle-exclamation"></i> <span>Please select a Diamond pack to proceed!</span>
+    </div>
 
+    <div class="cards-grid" id="diamonds-wrapper">
+        <div class="pack-card" onclick="selectPack(this, '25 Diamonds', '28')">
+            <div class="pack-title">25 Diamonds</div>
+            <div class="pack-price">Rs28</div>
+            <i class="fa-solid fa-gem diamond-icon"></i>
+        </div>
 
+        <div class="pack-card" onclick="selectPack(this, '50 Diamonds', '54')">
+            <div class="pack-title">50 Diamonds</div>
+            <div class="pack-price">Rs54</div>
+            <i class="fa-solid fa-gem diamond-icon"></i>
+        </div>
+    
+        <div class="pack-card" onclick="selectPack(this, '115 Diamonds', '99')">
+            <div class="pack-title">115 Diamonds</div>
+            <div class="pack-price">Rs99</div>
+            <i class="fa-solid fa-gem diamond-icon"></i>
+        </div>
 
+        <div class="pack-card" onclick="selectPack(this, '240 Diamonds', '198')">
+            <div class="pack-title">240 Diamonds</div>
+            <div class="pack-price">Rs198</div>
+            <i class="fa-solid fa-gem diamond-icon"></i>
+        </div>
 
+        <div class="pack-card" onclick="selectPack(this, '480 Diamonds', '396')">
+            <div class="pack-title">480 Diamonds</div>
+            <div class="pack-price">Rs396</div>
+            <i class="fa-solid fa-gem diamond-icon"></i>
+        </div>
 
+        <div class="pack-card" onclick="selectPack(this, '610 Diamonds', '505')">
+            <div class="pack-title">610 Diamonds</div>
+            <div class="pack-price">Rs505</div>
+            <i class="fa-solid fa-gem diamond-icon"></i>
+        </div>
 
+        <div class="pack-card" onclick="selectPack(this, '850 Diamonds', '705')">
+            <div class="pack-title">850 Diamonds</div>
+            <div class="pack-price">Rs705</div>
+            <i class="fa-solid fa-gem diamond-icon"></i>
+        </div>
 
+        <div class="pack-card" onclick="selectPack(this, '1090 Diamonds', '905')">
+            <div class="pack-title">1090 Diamonds</div>
+            <div class="pack-price">Rs905</div>
+            <i class="fa-solid fa-gem diamond-icon"></i>
+        </div>
 
+        <div class="pack-card" onclick="selectPack(this, '1240 Diamonds', '1000')">
+            <div class="pack-title">1240 Diamonds</div>
+            <div class="pack-price">Rs1000</div>
+            <i class="fa-solid fa-gem diamond-icon"></i>
+        </div>
 
-    <div class="section-box">
-        <div class="section-header-flex">
-            <div class="box-title">Diamonds <span style="color: #e53e3e;">*</span></div>
+        <div class="pack-card" onclick="selectPack(this, '1450 Diamonds', '1200')">
+            <div class="pack-title">1450 Diamonds</div>
+            <div class="pack-price">Rs1200</div>
+            <i class="fa-solid fa-gem diamond-icon"></i>
+        </div>
+
+        <div class="pack-card" onclick="selectPack(this, '1850 Diamonds', '1500')">
+            <div class="pack-title">1850 Diamonds</div>
+            <div class="pack-price">Rs1500</div>
+            <i class="fa-solid fa-gem diamond-icon"></i>
+        </div>
+
+        <div class="pack-card" onclick="selectPack(this, '2530 Diamonds', '2030')">
+            <div class="pack-title">2530 Diamonds</div>
+            <div class="pack-price">Rs2030</div>
+            <i class="fa-solid fa-gem diamond-icon"></i>
+        </div>
+
+        <div class="box-title" style="grid-column: 1 / -1; margin-top: 15px;">
+            Membership <span style="color:#e53e3e;">*</span>
+        </div>
+
+        <div class="pack-card" onclick="selectPack(this, 'Weekly Membership', '198')">
+            <div class="pack-title">Weekly Membership</div>
+            <div class="pack-price">Rs198</div>
+            <i class="fa-solid fa-gem diamond-icon"></i>
+        </div>
+
+        <div class="pack-card" onclick="selectPack(this, 'Monthly Membership', '990')">
+            <div class="pack-title">Monthly Membership</div>
+            <div class="pack-price">Rs990</div>
+            <i class="fa-solid fa-gem diamond-icon"></i>
+        </div>
+    </div>
+</div>
+
+<div class="bottom-drawer">
+    <div class="drawer-inner">
+        <div class="row-detail">
+            <span>Item</span>
+            <span class="val-white" id="summary-item">-</span>
+        </div>
+        <div class="total-row">
+            <span class="total-label">Total</span>
+            <span class="total-price" id="summary-total">Rs 0.00</span>
         </div>
         
-        <div class="error-message" id="pack-error" style="margin-bottom: 8px;">
-            <i class="fa-solid fa-circle-exclamation"></i> <span>Please select a Diamond pack to proceed!</span>
-        </div>
+        <button id="main-action-btn" class="action-btn">
+            <i class="fa-solid fa-basket-shopping"></i> Buy Now
+        </button>
+    </div>
+</div>
 
-        <div class="cards-grid" id="diamonds-wrapper">
-            <div class="pack-card" onclick="selectPack(this, '25 Diamonds', '28')">
-                <div class="pack-title">25 Diamonds</div>
-                <div class="pack-price">Rs28</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-
-
-
-            <div class="pack-card" onclick="selectPack(this, '50 Diamonds', '54')">
-                <div class="pack-title">50 Diamonds</div>
-                <div class="pack-price">Rs54</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
+<div class="qr-modal" id="qrModal">
+    <div class="qr-card">
+        <i class="fa-solid fa-xmark close-modal" onclick="closePaymentModal()"></i>
+        <div class="qr-title">Scan to Pay</div>
+        <div class="qr-subtitle">Please scan the QR code via Khalti, eSewa or Fonepay</div>
         
-<div class="pack-card" onclick="selectPack(this, '115 Diamonds', '99')">
-    <div class="pack-title">115 Diamonds</div>
-    <div class="pack-price">Rs99</div>
-    <i class="fa-solid fa-gem diamond-icon"></i>
-</div>
-
-<div class="pack-card" onclick="selectPack(this, '240 Diamonds', '198')">
-    <div class="pack-title">240 Diamonds</div>
-    <div class="pack-price">Rs198</div>
-    <i class="fa-solid fa-gem diamond-icon"></i>
-</div>
-
-<div class="pack-card" onclick="selectPack(this, '480 Diamonds', '396')">
-    <div class="pack-title">480 Diamonds</div>
-    <div class="pack-price">Rs396</div>
-    <i class="fa-solid fa-gem diamond-icon"></i>
-</div>
-
-<div class="pack-card" onclick="selectPack(this, '610 Diamonds', '505')">
-    <div class="pack-title">610 Diamonds</div>
-    <div class="pack-price">Rs505</div>
-    <i class="fa-solid fa-gem diamond-icon"></i>
-</div>
-
-
-<div class="pack-card" onclick="selectPack(this, '850 Diamonds', '705')">
-    <div class="pack-title">850 Diamonds</div>
-    <div class="pack-price">Rs705</div>
-    <i class="fa-solid fa-gem diamond-icon"></i>
-</div>
-
-<div class="pack-card" onclick="selectPack(this, '1090 Diamonds', '905')">
-    <div class="pack-title">1090 Diamonds</div>
-    <div class="pack-price">Rs905</div>
-    <i class="fa-solid fa-gem diamond-icon"></i>
-</div>
-
-
-<div class="pack-card" onclick="selectPack(this, '1240 Diamonds', '1000')">
-    <div class="pack-title">1240 Diamonds</div>
-    <div class="pack-price">Rs1000</div>
-    <i class="fa-solid fa-gem diamond-icon"></i>
-</div>
-
-<div class="pack-card" onclick="selectPack(this, '1450 Diamonds', '1200')">
-    <div class="pack-title">1450 Diamonds</div>
-    <div class="pack-price">Rs1200</div>
-    <i class="fa-solid fa-gem diamond-icon"></i>
-</div>
-
-<div class="pack-card" onclick="selectPack(this, '1850 Diamonds', '1500')">
-    <div class="pack-title">1850 Diamonds</div>
-    <div class="pack-price">Rs1500</div>
-    <i class="fa-solid fa-gem diamond-icon"></i>
-</div>
-
-<div class="pack-card" onclick="selectPack(this, '2530 Diamonds', '2030')">
-    <div class="pack-title">2530 Diamonds</div>
-    <div class="pack-price">Rs2030</div>
-    <i class="fa-solid fa-gem diamond-icon"></i>
-</div>
-
-<div class="box-title">
-    membership <span style="color:#e53e3e;">*</span>
-</div>
-
-<div class="cards-grid" id="diamonds-wrapper">
-    <!-- Weekly Membership -->
-    <!-- Monthly Membership -->
-</div>
-
-
-<div class="pack-card" onclick="selectPack(this, 'Weekly Membership', '198')">
-    <div class="pack-title">Weekly Membership</div>
-    <div class="pack-price">Rs198</div>
-    <i class="fa-solid fa-gem diamond-icon"></i>
-</div>
-
-
-<div class="pack-card" onclick="selectPack(this, 'Monthly Membership', '990')">
-    <div class="pack-title">Monthly Membership</div>
-    <div class="pack-price">Rs990</div>
-    <i class="fa-solid fa-gem diamond-icon"></i>
-</div>
-
-
-
-</div>
-    </div>
-
-    <div class="bottom-drawer">
-        <div class="drawer-inner">
-            <div class="row-detail">
-                <span>Item</span>
-                <span class="val-white" id="summary-item">-</span>
-            </div>
-            <div class="total-row">
-                <span class="total-label">Total</span>
-                <span class="total-price" id="summary-total">Rs 0.00</span>
-            </div>
-            
-            <button id="main-action-btn" class="action-btn">
-                <i class="fa-solid fa-basket-shopping"></i> Buy Now
-            </button>
+        <div class="account-details-box">
+            <strong> Notice:</strong> Gaule Store <br>
+            <strong> Remark:</strong> Please write your real name in the remarks. Do not write Free Fire Top Up.
         </div>
-    </div>
 
-    <div class="qr-modal" id="qrModal">
-        <div class="qr-card">
-            <i class="fa-solid fa-xmark close-modal" onclick="closePaymentModal()"></i>
-            <div class="qr-title">Scan to Pay</div>
-            <div class="qr-subtitle">Please scan the QR code via Khalti, eSewa or Fonepay</div>
-            
-            <div class="account-details-box">
-                <strong> Notice:</strong> Gaule Store <br>
-                <strong> Remark:</strong> Please write your real name in the remarks. Do not write Free Fire Top Up.
-            </div>
-
-            <div class="qr-image-wrapper">
-                <img src="qr_code.png" alt="Payment QR Code">
-            </div>
-
-            <div class="txid-container">
-                <label class="txid-label" for="txid">Transaction ID / Ref ID <span style="color: #e53e3e;">*</span></label>
-                <div class="txid-input-wrapper">
-                    <i class="fa-solid fa-receipt"></i>
-                    <input type="text" id="txid" class="txid-input" placeholder="Enter transaction ID after payment" oninput="validateTxIDLive()">
-                </div>
-                <div class="txid-error-message" id="txid-error">
-                    <i class="fa-solid fa-circle-exclamation"></i> <span>Transaction ID is required to verify payment!</span>
-                </div>
-            </div>
-
-            <div class="payment-summary-box">
-                <div class="pay-row">
-                    <span>Game UID:</span>
-                    <span id="modal-uid" style="font-weight: bold; color: #1a202c;">-</span>
-                </div>
-                <div class="pay-row">
-                    <span>Selected Pack:</span>
-                    <span id="modal-item">-</span>
-                </div>
-                <div class="pay-row">
-                    <span>Amount Due:</span>
-                    <span class="highlight-total" id="modal-total">Rs 0.00</span>
-                </div>
-            </div>
-
-            <button class="done-btn" onclick="submitPayment()">Submit Payment</button>
+        <div class="qr-image-wrapper">
+            <img src="qr_code.png" alt="Payment QR Code">
         </div>
-    </div>
 
-    <div class="success-modal" id="successModal">
-        <div class="success-card">
-            <div class="success-checkmark">
-                <i class="fa-solid fa-check"></i>
+        <div class="txid-container">
+            <label class="txid-label" for="txid">Transaction ID / Ref ID <span style="color: #e53e3e;">*</span></label>
+            <div class="txid-input-wrapper">
+                <i class="fa-solid fa-receipt"></i>
+                <input type="text" id="txid" class="txid-input" placeholder="Enter transaction ID after payment" oninput="validateTxIDLive()">
             </div>
-            <div class="success-title">Order Submitted!</div>
-            <p class="success-msg">Your order has been received. Our team will verify and top-up your diamonds instantly.</p>
-            
-            <div class="success-receipt-info">
-                <div class="receipt-row">
-                    <span>Game ID:</span>
-                    <span id="receipt-uid">-</span>
-                </div>
-                <div class="receipt-row">
-                    <span>Item:</span>
-                    <span id="receipt-item">-</span>
-                </div>
-                <div class="receipt-row">
-                    <span>Price:</span>
-                    <span id="receipt-price" style="color: #2ed573;">-</span>
-                </div>
-                <div class="receipt-row">
-                    <span>Status:</span>
-                    <span style="color: #ffb300;">Pending Verification</span>
-                </div>
+            <div class="txid-error-message" id="txid-error" style="display: none;">
+                <i class="fa-solid fa-circle-exclamation"></i> <span>Transaction ID is required to verify payment!</span>
             </div>
-
-            <button class="success-close-btn" onclick="closeSuccessModal()">Great, Thanks!</button>
         </div>
+
+        <div class="payment-summary-box">
+            <div class="pay-row">
+                <span>Game UID:</span>
+                <span id="modal-uid" style="font-weight: bold; color: #1a202c;">-</span>
+            </div>
+            <div class="pay-row">
+                <span>Selected Pack:</span>
+                <span id="modal-item">-</span>
+            </div>
+            <div class="pay-row">
+                <span>Amount Due:</span>
+                <span class="highlight-total" id="modal-total">Rs 0.00</span>
+            </div>
+        </div>
+
+        <button class="done-btn" onclick="submitPayment()">Submit Payment</button>
     </div>
+</div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        // यहाँ Firebase Database को लागि import थपियो:
-        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+<div class="success-modal" id="successModal">
+    <div class="success-card">
+        <div class="success-checkmark">
+            <i class="fa-solid fa-check"></i>
+        </div>
+        <div class="success-title">Order Submitted!</div>
+        <p class="success-msg">Your order has been received. Our team will verify and top-up your diamonds instantly.</p>
+        
+        <div class="success-receipt-info">
+            <div class="receipt-row">
+                <span>Game ID:</span>
+                <span id="receipt-uid">-</span>
+            </div>
+            <div class="receipt-row">
+                <span>Item:</span>
+                <span id="receipt-item">-</span>
+            </div>
+            <div class="receipt-row">
+                <span>Price:</span>
+                <span id="receipt-price" style="color: #2ed573;">-</span>
+            </div>
+            <div class="receipt-row">
+                <span>Status:</span>
+                <span style="color: #ffb300;">Pending Verification</span>
+            </div>
+        </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-            authDomain: "gaule-top-up-center.firebaseapp.com",
-            databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-            projectId: "gaule-top-up-center",
-            storageBucket: "gaule-top-up-center.firebasestorage.app",
-            messagingSenderId: "645605489690",
-            appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-        };
+        <button class="success-close-btn" onclick="closeSuccessModal()">Great, Thanks!</button>
+    </div>
+</div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app); // Database इनिसियलाइज भयो
-        const provider = new GoogleAuthProvider();
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-        let currentUser = null;
-        let selectedItemName = "";
-        let selectedItemPrice = "";
+    const firebaseConfig = {
+        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+        authDomain: "gaule-top-up-center.firebaseapp.com",
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+        projectId: "gaule-top-up-center",
+        storageBucket: "gaule-top-up-center.firebasestorage.app",
+        messagingSenderId: "645605489690",
+        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+    };
 
-        const mainActionBtn = document.getElementById('main-action-btn');
-        const gameUidInput = document.getElementById('game-uid');
-        const uidError = document.getElementById('uid-error');
-        const packError = document.getElementById('pack-error');
-        const diamondsWrapper = document.getElementById('diamonds-wrapper');
-        const txidInput = document.getElementById('txid');
-        const txidError = document.getElementById('txid-error');
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const provider = new GoogleAuthProvider();
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                mainActionBtn.innerHTML = `<i class="fa-solid fa-basket-shopping"></i> Buy Now`;
-                mainActionBtn.classList.remove('login-needed');
-            } else {
-                currentUser = null;
-                mainActionBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login to Buy`;
-                mainActionBtn.classList.add('login-needed');
-            }
-        });
+    let currentUser = null;
+    let selectedItemName = "";
+    let selectedItemPrice = "";
 
-        mainActionBtn.onclick = function() {
-            if (!currentUser) {
-                signInWithPopup(auth, provider).then((result) => {
-                    console.log("Logged in!");
-                }).catch((error) => {
-                    alert("लगइन असफल भयो: " + error.message);
-                });
-                return;
-            }
+    const mainActionBtn = document.getElementById('main-action-btn');
+    const gameUidInput = document.getElementById('game-uid');
+    const uidError = document.getElementById('uid-error');
+    const packError = document.getElementById('pack-error');
+    const diamondsWrapper = document.getElementById('diamonds-wrapper');
+    const txidInput = document.getElementById('txid');
+    const txidError = document.getElementById('txid-error');
 
-            let isFormValid = true;
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user;
+            mainActionBtn.innerHTML = `<i class="fa-solid fa-basket-shopping"></i> Buy Now`;
+            mainActionBtn.classList.remove('login-needed');
+        } else {
+            currentUser = null;
+            mainActionBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login to Buy`;
+            mainActionBtn.classList.add('login-needed');
+        }
+    });
 
-            if (!selectedItemName) {
-                diamondsWrapper.classList.add('error-border');
-                packError.style.display = "flex";
-                diamondsWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                isFormValid = false;
-            }
-
-            let uidValue = gameUidInput.value.trim();
-            if (uidValue === "") {
-                gameUidInput.classList.add('error-border');
-                uidError.style.display = "flex";
-                if(isFormValid) gameUidInput.focus();
-                isFormValid = false;
-            }
-
-            if(!isFormValid) return;
-            openPaymentModal(uidValue);
-        };
-
-        window.selectPack = function(element, name, price) {
-            diamondsWrapper.classList.remove('error-border');
-            packError.style.display = "none";
-
-            document.querySelectorAll('.pack-card').forEach(card => card.classList.remove('selected'));
-            element.classList.add('selected');
-            
-            selectedItemName = name;
-            selectedItemPrice = price;
-
-            document.getElementById('summary-item').innerText = name;
-            document.getElementById('summary-total').innerText = 'Rs ' + price;
-        };
-
-        window.validateUIDLive = function() {
-            if (gameUidInput.value.trim() !== "") {
-                gameUidInput.classList.remove('error-border');
-                uidError.style.display = "none";
-            }
-        };
-
-        window.validateTxIDLive = function() {
-            if (txidInput.value.trim() !== "") {
-                txidInput.classList.remove('error-border');
-                txidError.style.display = "none";
-            }
-        };
-
-        function openPaymentModal(uid) {
-            document.getElementById('modal-uid').innerText = uid;
-            document.getElementById('modal-item').innerText = selectedItemName;
-            document.getElementById('modal-total').innerText = 'Rs ' + selectedItemPrice;
-            
-            txidInput.value = ""; 
-            txidInput.classList.remove('error-border');
-            txidError.style.display = "none";
-
-            document.getElementById('qrModal').classList.add('show');
+    mainActionBtn.onclick = function() {
+        if (!currentUser) {
+            signInWithPopup(auth, provider).then((result) => {
+                console.log("Logged in!");
+            }).catch((error) => {
+                alert("लगइन असफल भयो: " + error.message);
+            });
+            return;
         }
 
-        window.closePaymentModal = function() {
-            document.getElementById('qrModal').classList.remove('show');
-        };
+        let isFormValid = true;
 
-        // अर्डर Firebase मा पठाउने फंक्सन
-        window.submitPayment = function() {
-            let txidValue = txidInput.value.trim();
-            let uidValue = gameUidInput.value.trim();
+        if (!selectedItemName) {
+            diamondsWrapper.classList.add('error-border');
+            packError.style.display = "flex";
+            diamondsWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            isFormValid = false;
+        }
+
+        let uidValue = gameUidInput.value.trim();
+        if (uidValue === "") {
+            gameUidInput.classList.add('error-border');
+            uidError.style.display = "flex";
+            if(isFormValid) gameUidInput.focus();
+            isFormValid = false;
+        }
+
+        if(!isFormValid) return;
+        openPaymentModal(uidValue);
+    };
+
+    window.selectPack = function(element, name, price) {
+        diamondsWrapper.classList.remove('error-border');
+        packError.style.display = "none";
+
+        document.querySelectorAll('.pack-card').forEach(card => card.classList.remove('selected'));
+        element.classList.add('selected');
+        
+        selectedItemName = name;
+        selectedItemPrice = price;
+
+        document.getElementById('summary-item').innerText = name;
+        document.getElementById('summary-total').innerText = 'Rs ' + price;
+    };
+
+    window.validateUIDLive = function() {
+        if (gameUidInput.value.trim() !== "") {
+            gameUidInput.classList.remove('error-border');
+            uidError.style.display = "none";
+        }
+    };
+
+    window.validateTxIDLive = function() {
+        if (txidInput.value.trim() !== "") {
+            txidInput.classList.remove('error-border');
+            txidError.style.display = "none";
+        }
+    };
+
+    function openPaymentModal(uid) {
+        document.getElementById('modal-uid').innerText = uid;
+        document.getElementById('modal-item').innerText = selectedItemName;
+        document.getElementById('modal-total').innerText = 'Rs ' + selectedItemPrice;
+        
+        txidInput.value = ""; 
+        txidInput.classList.remove('error-border');
+        txidError.style.display = "none";
+
+        // मोडल खुल्दा सबमिट बटनलाई पुनः सुचारु (Reset) गर्ने
+        const submitBtn = document.querySelector('.done-btn');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Submit Payment";
+            submitBtn.style.opacity = "1";
+            submitBtn.style.cursor = "pointer";
+        }
+
+        document.getElementById('qrModal').classList.add('show');
+    }
+
+    window.closePaymentModal = function() {
+        document.getElementById('qrModal').classList.remove('show');
+    };
+
+    // अर्डर Firebase मा पठाउने फंक्सन (डबल क्लिक फिक्स सहित)
+    window.submitPayment = function() {
+        let txidValue = txidInput.value.trim();
+        let uidValue = gameUidInput.value.trim();
+        
+        if (txidValue === "") {
+            txidInput.classList.add('error-border');
+            txidError.style.display = "flex";
+            txidInput.focus();
+            return;
+        }
+
+        // --- बटनलाई Disable गर्ने (डबल अर्डर रोक्न) ---
+        const submitBtn = document.querySelector('.done-btn');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting...";
+            submitBtn.style.opacity = "0.6";
+            submitBtn.style.cursor = "not-allowed";
+        }
+
+        const now = new Date();
+        const orderRef = push(ref(db, 'orders'));
+        
+        set(orderRef, {
+            date: now.toLocaleDateString(),
+            time: now.toLocaleTimeString(),
+            timestamp: Date.now(),
+            email: currentUser.email,
+            name: currentUser.displayName || "User",
+            userId: currentUser.uid,
+            product: selectedItemName,
+            amountDue: selectedItemPrice,
+            uid: uidValue,
+            transactionId: txidValue,
+            status: "Pending"
+        }).then(() => {
+            closePaymentModal();
+            document.getElementById('receipt-uid').innerText = uidValue;
+            document.getElementById('receipt-item').innerText = selectedItemName;
+            document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
+            document.getElementById('successModal').classList.add('show');
+        }).catch((error) => {
+            alert("अर्डर पठाउन समस्या भयो: " + error.message);
             
-            if (txidValue === "") {
-                txidInput.classList.add('error-border');
-                txidError.style.display = "flex";
-                txidInput.focus();
-                return;
+            // इरर आएमा बटन फेरि खुला गर्ने ताकि ग्राहकले फेरि ट्राइ गर्न सकोस्
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit Payment";
+                submitBtn.style.opacity = "1";
+                submitBtn.style.cursor = "pointer";
             }
+        });
+    };
 
-            const now = new Date();
-            const orderRef = push(ref(db, 'orders'));
-            
-            set(orderRef, {
-                date: now.toLocaleDateString(),
-                time: now.toLocaleTimeString(),
-                timestamp: Date.now(),
-                email: currentUser.email,
-                name: currentUser.displayName || "User",
-                userId: currentUser.uid,
-                product: selectedItemName,
-                amountDue: selectedItemPrice,
-                uid: uidValue,
-                transactionId: txidValue,
-                status: "Pending"
-            }).then(() => {
-                closePaymentModal();
-                document.getElementById('receipt-uid').innerText = uidValue;
-                document.getElementById('receipt-item').innerText = selectedItemName;
-                document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
-                document.getElementById('successModal').classList.add('show');
-            }).catch((error) => {
-                alert("अर्डर पठाउन समस्या भयो: " + error.message);
-            });
-        };
+    window.closeSuccessModal = function() {
+        document.getElementById('successModal').classList.remove('show');
+        location.reload();
+    };
+</script>
 
-        window.closeSuccessModal = function() {
-            document.getElementById('successModal').classList.remove('show');
-            location.reload();
-        };
-    </script>
-</body>
-</html>
+     
