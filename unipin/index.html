@@ -776,7 +776,6 @@
 
 
 
-
 </div>
     </div>
 
@@ -818,14 +817,14 @@
                     <i class="fa-solid fa-receipt"></i>
                     <input type="text" id="txid" class="txid-input" placeholder="Enter transaction ID after payment" oninput="validateTxIDLive()">
                 </div>
-                <div class="txid-error-message" id="txid-error">
+                <div class="txid-error-message" id="txid-error" style="display: none;">
                     <i class="fa-solid fa-circle-exclamation"></i> <span>Transaction ID is required to verify payment!</span>
                 </div>
             </div>
 
             <div class="payment-summary-box">
                 <div class="pay-row">
-                    <span>Email ID:</span>
+                    <span>User UID:</span>
                     <span id="modal-uid" style="font-weight: bold; color: #1a202c;">-</span>
                 </div>
                 <div class="pay-row">
@@ -852,7 +851,7 @@
             
             <div class="success-receipt-info">
                 <div class="receipt-row">
-                    <span>Email ID:</span>
+                    <span>Game ID:</span>
                     <span id="receipt-uid">-</span>
                 </div>
                 <div class="receipt-row">
@@ -876,7 +875,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        // यहाँ Firebase Database को लागि import थपियो:
         import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         const firebaseConfig = {
@@ -891,7 +889,7 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getDatabase(app); // Database इनिसियलाइज भयो
+        const db = getDatabase(app); 
         const provider = new GoogleAuthProvider();
 
         let currentUser = null;
@@ -931,9 +929,9 @@
             let isFormValid = true;
 
             if (!selectedItemName) {
-                diamondsWrapper.classList.add('error-border');
-                packError.style.display = "flex";
-                diamondsWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (diamondsWrapper) diamondsWrapper.classList.add('error-border');
+                if (packError) packError.style.display = "flex";
+                if (diamondsWrapper) diamondsWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 isFormValid = false;
             }
 
@@ -950,8 +948,8 @@
         };
 
         window.selectPack = function(element, name, price) {
-            diamondsWrapper.classList.remove('error-border');
-            packError.style.display = "none";
+            if (diamondsWrapper) diamondsWrapper.classList.remove('error-border');
+            if (packError) packError.style.display = "none";
 
             document.querySelectorAll('.pack-card').forEach(card => card.classList.remove('selected'));
             element.classList.add('selected');
@@ -986,6 +984,15 @@
             txidInput.classList.remove('error-border');
             txidError.style.display = "none";
 
+            // मोडल खुल्दा सबमिट बटन सुरक्षित अवस्थामा रिसेट हुन्छ
+            const submitBtn = document.querySelector('.done-btn');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit Payment";
+                submitBtn.style.opacity = "1";
+                submitBtn.style.cursor = "pointer";
+            }
+
             document.getElementById('qrModal').classList.add('show');
         }
 
@@ -993,7 +1000,7 @@
             document.getElementById('qrModal').classList.remove('show');
         };
 
-        // अर्डर Firebase मा पठाउने फंक्सन
+        // अर्डर Firebase मा पठाउने सुरक्षित फंक्सन (Anti-spam/Double-click protection)
         window.submitPayment = function() {
             let txidValue = txidInput.value.trim();
             let uidValue = gameUidInput.value.trim();
@@ -1003,6 +1010,15 @@
                 txidError.style.display = "flex";
                 txidInput.focus();
                 return;
+            }
+
+            // बटनलाई तुरुन्त डिसेबल गर्ने ताकि दोहोर्‍याएर क्लिक गर्न नमिलोस्
+            const submitBtn = document.querySelector('.done-btn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Submitting...";
+                submitBtn.style.opacity = "0.6";
+                submitBtn.style.cursor = "not-allowed";
             }
 
             const now = new Date();
@@ -1028,6 +1044,14 @@
                 document.getElementById('successModal').classList.add('show');
             }).catch((error) => {
                 alert("अर्डर पठाउन समस्या भयो: " + error.message);
+                
+                // नेटवर्क वा अन्य समस्या आएमा बटन पुनः सुचारु गर्ने
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Submit Payment";
+                    submitBtn.style.opacity = "1";
+                    submitBtn.style.cursor = "pointer";
+                }
             });
         };
 
@@ -1038,3 +1062,5 @@
     </script>
 </body>
 </html>
+
+         
