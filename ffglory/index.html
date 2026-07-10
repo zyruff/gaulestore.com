@@ -654,8 +654,6 @@
  
 
 
-     
-
 </div>
     </div>
 
@@ -697,7 +695,7 @@
                     <i class="fa-solid fa-receipt"></i>
                     <input type="text" id="txid" class="txid-input" placeholder="Enter transaction ID after payment" oninput="validateTxIDLive()">
                 </div>
-                <div class="txid-error-message" id="txid-error">
+                <div class="txid-error-message" id="txid-error" style="display: none;">
                     <i class="fa-solid fa-circle-exclamation"></i> <span>Transaction ID is required to verify payment!</span>
                 </div>
             </div>
@@ -755,7 +753,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        // यहाँ Firebase Database को लागि import थपियो:
         import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         const firebaseConfig = {
@@ -770,7 +767,7 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getDatabase(app); // Database इनिसियलाइज भयो
+        const db = getDatabase(app);
         const provider = new GoogleAuthProvider();
 
         let currentUser = null;
@@ -865,6 +862,15 @@
             txidInput.classList.remove('error-border');
             txidError.style.display = "none";
 
+            // नयाँ पेमेन्ट खोल्दा बटनलाई पुनः सक्रिय (Reset) गर्ने
+            const submitBtn = document.querySelector('.done-btn');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit Payment";
+                submitBtn.style.opacity = "1";
+                submitBtn.style.cursor = "pointer";
+            }
+
             document.getElementById('qrModal').classList.add('show');
         }
 
@@ -872,7 +878,7 @@
             document.getElementById('qrModal').classList.remove('show');
         };
 
-        // अर्डर Firebase मा पठाउने फंक्सन
+        // अर्डर Firebase मा पठाउने फंक्सन (Double click सुरक्षा सहित)
         window.submitPayment = function() {
             let txidValue = txidInput.value.trim();
             let uidValue = gameUidInput.value.trim();
@@ -882,6 +888,15 @@
                 txidError.style.display = "flex";
                 txidInput.focus();
                 return;
+            }
+
+            // --- डबल सबमिसन रोक्न बटनलाई डिसेबल (Disabled) गर्ने ---
+            const submitBtn = document.querySelector('.done-btn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Submitting...";
+                submitBtn.style.opacity = "0.6";
+                submitBtn.style.cursor = "not-allowed";
             }
 
             const now = new Date();
@@ -907,6 +922,14 @@
                 document.getElementById('successModal').classList.add('show');
             }).catch((error) => {
                 alert("अर्डर पठाउन समस्या भयो: " + error.message);
+                
+                // एरर आएमा बटन फेरि अन गर्ने ताकि प्रयोगकर्ताले ट्राइ गर्न सकोस्
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Submit Payment";
+                    submitBtn.style.opacity = "1";
+                    submitBtn.style.cursor = "pointer";
+                }
             });
         };
 
@@ -917,25 +940,3 @@
     </script>
 </body>
 </html>
-
-<div style="
-    text-align: center;
-    padding: 40px;
-    margin: 30px auto;
-    background: linear-gradient(135deg, #2c3e50, #4ca1af);
-    border-radius: 25px;
-    color: white;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    max-width: 700px;
-    font-family: 'Segoe UI', sans-serif;
-">
-    <h2 style="margin: 0 0 20px 0; font-size: 28px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 10px;">
-        ⚠️ ध्यान दिनुहोस् (Important Notice)
-    </h2>
-    <p style="font-size: 20px; margin: 15px 0; line-height: 1.6;">
-        <b>Guild Glory Bot</b> किन्नु भन्दा अगाडि, आफ्नो <b>guild ko approval method</b> लाई <b>'Default'</b> मा सेट गर्नुहोला।
-    </p>
-    <p style="font-size: 20px; margin: 15px 0; line-height: 1.6; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px;">
-        साथै, <b>payment</b> गर्दा <b>remark</b> मा आफ्नो <b>real name</b> लेख्न नभुल्नुहोला।
-    </p>
-</div>
