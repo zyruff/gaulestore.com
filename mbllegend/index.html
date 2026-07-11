@@ -86,23 +86,58 @@
         .action-btn { display: flex; justify-content: center; align-items: center; gap: 8px; border: none; cursor: pointer; font-weight: 700; color: #ffffff; background-color: #ffb300; transition: background 0.2s; width: 200px; height: 42px; font-size: 14px; border-radius: 25px; margin: 0 auto; }
         .action-btn.login-needed { background-color: #dc2626; }
 
-        /* --- QR MODAL --- */
-        .qr-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 200; opacity: 0; pointer-events: none; transition: all 0.3s ease; padding: 20px; }
-        .qr-modal.show { opacity: 1; pointer-events: auto; }
-        .qr-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; max-width: 380px; width: 100%; text-align: center; position: relative; transform: scale(0.8); transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.1); box-sizing: border-box; }
-        .qr-modal.show .qr-card { transform: scale(1); }
+        /* --- QR MODAL FIXED CENTER --- */
+        .qr-modal { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0, 0, 0, 0.5); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 200; 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: all 0.3s ease; 
+            padding: 16px; 
+            box-sizing: border-box;
+        }
+        .qr-modal.show { 
+            opacity: 1; 
+            pointer-events: auto; 
+        }
+        .qr-card { 
+            background-color: #ffffff; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 16px; 
+            padding: 20px; 
+            max-width: 380px; 
+            width: 100%; 
+            text-align: center; 
+            position: relative; 
+            transform: scale(0.8); 
+            transition: all 0.3s ease; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            box-sizing: border-box;
+            margin: 0 auto;
+        }
+        .qr-modal.show .qr-card { 
+            transform: scale(1); 
+        }
         .close-modal { position: absolute; top: 15px; right: 15px; font-size: 20px; color: #718096; cursor: pointer; }
         .qr-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; color: #1a202c; }
         .qr-subtitle { font-size: 13px; color: #4a5568; margin-bottom: 12px; }
         .account-details-box { background: #fffdf5; border: 1px solid #ffb300; padding: 10px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; text-align: left; line-height: 1.5; }
         
-        /* --- QR IMAGE CENTERED FIXED --- */
+        /* --- QR IMAGE WRAPPER CENTERED --- */
         .qr-image-wrapper { 
             background-color: #f7fafc; 
             padding: 12px; 
             border-radius: 12px; 
-            display: flex;
-            justify-content: center; 
+            display: flex; 
+            justify-content: center;
             align-items: center;
             margin: 0 auto 15px auto; 
             border: 1px solid #e2e8f0; 
@@ -117,13 +152,15 @@
             object-fit: contain; 
             display: block; 
         }
-        /* इमेज खाली हुँदा ब्रोकेन आइकन हटाउन */
-        .qr-image-wrapper img:not([src]), .qr-image-wrapper img[src=""] {
+        /* इमेज खाली वा सेट नभएको खण्डमा ब्रोकेन आइकन हटाउन */
+        .qr-image-wrapper img:not([src]), .qr-image-wrapper img[src=""], .qr-image-wrapper img[src="qr_code.png"] {
             display: none;
         }
-        /* इमेज नहुँदा बक्स भित्र 'QR Code Placeholder' टेक्स्ट देखाउन (इच्छाधीन) */
-        .qr-image-wrapper:not(:has(img[src])):after, .qr-image-wrapper:has(img[src=""]):after {
-            content: "Scan QR Code";
+        /* इमेज नभएको अवस्थामा बक्स भित्र राम्रो टेक्स्ट देखाउन */
+        .qr-image-wrapper:not(:has(img[src])):after, 
+        .qr-image-wrapper:has(img[src=""]):after,
+        .qr-image-wrapper:has(img[src="qr_code.png"]):after {
+            content: "Payment QR Code";
             color: #a0aec0;
             font-size: 14px;
             font-weight: 500;
@@ -399,7 +436,7 @@
         </div>
 
         <div class="qr-image-wrapper">
-            <!-- यहाँ इमेज नहुँदा पनि बक्स ठीक बीचमा बस्छ -->
+            <!-- यहाँ इमेज राखिएको छैन भने पनि बक्स पर्फेक्ट सेन्टरमै बस्छ -->
             <img src="" alt="Payment QR Code">
         </div>
 
@@ -653,7 +690,7 @@
         txidInput.classList.remove('error-border');
         txidError.style.display = "none";
 
-        // बटन स्टेट रिसेट
+        // यदि पहिले बटन डिसेबल भएको थियो भने फेरि रिसेट गर्ने
         const doneBtn = document.querySelector('.done-btn');
         doneBtn.disabled = false;
         doneBtn.style.opacity = "1";
@@ -667,7 +704,7 @@
         document.getElementById('qrModal').classList.remove('show');
     };
 
-    // Submit Order (With Double Click Protection)
+    // Submit Order to Firebase Realtime DB (With Double Click Protection)
     window.submitPayment = function() {
         let txidValue = txidInput.value.trim();
         let uidValue = gameUidInput.value.trim();
@@ -682,8 +719,9 @@
 
         // --- DOUBLE SUBMISSION PREVENTION ---
         const doneBtn = document.querySelector('.done-btn');
-        if (doneBtn.disabled) return; 
+        if (doneBtn.disabled) return; // पहिले नै प्रोसेसमा छ भने दोहोर्याएर क्लिक हुन नदिने
         
+        // बटनलाई लक गर्ने र "Submitting..." राख्ने
         doneBtn.disabled = true;
         doneBtn.style.opacity = "0.7";
         doneBtn.style.cursor = "not-allowed";
@@ -714,6 +752,7 @@
         }).catch((error) => {
             alert("अर्डर पठाउन समस्या भयो: " + error.message);
             
+            // फेल खाएमा बटन फेरि एक्टिभ बनाउने
             doneBtn.disabled = false;
             doneBtn.style.opacity = "1";
             doneBtn.style.cursor = "pointer";
