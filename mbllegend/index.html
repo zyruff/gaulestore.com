@@ -131,7 +131,7 @@
         .qr-subtitle { font-size: 13px; color: #4a5568; margin-bottom: 12px; }
         .account-details-box { background: #fffdf5; border: 1px solid #ffb300; padding: 10px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; text-align: left; line-height: 1.5; }
         
-        /* --- QR IMAGE WRAPPER CENTERED --- */
+        /* --- QR IMAGE WRAPPER CENTERED (CLEANED) --- */
         .qr-image-wrapper { 
             background-color: #f7fafc; 
             padding: 12px; 
@@ -151,19 +151,6 @@
             max-height: 100%; 
             object-fit: contain; 
             display: block; 
-        }
-        /* इमेज खाली वा सेट नभएको खण्डमा ब्रोकेन आइकन हटाउन */
-        .qr-image-wrapper img:not([src]), .qr-image-wrapper img[src=""], .qr-image-wrapper img[src="qr_code.png"] {
-            display: none;
-        }
-        /* इमेज नभएको अवस्थामा बक्स भित्र राम्रो टेक्स्ट देखाउन */
-        .qr-image-wrapper:not(:has(img[src])):after, 
-        .qr-image-wrapper:has(img[src=""]):after,
-        .qr-image-wrapper:has(img[src="qr_code.png"]):after {
-            content: "Payment QR Code";
-            color: #a0aec0;
-            font-size: 14px;
-            font-weight: 500;
         }
         
         .txid-container { text-align: left; margin-bottom: 5px; }
@@ -436,8 +423,8 @@
         </div>
 
         <div class="qr-image-wrapper">
-            <!-- यहाँ इमेज राखिएको छैन भने पनि बक्स पर्फेक्ट सेन्टरमै बस्छ -->
-            <img src="" alt="Payment QR Code">
+            <!-- यहाँ qr_code.png राखिएको छ र देखाउन नमिल्ने नियमहरू हटाइएका छन् -->
+            <img src="qr_code.png" alt="Payment QR Code">
         </div>
 
         <div class="txid-container">
