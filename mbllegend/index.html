@@ -89,20 +89,51 @@
         /* --- QR MODAL --- */
         .qr-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 200; opacity: 0; pointer-events: none; transition: all 0.3s ease; padding: 20px; }
         .qr-modal.show { opacity: 1; pointer-events: auto; }
-        .qr-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; max-width: 380px; width: 100%; text-align: center; position: relative; transform: scale(0.8); transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .qr-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; max-width: 380px; width: 100%; text-align: center; position: relative; transform: scale(0.8); transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.1); box-sizing: border-box; }
         .qr-modal.show .qr-card { transform: scale(1); }
         .close-modal { position: absolute; top: 15px; right: 15px; font-size: 20px; color: #718096; cursor: pointer; }
         .qr-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; color: #1a202c; }
         .qr-subtitle { font-size: 13px; color: #4a5568; margin-bottom: 12px; }
         .account-details-box { background: #fffdf5; border: 1px solid #ffb300; padding: 10px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; text-align: left; line-height: 1.5; }
-        .qr-image-wrapper { background-color: #f7fafc; padding: 12px; border-radius: 12px; display: inline-block; margin-bottom: 15px; border: 1px solid #e2e8f0; }
-        .qr-image-wrapper img { width: 180px; height: 180px; display: block; object-fit: contain; margin: 0 auto; }
+        
+        /* --- QR IMAGE CENTERED FIXED --- */
+        .qr-image-wrapper { 
+            background-color: #f7fafc; 
+            padding: 12px; 
+            border-radius: 12px; 
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+            margin: 0 auto 15px auto; 
+            border: 1px solid #e2e8f0; 
+            max-width: 200px;
+            width: 100%;
+            height: 200px;
+            box-sizing: border-box;
+        }
+        .qr-image-wrapper img { 
+            max-width: 100%; 
+            max-height: 100%; 
+            object-fit: contain; 
+            display: block; 
+        }
+        /* इमेज खाली हुँदा ब्रोकेन आइकन हटाउन */
+        .qr-image-wrapper img:not([src]), .qr-image-wrapper img[src=""] {
+            display: none;
+        }
+        /* इमेज नहुँदा बक्स भित्र 'QR Code Placeholder' टेक्स्ट देखाउन (इच्छाधीन) */
+        .qr-image-wrapper:not(:has(img[src])):after, .qr-image-wrapper:has(img[src=""]):after {
+            content: "Scan QR Code";
+            color: #a0aec0;
+            font-size: 14px;
+            font-weight: 500;
+        }
         
         .txid-container { text-align: left; margin-bottom: 5px; }
         .txid-label { font-size: 12px; font-weight: 600; color: #4a5568; margin-bottom: 6px; display: block; }
         .txid-input-wrapper { position: relative; display: flex; align-items: center; }
         .txid-input-wrapper i { position: absolute; left: 12px; color: #a0aec0; }
-        .txid-input { width: 100%; background-color: #f7fafc; border: 1px solid #cbd5e0; border-radius: 8px; padding: 12px 12px 12px 38px; color: #1a202c; font-size: 14px; outline: none; transition: all 0.2s; }
+        .txid-input { width: 100%; background-color: #f7fafc; border: 1px solid #cbd5e0; border-radius: 8px; padding: 12px 12px 12px 38px; color: #1a202c; font-size: 14px; outline: none; transition: all 0.2s; box-sizing: border-box; }
         .txid-input.error-border { border: 1px solid #e53e3e !important; background-color: #fff5f5 !important; }
         .txid-error-message { color: #e53e3e; font-size: 11px; margin-top: 4px; margin-bottom: 10px; display: none; align-items: center; gap: 4px; }
         
@@ -111,12 +142,12 @@
         .pay-row span:first-child { color: #4a5568; }
         .pay-row span:last-child { color: #1a202c; font-weight: 500; }
         .pay-row .highlight-total { color: #ffb300 !important; font-weight: 700; }
-        .done-btn { background-color: #ffb300; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .done-btn { background-color: #ffb300; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-sizing: border-box; }
 
         /* --- SUCCESS MODAL --- */
         .success-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 300; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out; }
         .success-modal.show { opacity: 1; pointer-events: auto; }
-        .success-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(30px); transition: all 0.3s ease-in-out; }
+        .success-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(30px); transition: all 0.3s ease-in-out; box-sizing: border-box; }
         .success-modal.show .success-card { transform: translateY(0); }
         .success-checkmark { width: 72px; height: 72px; background: #2ed573; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; animation: pulseCircle 1.6s infinite cubic-bezier(0.66, 0, 0, 1); }
         .success-checkmark i { color: white; font-size: 32px; transform: scale(0); animation: scaleCheck 0.4s 0.2s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -368,7 +399,8 @@
         </div>
 
         <div class="qr-image-wrapper">
-            <img src="qr_code.png" alt="Payment QR Code">
+            <!-- यहाँ इमेज नहुँदा पनि बक्स ठीक बीचमा बस्छ -->
+            <img src="" alt="Payment QR Code">
         </div>
 
         <div class="txid-container">
@@ -621,7 +653,7 @@
         txidInput.classList.remove('error-border');
         txidError.style.display = "none";
 
-        // यदि पहिले बटन डिसेबल भएको थियो भने फेरि रिसेट गर्ने
+        // बटन स्टेट रिसेट
         const doneBtn = document.querySelector('.done-btn');
         doneBtn.disabled = false;
         doneBtn.style.opacity = "1";
@@ -635,7 +667,7 @@
         document.getElementById('qrModal').classList.remove('show');
     };
 
-    // Submit Order to Firebase Realtime DB (With Double Click Protection)
+    // Submit Order (With Double Click Protection)
     window.submitPayment = function() {
         let txidValue = txidInput.value.trim();
         let uidValue = gameUidInput.value.trim();
@@ -650,9 +682,8 @@
 
         // --- DOUBLE SUBMISSION PREVENTION ---
         const doneBtn = document.querySelector('.done-btn');
-        if (doneBtn.disabled) return; // पहिले नै प्रोसेसमा छ भने दोहोर्याएर क्लिक हुन नदिने
+        if (doneBtn.disabled) return; 
         
-        // बटनलाई लक गर्ने र "Submitting..." राख्ने
         doneBtn.disabled = true;
         doneBtn.style.opacity = "0.7";
         doneBtn.style.cursor = "not-allowed";
@@ -683,7 +714,6 @@
         }).catch((error) => {
             alert("अर्डर पठाउन समस्या भयो: " + error.message);
             
-            // फेल खाएमा बटन फेरि एक्टिभ बनाउने
             doneBtn.disabled = false;
             doneBtn.style.opacity = "1";
             doneBtn.style.cursor = "pointer";
