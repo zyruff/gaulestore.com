@@ -1191,53 +1191,41 @@ onValue(ref(db, "reviews"), (snapshot) => {
 </style>
 
 
-<!-- १. Firebase को लागि आवश्यक स्क्रिप्टहरू -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
-<script>
-  // २. तपाईंको कन्फिगरेसन
-  const firebaseConfig = {
-    apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-    authDomain: "gaule-top-up-center.firebaseapp.com",
-    databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-    projectId: "gaule-top-up-center",
-    storageBucket: "gaule-top-up-center.firebasestorage.app",
-    messagingSenderId: "645605489690",
-    appId: "1:645605489690:web:0b0f2898d295be03c1e5a3"
-  };
 
-  // ३. Firebase सुरु गर्ने
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const database = firebase.database();
+<!-- Shake Animation वाला आइकन -->
+<a href="https://wa.me/9779761081110" target="_blank" class="shake-btn">
+    <svg fill="#ffffff" width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.48 2 2 6.06 2 11.11c0 2.51 1.05 4.8 2.74 6.55L3.91 22l4.89-1.92A10.87 10.87 0 0 0 12 20.22c5.52 0 10-4.06 10-9.11S17.52 2 12 2zm0 16.5c-1.55 0-3-.4-4.28-1.12l-2.4.95.84-2.31A7.6 7.6 0 0 1 4.5 11.11c0-4.14 3.36-7.5 7.5-7.5s7.5 3.36 7.5 7.5-3.36 7.5-7.5 7.5z"/>
+    </svg>
+</a>
 
-  // ४. च्याट बटन क्लिक गर्दाको फंक्सन
-  function handleChatClick() {
-      // यदि प्रयोगकर्ता Login छैनन् भने
-      if (!auth.currentUser) {
-          alert("कृपया पहिले Google बाट Login गर्नुहोस्!");
-          // यहाँ तपाईंको Login पेजको सही लिङ्क राख्नुहोस्
-          window.location.href = "https://roshantamang2.com.np/"; 
-      } else {
-          // यदि Login छन् भने च्याट बक्स खोल्ने
-          document.getElementById('my-chat-box').style.display = 'block';
-          loadMessages(auth.currentUser.uid);
-      }
-  }
+<style>
+    .shake-btn {
+        position: fixed !important;
+        bottom: 30px !important;
+        right: 30px !important;
+        width: 50px !important;
+        height: 50px !important;
+        background-color: #25d366 !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.5) !important;
+        z-index: 999999 !important;
+        /* Shake animation */
+        animation: shake 3s infinite !important;
+    }
 
-  // ५. म्यासेज लोड गर्ने फंक्सन
-  function loadMessages(uid) {
-      var chat = document.getElementById('chat-messages');
-      chat.innerHTML = "";
-      database.ref('users/' + uid + '/messages/').on('child_added', function(snapshot) {
-          var data = snapshot.val();
-          var className = (data.sender === 'admin') ? 'msg-admin' : 'msg-user';
-          chat.innerHTML += '<div class="'+className+'">' + data.text + '</div>';
-          chat.scrollTop = chat.scrollHeight;
-      });
-  }
-</script>
+    @keyframes shake {
+        0%, 100% { transform: rotate(0deg); }
+        10% { transform: rotate(-10deg); }
+        20% { transform: rotate(10deg); }
+        30% { transform: rotate(-10deg); }
+        40% { transform: rotate(10deg); }
+        50% { transform: rotate(0deg); } /* यहाँ रोकिन्छ अनि फेरी सुरु हुन्छ */
+    }
+</style>
 
      
