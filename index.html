@@ -1191,88 +1191,53 @@ onValue(ref(db, "reviews"), (snapshot) => {
 </style>
 
 
-
-
-<!-- १. CSS (सम्पर्क र सानो डिजाइन) -->
-<style>
-    .support-btn { 
-        position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; 
-        background: #2563eb; color: #fff; border-radius: 50%; 
-        display: flex; align-items: center; justify-content: center; 
-        font-size: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
-        z-index: 999999; animation: blink-animation 2s infinite; 
-    }
-    @keyframes blink-animation {
-        0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); }
-    }
-    .chat-container { 
-        display: none; position: fixed; bottom: 80px; right: 20px; width: 280px; height: 380px; 
-        background: #fff; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); 
-        overflow: hidden; z-index: 999999; border: 1px solid #eee; 
-    }
-    .chat-header { background: #1e293b; color: white; padding: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
-    .msg-user { background: #2563eb; color: white; padding: 8px 12px; border-radius: 10px 10px 0 10px; margin: 5px; align-self: flex-end; max-width: 80%; font-size: 13px; }
-    .msg-admin { background: #f3f4f6; color: #333; padding: 8px 12px; border-radius: 10px 10px 10px 0; margin: 5px; align-self: flex-start; max-width: 80%; font-size: 13px; }
-</style>
-
-<!-- २. HTML -->
-<div class="support-btn" onclick="handleChatClick()">💬</div>
-
-<div id="my-chat-box" class="chat-container">
-    <div class="chat-header">
-        <span>Support</span>
-        <span onclick="document.getElementById('my-chat-box').style.display='none'" style="cursor:pointer;">✕</span>
-    </div>
-    <div id="chat-messages" style="height:270px; overflow-y:auto; display:flex; flex-direction:column; padding:8px;"></div>
-    <div style="padding:8px; border-top:1px solid #eee;">
-        <input type="text" id="chat-input" placeholder="Message..." style="width:100%; border:1px solid #ddd; padding:8px; border-radius:5px; font-size:13px; box-sizing:border-box;">
-    </div>
-</div>
-
-<!-- ३. Script (Firebase) -->
+<!-- १. Firebase को लागि आवश्यक स्क्रिप्टहरू -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
 <script>
+  // २. तपाईंको कन्फिगरेसन
   const firebaseConfig = {
     apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+    authDomain: "gaule-top-up-center.firebaseapp.com",
     databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-    projectId: "gaule-top-up-center"
+    projectId: "gaule-top-up-center",
+    storageBucket: "gaule-top-up-center.firebasestorage.app",
+    messagingSenderId: "645605489690",
+    appId: "1:645605489690:web:0b0f2898d295be03c1e5a3"
   };
+
+  // ३. Firebase सुरु गर्ने
   firebase.initializeApp(firebaseConfig);
-  
+  const auth = firebase.auth();
+  const database = firebase.database();
+
+  // ४. च्याट बटन क्लिक गर्दाको फंक्सन
   function handleChatClick() {
-      if (!localStorage.getItem('user_token')) {
-          window.location.href = "/login.php"; 
+      // यदि प्रयोगकर्ता Login छैनन् भने
+      if (!auth.currentUser) {
+          alert("कृपया पहिले Google बाट Login गर्नुहोस्!");
+          // यहाँ तपाईंको Login पेजको सही लिङ्क राख्नुहोस्
+          window.location.href = "https://roshantamang2.com.np/"; 
       } else {
+          // यदि Login छन् भने च्याट बक्स खोल्ने
           document.getElementById('my-chat-box').style.display = 'block';
-          loadMessages();
+          loadMessages(auth.currentUser.uid);
       }
   }
 
-  function sendMsg() {
-      var input = document.getElementById('chat-input');
-      if (input.value.trim() !== "") {
-          firebase.database().ref('users/' + localStorage.getItem('user_id') + '/messages/').push({
-              text: input.value, sender: 'user', timestamp: Date.now()
-          });
-          input.value = '';
-      }
-  }
-
-  document.getElementById('chat-input').addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') sendMsg();
-  });
-
-  function loadMessages() {
+  // ५. म्यासेज लोड गर्ने फंक्सन
+  function loadMessages(uid) {
       var chat = document.getElementById('chat-messages');
       chat.innerHTML = "";
-      firebase.database().ref('users/' + localStorage.getItem('user_id') + '/messages/').on('child_added', function(snapshot) {
+      database.ref('users/' + uid + '/messages/').on('child_added', function(snapshot) {
           var data = snapshot.val();
-          chat.innerHTML += '<div class="'+(data.sender === 'admin' ? 'msg-admin' : 'msg-user')+'">' + data.text + '</div>';
+          var className = (data.sender === 'admin') ? 'msg-admin' : 'msg-user';
+          chat.innerHTML += '<div class="'+className+'">' + data.text + '</div>';
           chat.scrollTop = chat.scrollHeight;
       });
   }
 </script>
-
 
      
