@@ -331,6 +331,42 @@
 
 </div>
 
+
+
+
+<div class="service-container" style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:500px; margin:0 auto; padding:20px 0;">
+
+    <!-- FF Airdrop -->
+    <div style="text-align:center; width:80px;">
+        <a href="ffairdrop/" style="display:block; width:80px; height:80px;">
+            <img src="ff_airdrop.png" style="width:80px; height:80px; border-radius:15px; border:1px solid #ccc; display:block;">
+        </a>
+        <div style="font-weight:800; font-size:11px; color:#333; margin-top:5px; pointer-events:none;">FF AIRDROP</div>
+    </div>
+
+    <!-- Less Is More -->
+    <div style="text-align:center; width:80px;">
+        <a href="lessismore/" style="display:block; width:80px; height:80px;">
+            <img src="less_is_more.png" style="width:80px; height:80px; border-radius:15px; border:1px solid #ccc; display:block;">
+        </a>
+        <div style="font-weight:800; font-size:11px; color:#333; margin-top:5px; pointer-events:none;">LESS IS MORE</div>
+    </div>
+
+    <!-- LEVEL UP PASS -->
+    <div style="text-align:center; width:80px;">
+        <a href="leveluppass/" style="display:block; width:80px; height:80px;">
+            <img src="level_up_pass.png" style="width:80px; height:80px; border-radius:15px; border:1px solid #ccc; display:block;">
+        </a>
+        <div style="font-weight:800; font-size:11px; color:#333; margin-top:5px; pointer-events:none;">LEVEL UP PASS</div>
+    </div>
+
+</div>
+
+
+
+
+
+
 <div class="service-container" style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:500px; margin:0 auto; padding:20px 0;">
 
     <!-- Mobile Legend -->
@@ -387,8 +423,7 @@
 
 </div>
 
-
-         
+      
 
 
 <style>
@@ -1227,86 +1262,3 @@ onValue(ref(db, "reviews"), (snapshot) => {
         50% { transform: rotate(0deg); } /* यहाँ रोकिन्छ अनि फेरी सुरु हुन्छ */
     }
 </style>
-
-
-
-
-
-
-<!DOCTYPE html>
-<html lang="ne">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        /* Semi-Transparent Notice Bar */
-        #gaule-glass-notice {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            /* background मा 0.5 ले गर्दा यो अलि बढी पारदर्शी हुन्छ */
-            background: rgba(255, 255, 255, 0.5); 
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-bottom: 2px solid rgba(229, 57, 53, 0.6);
-            z-index: 9999;
-            padding: 12px;
-            text-align: center;
-            font-family: Arial, sans-serif;
-            animation: slideDown 0.5s ease-out;
-        }
-
-        .notice-title {
-            font-weight: bold;
-            color: #d32f2f; /* अलि गाढा रातो */
-            font-size: 16px;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .notice-desc {
-            color: #1a1a1a;
-            font-size: 14px;
-            line-height: 1.4;
-            font-weight: 600; /* अक्षर अलि प्रस्ट पार्न */
-        }
-
-        .progress-bar-glass {
-            height: 3px;
-            background: #e53935;
-            width: 100%;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            animation: shrink 10s linear forwards;
-        }
-
-        @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-        @keyframes shrink { from { width: 100%; } to { width: 0%; } }
-    </style>
-</head>
-<body>
-
-    <div id="gaule-glass-notice">
-        <span class="notice-title">GAULE STORE (Notice)</span>
-        <div class="notice-desc">
-            म हाल बाहिर भएकोले अर्डर कम्प्लीट गर्न अलि ढिला हुन सक्छ।<br>
-            यदि ढिलो भयो भने WhatsApp मा सम्पर्क गर्नुहोला।
-        </div>
-        <div class="progress-bar-glass"></div>
-    </div>
-
-    <script>
-        setTimeout(function() {
-            var notice = document.getElementById('gaule-glass-notice');
-            notice.style.transition = 'top 0.5s';
-            notice.style.top = '-100px';
-            setTimeout(function() { notice.style.display = 'none'; }, 500);
-        }, 10000);
-    </script>
-
-</body>
-</html>
-     
-     
