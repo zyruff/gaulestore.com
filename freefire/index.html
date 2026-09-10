@@ -141,7 +141,6 @@
         .uid-input-group { display: flex; gap: 8px; }
         .uid-input { flex: 1; background-color: #f7fafc; border: 1px solid #cbd5e0; border-radius: 8px; padding: 12px 14px; color: #1a202c; font-size: 14px; outline: none; transition: all 0.2s; }
         .uid-input.error-border { border: 1px solid #e53e3e !important; background-color: #fff5f5 !important; }
-        .check-btn { background-color: #1a202c; color: #ffffff; border: none; padding: 0 16px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; }
         .error-message { color: #e53e3e; font-size: 12px; margin-top: 8px; display: none; align-items: center; gap: 6px; font-weight: 500; }
         .instruction-text { font-size: 11px; color: #718096; display: flex; gap: 8px; line-height: 1.4; margin-top: 10px; }
         .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 4px; border-radius: 14px; border: 2px solid transparent; transition: all 0.2s ease; }
@@ -228,17 +227,11 @@
         <div class="tab">Membership</div>
     </div>
 
-    <!-- Admin API & QR Control Panel -->
+    <!-- Admin QR Control Panel -->
     <div class="admin-api-panel" id="adminApiPanel">
         <div style="font-weight: 700; font-size: 13px; color: #b7791f; margin-bottom: 6px;"><i class="fa-solid fa-gear"></i> Admin Dashboard Settings</div>
         
-        <label style="font-size: 11px; color: #4a5568; font-weight: 600;">API URL endpoint:</label>
-        <input type="text" id="admin-api-url" placeholder="https://api.gameskinbo.com/ff-info/get">
-        
-        <label style="font-size: 11px; color: #4a5568; font-weight: 600;">API Key (x-api-key):</label>
-        <input type="text" id="admin-api-key" placeholder="Enter API Key">
-
-        <label style="font-size: 11px; color: #4a5568; font-weight: 600; margin-top: 6px; display: block;">QR Code Image URL:</label>
+        <label style="font-size: 11px; color: #4a5568; font-weight: 600; display: block;">QR Code Image URL:</label>
         <input type="text" id="admin-qr-url" placeholder="qr_code.png वा इमेजको प्रत्यक्ष लिंक">
 
         <button class="admin-save-btn" onclick="saveAdminSettings()">Save Settings</button>
@@ -253,12 +246,6 @@
         
         <div class="uid-input-group">
             <input type="text" id="game-uid" class="uid-input" placeholder="PLAYER ID (UID)" oninput="validateUIDLive()">
-            <button class="check-btn" onclick="checkPlayerName()">Check</button>
-        </div>
-
-        <div id="player-name-display" style="margin-top: 10px; padding: 10px; border-radius: 8px; background: #f0fff4; border: 1px solid #9ae6b4; display: none;">
-            <i class="fa-solid fa-user-check" style="color: #22543d;"></i> 
-            <span id="player-name" style="font-weight: 600; color: #22543d; font-size: 14px;">-</span>
         </div>
         
         <div class="error-message" id="uid-error">
@@ -431,7 +418,6 @@
             </div>
 
             <div class="qr-image-wrapper">
-                <!-- dynamic QR image element -->
                 <img id="dynamic-qr-img" src="qr_code.png" alt="Payment QR Code">
             </div>
 
@@ -450,10 +436,6 @@
                 <div class="pay-row">
                     <span>Game UID:</span>
                     <span id="modal-uid" style="font-weight: bold; color: #1a202c;">-</span>
-                </div>
-                <div class="pay-row" id="modal-player-row">
-                    <span>Player Name:</span>
-                    <span id="modal-player-name" style="font-weight: 600; color: #48bb78;">-</span>
                 </div>
                 <div class="pay-row">
                     <span>Selected Pack:</span>
@@ -523,11 +505,6 @@
         let currentUser = null;
         let selectedItemName = "";
         let selectedItemPrice = "";
-        let fetchedPlayerName = ""; 
-
-        // Default Fallbacks
-        let currentApiUrl = "https://api.gameskinbo.com/ff-info/get";
-        let currentApiKey = "8-kVJLu1Bxy5Mj6tmJupzSwK3WSJJ22wj29FGVvwwm4";
         let currentQrUrl = "qr_code.png";
 
         const mainActionBtn = document.getElementById('main-action-btn');
@@ -540,25 +517,19 @@
         const adminApiPanel = document.getElementById('adminApiPanel');
         const dynamicQrImg = document.getElementById('dynamic-qr-img');
 
-        // Load API and QR settings from Firebase
+        // Load QR settings from Firebase
         async function loadAdminSettings() {
             try {
                 const snapshot = await get(child(ref(db), 'settings/api'));
                 if (snapshot.exists()) {
                     const data = snapshot.val();
-                    if (data.url) currentApiUrl = data.url;
-                    if (data.key) currentApiKey = data.key;
                     if (data.qrUrl) currentQrUrl = data.qrUrl;
 
-                    // Update QR image on page
                     if (dynamicQrImg) {
                         dynamicQrImg.src = currentQrUrl;
                     }
                     
-                    // Fill admin panel inputs if admin is logged in
                     if (currentUser && currentUser.email === "gaulestore.np@gmail.com") {
-                        document.getElementById('admin-api-url').value = currentApiUrl;
-                        document.getElementById('admin-api-key').value = currentApiKey;
                         document.getElementById('admin-qr-url').value = currentQrUrl;
                     }
                 }
@@ -587,91 +558,25 @@
             }
         });
 
-        // Initial load
         loadAdminSettings();
 
         window.saveAdminSettings = function() {
-            const newUrl = document.getElementById('admin-api-url').value.trim();
-            const newKey = document.getElementById('admin-api-key').value.trim();
             const newQrUrl = document.getElementById('admin-qr-url').value.trim();
 
-            if (!newUrl || !newKey || !newQrUrl) {
-                alert("कृपया सबै फिल्डहरू भर्नुहोस्!");
+            if (!newQrUrl) {
+                alert("कृपया QR इमेजको प्रत्यक्ष लिंक भर्नुहोस्!");
                 return;
             }
 
             set(ref(db, 'settings/api'), {
-                url: newUrl,
-                key: newKey,
                 qrUrl: newQrUrl
             }).then(() => {
-                currentApiUrl = newUrl;
-                currentApiKey = newKey;
                 currentQrUrl = newQrUrl;
                 dynamicQrImg.src = currentQrUrl;
-                alert("Settings Successfully Updated & Saved!");
+                alert("QR Link Successfully Updated & Saved!");
             }).catch((err) => {
                 alert("Failed to update: " + err.message);
             });
-        };
-
-        window.checkPlayerName = async function() {
-            const uid = document.getElementById("game-uid").value.trim();
-            const display = document.getElementById("player-name-display");
-            const nameSpan = document.getElementById("player-name");
-            const uidError = document.getElementById("uid-error");
-
-            if (!uid) {
-                gameUidInput.classList.add('error-border');
-                uidError.style.display = "flex";
-                uidError.querySelector("span").innerText = "Please enter your Game UID!";
-                display.style.display = "none";
-                fetchedPlayerName = "";
-                return;
-            }
-
-            display.style.display = "block";
-            nameSpan.innerText = "Searching...";
-            display.style.background = "#f0fff4";
-            display.style.borderColor = "#9ae6b4";
-            uidError.style.display = "none";
-            gameUidInput.classList.remove('error-border');
-
-            try {
-                const response = await fetch(`${currentApiUrl}?uid=${uid}&region=BD`, {
-                    headers: { 'x-api-key': currentApiKey }
-                });
-                const data = await response.json();
-
-                let accountName = "";
-                if (data.AccountInfo) {
-                    accountName = data.AccountInfo.AccountName || data.AccountInfo.Nickname || data.AccountInfo.AccountNickName || data.AccountInfo.UserName;
-                } else if (data.nickname || data.name || data.AccountName) {
-                    accountName = data.nickname || data.name || data.AccountName;
-                }
-
-                if (accountName) {
-                    fetchedPlayerName = accountName;
-                    nameSpan.innerText = "Player: " + fetchedPlayerName;
-                    display.style.background = "#f0fff4";
-                    display.style.borderColor = "#9ae6b4";
-                    display.style.display = "block";
-                    gameUidInput.classList.remove('error-border');
-                    uidError.style.display = "none";
-                } else {
-                    fetchedPlayerName = "";
-                    display.style.display = "none";
-                    gameUidInput.classList.add('error-border');
-                    uidError.style.display = "flex";
-                    uidError.querySelector("span").innerText = "Invalid or Missing UID!";
-                }
-            } catch (error) {
-                fetchedPlayerName = "";
-                display.style.display = "none";
-                gameUidInput.classList.add('error-border');
-                uidError.style.display = "flex";
-                uidError.querySelector("span").innerText = "Invalid or Missing UID!";
-            }
         };
 
         mainActionBtn.onclick = function() {
@@ -736,12 +641,6 @@
 
         function openPaymentModal(uid) {
             document.getElementById('modal-uid').innerText = uid;
-            const modalPlayerRow = document.getElementById('modal-player-row');
-            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Unknown";
-            
-            document.getElementById('modal-player-name').innerText = finalPlayerName;
-            modalPlayerRow.style.display = "flex";
-
             document.getElementById('modal-item').innerText = selectedItemName;
             document.getElementById('modal-total').innerText = 'Rs ' + selectedItemPrice;
             
@@ -777,7 +676,6 @@
 
             const now = new Date();
             const orderRef = push(ref(db, 'orders'));
-            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Not Checked / Manual";
             
             set(orderRef, {
                 date: now.toLocaleDateString(),
@@ -789,7 +687,6 @@
                 product: selectedItemName,
                 amountDue: selectedItemPrice,
                 uid: uidValue,
-                playerName: finalPlayerName,
                 transactionId: txidValue,
                 status: "Pending"
             }).then(() => {
@@ -812,6 +709,7 @@
     </script>
 </body>
 </html>
+
 
 
 
