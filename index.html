@@ -1246,7 +1246,7 @@ onValue(ref(db, "reviews"), (snapshot) => {
         <div class="chat-header">
             <div class="chat-title-area">
                 <!-- Logo Image -->
-                <img src="https://cdn.phototourl.com/free/2026-09-11-8ed06a9f-0b4f-4c29-8698-edd3282c7d9f.png" alt="Logo" class="chat-logo" id="chat-logo">
+                <img src="https://i.ibb.co/7X8mQyD/logo.png" alt="Logo" class="chat-logo" id="chat-logo">
                 <div class="chat-title-text">
                     <div class="chat-status-row">
                         <!-- Blinking Green Dot -->
@@ -1369,6 +1369,15 @@ onValue(ref(db, "reviews"), (snapshot) => {
     0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
     70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
     100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+@keyframes bounceAlert {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px) scale(1.1); }
+}
+
+.bounce-animation {
+    animation: bounceAlert 0.5s ease infinite !important;
 }
 
 #chat-toggle-btn:hover {
@@ -1779,6 +1788,19 @@ const adminUsersContainer = document.getElementById('admin-users-container');
 
 let messagesRef = null;
 
+// Audio Notification using hosted EdgeOne Link
+function playNotificationSound() {
+    try {
+        const audio = new Audio("https://surviving-cyan-8sp8w7a3.edgeone.dev/");
+        audio.volume = 1.0;
+        audio.play().catch(error => {
+            console.log("Audio play blocked by browser policy:", error);
+        });
+    } catch(e) {
+        console.log("Audio error:", e);
+    }
+}
+
 function loadChatForUser(targetUserId) {
     activeChatUserId = targetUserId;
     chatMessages.innerHTML = `
@@ -1791,35 +1813,76 @@ function loadChatForUser(targetUserId) {
         messagesRef.off();
     }
 
+    let isInitialLoad = true;
+    let totalMessagesCount = 0;
+
     messagesRef = db.ref('private_chats/' + activeChatUserId + '/messages');
-    messagesRef.on('child_added', (snapshot) => {
+    
+    // Real-time message listener for rendering and notifications
+    messagesRef.on('value', (snapshot) => {
         const data = snapshot.val();
         if (!data) return;
 
-        const msgDiv = document.createElement('div');
+        const messagesArray = Object.values(data);
         
-        if (data.sender === 'admin') {
-            msgDiv.className = 'chat-message admin-message';
-        } else {
-            msgDiv.className = 'chat-message user-message';
+        if (isInitialLoad) {
+            totalMessagesCount = messagesArray.length;
+            isInitialLoad = false;
+            // Render initial messages
+            chatMessages.innerHTML = `
+                <div class="chat-message bot-message">
+                    Namaste! 🌟 Tapailai kasta sahayog chaiyeko xa? Hamilai message, sticker ya photo pathaunuhola.
+                </div>
+            `;
+            messagesArray.forEach(msg => {
+                appendMessageToUI(msg);
+            });
+            return;
         }
 
-        if (data.type === 'image') {
-            msgDiv.classList.add('chat-image-bubble');
-            const img = document.createElement('img');
-            img.src = data.content;
-            img.className = 'chat-sent-image';
-            msgDiv.appendChild(img);
-        } else if (data.type === 'sticker') {
-            msgDiv.classList.add('sticker-message-bubble');
-            msgDiv.textContent = data.content;
-        } else {
-            msgDiv.textContent = data.content;
-        }
+        // Check if a new message came in
+        if (messagesArray.length > totalMessagesCount) {
+            const latestMessage = messagesArray[messagesArray.length - 1];
+            appendMessageToUI(latestMessage);
 
-        chatMessages.appendChild(msgDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+            // Check if message is from the other side
+            const isFromOther = isAdmin ? (latestMessage.sender === 'user') : (latestMessage.sender === 'admin');
+            
+            if (isFromOther) {
+                if (chatBox.classList.contains('chat-box-hidden')) {
+                    playNotificationSound();
+                    toggleBtn.classList.add('bounce-animation');
+                }
+            }
+        }
+        totalMessagesCount = messagesArray.length;
     });
+}
+
+function appendMessageToUI(data) {
+    const msgDiv = document.createElement('div');
+    
+    if (data.sender === 'admin') {
+        msgDiv.className = 'chat-message admin-message';
+    } else {
+        msgDiv.className = 'chat-message user-message';
+    }
+
+    if (data.type === 'image') {
+        msgDiv.classList.add('chat-image-bubble');
+        const img = document.createElement('img');
+        img.src = data.content;
+        img.className = 'chat-sent-image';
+        msgDiv.appendChild(img);
+    } else if (data.type === 'sticker') {
+        msgDiv.classList.add('sticker-message-bubble');
+        msgDiv.textContent = data.content;
+    } else {
+        msgDiv.textContent = data.content;
+    }
+
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 // Perform Google Login Trigger function
@@ -1889,6 +1952,7 @@ toggleBtn.addEventListener('click', () => {
         return;
     }
 
+    toggleBtn.classList.remove('bounce-animation');
     chatBox.classList.toggle('chat-box-hidden');
     if (!chatBox.classList.contains('chat-box-hidden')) {
         chatInput.focus();
@@ -2002,6 +2066,7 @@ function loadAllCustomersList() {
     });
 }
 </script>
+
 
 
 
