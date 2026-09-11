@@ -1231,357 +1231,776 @@ onValue(ref(db, "reviews"), (snapshot) => {
 </style>
 
 
+<!-- Live Chat Widget -->
+<div id="custom-chat-container">
+    <!-- Smaller Circle Chat Toggle Button with Icon and 'Live Chat' text -->
+    <button id="chat-toggle-btn" aria-label="Open Chat">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+        </svg>
+        <span class="chat-btn-text">Live Chat</span>
+    </button>
 
+    <!-- Chat Box Window -->
+    <div id="chat-box" class="chat-box-hidden">
+        <div class="chat-header">
+            <div class="chat-title-area">
+                <!-- Logo Image -->
+                <img src="https://i.ibb.co/7X8mQyD/logo.png" alt="Logo" class="chat-logo" id="chat-logo">
+                <div class="chat-title-text">
+                    <div class="chat-status-row">
+                        <!-- Blinking Green Dot -->
+                        <span class="chat-status-dot"></span>
+                        <h3 id="chat-header-title">Live Support</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-header-actions">
+                <!-- Google Login Button in Header -->
+                <button id="google-login-btn" title="Sign in with Google">
+                    <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.5-.38-2.24s.13-1.52.38-2.24V6.61H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.39l4.09-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.15 2.68 1.18 6.61l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
+                    <span>Google Login</span>
+                </button>
+                <button id="chat-close-btn">&times;</button>
+            </div>
+        </div>
+        
+        <!-- Admin User Selection Panel (Visible only to Admin) -->
+        <div id="admin-user-list-panel" class="admin-panel-hidden">
+            <div class="admin-panel-header">Customer Inquiries List</div>
+            <div id="admin-users-container">
+                <!-- Dynamic user list will load here -->
+            </div>
+        </div>
 
-<style>
-    #chat-widget-btn {
-        position: fixed;
-        bottom: 80px;
-        right: 20px;
-        background: linear-gradient(135deg, #25D366, #128C7E);
-        color: white;
-        padding: 8px 14px;
-        border-radius: 25px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-        cursor: pointer;
-        z-index: 9999;
-        font-family: Arial, sans-serif;
-        font-size: 13px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    #chat-widget-btn:hover {
-        transform: translateY(-2px) scale(1.03);
-    }
-    #chat-widget-btn svg {
-        width: 22px;
-        height: 22px;
-        fill: white;
-    }
+        <div class="chat-body" id="chat-messages">
+            <div class="chat-message bot-message">
+                Namaste! 🌟 Tapailai kasta sahayog chaiyeko xa? Hamilai message, sticker ya photo pathaunuhola.
+            </div>
+        </div>
 
-    /* Chat Popup Box Style */
-    #chat-popup-box {
-        position: fixed;
-        bottom: 140px;
-        right: 20px;
-        width: 320px;
-        height: 400px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-        display: none;
-        flex-direction: column;
-        z-index: 9999;
-        overflow: hidden;
-        font-family: Arial, sans-serif;
-    }
-    .chat-header {
-        background: #128C7E;
-        color: white;
-        padding: 12px;
-        font-weight: bold;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .chat-header button {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
-    }
-    .chat-messages {
-        flex: 1;
-        padding: 10px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        background: #f9f9f9;
-    }
-    .message {
-        padding: 8px 12px;
-        border-radius: 8px;
-        max-width: 80%;
-        font-size: 13px;
-    }
-    .message.user {
-        background: #dcf8c6;
-        align-self: flex-end;
-    }
-    .message.admin {
-        background: #fff;
-        border: 1px solid #ddd;
-        align-self: flex-start;
-    }
-    .chat-input-area {
-        display: flex;
-        padding: 8px;
-        border-top: 1px solid #ddd;
-        background: #fff;
-    }
-    .chat-input-area input {
-        flex: 1;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        outline: none;
-        font-size: 13px;
-    }
-    .chat-input-area button {
-        background: #128C7E;
-        color: white;
-        border: none;
-        padding: 8px 12px;
-        margin-left: 5px;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-</style>
+        <!-- Stickers Picker Popup Panel -->
+        <div id="sticker-picker" class="sticker-picker-hidden">
+            <div class="sticker-header">Stickers</div>
+            <div class="sticker-grid">
+                <span class="sticker-item" data-sticker="🔥">🔥</span>
+                <span class="sticker-item" data-sticker="🚀">🚀</span>
+                <span class="sticker-item" data-sticker="🎮">🎮</span>
+                <span class="sticker-item" data-sticker="💎">💎</span>
+                <span class="sticker-item" data-sticker="❤️">❤️</span>
+                <span class="sticker-item" data-sticker="😎">😎</span>
+                <span class="sticker-item" data-sticker="🎉">🎉</span>
+                <span class="sticker-item" data-sticker="👍">👍</span>
+                <span class="sticker-item" data-sticker="⭐">⭐</span>
+            </div>
+        </div>
 
-<!-- Floating Chat Button -->
-<div id="chat-widget-btn" title="Live Chat">
-    <svg viewBox="0 0 32 32">
-        <path d="M16 2C8.268 2 2 8.268 2 16c0 2.824.825 5.459 2.25 7.691L3 29l5.509-1.222C10.709 29.175 13.298 30 16 30c7.732 0 14-6.268 14-14S23.732 2 16 2zM12.21 9.77c.214-.002.43.03.633.1.43.142.716.483.824.931l.629 2.627c.108.448-.02.933-.352 1.259l-1.077 1.077c.725 1.542 1.97 2.787 3.512 3.512l1.077-1.077c.326-.332.811-.46 1.259-.352l2.627.629c.448.108.789.394.931.824.168.513.045 1.085-.326 1.488l-1.636 1.636c-.477.477-1.161.644-1.78.432-2.392-.814-4.522-2.316-6.196-3.99-1.674-1.674-3.176-3.804-3.99-6.196-.212-.619-.045-1.303.432-1.78l1.636-1.636c.306-.307.72-.477 1.15-.479z"/>
-    </svg>
-    <span>Live Chat</span>
-</div>
+        <div class="chat-footer">
+            <!-- Hidden File Input for Photos -->
+            <input type="file" id="chat-file-input" accept="image/*" style="display: none;">
 
-<style>
-    #chat-widget-btn {
-        position: fixed;
-        bottom: 80px;
-        right: 20px;
-        background: linear-gradient(135deg, #25D366, #128C7E);
-        color: white;
-        padding: 8px 14px;
-        border-radius: 25px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-        cursor: pointer;
-        z-index: 9999;
-        font-family: Arial, sans-serif;
-        font-size: 13px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    #chat-widget-btn:hover {
-        transform: translateY(-2px) scale(1.03);
-    }
-    #chat-widget-btn svg {
-        width: 22px;
-        height: 22px;
-        fill: white;
-    }
+            <!-- Photo Upload Button -->
+            <button id="photo-toggle-btn" title="Send Photo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+            </button>
 
-    #chat-popup-box {
-        position: fixed;
-        bottom: 140px;
-        right: 20px;
-        width: 320px;
-        height: 400px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-        display: none;
-        flex-direction: column;
-        z-index: 9999;
-        overflow: hidden;
-        font-family: Arial, sans-serif;
-    }
-    .chat-header {
-        background: #128C7E;
-        color: white;
-        padding: 12px;
-        font-weight: bold;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 14px;
-    }
-    .chat-header button {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 18px;
-        cursor: pointer;
-    }
-    .chat-messages {
-        flex: 1;
-        padding: 10px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        background: #f9f9f9;
-    }
-    .message {
-        padding: 8px 12px;
-        border-radius: 8px;
-        max-width: 80%;
-        font-size: 13px;
-        word-wrap: break-word;
-    }
-    .message.user {
-        background: #dcf8c6;
-        align-self: flex-end;
-    }
-    .message.admin {
-        background: #fff;
-        border: 1px solid #ddd;
-        align-self: flex-start;
-    }
-    .chat-input-area {
-        display: flex;
-        padding: 8px;
-        border-top: 1px solid #ddd;
-        background: #fff;
-    }
-    .chat-input-area input {
-        flex: 1;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        outline: none;
-        font-size: 13px;
-    }
-    .chat-input-area button {
-        background: #128C7E;
-        color: white;
-        border: none;
-        padding: 8px 12px;
-        margin-left: 5px;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-</style>
+            <!-- Sticker Toggle Button -->
+            <button id="sticker-toggle-btn" title="Send Sticker">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                    <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                    <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                </svg>
+            </button>
 
-<!-- Floating Chat Button -->
-<div id="chat-widget-btn" title="Live Chat">
-    <svg viewBox="0 0 32 32">
-        <path d="M16 2C8.268 2 2 8.268 2 16c0 2.824.825 5.459 2.25 7.691L3 29l5.509-1.222C10.709 29.175 13.298 30 16 30c7.732 0 14-6.268 14-14S23.732 2 16 2zM12.21 9.77c.214-.002.43.03.633.1.43.142.716.483.824.931l.629 2.627c.108.448-.02.933-.352 1.259l-1.077 1.077c.725 1.542 1.97 2.787 3.512 3.512l1.077-1.077c.326-.332.811-.46 1.259-.352l2.627.629c.448.108.789.394.931.824.168.513.045 1.085-.326 1.488l-1.636 1.636c-.477.477-1.161.644-1.78.432-2.392-.814-4.522-2.316-6.196-3.99-1.674-1.674-3.176-3.804-3.99-6.196-.212-.619-.045-1.303.432-1.78l1.636-1.636c.306-.307.72-.477 1.15-.479z"/>
-    </svg>
-    <span>Live Chat</span>
-</div>
-
-<!-- Chat Popup Box -->
-<div id="chat-popup-box">
-    <div class="chat-header">
-        <span id="chat-title">Gaule Support</span>
-        <button id="close-chat">&times;</button>
-    </div>
-    <div class="chat-messages" id="chat-messages"></div>
-    <div class="chat-input-area">
-        <input type="text" id="chat-input" placeholder="Type a message...">
-        <button id="send-btn">Send</button>
+            <input type="text" id="chat-input" placeholder="Message lekhnuhos..." autocomplete="off">
+            <button id="chat-send-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+<style>
+/* Chat Widget Styles */
+#custom-chat-container {
+    position: fixed;
+    bottom: 90px;
+    right: 25px;
+    z-index: 9999;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-      authDomain: "gaule-top-up-center.firebaseapp.com",
-      databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-      projectId: "gaule-top-up-center",
-      storageBucket: "gaule-top-up-center.firebasestorage.app",
-      messagingSenderId: "645605489690",
-      appId: "1:645605489690:web:0b0f2898d295be03c1e5a3",
-      measurementId: "G-M7BY3PQM3H"
+#chat-toggle-btn {
+    width: 55px;
+    height: 55px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.45);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: glowingGreenPulse 2s infinite;
+}
+
+.chat-btn-text {
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+@keyframes glowingGreenPulse {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+#chat-toggle-btn:hover {
+    transform: scale(1.08);
+    animation: none;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.7);
+}
+
+.chat-box-hidden {
+    display: none !important;
+}
+
+#chat-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 600px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: scaleUp 0.3s ease forwards;
+    border: 1px solid #e5e7eb;
+}
+
+@keyframes scaleUp {
+    from { opacity: 0; transform: translate(-50%, -48%) scale(0.95); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.chat-header {
+    background: #ffffff;
+    color: #1e293b;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.chat-title-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chat-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff;
+}
+
+.chat-title-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-status-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chat-status-dot {
+    width: 9px;
+    height: 9px;
+    background-color: #22c55e;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 8px #22c55e;
+    animation: pulseBlink 1.5s infinite;
+}
+
+@keyframes pulseBlink {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.chat-header h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.chat-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#google-login-btn {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s, border-color 0.2s;
+}
+#google-login-btn:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+#chat-close-btn {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+}
+#chat-close-btn:hover {
+    color: #0f172a;
+}
+
+/* Admin Panel Styles */
+.admin-panel-hidden {
+    display: none !important;
+}
+#admin-user-list-panel {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    max-height: 130px;
+    overflow-y: auto;
+    padding: 8px 12px;
+}
+.admin-panel-header {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+.admin-user-item {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+}
+.admin-user-item:hover, .admin-user-item.active {
+    background: #e0f2fe;
+    border-color: #38bdf8;
+    color: #0369a1;
+    font-weight: 600;
+}
+
+.chat-body {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: relative;
+}
+
+/* Sticker Picker Box Styles */
+.sticker-picker-hidden {
+    display: none !important;
+}
+
+#sticker-picker {
+    position: absolute;
+    bottom: 75px;
+    left: 16px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    padding: 12px;
+    width: 230px;
+    z-index: 100;
+}
+
+.sticker-header {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 4px;
+}
+
+.sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    text-align: center;
+}
+
+.sticker-item {
+    font-size: 26px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    transition: background 0.2s, transform 0.2s;
+    display: inline-block;
+}
+.sticker-item:hover {
+    background: #f1f5f9;
+    transform: scale(1.2);
+}
+
+.sticker-message-bubble {
+    font-size: 40px !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+}
+
+.chat-image-bubble {
+    padding: 6px !important;
+    background: #2563eb !important;
+    border-radius: 14px !important;
+    border-bottom-right-radius: 2px !important;
+}
+
+.chat-sent-image {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 10px;
+    display: block;
+    object-fit: cover;
+}
+
+.chat-message {
+    max-width: 75%;
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-size: 15px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    position: relative;
+}
+
+.bot-message {
+    background: #f1f5f9;
+    color: #1e293b;
+    align-self: flex-start;
+    border-bottom-left-radius: 2px;
+    border: 1px solid #e2e8f0;
+}
+
+.user-message {
+    background: #2563eb;
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 2px;
+}
+
+.admin-message {
+    background: #10b981;
+    color: white;
+    align-self: flex-start;
+    border-bottom-left-radius: 2px;
+}
+
+.chat-footer {
+    padding: 16px;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#photo-toggle-btn, #sticker-toggle-btn {
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 50%;
+    transition: color 0.2s, background 0.2s;
+    flex-shrink: 0;
+}
+#photo-toggle-btn:hover, #sticker-toggle-btn:hover {
+    color: #2563eb;
+    background: #f1f5f9;
+}
+
+#chat-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    outline: none;
+    font-size: 15px;
+    background: #ffffff;
+    color: #0f172a;
+    transition: border-color 0.2s;
+}
+#chat-input:focus {
+    border-color: #2563eb;
+}
+
+#chat-send-btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+#chat-send-btn:hover {
+    background: #1d4ed8;
+}
+
+@media (max-width: 600px) {
+    #chat-box {
+        position: fixed;
+        bottom: 35px;
+        right: 15px;
+        left: 15px;
+        top: auto;
+        transform: none;
+        width: auto;
+        height: 400px;
+        border-radius: 16px;
+        animation: slideUp 0.3s ease forwards;
+    }
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+}
+</style>
+
+<!-- Firebase App, Auth & Realtime Database CDN -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+<script>
+// Firebase Initialization
+const firebaseConfig = {
+  apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+  authDomain: "gaule-top-up-center.firebaseapp.com",
+  databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+  projectId: "gaule-top-up-center",
+  storageBucket: "gaule-top-up-center.firebasestorage.app",
+  messagingSenderId: "645605489690",
+  appId: "1:645605489690:web:0b0f2898d295be03c1e5a3",
+  measurementId: "G-M7BY3PQM3H"
+};
+
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+const auth = firebase.auth();
+
+let activeChatUserId = '';
+let isAdmin = false;
+
+const toggleBtn = document.getElementById('chat-toggle-btn');
+const chatBox = document.getElementById('chat-box');
+const closeBtn = document.getElementById('chat-close-btn');
+const sendBtn = document.getElementById('chat-send-btn');
+const chatInput = document.getElementById('chat-input');
+const chatMessages = document.getElementById('chat-messages');
+const stickerToggleBtn = document.getElementById('sticker-toggle-btn');
+const stickerPicker = document.getElementById('sticker-picker');
+const stickerItems = document.querySelectorAll('.sticker-item');
+const photoToggleBtn = document.getElementById('photo-toggle-btn');
+const chatFileInput = document.getElementById('chat-file-input');
+
+const googleLoginBtn = document.getElementById('google-login-btn');
+const chatHeaderTitle = document.getElementById('chat-header-title');
+const adminUserListPanel = document.getElementById('admin-user-list-panel');
+const adminUsersContainer = document.getElementById('admin-users-container');
+
+let messagesRef = null;
+
+function loadChatForUser(targetUserId) {
+    activeChatUserId = targetUserId;
+    chatMessages.innerHTML = `
+        <div class="chat-message bot-message">
+            Namaste! 🌟 Tapailai kasta sahayog chaiyeko xa? Hamilai message, sticker ya photo pathaunuhola.
+        </div>
+    `;
+
+    if (messagesRef) {
+        messagesRef.off();
+    }
+
+    messagesRef = db.ref('private_chats/' + activeChatUserId + '/messages');
+    messagesRef.on('child_added', (snapshot) => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        const msgDiv = document.createElement('div');
+        
+        if (data.sender === 'admin') {
+            msgDiv.className = 'chat-message admin-message';
+        } else {
+            msgDiv.className = 'chat-message user-message';
+        }
+
+        if (data.type === 'image') {
+            msgDiv.classList.add('chat-image-bubble');
+            const img = document.createElement('img');
+            img.src = data.content;
+            img.className = 'chat-sent-image';
+            msgDiv.appendChild(img);
+        } else if (data.type === 'sticker') {
+            msgDiv.classList.add('sticker-message-bubble');
+            msgDiv.textContent = data.content;
+        } else {
+            msgDiv.textContent = data.content;
+        }
+
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+}
+
+// Perform Google Login Trigger function
+function triggerGoogleLogin() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch((error) => {
+        console.error("Google Login Failed:", error.message);
+    });
+}
+
+// Check Firebase Auth State Changes
+auth.onAuthStateChanged((user) => {
+    if (user && user.email === "gaulestore.np@gmail.com") {
+        isAdmin = true;
+        chatHeaderTitle.textContent = "Admin - Gaule Store";
+        googleLoginBtn.innerHTML = `<span>Admin</span>`;
+        googleLoginBtn.style.background = "#dcfce7";
+        googleLoginBtn.style.borderColor = "#10b981";
+        googleLoginBtn.style.color = "#047857";
+        adminUserListPanel.classList.remove('admin-panel-hidden');
+        loadAllCustomersList();
+    } else if (user) {
+        isAdmin = false;
+        chatHeaderTitle.textContent = "Live Support";
+        googleLoginBtn.innerHTML = `<span>${user.displayName || 'Logged In'}</span>`;
+        googleLoginBtn.style.background = "#f1f5f9";
+        googleLoginBtn.style.borderColor = "#94a3b8";
+        googleLoginBtn.style.color = "#334155";
+        adminUserListPanel.classList.add('admin-panel-hidden');
+        
+        // Save user info in database so admin can see their name
+        db.ref('private_chats/' + user.uid + '/userInfo').set({
+            name: user.displayName || 'Customer',
+            email: user.email || '',
+            photo: user.photoURL || ''
+        });
+
+        loadChatForUser(user.uid);
+    } else {
+        isAdmin = false;
+        chatHeaderTitle.textContent = "Live Support";
+        googleLoginBtn.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.5-.38-2.24s.13-1.52.38-2.24V6.61H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.39l4.09-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.15 2.68 1.18 6.61l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
+            <span>Google Login</span>
+        `;
+        googleLoginBtn.style.background = "#f8fafc";
+        googleLoginBtn.style.borderColor = "#cbd5e1";
+        googleLoginBtn.style.color = "#334155";
+        adminUserListPanel.classList.add('admin-panel-hidden');
+    }
+});
+
+// Google Popup Sign In Button Click
+googleLoginBtn.addEventListener('click', () => {
+    if (auth.currentUser) {
+        auth.signOut();
+        chatBox.classList.add('chat-box-hidden');
+        return;
+    }
+    triggerGoogleLogin();
+});
+
+// Live Chat Toggle Button Click Handler
+toggleBtn.addEventListener('click', () => {
+    if (!auth.currentUser) {
+        triggerGoogleLogin();
+        return;
+    }
+
+    chatBox.classList.toggle('chat-box-hidden');
+    if (!chatBox.classList.contains('chat-box-hidden')) {
+        chatInput.focus();
+    } else {
+        stickerPicker.classList.add('sticker-picker-hidden');
+    }
+});
+
+closeBtn.addEventListener('click', () => {
+    chatBox.classList.add('chat-box-hidden');
+    stickerPicker.classList.add('sticker-picker-hidden');
+});
+
+stickerToggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    stickerPicker.classList.toggle('sticker-picker-hidden');
+});
+
+photoToggleBtn.addEventListener('click', () => {
+    stickerPicker.classList.add('sticker-picker-hidden');
+    chatFileInput.click();
+});
+
+chatFileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const messageData = {
+            sender: isAdmin ? 'admin' : 'user',
+            type: 'image',
+            content: event.target.result,
+            timestamp: Date.now()
+        };
+        db.ref('private_chats/' + activeChatUserId + '/messages').push(messageData);
+    };
+    reader.readAsDataURL(file);
+    chatFileInput.value = '';
+});
+
+chatBox.addEventListener('click', () => {
+    if (!stickerPicker.classList.contains('sticker-picker-hidden')) {
+        stickerPicker.classList.add('sticker-picker-hidden');
+    }
+});
+stickerToggleBtn.addEventListener('click', (e) => { e.stopPropagation(); });
+stickerPicker.addEventListener('click', (e) => { e.stopPropagation(); });
+
+stickerItems.forEach(item => {
+    item.addEventListener('click', () => {
+        const stickerChar = item.getAttribute('data-sticker');
+        const messageData = {
+            sender: isAdmin ? 'admin' : 'user',
+            type: 'sticker',
+            content: stickerChar,
+            timestamp: Date.now()
+        };
+        db.ref('private_chats/' + activeChatUserId + '/messages').push(messageData);
+        stickerPicker.classList.add('sticker-picker-hidden');
+    });
+});
+
+function sendMessage() {
+    const text = chatInput.value.trim();
+    if(text === '') return;
+
+    const messageData = {
+        sender: isAdmin ? 'admin' : 'user',
+        type: 'text',
+        content: text,
+        timestamp: Date.now()
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    const provider = new GoogleAuthProvider();
+    db.ref('private_chats/' + activeChatUserId + '/messages').push(messageData);
+    chatInput.value = '';
+    stickerPicker.classList.add('sticker-picker-hidden');
+}
 
-    let currentUser = null;
-    let messagesLoaded = false;
-
-    const chatBtn = document.getElementById("chat-widget-btn");
-    const chatBox = document.getElementById("chat-popup-box");
-    const closeBtn = document.getElementById("close-chat");
-    const sendBtn = document.getElementById("send-btn");
-    const chatInput = document.getElementById("chat-input");
-    const messagesContainer = document.getElementById("chat-messages");
-
-    onAuthStateChanged(auth, (user) => {
-        currentUser = user;
-        if (user) {
-            console.log("Logged in user:", user.email);
-        }
-    });
-
-    chatBtn.addEventListener("click", () => {
-        if (!currentUser) {
-            signInWithPopup(auth, provider)
-            .then((result) => {
-                currentUser = result.user;
-                openChatBox();
-            })
-            .catch((error) => console.error("Login error:", error));
-        } else {
-            openChatBox();
-        }
-    });
-
-    closeBtn.addEventListener("click", () => {
-        chatBox.style.display = "none";
-    });
-
-    function openChatBox() {
-        chatBox.style.display = "flex";
-        if (!messagesLoaded) {
-            loadUserSpecificChat(currentUser.uid);
-            messagesLoaded = true;
-        }
+sendBtn.addEventListener('click', sendMessage);
+chatInput.addEventListener('keypress', (e) => {
+    if(e.key === 'Enter') {
+        sendMessage();
     }
+});
 
-    function loadUserSpecificChat(userId) {
-        messagesContainer.innerHTML = "";
-        // Pratyek user ko aafnai UID ko path ma database save huncha
-        const userChatRef = ref(db, 'user_chats/' + userId);
-        
-        onChildAdded(userChatRef, (snapshot) => {
-            const data = snapshot.val();
-            const msgDiv = document.createElement("div");
-            msgDiv.className = "message " + (data.sender === 'user' ? 'user' : 'admin');
-            msgDiv.textContent = data.text;
-            messagesContainer.appendChild(msgDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+function loadAllCustomersList() {
+    db.ref('private_chats').on('value', (snapshot) => {
+        adminUsersContainer.innerHTML = '';
+        const chats = snapshot.val();
+        if (!chats) {
+            adminUsersContainer.innerHTML = '<div style="font-size:12px; color:#64748b; padding:4px;">No customer chats yet.</div>';
+            return;
+        }
+
+        Object.keys(chats).forEach(uid => {
+            const userData = chats[uid].userInfo;
+            const customerName = userData && userData.name ? userData.name : 'Customer ' + uid.substring(0, 6);
+
+            const userDiv = document.createElement('div');
+            userDiv.className = `admin-user-item ${activeChatUserId === uid ? 'active' : ''}`;
+            userDiv.innerHTML = `<span>👤 ${customerName}</span> <span style="font-size:11px; background:#e2e8f0; padding:2px 6px; border-radius:4px;">Chat</span>`;
+            
+            userDiv.addEventListener('click', () => {
+                document.querySelectorAll('.admin-user-item').forEach(el => el.classList.remove('active'));
+                userDiv.classList.add('active');
+                loadChatForUser(uid);
+            });
+            adminUsersContainer.appendChild(userDiv);
         });
-    }
-
-    sendBtn.addEventListener("click", sendMessage);
-    chatInput.addEventListener("keypress", (e) => {
-        if (e.key === 'Enter') sendMessage();
     });
-
-    function sendMessage() {
-        const text = chatInput.value.trim();
-        if (!text || !currentUser) return;
-
-        const userChatRef = ref(db, 'user_chats/' + currentUser.uid);
-        push(userChatRef, {
-            text: text,
-            sender: 'user',
-            timestamp: Date.now(),
-            userName: currentUser.displayName,
-            userEmail: currentUser.email
-        });
-
-        chatInput.value = "";
-    }
+}
 </script>
+
 
 
 
