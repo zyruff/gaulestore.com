@@ -1351,15 +1351,132 @@ onValue(ref(db, "reviews"), (snapshot) => {
     <span>Live Chat</span>
 </div>
 
-<!-- Chat Popup Window -->
+<style>
+    #chat-widget-btn {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        background: linear-gradient(135deg, #25D366, #128C7E);
+        color: white;
+        padding: 8px 14px;
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        cursor: pointer;
+        z-index: 9999;
+        font-family: Arial, sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    #chat-widget-btn:hover {
+        transform: translateY(-2px) scale(1.03);
+    }
+    #chat-widget-btn svg {
+        width: 22px;
+        height: 22px;
+        fill: white;
+    }
+
+    #chat-popup-box {
+        position: fixed;
+        bottom: 140px;
+        right: 20px;
+        width: 320px;
+        height: 400px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        display: none;
+        flex-direction: column;
+        z-index: 9999;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+    }
+    .chat-header {
+        background: #128C7E;
+        color: white;
+        padding: 12px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+    }
+    .chat-header button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+    }
+    .chat-messages {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        background: #f9f9f9;
+    }
+    .message {
+        padding: 8px 12px;
+        border-radius: 8px;
+        max-width: 80%;
+        font-size: 13px;
+        word-wrap: break-word;
+    }
+    .message.user {
+        background: #dcf8c6;
+        align-self: flex-end;
+    }
+    .message.admin {
+        background: #fff;
+        border: 1px solid #ddd;
+        align-self: flex-start;
+    }
+    .chat-input-area {
+        display: flex;
+        padding: 8px;
+        border-top: 1px solid #ddd;
+        background: #fff;
+    }
+    .chat-input-area input {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        outline: none;
+        font-size: 13px;
+    }
+    .chat-input-area button {
+        background: #128C7E;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        margin-left: 5px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
+
+<!-- Floating Chat Button -->
+<div id="chat-widget-btn" title="Live Chat">
+    <svg viewBox="0 0 32 32">
+        <path d="M16 2C8.268 2 2 8.268 2 16c0 2.824.825 5.459 2.25 7.691L3 29l5.509-1.222C10.709 29.175 13.298 30 16 30c7.732 0 14-6.268 14-14S23.732 2 16 2zM12.21 9.77c.214-.002.43.03.633.1.43.142.716.483.824.931l.629 2.627c.108.448-.02.933-.352 1.259l-1.077 1.077c.725 1.542 1.97 2.787 3.512 3.512l1.077-1.077c.326-.332.811-.46 1.259-.352l2.627.629c.448.108.789.394.931.824.168.513.045 1.085-.326 1.488l-1.636 1.636c-.477.477-1.161.644-1.78.432-2.392-.814-4.522-2.316-6.196-3.99-1.674-1.674-3.176-3.804-3.99-6.196-.212-.619-.045-1.303.432-1.78l1.636-1.636c.306-.307.72-.477 1.15-.479z"/>
+    </svg>
+    <span>Live Chat</span>
+</div>
+
+<!-- Chat Popup Box -->
 <div id="chat-popup-box">
     <div class="chat-header">
-        <span>Gaule Store Support</span>
+        <span id="chat-title">Gaule Support</span>
         <button id="close-chat">&times;</button>
     </div>
-    <div class="chat-messages" id="chat-messages">
-        <!-- Messages will load here -->
-    </div>
+    <div class="chat-messages" id="chat-messages"></div>
     <div class="chat-input-area">
         <input type="text" id="chat-input" placeholder="Type a message...">
         <button id="send-btn">Send</button>
@@ -1388,10 +1505,7 @@ onValue(ref(db, "reviews"), (snapshot) => {
     const provider = new GoogleAuthProvider();
 
     let currentUser = null;
-
-    onAuthStateChanged(auth, (user) => {
-        currentUser = user;
-    });
+    let messagesLoaded = false;
 
     const chatBtn = document.getElementById("chat-widget-btn");
     const chatBox = document.getElementById("chat-popup-box");
@@ -1400,16 +1514,21 @@ onValue(ref(db, "reviews"), (snapshot) => {
     const chatInput = document.getElementById("chat-input");
     const messagesContainer = document.getElementById("chat-messages");
 
-    // Chat Icon Click Handler
+    onAuthStateChanged(auth, (user) => {
+        currentUser = user;
+        if (user) {
+            console.log("Logged in user:", user.email);
+        }
+    });
+
     chatBtn.addEventListener("click", () => {
         if (!currentUser) {
-            // Login chaina vane Google login kholne
             signInWithPopup(auth, provider)
             .then((result) => {
                 currentUser = result.user;
                 openChatBox();
             })
-            .catch((error) => console.error(error));
+            .catch((error) => console.error("Login error:", error));
         } else {
             openChatBox();
         }
@@ -1421,13 +1540,16 @@ onValue(ref(db, "reviews"), (snapshot) => {
 
     function openChatBox() {
         chatBox.style.display = "flex";
-        loadUserMessages(currentUser.uid);
+        if (!messagesLoaded) {
+            loadUserSpecificChat(currentUser.uid);
+            messagesLoaded = true;
+        }
     }
 
-    // Load only current user's messages from Firebase Realtime Database
-    function loadUserMessages(userId) {
+    function loadUserSpecificChat(userId) {
         messagesContainer.innerHTML = "";
-        const userChatRef = ref(db, 'chats/' + userId);
+        // Pratyek user ko aafnai UID ko path ma database save huncha
+        const userChatRef = ref(db, 'user_chats/' + userId);
         
         onChildAdded(userChatRef, (snapshot) => {
             const data = snapshot.val();
@@ -1439,7 +1561,6 @@ onValue(ref(db, "reviews"), (snapshot) => {
         });
     }
 
-    // Send Message Handler
     sendBtn.addEventListener("click", sendMessage);
     chatInput.addEventListener("keypress", (e) => {
         if (e.key === 'Enter') sendMessage();
@@ -1449,17 +1570,19 @@ onValue(ref(db, "reviews"), (snapshot) => {
         const text = chatInput.value.trim();
         if (!text || !currentUser) return;
 
-        const userChatRef = ref(db, 'chats/' + currentUser.uid);
+        const userChatRef = ref(db, 'user_chats/' + currentUser.uid);
         push(userChatRef, {
             text: text,
             sender: 'user',
             timestamp: Date.now(),
-            userName: currentUser.displayName
+            userName: currentUser.displayName,
+            userEmail: currentUser.email
         });
 
         chatInput.value = "";
     }
 </script>
+
 
 
 
