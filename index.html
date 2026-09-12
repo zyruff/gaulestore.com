@@ -19,7 +19,15 @@
       "@type": "WebSite",
       "name": "Gaule Store",
       "alternateName": "GAULE STORE",
-      "url": "https://roshantamang2.com.np/"
+      "url": "https://roshantamang2.com.np/",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Gaule Store",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://roshantamang2.com.np/owner.png"
+        }
+      }
     }
     </script>
      
@@ -33,6 +41,7 @@
         .search-box { display: flex; gap: 5px; margin-bottom: 20px; }
         #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
         .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
+        #header-user-name { font-size: 13px; font-weight: bold; display: none; color: #333; }
         #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; }
         #profile-dropdown { display: none; position: absolute; top: 50px; right: 0; background: white; border: 1px solid #ccc; padding: 15px; width: 200px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); border-radius: 8px; text-align: center; z-index: 1000; }
         .user-name { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
@@ -50,6 +59,7 @@
     <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
     <div class="store-title">GAULE <span style="color:#dc2626;">STORE</span></div>
     <div class="header-right">
+        <span id="header-user-name"></span>
         <div id="login-container" onclick="googleLogin()">
             <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
@@ -110,6 +120,13 @@
             document.getElementById("login-container").style.display = "none";
             document.getElementById("profile-pic").style.display = "block";
             document.getElementById("profile-pic").src = user.photoURL;
+            
+            // Header ma user ko naam dekhaucha
+            const headerName = document.getElementById("header-user-name");
+            headerName.innerText = user.displayName;
+            headerName.style.display = "inline";
+
+            // Dropdown ma detail update garne
             document.getElementById("display-name").innerText = user.displayName;
             document.getElementById("display-email").innerText = user.email;
         }
@@ -117,6 +134,7 @@
 </script>
 </body>
 </html>
+
 
 
 
