@@ -137,25 +137,21 @@
         .section-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .box-title { font-size: 15px; text-transform: uppercase; font-weight: 700; color: #1a202c; }
         
-        /* Premium Edit Button */
+        /* Premium Edit Button for QR */
         .admin-trigger-container { margin: 0 16px 15px 16px; display: none; }
         .admin-trigger-container.show { display: block; }
         .premium-edit-btn { background: linear-gradient(135deg, #ffb300 0%, #ff9100 100%); color: white; border: none; width: 100%; padding: 12px 18px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(255, 179, 0, 0.3); transition: transform 0.2s, box-shadow 0.2s; }
-        .premium-edit-btn:active { transform: scale(0.98); box-shadow: 0 2px 8px rgba(255, 179, 0, 0.2); }
+        .premium-edit-btn:active { transform: scale(0.98); }
 
-        /* Modal Panel for Admin Settings */
+        /* Modal Panel for Admin QR Settings */
         .admin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 250; opacity: 0; pointer-events: none; transition: all 0.3s ease; padding: 15px; }
         .admin-modal.show { opacity: 1; pointer-events: auto; }
-        .admin-modal-card { background: #ffffff; border-radius: 20px; padding: 24px; max-width: 480px; width: 100%; max-height: 85vh; overflow-y: auto; position: relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15); transform: scale(0.9); transition: all 0.3s ease; }
+        .admin-modal-card { background: #ffffff; border-radius: 20px; padding: 24px; max-width: 400px; width: 100%; position: relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15); transform: scale(0.9); transition: all 0.3s ease; }
         .admin-modal.show .admin-modal-card { transform: scale(1); }
         .admin-close-modal { position: absolute; top: 18px; right: 18px; font-size: 20px; color: #718096; cursor: pointer; background: #edf2f7; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         
         .admin-api-panel input { width: 100%; padding: 10px 12px; margin-bottom: 10px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 13px; outline: none; background: #f7fafc; }
-        .admin-save-btn { background: #2ed573; color: white; border: none; padding: 12px 14px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; width: 100%; margin-top: 15px; box-shadow: 0 4px 12px rgba(46, 213, 115, 0.3); }
-        
-        .admin-price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
-        .admin-price-item { font-size: 11px; color: #4a5568; font-weight: 600; }
-        .admin-price-item input { margin-top: 4px; margin-bottom: 0px; }
+        .admin-save-btn { background: #2ed573; color: white; border: none; padding: 12px 14px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; width: 100%; margin-top: 10px; box-shadow: 0 4px 12px rgba(46, 213, 115, 0.3); }
 
         .input-card-panel { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         .input-label { font-size: 11px; font-weight: 600; color: #718096; text-transform: uppercase; margin-bottom: 8px; }
@@ -243,48 +239,25 @@
         <div class="tab">Membership</div>
     </div>
 
-    <!-- Premium Admin Edit Trigger Button (Only for gaulestore.np@gmail.com) -->
+    <!-- Admin QR Edit Trigger Button (Only for gaulestore.np@gmail.com) -->
     <div class="admin-trigger-container" id="adminTriggerContainer">
         <button class="premium-edit-btn" onclick="openAdminModal()">
-            <i class="fa-solid fa-sliders"></i> Edit Store & Prices (Admin)
+            <i class="fa-solid fa-qrcode"></i> Edit QR Code URL (Admin)
         </button>
     </div>
 
-    <!-- Admin Settings Modal (Hidden by default, opens on button click) -->
+    <!-- Admin Settings Modal for QR -->
     <div class="admin-modal" id="adminModal">
         <div class="admin-modal-card">
             <div class="admin-close-modal" onclick="closeAdminModal()"><i class="fa-solid fa-xmark"></i></div>
             <div style="font-weight: 700; font-size: 16px; color: #1a202c; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-gear" style="color: #ffb300;"></i> Admin Dashboard Settings
+                <i class="fa-solid fa-gear" style="color: #ffb300;"></i> Update QR Code
             </div>
             
             <div class="admin-api-panel">
                 <label style="font-size: 11px; color: #4a5568; font-weight: 700; display: block; margin-bottom: 4px;">QR Code Image URL:</label>
                 <input type="text" id="admin-qr-url" placeholder="qr_code.png वा इमेजको प्रत्यक्ष लिंक">
-
-                <div style="font-weight: 700; font-size: 12px; color: #b7791f; margin-top: 14px; margin-bottom: 8px;">Update Pack Prices (Rs):</div>
-                <div class="admin-price-grid">
-                    <div class="admin-price-item">25 Diamonds: <input type="text" id="p_25" value="30"></div>
-                    <div class="admin-price-item">50 Diamonds: <input type="text" id="p_50" value="56"></div>
-                    <div class="admin-price-item">115 Diamonds: <input type="text" id="p_115" value="100"></div>
-                    <div class="admin-price-item">240 Diamonds: <input type="text" id="p_240" value="200"></div>
-                    <div class="admin-price-item">480 Diamonds: <input type="text" id="p_480" value="400"></div>
-                    <div class="admin-price-item">610 Diamonds: <input type="text" id="p_610" value="505"></div>
-                    <div class="admin-price-item">850 Diamonds: <input type="text" id="p_850" value="705"></div>
-                    <div class="admin-price-item">1090 Diamonds: <input type="text" id="p_1090" value="905"></div>
-                    <div class="admin-price-item">1240 Diamonds: <input type="text" id="p_1240" value="1010"></div>
-                    <div class="admin-price-item">1460 Diamonds: <input type="text" id="p_1460" value="1210"></div>
-                    <div class="admin-price-item">1850 Diamonds: <input type="text" id="p_1850" value="1515"></div>
-                    <div class="admin-price-item">2530 Diamonds: <input type="text" id="p_2530" value="2030"></div>
-                    <div class="admin-price-item">Weekly Membership: <input type="text" id="p_weekly" value="200"></div>
-                    <div class="admin-price-item">2x Weekly Membership: <input type="text" id="p_2weekly" value="400"></div>
-                    <div class="admin-price-item">Monthly Membership: <input type="text" id="p_monthly" value="1000"></div>
-                    <div class="admin-price-item">2x Monthly Membership: <input type="text" id="p_2monthly" value="2000"></div>
-                    <div class="admin-price-item">Weekly Lite: <input type="text" id="p_weeklylite" value="65"></div>
-                    <div class="admin-price-item">2x Weekly Lite: <input type="text" id="p_2weeklylite" value="130"></div>
-                </div>
-
-                <button class="admin-save-btn" onclick="saveAdminSettings()">Save All Changes</button>
+                <button class="admin-save-btn" onclick="saveAdminQR()">Save QR Code</button>
             </div>
         </div>
     </div>
@@ -321,73 +294,73 @@
         </div>
 
         <div class="cards-grid" id="diamonds-wrapper">
-            <div class="pack-card" onclick="selectPack(this, '25 Diamonds', 'price_25')" data-key="25">
+            <div class="pack-card" onclick="selectPack(this, '25 Diamonds', '25')" data-key="25">
                 <div class="pack-title">25 Diamonds</div>
                 <div class="pack-price" id="price_25_display">Rs30</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <div class="pack-card" onclick="selectPack(this, '50 Diamonds', 'price_50')" data-key="50">
+            <div class="pack-card" onclick="selectPack(this, '50 Diamonds', '50')" data-key="50">
                 <div class="pack-title">50 Diamonds</div>
                 <div class="pack-price" id="price_50_display">Rs56</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
         
-            <div class="pack-card" onclick="selectPack(this, '115 Diamonds', 'price_115')" data-key="115">
+            <div class="pack-card" onclick="selectPack(this, '115 Diamonds', '115')" data-key="115">
                 <div class="pack-title">115 Diamonds</div>
                 <div class="pack-price" id="price_115_display">Rs100</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <div class="pack-card" onclick="selectPack(this, '240 Diamonds', 'price_240')" data-key="240">
+            <div class="pack-card" onclick="selectPack(this, '240 Diamonds', '240')" data-key="240">
                 <div class="pack-title">240 Diamonds</div>
                 <div class="pack-price" id="price_240_display">Rs200</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <div class="pack-card" onclick="selectPack(this, '480 Diamonds', 'price_480')" data-key="480">
+            <div class="pack-card" onclick="selectPack(this, '480 Diamonds', '480')" data-key="480">
                 <div class="pack-title">480 Diamonds</div>
                 <div class="pack-price" id="price_480_display">Rs400</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <div class="pack-card" onclick="selectPack(this, '610 Diamonds', 'price_610')" data-key="610">
+            <div class="pack-card" onclick="selectPack(this, '610 Diamonds', '610')" data-key="610">
                 <div class="pack-title">610 Diamonds</div>
                 <div class="pack-price" id="price_610_display">Rs505</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <div class="pack-card" onclick="selectPack(this, '850 Diamonds', 'price_850')" data-key="850">
+            <div class="pack-card" onclick="selectPack(this, '850 Diamonds', '850')" data-key="850">
                 <div class="pack-title">850 Diamonds</div>
                 <div class="pack-price" id="price_850_display">Rs705</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <div class="pack-card" onclick="selectPack(this, '1090 Diamonds', 'price_1090')" data-key="1090">
+            <div class="pack-card" onclick="selectPack(this, '1090 Diamonds', '1090')" data-key="1090">
                 <div class="pack-title">1090 Diamonds</div>
                 <div class="pack-price" id="price_1090_display">Rs905</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <div class="pack-card" onclick="selectPack(this, '1240 Diamonds', 'price_1240')" data-key="1240">
+            <div class="pack-card" onclick="selectPack(this, '1240 Diamonds', '1240')" data-key="1240">
                 <div class="pack-title">1240 Diamonds</div>
                 <div class="pack-price" id="price_1240_display">Rs1010</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <div class="pack-card" onclick="selectPack(this, '1460 Diamonds', 'price_1460')" data-key="1460">
+            <div class="pack-card" onclick="selectPack(this, '1460 Diamonds', '1460')" data-key="1460">
                 <div class="pack-title">1460 Diamonds</div>
                 <div class="pack-price" id="price_1460_display">Rs1210</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <div class="pack-card" onclick="selectPack(this, '1850 Diamonds', 'price_1850')" data-key="1850">
+            <div class="pack-card" onclick="selectPack(this, '1850 Diamonds', '1850')" data-key="1850">
                 <div class="pack-title">1850 Diamonds</div>
                 <div class="pack-price" id="price_1850_display">Rs1515</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <div class="pack-card" onclick="selectPack(this, '2530 Diamonds', 'price_2530')" data-key="2530">
+            <div class="pack-card" onclick="selectPack(this, '2530 Diamonds', '2530')" data-key="2530">
                 <div class="pack-title">2530 Diamonds</div>
                 <div class="pack-price" id="price_2530_display">Rs2030</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
@@ -397,42 +370,42 @@
                 Membership <span style="color:#e53e3e;">*</span>
             </div>
 
-            <div class="pack-card" onclick="selectPack(this, 'Weekly Membership', 'price_weekly')" data-key="weekly">
+            <div class="pack-card" onclick="selectPack(this, 'Weekly Membership', 'weekly')" data-key="weekly">
                 <img src="weekly.png" alt="Weekly Membership" style="width: 90px; height: 65px; display: block; margin: 1px auto;">
                 <div class="pack-title">Weekly Membership</div>
                 <div class="pack-price" id="price_weekly_display">Rs200</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <div class="pack-card" onclick="selectPack(this, '2x Weekly Membership', 'price_2weekly')" data-key="2weekly">
+            <div class="pack-card" onclick="selectPack(this, '2x Weekly Membership', '2weekly')" data-key="2weekly">
                 <img src="2weekly.png" alt="2x Weekly Membership" style="width: 90px; height: 65px; display: block; margin: 1px auto;">
                 <div class="pack-title">2x Weekly Membership</div>
                 <div class="pack-price" id="price_2weekly_display">Rs400</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <div class="pack-card" onclick="selectPack(this, 'Monthly Membership', 'price_monthly')" data-key="monthly">
+            <div class="pack-card" onclick="selectPack(this, 'Monthly Membership', 'monthly')" data-key="monthly">
                 <img src="monthly.png" alt="Monthly Membership" style="width: 90px; height: 65px; display: block; margin: 1px auto;">
                 <div class="pack-title">Monthly Membership</div>
                 <div class="pack-price" id="price_monthly_display">Rs1000</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <div class="pack-card" onclick="selectPack(this, '2x Monthly Membership', 'price_2monthly')" data-key="2monthly">
+            <div class="pack-card" onclick="selectPack(this, '2x Monthly Membership', '2monthly')" data-key="2monthly">
                 <img src="2monthly.png" alt="2x Monthly Membership" style="width: 90px; height: 65px; display: block; margin: 1px auto;">
                 <div class="pack-title">2x Monthly Membership</div>
                 <div class="pack-price" id="price_2monthly_display">Rs2000</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <div class="pack-card" onclick="selectPack(this, 'Weekly Lite', 'price_weeklylite')" data-key="weeklylite">
+            <div class="pack-card" onclick="selectPack(this, 'Weekly Lite', 'weeklylite')" data-key="weeklylite">
                 <img src="weeklylite.png" alt="Weekly Lite" style="width: 90px; height: 65px; display: block; margin: 1px auto;">
                 <div class="pack-title">Weekly Lite</div>
                 <div class="pack-price" id="price_weeklylite_display">Rs65</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <div class="pack-card" onclick="selectPack(this, '2x Weekly Lite', 'price_2weeklylite')" data-key="2weeklylite">
+            <div class="pack-card" onclick="selectPack(this, '2x Weekly Lite', '2weeklylite')" data-key="2weeklylite">
                 <img src="2weeklylite.png" alt="2x Weekly Lite" style="width: 90px; height: 65px; display: block; margin: 1px auto;">
                 <div class="pack-title">2x Weekly Lite</div>
                 <div class="pack-price" id="price_2weeklylite_display">Rs130</div>
@@ -559,10 +532,26 @@
         let selectedItemPriceKey = "";
         let currentQrUrl = "qr_code.png";
         
-        let dynamicPrices = {
-            "25": "30", "50": "56", "115": "100", "240": "200", "480": "400", "610": "505",
-            "850": "705", "1090": "905", "1240": "1010", "1460": "1210", "1850": "1515", "2530": "2030",
-            "weekly": "200", "2weekly": "400", "monthly": "1000", "2monthly": "2000", "weeklylite": "65", "2weeklylite": "130"
+        // डायमण्ड र मेम्बरसिपका मूल्यहरू (diamondPrices) यहाँबाट कन्ट्रोल हुन्छ:
+        const diamondPrices = {
+            "25": "30", 
+            "50": "56", 
+            "115": "100", 
+            "240": "200", 
+            "480": "400", 
+            "610": "505",
+            "850": "705", 
+            "1090": "905", 
+            "1240": "1010", 
+            "1460": "1210", 
+            "1850": "1515", 
+            "2530": "2030",
+            "weekly": "200", 
+            "2weekly": "400", 
+            "monthly": "1000", 
+            "2monthly": "2000", 
+            "weeklylite": "65", 
+            "2weeklylite": "130"
         };
 
         const mainActionBtn = document.getElementById('main-action-btn');
@@ -579,42 +568,34 @@
         // Modal Open/Close Functions
         window.openAdminModal = function() {
             adminModal.classList.add('show');
+            document.getElementById('admin-qr-url').value = currentQrUrl;
         };
 
         window.closeAdminModal = function() {
             adminModal.classList.remove('show');
         };
 
-        // Load Admin Settings and Prices from Firebase
-        async function loadAdminSettings() {
+        // Firebase बाट केवल QR URL मात्र लोड गर्ने
+        async function loadAdminQR() {
             try {
-                const snapshot = await get(child(ref(db), 'settings'));
+                const snapshot = await get(child(ref(db), 'settings/api'));
                 if (snapshot.exists()) {
                     const data = snapshot.val();
-                    if (data.api && data.api.qrUrl) {
-                        currentQrUrl = data.api.qrUrl;
+                    if (data.qrUrl) {
+                        currentQrUrl = data.qrUrl;
                         if (dynamicQrImg) dynamicQrImg.src = currentQrUrl;
                     }
-                    if (data.prices) {
-                        dynamicPrices = { ...dynamicPrices, ...data.prices };
-                    }
                 }
-                updateUIprices();
             } catch (e) {
-                console.log("Using default configurations");
+                console.log("Using default QR configuration");
             }
         }
 
+        // कोडमा भएका मूल्यहरूलाई वेबपेजमा देखाउने फंक्सन
         function updateUIprices() {
-            for (let key in dynamicPrices) {
+            for (let key in diamondPrices) {
                 const dispEl = document.getElementById(`price_${key}_display`);
-                if (dispEl) dispEl.innerText = "Rs" + dynamicPrices[key];
-                
-                const inputEl = document.getElementById(`p_${key}`);
-                if (inputEl) inputEl.value = dynamicPrices[key];
-            }
-            if (currentUser && currentUser.email === "gaulestore.np@gmail.com") {
-                document.getElementById('admin-qr-url').value = currentQrUrl;
+                if (dispEl) dispEl.innerText = "Rs" + diamondPrices[key];
             }
         }
 
@@ -629,39 +610,32 @@
                 } else {
                     adminTriggerContainer.classList.remove('show');
                 }
-                await loadAdminSettings();
+                await loadAdminQR();
             } else {
                 currentUser = null;
                 mainActionBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login to Buy`;
                 mainActionBtn.classList.add('login-needed');
                 adminTriggerContainer.classList.remove('show');
-                await loadAdminSettings();
+                await loadAdminQR();
             }
+            updateUIprices();
         });
 
-        window.saveAdminSettings = function() {
-            let newPrices = {};
-            for (let key in dynamicPrices) {
-                const val = document.getElementById(`p_${key}`).value.trim();
-                if(val) newPrices[key] = val;
+        // एडमिनले QR सेभ गर्ने फंक्सन
+        window.saveAdminQR = function() {
+            const newQrUrl = document.getElementById('admin-qr-url').value.trim();
+            if (!newQrUrl) {
+                alert("कृपया QR इमेजको प्रत्यक्ष लिंक भर्नुहोस्!");
+                return;
             }
 
-            // केवल prices मात्र Firebase मा सेभ गर्ने (api/qrUrl लाई सुरक्षित राख्दै)
-            get(child(ref(db), 'settings')).then((snapshot) => {
-                let existingData = snapshot.exists() ? snapshot.val() : {};
-                let currentApi = existingData.api || { qrUrl: currentQrUrl };
-
-                set(ref(db, 'settings'), {
-                    api: currentApi,
-                    prices: newPrices
-                }).then(() => {
-                    dynamicPrices = { ...dynamicPrices, ...newPrices };
-                    updateUIprices();
-                    closeAdminModal();
-                    alert("Prices Successfully Updated & Saved!");
-                }).catch((err) => {
-                    alert("Failed to update prices: " + err.message);
-                });
+            set(ref(db, 'settings/api'), { qrUrl: newQrUrl }).then(() => {
+                currentQrUrl = newQrUrl;
+                dynamicQrImg.src = currentQrUrl;
+                closeAdminModal();
+                alert("QR Code URL Successfully Updated!");
+            }).catch((err) => {
+                alert("Failed to update QR: " + err.message);
             });
         };
 
@@ -705,8 +679,8 @@
             element.classList.add('selected');
             
             selectedItemName = name;
-            selectedItemPriceKey = element.getAttribute('data-key');
-            let currentPrice = dynamicPrices[selectedItemPriceKey] || "0";
+            selectedItemPriceKey = priceKey;
+            let currentPrice = diamondPrices[selectedItemPriceKey] || "0";
 
             document.getElementById('summary-item').innerText = name;
             document.getElementById('summary-total').innerText = 'Rs ' + currentPrice;
@@ -727,7 +701,7 @@
         };
 
         function openPaymentModal(uid) {
-            let currentPrice = dynamicPrices[selectedItemPriceKey] || "0";
+            let currentPrice = diamondPrices[selectedItemPriceKey] || "0";
             document.getElementById('modal-uid').innerText = uid;
             document.getElementById('modal-item').innerText = selectedItemName;
             document.getElementById('modal-total').innerText = 'Rs ' + currentPrice;
@@ -750,7 +724,7 @@
         window.submitPayment = function() {
             let txidValue = txidInput.value.trim();
             let uidValue = gameUidInput.value.trim();
-            let currentPrice = dynamicPrices[selectedItemPriceKey] || "0";
+            let currentPrice = diamondPrices[selectedItemPriceKey] || "0";
             
             if (txidValue === "") {
                 txidInput.classList.remove('error-border');
@@ -798,6 +772,7 @@
     </script>
 </body>
 </html>
+
 
 
 
