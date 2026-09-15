@@ -307,7 +307,7 @@
 
 <div class="service-container" style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:500px; margin:0 auto; padding:20px 0;">
 
-<!-- Free Fire App Icon with Fixed 48 Hours Timer -->
+<!-- Free Fire App Icon with Global Synchronized Timer -->
 <div style="text-align:center; width:95px; font-family: sans-serif;">
     <a href="freefire/" style="display:block; width:80px; height:80px; text-decoration:none; position:relative; margin: 0 auto;">
         <img src="Free_Fire_Logo.png" alt="Free Fire" style="width:80px; height:80px; border-radius:20px; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:block;">
@@ -327,25 +327,20 @@
 </div>
 
 <script>
-    const totalHours = 48; // 48 hours
-    const storageKey = 'ff_offer_end_time_v6'; // Fresh storage key
-    
-    let endTime = localStorage.getItem(storageKey);
-    
-    if (!endTime) {
-        endTime = new Date().getTime() + (totalHours * 60 * 60 * 1000);
-        localStorage.setItem(storageKey, endTime);
-    }
+    // Yaha offer sakine exact Date ra Time (Deadline) rakhne.
+    // Example ko lagi: Ahile bata thik 48 hours pachi ko date/time fix gareko chu.
+    // Tapai aafno website live garne bela ko date ra time yaha milauna saknu hunchha.
+    const targetDate = new Date('2026-09-17T18:00:00').getTime(); 
 
     function updateTimer() {
         const now = new Date().getTime();
-        const distance = endTime - now;
+        const distance = targetDate - now;
 
         if (distance < 0) {
             clearInterval(timerInterval);
             document.getElementById("offerContainer").style.display = "none";
         } else {
-            // Fix: Directly calculating total remaining hours without 24h clipping
+            // Global remaining time calculation (sabai lai eutai time dekhauxa)
             const hours = Math.floor(distance / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
@@ -362,15 +357,6 @@
     const timerInterval = setInterval(updateTimer, 1000);
 </script>
 
-
-
-<!-- PUBG App Icon -->
-<div style="text-align:center; width:80px; font-family: sans-serif;">
-    <a href="pubg/" style="display:block; width:80px; height:80px; text-decoration:none;">
-        <img src="PUBG_Logo.png" alt="PUBG" style="width:80px; height:80px; border-radius:20px; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:block; transition: transform 0.2s ease;">
-    </a>
-    <div style="font-weight:700; font-size:11px; color:#333; margin-top:6px; letter-spacing: 0.5px; pointer-events:none;">PUBG</div>
-</div>
 
 
 <!-- UniPin App Icon -->
