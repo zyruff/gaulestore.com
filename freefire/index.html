@@ -291,31 +291,32 @@
         </div>
     </div>
 
-<div class="section-box">
-    <div class="section-header-flex">
-        <div class="box-title">Game ID <span style="color: #e53e3e;">*</span></div>
-    </div>
-    <div class="input-card-panel">
-        <div class="input-label">User ID (uid)</div>
-        
-        <div class="uid-input-group">
-            <input type="text" id="game-uid" class="uid-input" placeholder="PLAYER ID (UID)" oninput="validateUIDLive()">
-        </div>
-        
-        <div class="error-message" id="uid-error">
-            <i class="fa-solid fa-circle-exclamation"></i> <span>Invalid or Missing UID!</span>
-        </div>
-        
-        <div class="instruction-text">
-            <i class="fa-solid fa-circle-info"></i>
-            <span>Open Free fire, Click on Profile icon, you will get your UID.</span>
-        </div>
-    </div>
-</div>
-
     <div class="section-box">
         <div class="section-header-flex">
-            <div class="box-title">Diamonds <span style="color: #e53e3e;">*</span></div>
+            <div class="box-title">Game ID <span style="color: #e53e3e;">*</span></div>
+        </div>
+        <div class="input-card-panel">
+            <div class="input-label">User ID (uid)</div>
+            
+            <div class="uid-input-group">
+                <input type="text" id="game-uid" class="uid-input" placeholder="PLAYER ID (UID)" oninput="validateUIDLive()">
+            </div>
+            
+            <div class="error-message" id="uid-error">
+                <i class="fa-solid fa-circle-exclamation"></i> <span>Invalid or Missing UID!</span>
+            </div>
+            
+            <div class="instruction-text">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Open Free fire, Click on Profile icon, you will get your UID.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Free Fire Section vitra nai sabai Diamonds ra Memberships rakhieko cha -->
+    <div class="section-box">
+        <div class="section-header-flex">
+            <div class="box-title">Free Fire Store <span style="color: #e53e3e;">*</span></div>
         </div>
         
         <div class="error-message" id="pack-error" style="margin-bottom: 8px; display: none;">
@@ -584,7 +585,6 @@
             adminModal.classList.add('show');
             document.getElementById('admin-qr-url').value = currentQrUrl;
             
-            // Fill current prices into admin inputs
             for (let key in diamondPrices) {
                 let inputEl = document.getElementById(`p_${key}`);
                 if (inputEl) inputEl.value = diamondPrices[key];
@@ -597,16 +597,17 @@
 
         async function loadAdminSettings() {
             try {
-                const snapshot = await get(child(ref(db), 'settings'));
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    if (data.api && data.api.qrUrl) {
-                        currentQrUrl = data.api.qrUrl;
-                        if (dynamicQrImg) dynamicQrImg.src = currentQrUrl;
-                    }
-                    if (data.prices) {
-                        diamondPrices = { ...diamondPrices, ...data.prices };
-                    }
+                const [apiSnap, diamondsSnap] = await Promise.all([
+                    get(child(ref(db), 'api')),
+                    get(child(ref(db), 'diamonds'))
+                ]);
+
+                if (apiSnap.exists() && apiSnap.val().qrUrl) {
+                    currentQrUrl = apiSnap.val().qrUrl;
+                    if (dynamicQrImg) dynamicQrImg.src = currentQrUrl;
+                }
+                if (diamondsSnap.exists()) {
+                    diamondPrices = { ...diamondPrices, ...diamondsSnap.val() };
                 }
             } catch (e) {
                 console.log("Using default configuration");
@@ -655,10 +656,10 @@
                 newPrices[key] = inputVal || diamondPrices[key];
             }
 
-            set(ref(db, 'settings'), {
-                api: { qrUrl: newQrUrl },
-                prices: newPrices
-            }).then(() => {
+            Promise.all([
+                set(ref(db, 'api'), { qrUrl: newQrUrl }),
+                set(ref(db, 'diamonds'), newPrices)
+            ]).then(() => {
                 currentQrUrl = newQrUrl;
                 dynamicQrImg.src = currentQrUrl;
                 diamondPrices = newPrices;
@@ -803,6 +804,8 @@
     </script>
 </body>
 </html>
+
+
 
 
 
