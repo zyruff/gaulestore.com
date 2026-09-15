@@ -136,6 +136,27 @@
         .section-box { margin: 0 16px 20px 16px; }
         .section-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .box-title { font-size: 15px; text-transform: uppercase; font-weight: 700; color: #1a202c; }
+        
+        /* Premium Edit Button */
+        .admin-trigger-container { margin: 0 16px 15px 16px; display: none; }
+        .admin-trigger-container.show { display: block; }
+        .premium-edit-btn { background: linear-gradient(135deg, #ffb300 0%, #ff9100 100%); color: white; border: none; width: 100%; padding: 12px 18px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(255, 179, 0, 0.3); transition: transform 0.2s, box-shadow 0.2s; }
+        .premium-edit-btn:active { transform: scale(0.98); box-shadow: 0 2px 8px rgba(255, 179, 0, 0.2); }
+
+        /* Modal Panel for Admin Settings */
+        .admin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 250; opacity: 0; pointer-events: none; transition: all 0.3s ease; padding: 15px; }
+        .admin-modal.show { opacity: 1; pointer-events: auto; }
+        .admin-modal-card { background: #ffffff; border-radius: 20px; padding: 24px; max-width: 480px; width: 100%; max-height: 85vh; overflow-y: auto; position: relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15); transform: scale(0.9); transition: all 0.3s ease; }
+        .admin-modal.show .admin-modal-card { transform: scale(1); }
+        .admin-close-modal { position: absolute; top: 18px; right: 18px; font-size: 20px; color: #718096; cursor: pointer; background: #edf2f7; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        
+        .admin-api-panel input { width: 100%; padding: 10px 12px; margin-bottom: 10px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 13px; outline: none; background: #f7fafc; }
+        .admin-save-btn { background: #2ed573; color: white; border: none; padding: 12px 14px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; width: 100%; margin-top: 15px; box-shadow: 0 4px 12px rgba(46, 213, 115, 0.3); }
+        
+        .admin-price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+        .admin-price-item { font-size: 11px; color: #4a5568; font-weight: 600; }
+        .admin-price-item input { margin-top: 4px; margin-bottom: 0px; }
+
         .input-card-panel { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         .input-label { font-size: 11px; font-weight: 600; color: #718096; text-transform: uppercase; margin-bottom: 8px; }
         .uid-input-group { display: flex; gap: 8px; }
@@ -152,15 +173,6 @@
         .pack-price { font-size: 15px; font-weight: 700; color: #ffb300; }
         .diamond-icon { position: absolute; bottom: 14px; right: 14px; color: #3182ce; font-size: 20px; }
         
-        .admin-api-panel { background: #fffdf5; border: 1px dashed #ffb300; border-radius: 12px; padding: 14px; margin: 0 16px 20px 16px; display: none; }
-        .admin-api-panel.show { display: block; }
-        .admin-api-panel input { width: 100%; padding: 8px 10px; margin-bottom: 8px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 12px; outline: none; }
-        .admin-save-btn { background: #ffb300; color: white; border: none; padding: 10px 14px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; width: 100%; margin-top: 10px; }
-        
-        .admin-price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
-        .admin-price-item { font-size: 11px; color: #4a5568; font-weight: 600; }
-        .admin-price-item input { margin-top: 2px; }
-
         .bottom-drawer { position: fixed; bottom: 55px; left: 2px; right: 2px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); z-index: 100; }
         .drawer-inner { max-width: 600px; margin: 0 auto; }
         .row-detail { display: flex; justify-content: space-between; font-size: 13px; color: #4a5568; margin-bottom: 8px; }
@@ -231,36 +243,50 @@
         <div class="tab">Membership</div>
     </div>
 
-    <!-- Admin Settings Panel -->
-    <div class="admin-api-panel" id="adminApiPanel">
-        <div style="font-weight: 700; font-size: 13px; color: #b7791f; margin-bottom: 6px;"><i class="fa-solid fa-gear"></i> Admin Dashboard & Price Settings</div>
-        
-        <label style="font-size: 11px; color: #4a5568; font-weight: 600; display: block; margin-top: 6px;">QR Code Image URL:</label>
-        <input type="text" id="admin-qr-url" placeholder="qr_code.png वा इमेजको प्रत्यक्ष लिंक">
+    <!-- Premium Admin Edit Trigger Button (Only for gaulestore.np@gmail.com) -->
+    <div class="admin-trigger-container" id="adminTriggerContainer">
+        <button class="premium-edit-btn" onclick="openAdminModal()">
+            <i class="fa-solid fa-sliders"></i> Edit Store & Prices (Admin)
+        </button>
+    </div>
 
-        <div style="font-weight: 700; font-size: 12px; color: #b7791f; margin-top: 10px; margin-bottom: 4px;">Update Pack Prices (Rs):</div>
-        <div class="admin-price-grid">
-            <div class="admin-price-item">25 Diamonds: <input type="text" id="p_25" value="30"></div>
-            <div class="admin-price-item">50 Diamonds: <input type="text" id="p_50" value="56"></div>
-            <div class="admin-price-item">115 Diamonds: <input type="text" id="p_115" value="100"></div>
-            <div class="admin-price-item">240 Diamonds: <input type="text" id="p_240" value="200"></div>
-            <div class="admin-price-item">480 Diamonds: <input type="text" id="p_480" value="400"></div>
-            <div class="admin-price-item">610 Diamonds: <input type="text" id="p_610" value="505"></div>
-            <div class="admin-price-item">850 Diamonds: <input type="text" id="p_850" value="705"></div>
-            <div class="admin-price-item">1090 Diamonds: <input type="text" id="p_1090" value="905"></div>
-            <div class="admin-price-item">1240 Diamonds: <input type="text" id="p_1240" value="1010"></div>
-            <div class="admin-price-item">1460 Diamonds: <input type="text" id="p_1460" value="1210"></div>
-            <div class="admin-price-item">1850 Diamonds: <input type="text" id="p_1850" value="1515"></div>
-            <div class="admin-price-item">2530 Diamonds: <input type="text" id="p_2530" value="2030"></div>
-            <div class="admin-price-item">Weekly Membership: <input type="text" id="p_weekly" value="200"></div>
-            <div class="admin-price-item">2x Weekly Membership: <input type="text" id="p_2weekly" value="400"></div>
-            <div class="admin-price-item">Monthly Membership: <input type="text" id="p_monthly" value="1000"></div>
-            <div class="admin-price-item">2x Monthly Membership: <input type="text" id="p_2monthly" value="2000"></div>
-            <div class="admin-price-item">Weekly Lite: <input type="text" id="p_weeklylite" value="65"></div>
-            <div class="admin-price-item">2x Weekly Lite: <input type="text" id="p_2weeklylite" value="130"></div>
+    <!-- Admin Settings Modal (Hidden by default, opens on button click) -->
+    <div class="admin-modal" id="adminModal">
+        <div class="admin-modal-card">
+            <div class="admin-close-modal" onclick="closeAdminModal()"><i class="fa-solid fa-xmark"></i></div>
+            <div style="font-weight: 700; font-size: 16px; color: #1a202c; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-gear" style="color: #ffb300;"></i> Admin Dashboard Settings
+            </div>
+            
+            <div class="admin-api-panel">
+                <label style="font-size: 11px; color: #4a5568; font-weight: 700; display: block; margin-bottom: 4px;">QR Code Image URL:</label>
+                <input type="text" id="admin-qr-url" placeholder="qr_code.png वा इमेजको प्रत्यक्ष लिंक">
+
+                <div style="font-weight: 700; font-size: 12px; color: #b7791f; margin-top: 14px; margin-bottom: 8px;">Update Pack Prices (Rs):</div>
+                <div class="admin-price-grid">
+                    <div class="admin-price-item">25 Diamonds: <input type="text" id="p_25" value="30"></div>
+                    <div class="admin-price-item">50 Diamonds: <input type="text" id="p_50" value="56"></div>
+                    <div class="admin-price-item">115 Diamonds: <input type="text" id="p_115" value="100"></div>
+                    <div class="admin-price-item">240 Diamonds: <input type="text" id="p_240" value="200"></div>
+                    <div class="admin-price-item">480 Diamonds: <input type="text" id="p_480" value="400"></div>
+                    <div class="admin-price-item">610 Diamonds: <input type="text" id="p_610" value="505"></div>
+                    <div class="admin-price-item">850 Diamonds: <input type="text" id="p_850" value="705"></div>
+                    <div class="admin-price-item">1090 Diamonds: <input type="text" id="p_1090" value="905"></div>
+                    <div class="admin-price-item">1240 Diamonds: <input type="text" id="p_1240" value="1010"></div>
+                    <div class="admin-price-item">1460 Diamonds: <input type="text" id="p_1460" value="1210"></div>
+                    <div class="admin-price-item">1850 Diamonds: <input type="text" id="p_1850" value="1515"></div>
+                    <div class="admin-price-item">2530 Diamonds: <input type="text" id="p_2530" value="2030"></div>
+                    <div class="admin-price-item">Weekly Membership: <input type="text" id="p_weekly" value="200"></div>
+                    <div class="admin-price-item">2x Weekly Membership: <input type="text" id="p_2weekly" value="400"></div>
+                    <div class="admin-price-item">Monthly Membership: <input type="text" id="p_monthly" value="1000"></div>
+                    <div class="admin-price-item">2x Monthly Membership: <input type="text" id="p_2monthly" value="2000"></div>
+                    <div class="admin-price-item">Weekly Lite: <input type="text" id="p_weeklylite" value="65"></div>
+                    <div class="admin-price-item">2x Weekly Lite: <input type="text" id="p_2weeklylite" value="130"></div>
+                </div>
+
+                <button class="admin-save-btn" onclick="saveAdminSettings()">Save All Changes</button>
+            </div>
         </div>
-
-        <button class="admin-save-btn" onclick="saveAdminSettings()">Save All Settings & Prices</button>
     </div>
 
 <div class="section-box">
@@ -546,8 +572,18 @@
         const diamondsWrapper = document.getElementById('diamonds-wrapper');
         const txidInput = document.getElementById('txid');
         const txidError = document.getElementById('txid-error');
-        const adminApiPanel = document.getElementById('adminApiPanel');
+        const adminTriggerContainer = document.getElementById('adminTriggerContainer');
+        const adminModal = document.getElementById('adminModal');
         const dynamicQrImg = document.getElementById('dynamic-qr-img');
+
+        // Modal Open/Close Functions
+        window.openAdminModal = function() {
+            adminModal.classList.add('show');
+        };
+
+        window.closeAdminModal = function() {
+            adminModal.classList.remove('show');
+        };
 
         // Load Admin Settings and Prices from Firebase
         async function loadAdminSettings() {
@@ -589,16 +625,16 @@
                 mainActionBtn.classList.remove('login-needed');
 
                 if (user.email === "gaulestore.np@gmail.com") {
-                    adminApiPanel.classList.add('show');
+                    adminTriggerContainer.classList.add('show');
                 } else {
-                    adminApiPanel.classList.remove('show');
+                    adminTriggerContainer.classList.remove('show');
                 }
                 await loadAdminSettings();
             } else {
                 currentUser = null;
                 mainActionBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login to Buy`;
                 mainActionBtn.classList.add('login-needed');
-                adminApiPanel.classList.remove('show');
+                adminTriggerContainer.classList.remove('show');
                 await loadAdminSettings();
             }
         });
@@ -624,6 +660,7 @@
                 dynamicQrImg.src = currentQrUrl;
                 dynamicPrices = { ...dynamicPrices, ...newPrices };
                 updateUIprices();
+                closeAdminModal();
                 alert("Settings & Prices Successfully Updated & Saved!");
             }).catch((err) => {
                 alert("Failed to update: " + err.message);
@@ -718,7 +755,7 @@
             let currentPrice = dynamicPrices[selectedItemPriceKey] || "0";
             
             if (txidValue === "") {
-                txidInput.classList.add('error-border');
+                txidInput.classList.remove('error-border');
                 txidError.style.display = "flex";
                 txidInput.focus();
                 return;
@@ -751,7 +788,7 @@
                 document.getElementById('successModal').classList.add('show');
             }).catch((error) => {
                 alert("अर्डर पठाउन समस्या भयो: " + error.message);
-                submitBtn.disabled = false;
+                submitBtn.disabled, submitBtn.disabled = false;
                 submitBtn.innerText = "Submit Payment";
             });
         };
@@ -763,6 +800,7 @@
     </script>
 </body>
 </html>
+
 
 
 
