@@ -640,30 +640,28 @@
         });
 
         window.saveAdminSettings = function() {
-            const newQrUrl = document.getElementById('admin-qr-url').value.trim();
-            if (!newQrUrl) {
-                alert("कृपया QR इमेजको प्रत्यक्ष लिंक भर्नुहोस्!");
-                return;
-            }
-
             let newPrices = {};
             for (let key in dynamicPrices) {
                 const val = document.getElementById(`p_${key}`).value.trim();
                 if(val) newPrices[key] = val;
             }
 
-            set(ref(db, 'settings'), {
-                api: { qrUrl: newQrUrl },
-                prices: newPrices
-            }).then(() => {
-                currentQrUrl = newQrUrl;
-                dynamicQrImg.src = currentQrUrl;
-                dynamicPrices = { ...dynamicPrices, ...newPrices };
-                updateUIprices();
-                closeAdminModal();
-                alert("Settings & Prices Successfully Updated & Saved!");
-            }).catch((err) => {
-                alert("Failed to update: " + err.message);
+            // केवल prices मात्र Firebase मा सेभ गर्ने (api/qrUrl लाई सुरक्षित राख्दै)
+            get(child(ref(db), 'settings')).then((snapshot) => {
+                let existingData = snapshot.exists() ? snapshot.val() : {};
+                let currentApi = existingData.api || { qrUrl: currentQrUrl };
+
+                set(ref(db, 'settings'), {
+                    api: currentApi,
+                    prices: newPrices
+                }).then(() => {
+                    dynamicPrices = { ...dynamicPrices, ...newPrices };
+                    updateUIprices();
+                    closeAdminModal();
+                    alert("Prices Successfully Updated & Saved!");
+                }).catch((err) => {
+                    alert("Failed to update prices: " + err.message);
+                });
             });
         };
 
@@ -788,7 +786,7 @@
                 document.getElementById('successModal').classList.add('show');
             }).catch((error) => {
                 alert("अर्डर पठाउन समस्या भयो: " + error.message);
-                submitBtn.disabled, submitBtn.disabled = false;
+                submitBtn.disabled = false;
                 submitBtn.innerText = "Submit Payment";
             });
         };
@@ -800,6 +798,7 @@
     </script>
 </body>
 </html>
+
 
 
 
