@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ne" class="h-full">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Support & Chat Portal - Gaule Store</title>
+    <title>Chat Support</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,200 +12,140 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: {
-                            50: '#fefce8',
-                            100: '#fef08a',
-                            500: '#eab308',
-                            600: '#ca8a04',
-                            700: '#a16207',
-                        }
+                        brand: { 50: '#fefce8', 100: '#fef9c3', 500: '#eab308', 600: '#ca8a04', 700: '#a16207' }
                     }
                 }
             }
         }
     </script>
-    <!-- FontAwesome for Icons -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Firebase SDKs (Compat version) -->
+    <!-- Firebase App (Compat) & Realtime Database & Auth SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
-    <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.8); }
-        @keyframes pulse-slow {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-        .animate-pulse-slow { animation: pulse-slow 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn { animation: fadeIn 0.25s ease-out forwards; }
-    </style>
 </head>
-<body class="h-full bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-200">
+<body class="h-full bg-slate-100 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100 antialiased overflow-hidden flex flex-col">
 
-    <!-- MAIN APP WRAPPER -->
-    <div class="flex h-full w-full overflow-hidden relative">
-        
-        <!-- Hidden Admin Logo Upload Input -->
-        <input type="file" id="adminLogoInput" class="hidden" accept="image/png, image/jpeg, image/webp" onchange="handleAdminLogoSelected(event)">
-
-        <!-- Sidebar / Customers List (Visible ONLY to Admin) -->
-        <aside id="sidebar" class="hidden w-full md:w-80 lg:w-96 flex-shrink-0 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col h-full z-30 absolute md:relative transition-transform duration-300 -translate-x-full md:translate-x-0">
-            <!-- Sidebar Header -->
-            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="relative group cursor-pointer" onclick="document.getElementById('adminLogoInput').click()" title="Click to change Logo">
-                        <div id="adminLogoContainer" class="w-10 h-10 rounded-full overflow-hidden ring-2 ring-yellow-500 bg-slate-900 flex items-center justify-center flex-shrink-0">
-                            <!-- Direct PNG Logo Image -->
-                            <img src="logo.png" alt="Gaule Store Logo" class="w-full h-full object-cover">
-                        </div>
-                        <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <i class="fa-solid fa-camera text-white text-xs"></i>
-                        </div>
-                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
+    <!-- Top Navigation Bar -->
+    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 h-16 flex items-center justify-between px-4 sm:px-6 flex-shrink-0 z-20">
+        <div class="flex items-center space-x-3">
+            <button id="openSidebar" class="hidden md:hidden text-slate-600 dark:text-slate-300 hover:text-yellow-600 focus:outline-none">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 rounded-full overflow-hidden bg-slate-900 flex items-center justify-center ring-2 ring-yellow-500 shadow-sm cursor-pointer relative group" onclick="document.getElementById('adminLogoInput').click()">
+                    <div id="adminLogoContainer" class="w-full h-full flex items-center justify-center text-white font-bold">
+                        <img src="logo.png" alt="Logo" class="w-full h-full object-cover">
                     </div>
-                    <div>
-                        <h2 class="font-bold text-slate-900 dark:text-white leading-tight">Gaule Store</h2>
-                        <span class="text-xs text-yellow-600 dark:text-yellow-400 font-medium">Top Up Center</span>
-                    </div>
+                    <div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center text-white text-[10px]">Edit</div>
                 </div>
-                <div class="flex items-center space-x-1">
-                    <button id="themeToggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors" title="Toggle Theme">
-                        <i class="fa-solid fa-moon dark:hidden"></i>
-                        <i class="fa-solid fa-sun hidden dark:inline"></i>
-                    </button>
-                    <button id="closeSidebar" class="md:hidden p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300">
-                        <i class="fa-solid fa-xmark text-lg"></i>
-                    </button>
+                <input type="file" id="adminLogoInput" class="hidden" accept="image/*" onchange="handleAdminLogoSelected(event)">
+                <div>
+                    <h1 class="font-bold text-base sm:text-lg tracking-wide text-slate-900 dark:text-white leading-tight">Support Center</h1>
+                    <span class="text-[10px] text-yellow-600 dark:text-yellow-400 font-semibold uppercase tracking-wider">Chat Portal</span>
                 </div>
             </div>
+        </div>
 
-            <!-- Admin Mode Badge -->
-            <div class="p-2.5 bg-yellow-50 dark:bg-yellow-950/40 border-b border-yellow-100 dark:border-yellow-900/50 flex items-center justify-between text-xs text-yellow-800 dark:text-yellow-300 px-4">
-                <span class="font-semibold"><i class="fa-solid fa-shield-halved mr-1"></i> Admin: gaulestore.np@gmail.com</span>
-                <button onclick="logoutGoogle()" class="text-red-500 hover:underline font-medium">Logout</button>
+        <div class="flex items-center space-x-3">
+            <!-- Theme Toggle -->
+            <button id="themeToggleTop" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                <i class="fa-solid fa-moon dark:hidden"></i>
+                <i class="fa-solid fa-sun hidden dark:inline text-yellow-400"></i>
+            </button>
+
+            <!-- Google Login Button (For Customers) -->
+            <button id="googleLoginBtn" onclick="loginWithGoogle()" class="flex items-center space-x-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/70 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-full text-xs font-semibold shadow-sm transition-all">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-4 h-4" alt="Google">
+                <span>Login with Google</span>
+            </button>
+
+            <!-- Logged In Profile View -->
+            <div id="customerProfileView" class="hidden items-center space-x-2">
+                <img id="loggedInCustomerPhoto" src="" class="w-8 h-8 rounded-full object-cover ring-1 ring-yellow-500" alt="Profile">
+                <div class="hidden sm:block text-left">
+                    <p id="loggedInCustomerName" class="text-xs font-bold leading-none text-slate-900 dark:text-white truncate max-w-[100px]"></p>
+                    <p id="loggedInCustomerEmail" class="text-[9px] text-slate-400 truncate max-w-[120px]"></p>
+                </div>
+                <button onclick="logoutGoogle()" title="Logout" class="text-slate-400 hover:text-red-500 text-xs p-1 ml-1">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
             </div>
+        </div>
+    </header>
 
-            <!-- Search Bar -->
-            <div class="p-3 border-b border-slate-100 dark:border-slate-700/50">
+    <!-- Main Content Layout -->
+    <div class="flex-1 flex overflow-hidden relative">
+
+        <!-- Sidebar (Visible to Admin or responsive toggle) -->
+        <aside id="sidebar" class="absolute md:relative inset-y-0 left-0 w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col z-10 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out shadow-lg md:shadow-none">
+            <div class="p-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Customer Chats</h2>
+                <button id="closeSidebar" class="md:hidden text-slate-400 hover:text-slate-600 text-sm">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <!-- Search Filter -->
+            <div class="p-2 border-b border-slate-100 dark:border-slate-800/60">
                 <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                        <i class="fa-solid fa-magnifying-glass text-sm"></i>
-                    </span>
-                    <input type="text" id="searchCustomer" placeholder="Search customers..." class="w-full pl-9 pr-4 py-2 bg-slate-100 dark:bg-slate-900 text-sm rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-yellow-500 text-slate-800 dark:text-slate-200 placeholder-slate-400">
+                    <i class="fa-solid fa-search absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                    <input type="text" id="searchCustomer" placeholder="Search customer..." class="w-full pl-8 pr-3 py-1.5 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:ring-1 focus:ring-yellow-500">
                 </div>
             </div>
-
-            <!-- Customers List -->
-            <div id="chatList" class="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700/50">
-                <!-- Admin sees list of all customers here -->
+            <!-- Customer List Container -->
+            <div id="chatList" class="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/50">
+                <!-- Dynamic customer items will be loaded here -->
             </div>
         </aside>
 
-        <!-- Main Chat Area -->
-        <main class="flex-1 flex flex-col h-full bg-slate-50 dark:bg-slate-950 relative">
+        <!-- Chat Window Area -->
+        <main class="flex-1 flex flex-col bg-slate-50 dark:bg-slate-950 overflow-hidden relative">
             
-            <!-- Chat Header -->
-            <header class="h-16 px-4 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between z-10 shadow-sm">
-                <div class="flex items-center space-x-3">
-                    <button id="openSidebar" class="hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300">
-                        <i class="fa-solid fa-bars text-lg"></i>
-                    </button>
-                    <div class="relative">
-                        <div id="currentChatAvatarContainer" class="w-10 h-10 rounded-full overflow-hidden ring-1 ring-slate-200 dark:ring-slate-700 bg-slate-900 flex items-center justify-center flex-shrink-0">
-                            <img src="logo.png" alt="Gaule Store Logo" class="w-full h-full object-cover">
-                        </div>
-                        <span id="currentChatStatusDot" class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
-                    </div>
-                    <div>
-                        <h2 id="currentChatName" class="font-bold text-slate-900 dark:text-white text-sm sm:text-base leading-tight">Gaule Store Support</h2>
-                        <span id="currentChatStatusText" class="text-xs text-slate-500 dark:text-slate-400">Online</span>
-                    </div>
-                </div>
-
-                <!-- Right Header Controls / Customer Google Login -->
-                <div class="flex items-center space-x-2">
-                    <div id="customerAuthContainer">
-                        <button id="googleLoginBtn" onclick="loginWithGoogle()" class="py-1.5 px-3 bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold flex items-center space-x-2 shadow-sm transition-all">
-                            <i class="fa-brands fa-google text-red-500"></i>
-                            <span>Login with Google</span>
-                        </button>
-                        <div id="customerProfileView" class="hidden items-center space-x-2">
-                            <img id="loggedInCustomerPhoto" class="w-8 h-8 rounded-full object-cover ring-1 ring-yellow-500" src="" alt="Profile">
-                            <div class="hidden sm:block text-left">
-                                <p id="loggedInCustomerName" class="text-xs font-bold leading-none text-slate-800 dark:text-slate-200"></p>
-                                <p id="loggedInCustomerEmail" class="text-[10px] text-slate-400 truncate max-w-[120px]"></p>
-                            </div>
-                            <button onclick="logoutGoogle()" class="text-xs text-red-500 hover:underline px-2 py-1 ml-1 font-medium">Logout</button>
-                        </div>
-                    </div>
-                    <button id="themeToggleTop" class="md:hidden p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300">
-                        <i class="fa-solid fa-moon dark:hidden"></i>
-                        <i class="fa-solid fa-sun hidden dark:inline"></i>
-                    </button>
-                </div>
-            </header>
-
-            <!-- Message Stream -->
+            <!-- Message History Container -->
             <div id="messageContainer" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
                 <div class="flex justify-center">
-                    <span id="chatNoticeBadge" class="px-3 py-1 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs rounded-full shadow-sm font-medium">Please 'Login with Google' above to chat with Gaule Store Support</span>
+                    <span class="px-3 py-1 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs rounded-full shadow-sm font-medium">Secure Chat Session</span>
                 </div>
             </div>
 
-            <!-- Gallery Input -->
-            <input type="file" id="galleryInput" class="hidden" accept="image/*" onchange="handleGalleryPhotoSelected(event)">
-
-            <!-- Chat Input Area -->
-            <footer class="p-3 sm:p-4 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 z-10">
-                
-                <!-- Recording Active Banner -->
-                <div id="recordingUI" class="hidden items-center justify-between mb-3 px-3 py-2 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-xl">
-                    <div class="flex items-center space-x-2 text-red-600 dark:text-red-400">
-                        <span class="w-3 h-3 bg-red-500 rounded-full animate-pulse-slow"></span>
-                        <span id="recordingTimer" class="text-xs font-bold">00:00</span>
-                        <span class="text-xs">Recording audio...</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <button type="button" onclick="cancelRecording()" class="text-xs text-slate-500 hover:text-red-600 px-2 py-1">Cancel</button>
-                        <button type="button" onclick="stopAndSendRecording()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium shadow-sm flex items-center space-x-1">
-                            <i class="fa-solid fa-paper-plane text-[10px]"></i> <span>Send Audio</span>
-                        </button>
-                    </div>
+            <!-- Voice Recording Preview Panel -->
+            <div id="recordingUI" class="hidden absolute bottom-20 left-4 right-4 bg-white dark:bg-slate-900 p-3 rounded-2xl shadow-xl border border-red-500/30 items-center justify-between z-20 animate-bounce-short">
+                <div class="flex items-center space-x-3">
+                    <div class="w-3 h-3 rounded-full bg-red-500 animate-ping"></div>
+                    <span class="text-xs font-semibold text-slate-700 dark:text-slate-200">Recording Audio... <span id="recordingTimer" class="text-red-500 font-mono font-bold ml-1">00:00</span></span>
                 </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="cancelRecording()" class="px-3 py-1.5 text-xs text-slate-500 hover:text-red-500 font-medium">Cancel</button>
+                    <button onclick="stopAndSendRecording()" class="px-4 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-xl text-xs font-bold shadow-md">Send Voice</button>
+                </div>
+            </div>
 
-                <form id="chatForm" onsubmit="handleSendMessage(event)" class="flex items-center space-x-2 sm:space-x-3">
-                    <!-- Gallery Photo Button -->
-                    <button type="button" onclick="document.getElementById('galleryInput').click()" class="p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-colors" title="Open Gallery">
-                        <i class="fa-regular fa-image text-lg"></i>
-                    </button>
-                    
-                    <div class="flex-1 relative">
-                        <input id="messageInput" type="text" placeholder="Type a message..." autocomplete="off" disabled class="w-full px-4 py-3 bg-slate-100 dark:bg-slate-900 text-sm rounded-xl border-none focus:outline-none focus:ring-2 focus:ring-yellow-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 pr-10 opacity-60">
-                    </div>
+            <!-- Message Input Form -->
+            <form id="messageForm" onsubmit="handleSendMessage(event)" class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-3 sm:p-4 flex items-center space-x-2 flex-shrink-0">
+                <!-- File Attachment Input (Gallery) -->
+                <input type="file" id="galleryInput" class="hidden" accept="image/*" onchange="handleGalleryPhotoSelected(event)">
+                <button type="button" onclick="document.getElementById('galleryInput').click()" title="Attach Photo" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center flex-shrink-0 transition-colors">
+                    <i class="fa-solid fa-image"></i>
+                </button>
 
-                    <!-- Voice Recorder Button -->
-                    <button type="button" id="micBtn" onclick="toggleRecording()" disabled class="bg-slate-100 dark:bg-slate-700 text-slate-400 w-11 h-11 rounded-xl flex items-center justify-center transition-all flex-shrink-0 opacity-60 cursor-not-allowed" title="Record Voice">
-                        <i class="fa-solid fa-microphone text-sm"></i>
-                    </button>
+                <!-- Voice Recording Mic Button -->
+                <button type="button" id="micBtn" onclick="toggleRecording()" title="Hold or Click to Record Voice" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center flex-shrink-0 transition-colors">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
 
-                    <button type="submit" id="sendBtn" disabled class="bg-yellow-600/50 text-white w-11 h-11 rounded-xl flex items-center justify-center shadow-md transition-all flex-shrink-0 cursor-not-allowed" title="Send Message">
-                        <i class="fa-solid fa-paper-plane text-sm"></i>
-                    </button>
-                </form>
-            </footer>
+                <!-- Text Input Box -->
+                <input type="text" id="messageInput" placeholder="Please login with Google to type..." disabled class="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 text-xs sm:text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-yellow-500 opacity-60">
+
+                <!-- Send Button -->
+                <button type="submit" id="sendBtn" disabled class="w-10 h-10 rounded-xl bg-yellow-600/50 cursor-not-allowed text-white flex items-center justify-center flex-shrink-0 shadow-sm transition-all">
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </form>
         </main>
     </div>
 
-    <!-- Script JavaScript -->
+    <!-- Application Script Block -->
     <script>
         // Firebase Configuration
         const firebaseConfig = {
@@ -222,14 +162,13 @@
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
-        const db = firebase.firestore();
+        
+        // Realtime Database & Auth initialization
+        const rtdb = firebase.database();
         const auth = firebase.auth();
 
-        // Official Admin Email Configured Here
         const ADMIN_EMAIL = "gaulestore.np@gmail.com";
-
-        // Default logo.png markup
-        const defaultLogoHtml = `<img src="logo.png" alt="Gaule Store Logo" class="w-full h-full object-cover">`;
+        const defaultLogoHtml = `<img src="logo.png" alt="Logo" class="w-full h-full object-cover">`;
 
         let adminLogoHtml = localStorage.getItem('admin_logo_html') || defaultLogoHtml;
         document.getElementById('adminLogoContainer').innerHTML = adminLogoHtml;
@@ -239,51 +178,40 @@
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
-                const imgResult = e.target.result;
-                adminLogoHtml = `<img src="${imgResult}" class="w-full h-full object-cover" alt="Admin Logo">`;
+                adminLogoHtml = `<img src="${e.target.result}" class="w-full h-full object-cover" alt="Admin Logo">`;
                 localStorage.setItem('admin_logo_html', adminLogoHtml);
                 document.getElementById('adminLogoContainer').innerHTML = adminLogoHtml;
-                if(activeCustomerId) fetchCustomerMessagesFromFirebase();
             };
             reader.readAsDataURL(file);
         }
 
-        // Google Authentication
         function loginWithGoogle() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).catch((error) => {
-                alert("Login Error: " + error.message);
-            });
+            auth.signInWithPopup(provider).catch((error) => alert("Login Error: " + error.message));
         }
 
         function logoutGoogle() {
-            auth.signOut().then(() => {
-                window.location.reload();
-            });
+            auth.signOut().then(() => window.location.reload());
         }
 
         let customers = [];
         let activeCustomerId = null;
         let currentUser = null;
         let isAdmin = false;
-        let unsubscribeMessages = null;
+        let messagesRef = null;
 
         const sidebar = document.getElementById('sidebar');
         const openSidebarBtn = document.getElementById('openSidebar');
         const closeSidebarBtn = document.getElementById('closeSidebar');
-        const themeToggleBtn = document.getElementById('themeToggle');
         const themeToggleTop = document.getElementById('themeToggleTop');
         const chatListContainer = document.getElementById('chatList');
         const messageContainer = document.getElementById('messageContainer');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
         const micBtn = document.getElementById('micBtn');
-        const currentChatName = document.getElementById('currentChatName');
-        const currentChatStatusText = document.getElementById('currentChatStatusText');
         const recordingUI = document.getElementById('recordingUI');
         const recordingTimer = document.getElementById('recordingTimer');
 
-        themeToggleBtn.addEventListener('click', toggleTheme);
         themeToggleTop.addEventListener('click', toggleTheme);
         function toggleTheme() {
             document.documentElement.classList.toggle('dark');
@@ -296,7 +224,6 @@
         openSidebarBtn.addEventListener('click', () => sidebar.classList.remove('-translate-x-full'));
         closeSidebarBtn.addEventListener('click', () => sidebar.classList.add('-translate-x-full'));
 
-        // Firebase Auth State Observer
         auth.onAuthStateChanged((user) => {
             currentUser = user;
             const googleLoginBtn = document.getElementById('googleLoginBtn');
@@ -310,36 +237,28 @@
                 document.getElementById('loggedInCustomerName').innerText = user.displayName || 'User';
                 document.getElementById('loggedInCustomerEmail').innerText = user.email || '';
 
-                // Check if user is Admin
                 isAdmin = (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
 
                 if (isAdmin) {
-                    // ADMIN VIEW
                     sidebar.classList.remove('hidden');
                     openSidebarBtn.classList.remove('hidden');
                     loadAllCustomersForAdmin();
                 } else {
-                    // CUSTOMER VIEW
                     sidebar.classList.add('hidden');
                     openSidebarBtn.classList.add('hidden');
-                    
                     activeCustomerId = user.uid;
 
-                    db.collection("chats").doc(user.uid).set({
+                    rtdb.ref('chats/' + user.uid).update({
                         customerName: user.displayName || 'Google Customer',
                         customerEmail: user.email || '',
                         customerPhoto: user.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
                         status: 'online',
                         lastMsg: 'Started conversation',
                         lastTime: getCurrentTime()
-                    }, { merge: true });
-
-                    currentChatName.innerText = "Gaule Store Support";
-                    document.getElementById('currentChatAvatarContainer').innerHTML = adminLogoHtml;
-                    currentChatStatusText.innerText = "Online - Admin Available";
+                    });
 
                     messageInput.disabled = false;
-                    messageInput.placeholder = "Type your message to Gaule Store...";
+                    messageInput.placeholder = "Type your message...";
                     messageInput.classList.remove('opacity-60');
                     sendBtn.disabled = false;
                     sendBtn.classList.remove('cursor-not-allowed', 'opacity-50', 'bg-yellow-600/50');
@@ -373,12 +292,12 @@
         });
 
         function loadAllCustomersForAdmin() {
-            db.collection("chats").onSnapshot((snapshot) => {
+            rtdb.ref('chats').on('value', (snapshot) => {
                 customers = [];
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
                     customers.push({
-                        id: doc.id,
+                        id: childSnapshot.key,
                         name: data.customerName || 'Customer',
                         email: data.customerEmail || '',
                         avatar: data.customerPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
@@ -410,10 +329,7 @@
 
             filtered.forEach(customer => {
                 const isActive = customer.id === activeCustomerId;
-                const activeClass = isActive 
-                    ? 'bg-yellow-50/70 dark:bg-yellow-900/20 border-l-4 border-yellow-500' 
-                    : 'hover:bg-slate-50 dark:hover:bg-slate-700/50';
-                
+                const activeClass = isActive ? 'bg-yellow-50/70 dark:bg-yellow-900/20 border-l-4 border-yellow-500' : 'hover:bg-slate-50 dark:hover:bg-slate-700/50';
                 const dotColor = customer.status === 'online' ? 'bg-emerald-500' : 'bg-slate-400';
 
                 const html = `
@@ -450,25 +366,16 @@
         }
 
         function listenToCustomerMessages(customerId) {
-            if (unsubscribeMessages) unsubscribeMessages();
+            if (messagesRef) messagesRef.off();
 
-            if (isAdmin) {
-                const customer = customers.find(c => c.id === customerId);
-                if (customer) {
-                    currentChatName.innerText = `${customer.name} (${customer.email})`;
-                    document.getElementById('currentChatAvatarContainer').innerHTML = `<img class="w-full h-full object-cover" src="${customer.avatar}" alt="Customer">`;
-                    currentChatStatusText.innerText = customer.status === 'online' ? 'Online' : 'Offline';
-                }
-            }
-
-            unsubscribeMessages = db.collection("chats").doc(customerId).collection("messages").orderBy("timestamp", "asc")
-                .onSnapshot((snapshot) => {
-                    let messagesList = [];
-                    snapshot.forEach((doc) => {
-                        messagesList.push(doc.data());
-                    });
-                    renderMessagesUI(messagesList);
+            messagesRef = rtdb.ref('chats/' + customerId + '/messages');
+            messagesRef.on('value', (snapshot) => {
+                let messagesList = [];
+                snapshot.forEach((childSnapshot) => {
+                    messagesList.push(childSnapshot.val());
                 });
+                renderMessagesUI(messagesList);
+            });
         }
 
         function renderMessagesUI(messages) {
@@ -573,19 +480,17 @@
                 sender: senderRole,
                 type: 'text',
                 text: text,
-                time: timeStr,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                time: timeStr
             };
 
-            db.collection("chats").doc(activeCustomerId).collection("messages").add(messageData)
-                .then(() => {
-                    db.collection("chats").doc(activeCustomerId).update({
-                        lastMsg: (isAdmin ? 'Admin: ' : '') + text,
-                        lastTime: timeStr
-                    });
-                    messageInput.value = '';
-                })
-                .catch(err => alert("Error: " + err.message));
+            const newMsgRef = rtdb.ref('chats/' + activeCustomerId + '/messages').push();
+            newMsgRef.set(messageData).then(() => {
+                rtdb.ref('chats/' + activeCustomerId).update({
+                    lastMsg: (isAdmin ? 'Admin: ' : '') + text,
+                    lastTime: timeStr
+                });
+                messageInput.value = '';
+            }).catch(err => alert("Error: " + err.message));
         }
 
         function handleGalleryPhotoSelected(event) {
@@ -601,12 +506,11 @@
                     sender: senderRole,
                     type: 'image',
                     url: photoUrl,
-                    time: timeStr,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    time: timeStr
                 };
 
-                db.collection("chats").doc(activeCustomerId).collection("messages").add(messageData);
-                db.collection("chats").doc(activeCustomerId).update({
+                rtdb.ref('chats/' + activeCustomerId + '/messages').push().set(messageData);
+                rtdb.ref('chats/' + activeCustomerId).update({
                     lastMsg: '📷 Photo attachment',
                     lastTime: timeStr
                 });
@@ -638,7 +542,7 @@
                         const reader = new FileReader();
                         reader.readAsDataURL(audioBlob);
                         reader.onloadend = function() {
-                            sendAudioMessageToFirebase(reader.result);
+                            sendAudioMessageToRTDB(reader.result);
                         };
                         stream.getTracks().forEach(track => track.stop());
                     };
@@ -693,7 +597,7 @@
             document.getElementById('micBtn').classList.remove('bg-red-500', 'text-white', 'animate-pulse');
         }
 
-        function sendAudioMessageToFirebase(audioUrl) {
+        function sendAudioMessageToRTDB(audioUrl) {
             if(!activeCustomerId || !currentUser) return;
             const senderRole = isAdmin ? 'admin' : 'customer';
             const timeStr = getCurrentTime();
@@ -701,12 +605,11 @@
                 sender: senderRole,
                 type: 'audio',
                 url: audioUrl,
-                time: timeStr,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                time: timeStr
             };
 
-            db.collection("chats").doc(activeCustomerId).collection("messages").add(messageData);
-            db.collection("chats").doc(activeCustomerId).update({
+            rtdb.ref('chats/' + activeCustomerId + '/messages').push().set(messageData);
+            rtdb.ref('chats/' + activeCustomerId).update({
                 lastMsg: '🎙️ Voice message',
                 lastTime: timeStr
             });
