@@ -239,7 +239,6 @@
 
                 isAdmin = (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
 
-                // Enable Input box and buttons for any logged in user (Admin or Customer)
                 messageInput.disabled = false;
                 messageInput.placeholder = "Type your message...";
                 messageInput.classList.remove('opacity-60');
@@ -393,43 +392,15 @@
 
             messages.forEach(msg => {
                 if (msg.sender === 'customer') {
-                    if (msg.type === 'text') {
-                        messageContainer.insertAdjacentHTML('beforeend', `
-                            <div class="flex items-end space-x-2 animate-fadeIn">
-                                <img class="w-8 h-8 rounded-full object-cover mb-1 flex-shrink-0" src="${customerAvatar}" alt="${customerName}">
-                                <div class="max-w-[75%] sm:max-w-md bg-white dark:bg-slate-800 rounded-2xl rounded-bl-sm p-3.5 shadow-sm border border-slate-100 dark:border-slate-700/60">
-                                    <p class="text-sm text-slate-800 dark:text-slate-200 leading-relaxed">${escapeHtml(msg.text)}</p>
-                                    <span class="block text-[10px] text-slate-400 text-right mt-1">${msg.time}</span>
-                                </div>
-                            </div>
-                        `);
-                    } else if (msg.type === 'image') {
-                        messageContainer.insertAdjacentHTML('beforeend', `
-                            <div class="flex items-end space-x-2 animate-fadeIn">
-                                <img class="w-8 h-8 rounded-full object-cover mb-1 flex-shrink-0" src="${customerAvatar}" alt="${customerName}">
-                                <div class="max-w-[70%] sm:max-w-xs flex flex-col items-start">
-                                    <div class="rounded-xl overflow-hidden shadow-md bg-black/5 dark:bg-white/5 mb-1">
-                                        <img src="${msg.url}" alt="Attachment" class="w-full h-auto object-cover max-h-72 cursor-pointer hover:opacity-95" onclick="window.open('${msg.url}')">
-                                    </div>
-                                    <span class="text-[10px] text-slate-400 pl-1">${msg.time}</span>
-                                </div>
-                            </div>
-                        `);
-                    }
-                } else {
+                    // CUSTOMER MESSAGE -> RIGHT SIDE
                     if (msg.type === 'text') {
                         messageContainer.insertAdjacentHTML('beforeend', `
                             <div class="flex items-end justify-end space-x-2 animate-fadeIn">
                                 <div class="max-w-[75%] sm:max-w-md bg-yellow-600 text-white rounded-2xl rounded-br-sm p-3.5 shadow-sm">
                                     <p class="text-sm leading-relaxed">${escapeHtml(msg.text)}</p>
-                                    <div class="flex items-center justify-end space-x-1 mt-1">
-                                        <span class="text-[10px] text-yellow-100">${msg.time}</span>
-                                        <i class="fa-solid fa-check-double text-[10px] text-yellow-200"></i>
-                                    </div>
+                                    <span class="block text-[10px] text-yellow-100 text-right mt-1">${msg.time}</span>
                                 </div>
-                                <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-slate-900 mb-1 flex items-center justify-center ring-1 ring-yellow-500">
-                                    ${adminLogoHtml}
-                                </div>
+                                <img class="w-8 h-8 rounded-full object-cover mb-1 flex-shrink-0 ring-1 ring-yellow-500" src="${customerAvatar}" alt="${customerName}">
                             </div>
                         `);
                     } else if (msg.type === 'image') {
@@ -437,16 +408,11 @@
                             <div class="flex items-end justify-end space-x-2 animate-fadeIn">
                                 <div class="max-w-[70%] sm:max-w-xs flex flex-col items-end">
                                     <div class="rounded-xl overflow-hidden shadow-md bg-black/5 dark:bg-white/5 mb-1">
-                                        <img src="${msg.url}" alt="Sent Photo" class="w-full h-auto object-cover max-h-72 cursor-pointer hover:opacity-95" onclick="window.open('${msg.url}')">
+                                        <img src="${msg.url}" alt="Attachment" class="w-full h-auto object-cover max-h-72 cursor-pointer hover:opacity-95" onclick="window.open('${msg.url}')">
                                     </div>
-                                    <div class="flex items-center space-x-1 text-slate-400 pr-1">
-                                        <span class="text-[10px]">${msg.time}</span>
-                                        <i class="fa-solid fa-check-double text-[10px] text-yellow-500"></i>
-                                    </div>
+                                    <span class="text-[10px] text-slate-400 pr-1">${msg.time}</span>
                                 </div>
-                                <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-slate-900 mb-1 flex items-center justify-center ring-1 ring-yellow-500">
-                                    ${adminLogoHtml}
-                                </div>
+                                <img class="w-8 h-8 rounded-full object-cover mb-1 flex-shrink-0 ring-1 ring-yellow-500" src="${customerAvatar}" alt="${customerName}">
                             </div>
                         `);
                     } else if (msg.type === 'audio') {
@@ -456,13 +422,60 @@
                                     <div class="flex items-center space-x-3 mb-1">
                                         <audio controls src="${msg.url}" class="h-9 w-48 sm:w-64"></audio>
                                     </div>
-                                    <div class="flex items-center justify-end space-x-1">
-                                        <span class="text-[10px] text-yellow-100">${msg.time}</span>
-                                        <i class="fa-solid fa-check-double text-[10px] text-yellow-200"></i>
-                                    </div>
+                                    <span class="block text-[10px] text-yellow-100 text-right mt-1">${msg.time}</span>
                                 </div>
+                                <img class="w-8 h-8 rounded-full object-cover mb-1 flex-shrink-0 ring-1 ring-yellow-500" src="${customerAvatar}" alt="${customerName}">
+                            </div>
+                        `);
+                    }
+                } else {
+                    // ADMIN MESSAGE -> LEFT SIDE
+                    if (msg.type === 'text') {
+                        messageContainer.insertAdjacentHTML('beforeend', `
+                            <div class="flex items-end space-x-2 animate-fadeIn">
                                 <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-slate-900 mb-1 flex items-center justify-center ring-1 ring-yellow-500">
                                     ${adminLogoHtml}
+                                </div>
+                                <div class="max-w-[75%] sm:max-w-md bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-2xl rounded-bl-sm p-3.5 shadow-sm border border-slate-100 dark:border-slate-700/60">
+                                    <p class="text-sm leading-relaxed">${escapeHtml(msg.text)}</p>
+                                    <div class="flex items-center justify-end space-x-1 mt-1">
+                                        <span class="text-[10px] text-slate-400">${msg.time}</span>
+                                        <i class="fa-solid fa-check-double text-[10px] text-yellow-500"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    } else if (msg.type === 'image') {
+                        messageContainer.insertAdjacentHTML('beforeend', `
+                            <div class="flex items-end space-x-2 animate-fadeIn">
+                                <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-slate-900 mb-1 flex items-center justify-center ring-1 ring-yellow-500">
+                                    ${adminLogoHtml}
+                                </div>
+                                <div class="max-w-[70%] sm:max-w-xs flex flex-col items-start">
+                                    <div class="rounded-xl overflow-hidden shadow-md bg-black/5 dark:bg-white/5 mb-1">
+                                        <img src="${msg.url}" alt="Sent Photo" class="w-full h-auto object-cover max-h-72 cursor-pointer hover:opacity-95" onclick="window.open('${msg.url}')">
+                                    </div>
+                                    <div class="flex items-center space-x-1 text-slate-400 pl-1">
+                                        <span class="text-[10px]">${msg.time}</span>
+                                        <i class="fa-solid fa-check-double text-[10px] text-yellow-500"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    } else if (msg.type === 'audio') {
+                        messageContainer.insertAdjacentHTML('beforeend', `
+                            <div class="flex items-end space-x-2 animate-fadeIn">
+                                <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-slate-900 mb-1 flex items-center justify-center ring-1 ring-yellow-500">
+                                    ${adminLogoHtml}
+                                </div>
+                                <div class="max-w-[75%] sm:max-w-md bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-2xl rounded-bl-sm p-3.5 shadow-sm border border-slate-100 dark:border-slate-700/60">
+                                    <div class="flex items-center space-x-3 mb-1">
+                                        <audio controls src="${msg.url}" class="h-9 w-48 sm:w-64"></audio>
+                                    </div>
+                                    <div class="flex items-center justify-end space-x-1">
+                                        <span class="text-[10px] text-slate-400">${msg.time}</span>
+                                        <i class="fa-solid fa-check-double text-[10px] text-yellow-500"></i>
+                                    </div>
                                 </div>
                             </div>
                         `);
