@@ -130,7 +130,7 @@
                 </button>
 
                 <!-- Voice Recording Mic Button -->
-                <button type="button" id="micBtn" onclick="toggleRecording()" title="Hold or Click to Record Voice" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center flex-shrink-0 transition-colors">
+                <button type="button" id="micBtn" onclick="toggleRecording()" title="Hold or Click to Record Voice" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center flex-shrink-0 transition-colors" disabled>
                     <i class="fa-solid fa-microphone"></i>
                 </button>
 
@@ -239,6 +239,16 @@
 
                 isAdmin = (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
 
+                // Enable Input box and buttons for any logged in user (Admin or Customer)
+                messageInput.disabled = false;
+                messageInput.placeholder = "Type your message...";
+                messageInput.classList.remove('opacity-60');
+                sendBtn.disabled = false;
+                sendBtn.classList.remove('cursor-not-allowed', 'opacity-50', 'bg-yellow-600/50');
+                sendBtn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
+                micBtn.disabled = false;
+                micBtn.classList.remove('cursor-not-allowed', 'opacity-60');
+
                 if (isAdmin) {
                     sidebar.classList.remove('hidden');
                     openSidebarBtn.classList.remove('hidden');
@@ -257,15 +267,6 @@
                         lastTime: getCurrentTime()
                     });
 
-                    messageInput.disabled = false;
-                    messageInput.placeholder = "Type your message...";
-                    messageInput.classList.remove('opacity-60');
-                    sendBtn.disabled = false;
-                    sendBtn.classList.remove('cursor-not-allowed', 'opacity-50', 'bg-yellow-600/50');
-                    sendBtn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
-                    micBtn.disabled = false;
-                    micBtn.classList.remove('cursor-not-allowed', 'opacity-60');
-
                     listenToCustomerMessages(user.uid);
                 }
             } else {
@@ -279,6 +280,8 @@
                 messageInput.placeholder = "Please login with Google to type...";
                 messageInput.classList.add('opacity-60');
                 sendBtn.disabled = true;
+                sendBtn.classList.add('cursor-not-allowed', 'bg-yellow-600/50');
+                sendBtn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
                 micBtn.disabled = true;
 
                 messageContainer.innerHTML = `
