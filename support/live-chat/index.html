@@ -1,1 +1,737 @@
 
+<!DOCTYPE html>
+<html lang="ne" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Support & Chat Portal - Gaule Store</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#fefce8',
+                            100: '#fef08a',
+                            500: '#eab308',
+                            600: '#ca8a04',
+                            700: '#a16207',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs (Compat version) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.8); }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .animate-pulse-slow { animation: pulse-slow 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn { animation: fadeIn 0.25s ease-out forwards; }
+    </style>
+</head>
+<body class="h-full bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-200">
+
+    <!-- MAIN APP WRAPPER -->
+    <div class="flex h-full w-full overflow-hidden relative">
+        
+        <!-- Hidden Admin Logo Upload Input -->
+        <input type="file" id="adminLogoInput" class="hidden" accept="image/png, image/jpeg, image/webp" onchange="handleAdminLogoSelected(event)">
+
+        <!-- Sidebar / Customers List (Visible ONLY to Admin) -->
+        <aside id="sidebar" class="hidden w-full md:w-80 lg:w-96 flex-shrink-0 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col h-full z-30 absolute md:relative transition-transform duration-300 -translate-x-full md:translate-x-0">
+            <!-- Sidebar Header -->
+            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="relative group cursor-pointer" onclick="document.getElementById('adminLogoInput').click()" title="Click to change Logo">
+                        <div id="adminLogoContainer" class="w-10 h-10 rounded-full overflow-hidden ring-2 ring-yellow-500 bg-slate-900 flex items-center justify-center flex-shrink-0">
+                            <!-- Direct PNG Logo Image -->
+                            <img src="logo.png" alt="Gaule Store Logo" class="w-full h-full object-cover">
+                        </div>
+                        <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fa-solid fa-camera text-white text-xs"></i>
+                        </div>
+                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-slate-900 dark:text-white leading-tight">Gaule Store</h2>
+                        <span class="text-xs text-yellow-600 dark:text-yellow-400 font-medium">Top Up Center</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <button id="themeToggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors" title="Toggle Theme">
+                        <i class="fa-solid fa-moon dark:hidden"></i>
+                        <i class="fa-solid fa-sun hidden dark:inline"></i>
+                    </button>
+                    <button id="closeSidebar" class="md:hidden p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Admin Mode Badge -->
+            <div class="p-2.5 bg-yellow-50 dark:bg-yellow-950/40 border-b border-yellow-100 dark:border-yellow-900/50 flex items-center justify-between text-xs text-yellow-800 dark:text-yellow-300 px-4">
+                <span class="font-semibold"><i class="fa-solid fa-shield-halved mr-1"></i> Admin: gaulestore.np@gmail.com</span>
+                <button onclick="logoutGoogle()" class="text-red-500 hover:underline font-medium">Logout</button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="p-3 border-b border-slate-100 dark:border-slate-700/50">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                    </span>
+                    <input type="text" id="searchCustomer" placeholder="Search customers..." class="w-full pl-9 pr-4 py-2 bg-slate-100 dark:bg-slate-900 text-sm rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-yellow-500 text-slate-800 dark:text-slate-200 placeholder-slate-400">
+                </div>
+            </div>
+
+            <!-- Customers List -->
+            <div id="chatList" class="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700/50">
+                <!-- Admin sees list of all customers here -->
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="flex-1 flex flex-col h-full bg-slate-50 dark:bg-slate-950 relative">
+            
+            <!-- Chat Header -->
+            <header class="h-16 px-4 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between z-10 shadow-sm">
+                <div class="flex items-center space-x-3">
+                    <button id="openSidebar" class="hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    <div class="relative">
+                        <div id="currentChatAvatarContainer" class="w-10 h-10 rounded-full overflow-hidden ring-1 ring-slate-200 dark:ring-slate-700 bg-slate-900 flex items-center justify-center flex-shrink-0">
+                            <img src="logo.png" alt="Gaule Store Logo" class="w-full h-full object-cover">
+                        </div>
+                        <span id="currentChatStatusDot" class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
+                    </div>
+                    <div>
+                        <h2 id="currentChatName" class="font-bold text-slate-900 dark:text-white text-sm sm:text-base leading-tight">Gaule Store Support</h2>
+                        <span id="currentChatStatusText" class="text-xs text-slate-500 dark:text-slate-400">Online</span>
+                    </div>
+                </div>
+
+                <!-- Right Header Controls / Customer Google Login -->
+                <div class="flex items-center space-x-2">
+                    <div id="customerAuthContainer">
+                        <button id="googleLoginBtn" onclick="loginWithGoogle()" class="py-1.5 px-3 bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold flex items-center space-x-2 shadow-sm transition-all">
+                            <i class="fa-brands fa-google text-red-500"></i>
+                            <span>Login with Google</span>
+                        </button>
+                        <div id="customerProfileView" class="hidden items-center space-x-2">
+                            <img id="loggedInCustomerPhoto" class="w-8 h-8 rounded-full object-cover ring-1 ring-yellow-500" src="" alt="Profile">
+                            <div class="hidden sm:block text-left">
+                                <p id="loggedInCustomerName" class="text-xs font-bold leading-none text-slate-800 dark:text-slate-200"></p>
+                                <p id="loggedInCustomerEmail" class="text-[10px] text-slate-400 truncate max-w-[120px]"></p>
+                            </div>
+                            <button onclick="logoutGoogle()" class="text-xs text-red-500 hover:underline px-2 py-1 ml-1 font-medium">Logout</button>
+                        </div>
+                    </div>
+                    <button id="themeToggleTop" class="md:hidden p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300">
+                        <i class="fa-solid fa-moon dark:hidden"></i>
+                        <i class="fa-solid fa-sun hidden dark:inline"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Message Stream -->
+            <div id="messageContainer" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+                <div class="flex justify-center">
+                    <span id="chatNoticeBadge" class="px-3 py-1 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs rounded-full shadow-sm font-medium">Please 'Login with Google' above to chat with Gaule Store Support</span>
+                </div>
+            </div>
+
+            <!-- Gallery Input -->
+            <input type="file" id="galleryInput" class="hidden" accept="image/*" onchange="handleGalleryPhotoSelected(event)">
+
+            <!-- Chat Input Area -->
+            <footer class="p-3 sm:p-4 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 z-10">
+                
+                <!-- Recording Active Banner -->
+                <div id="recordingUI" class="hidden items-center justify-between mb-3 px-3 py-2 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-xl">
+                    <div class="flex items-center space-x-2 text-red-600 dark:text-red-400">
+                        <span class="w-3 h-3 bg-red-500 rounded-full animate-pulse-slow"></span>
+                        <span id="recordingTimer" class="text-xs font-bold">00:00</span>
+                        <span class="text-xs">Recording audio...</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button type="button" onclick="cancelRecording()" class="text-xs text-slate-500 hover:text-red-600 px-2 py-1">Cancel</button>
+                        <button type="button" onclick="stopAndSendRecording()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium shadow-sm flex items-center space-x-1">
+                            <i class="fa-solid fa-paper-plane text-[10px]"></i> <span>Send Audio</span>
+                        </button>
+                    </div>
+                </div>
+
+                <form id="chatForm" onsubmit="handleSendMessage(event)" class="flex items-center space-x-2 sm:space-x-3">
+                    <!-- Gallery Photo Button -->
+                    <button type="button" onclick="document.getElementById('galleryInput').click()" class="p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-colors" title="Open Gallery">
+                        <i class="fa-regular fa-image text-lg"></i>
+                    </button>
+                    
+                    <div class="flex-1 relative">
+                        <input id="messageInput" type="text" placeholder="Type a message..." autocomplete="off" disabled class="w-full px-4 py-3 bg-slate-100 dark:bg-slate-900 text-sm rounded-xl border-none focus:outline-none focus:ring-2 focus:ring-yellow-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 pr-10 opacity-60">
+                    </div>
+
+                    <!-- Voice Recorder Button -->
+                    <button type="button" id="micBtn" onclick="toggleRecording()" disabled class="bg-slate-100 dark:bg-slate-700 text-slate-400 w-11 h-11 rounded-xl flex items-center justify-center transition-all flex-shrink-0 opacity-60 cursor-not-allowed" title="Record Voice">
+                        <i class="fa-solid fa-microphone text-sm"></i>
+                    </button>
+
+                    <button type="submit" id="sendBtn" disabled class="bg-yellow-600/50 text-white w-11 h-11 rounded-xl flex items-center justify-center shadow-md transition-all flex-shrink-0 cursor-not-allowed" title="Send Message">
+                        <i class="fa-solid fa-paper-plane text-sm"></i>
+                    </button>
+                </form>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Script JavaScript -->
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+          authDomain: "gaule-top-up-center.firebaseapp.com",
+          databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+          projectId: "gaule-top-up-center",
+          storageBucket: "gaule-top-up-center.firebasestorage.app",
+          messagingSenderId: "645605489690",
+          appId: "1:645605489690:web:0b0f2898d295be03c1e5a3",
+          measurementId: "G-M7BY3PQM3H"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Official Admin Email Configured Here
+        const ADMIN_EMAIL = "gaulestore.np@gmail.com";
+
+        // Default logo.png markup
+        const defaultLogoHtml = `<img src="logo.png" alt="Gaule Store Logo" class="w-full h-full object-cover">`;
+
+        let adminLogoHtml = localStorage.getItem('admin_logo_html') || defaultLogoHtml;
+        document.getElementById('adminLogoContainer').innerHTML = adminLogoHtml;
+
+        function handleAdminLogoSelected(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgResult = e.target.result;
+                adminLogoHtml = `<img src="${imgResult}" class="w-full h-full object-cover" alt="Admin Logo">`;
+                localStorage.setItem('admin_logo_html', adminLogoHtml);
+                document.getElementById('adminLogoContainer').innerHTML = adminLogoHtml;
+                if(activeCustomerId) fetchCustomerMessagesFromFirebase();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Google Authentication
+        function loginWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch((error) => {
+                alert("Login Error: " + error.message);
+            });
+        }
+
+        function logoutGoogle() {
+            auth.signOut().then(() => {
+                window.location.reload();
+            });
+        }
+
+        let customers = [];
+        let activeCustomerId = null;
+        let currentUser = null;
+        let isAdmin = false;
+        let unsubscribeMessages = null;
+
+        const sidebar = document.getElementById('sidebar');
+        const openSidebarBtn = document.getElementById('openSidebar');
+        const closeSidebarBtn = document.getElementById('closeSidebar');
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const themeToggleTop = document.getElementById('themeToggleTop');
+        const chatListContainer = document.getElementById('chatList');
+        const messageContainer = document.getElementById('messageContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const micBtn = document.getElementById('micBtn');
+        const currentChatName = document.getElementById('currentChatName');
+        const currentChatStatusText = document.getElementById('currentChatStatusText');
+        const recordingUI = document.getElementById('recordingUI');
+        const recordingTimer = document.getElementById('recordingTimer');
+
+        themeToggleBtn.addEventListener('click', toggleTheme);
+        themeToggleTop.addEventListener('click', toggleTheme);
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        }
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+
+        openSidebarBtn.addEventListener('click', () => sidebar.classList.remove('-translate-x-full'));
+        closeSidebarBtn.addEventListener('click', () => sidebar.classList.add('-translate-x-full'));
+
+        // Firebase Auth State Observer
+        auth.onAuthStateChanged((user) => {
+            currentUser = user;
+            const googleLoginBtn = document.getElementById('googleLoginBtn');
+            const customerProfileView = document.getElementById('customerProfileView');
+
+            if (user) {
+                googleLoginBtn.classList.add('hidden');
+                customerProfileView.classList.remove('hidden');
+                customerProfileView.classList.add('flex');
+                document.getElementById('loggedInCustomerPhoto').src = user.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+                document.getElementById('loggedInCustomerName').innerText = user.displayName || 'User';
+                document.getElementById('loggedInCustomerEmail').innerText = user.email || '';
+
+                // Check if user is Admin
+                isAdmin = (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+
+                if (isAdmin) {
+                    // ADMIN VIEW
+                    sidebar.classList.remove('hidden');
+                    openSidebarBtn.classList.remove('hidden');
+                    loadAllCustomersForAdmin();
+                } else {
+                    // CUSTOMER VIEW
+                    sidebar.classList.add('hidden');
+                    openSidebarBtn.classList.add('hidden');
+                    
+                    activeCustomerId = user.uid;
+
+                    db.collection("chats").doc(user.uid).set({
+                        customerName: user.displayName || 'Google Customer',
+                        customerEmail: user.email || '',
+                        customerPhoto: user.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+                        status: 'online',
+                        lastMsg: 'Started conversation',
+                        lastTime: getCurrentTime()
+                    }, { merge: true });
+
+                    currentChatName.innerText = "Gaule Store Support";
+                    document.getElementById('currentChatAvatarContainer').innerHTML = adminLogoHtml;
+                    currentChatStatusText.innerText = "Online - Admin Available";
+
+                    messageInput.disabled = false;
+                    messageInput.placeholder = "Type your message to Gaule Store...";
+                    messageInput.classList.remove('opacity-60');
+                    sendBtn.disabled = false;
+                    sendBtn.classList.remove('cursor-not-allowed', 'opacity-50', 'bg-yellow-600/50');
+                    sendBtn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
+                    micBtn.disabled = false;
+                    micBtn.classList.remove('cursor-not-allowed', 'opacity-60');
+
+                    listenToCustomerMessages(user.uid);
+                }
+            } else {
+                googleLoginBtn.classList.remove('hidden');
+                customerProfileView.classList.add('hidden');
+                sidebar.classList.add('hidden');
+                openSidebarBtn.classList.add('hidden');
+                
+                activeCustomerId = null;
+                messageInput.disabled = true;
+                messageInput.placeholder = "Please login with Google to type...";
+                messageInput.classList.add('opacity-60');
+                sendBtn.disabled = true;
+                micBtn.disabled = true;
+
+                messageContainer.innerHTML = `
+                    <div class="flex justify-center">
+                        <span class="px-4 py-2 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 text-xs rounded-xl shadow-sm border border-amber-200 dark:border-amber-900 font-medium text-center">
+                            <i class="fa-solid fa-lock mr-1"></i> Please click <b>'Login with Google'</b> on the top right to start chatting securely.
+                        </span>
+                    </div>
+                `;
+            }
+        });
+
+        function loadAllCustomersForAdmin() {
+            db.collection("chats").onSnapshot((snapshot) => {
+                customers = [];
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    customers.push({
+                        id: doc.id,
+                        name: data.customerName || 'Customer',
+                        email: data.customerEmail || '',
+                        avatar: data.customerPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+                        status: data.status || 'online',
+                        time: data.lastTime || 'Just now',
+                        lastMsg: data.lastMsg || 'No messages yet'
+                    });
+                });
+
+                if (customers.length > 0 && !activeCustomerId) {
+                    activeCustomerId = customers[0].id;
+                }
+
+                renderAdminCustomerList(document.getElementById('searchCustomer').value);
+                if (activeCustomerId && isAdmin) {
+                    listenToCustomerMessages(activeCustomerId);
+                }
+            });
+        }
+
+        function renderAdminCustomerList(filterText = '') {
+            chatListContainer.innerHTML = '';
+            const filtered = customers.filter(c => c.name.toLowerCase().includes(filterText.toLowerCase()) || c.email.toLowerCase().includes(filterText.toLowerCase()));
+
+            if(filtered.length === 0) {
+                chatListContainer.innerHTML = `<div class="p-6 text-center text-xs text-slate-400">No customers found.</div>`;
+                return;
+            }
+
+            filtered.forEach(customer => {
+                const isActive = customer.id === activeCustomerId;
+                const activeClass = isActive 
+                    ? 'bg-yellow-50/70 dark:bg-yellow-900/20 border-l-4 border-yellow-500' 
+                    : 'hover:bg-slate-50 dark:hover:bg-slate-700/50';
+                
+                const dotColor = customer.status === 'online' ? 'bg-emerald-500' : 'bg-slate-400';
+
+                const html = `
+                    <div onclick="switchAdminChat('${customer.id}')" class="p-3 cursor-pointer flex items-center space-x-3 transition-colors ${activeClass}">
+                        <div class="relative flex-shrink-0">
+                            <img class="w-12 h-12 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700" src="${customer.avatar}" alt="${customer.name}">
+                            <span class="absolute bottom-0 right-0 w-3.5 h-3.5 ${dotColor} border-2 border-white dark:border-slate-800 rounded-full"></span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-baseline mb-0.5">
+                                <h3 class="font-semibold text-slate-900 dark:text-white truncate text-sm">${customer.name}</h3>
+                                <span class="text-[10px] text-slate-400">${customer.time}</span>
+                            </div>
+                            <p class="text-[11px] text-yellow-600 dark:text-yellow-400 truncate mb-0.5">${customer.email}</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 truncate">${customer.lastMsg}</p>
+                        </div>
+                    </div>
+                `;
+                chatListContainer.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        document.getElementById('searchCustomer').addEventListener('input', (e) => {
+            renderAdminCustomerList(e.target.value);
+        });
+
+        function switchAdminChat(id) {
+            activeCustomerId = id;
+            renderAdminCustomerList(document.getElementById('searchCustomer').value);
+            listenToCustomerMessages(activeCustomerId);
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+
+        function listenToCustomerMessages(customerId) {
+            if (unsubscribeMessages) unsubscribeMessages();
+
+            if (isAdmin) {
+                const customer = customers.find(c => c.id === customerId);
+                if (customer) {
+                    currentChatName.innerText = `${customer.name} (${customer.email})`;
+                    document.getElementById('currentChatAvatarContainer').innerHTML = `<img class="w-full h-full object-cover" src="${customer.avatar}" alt="Customer">`;
+                    currentChatStatusText.innerText = customer.status === 'online' ? 'Online' : 'Offline';
+                }
+            }
+
+            unsubscribeMessages = db.collection("chats").doc(customerId).collection("messages").orderBy("timestamp", "asc")
+                .onSnapshot((snapshot) => {
+                    let messagesList = [];
+                    snapshot.forEach((doc) => {
+                        messagesList.push(doc.data());
+                    });
+                    renderMessagesUI(messagesList);
+                });
+        }
+
+        function renderMessagesUI(messages) {
+            messageContainer.innerHTML = `
+                <div class="flex justify-center">
+                    <span class="px-3 py-1 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs rounded-full shadow-sm font-medium">Secure Chat Session</span>
+                </div>
+            `;
+
+            const customerAvatar = isAdmin ? (customers.find(c => c.id === activeCustomerId)?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150') : currentUser.photoURL;
+            const customerName = isAdmin ? (customers.find(c => c.id === activeCustomerId)?.name || 'Customer') : currentUser.displayName;
+
+            messages.forEach(msg => {
+                if (msg.sender === 'customer') {
+                    if (msg.type === 'text') {
+                        messageContainer.insertAdjacentHTML('beforeend', `
+                            <div class="flex items-end space-x-2 animate-fadeIn">
+                                <img class="w-8 h-8 rounded-full object-cover mb-1 flex-shrink-0" src="${customerAvatar}" alt="${customerName}">
+                                <div class="max-w-[75%] sm:max-w-md bg-white dark:bg-slate-800 rounded-2xl rounded-bl-sm p-3.5 shadow-sm border border-slate-100 dark:border-slate-700/60">
+                                    <p class="text-sm text-slate-800 dark:text-slate-200 leading-relaxed">${escapeHtml(msg.text)}</p>
+                                    <span class="block text-[10px] text-slate-400 text-right mt-1">${msg.time}</span>
+                                </div>
+                            </div>
+                        `);
+                    } else if (msg.type === 'image') {
+                        messageContainer.insertAdjacentHTML('beforeend', `
+                            <div class="flex items-end space-x-2 animate-fadeIn">
+                                <img class="w-8 h-8 rounded-full object-cover mb-1 flex-shrink-0" src="${customerAvatar}" alt="${customerName}">
+                                <div class="max-w-[70%] sm:max-w-xs flex flex-col items-start">
+                                    <div class="rounded-xl overflow-hidden shadow-md bg-black/5 dark:bg-white/5 mb-1">
+                                        <img src="${msg.url}" alt="Attachment" class="w-full h-auto object-cover max-h-72 cursor-pointer hover:opacity-95" onclick="window.open('${msg.url}')">
+                                    </div>
+                                    <span class="text-[10px] text-slate-400 pl-1">${msg.time}</span>
+                                </div>
+                            </div>
+                        `);
+                    }
+                } else {
+                    if (msg.type === 'text') {
+                        messageContainer.insertAdjacentHTML('beforeend', `
+                            <div class="flex items-end justify-end space-x-2 animate-fadeIn">
+                                <div class="max-w-[75%] sm:max-w-md bg-yellow-600 text-white rounded-2xl rounded-br-sm p-3.5 shadow-sm">
+                                    <p class="text-sm leading-relaxed">${escapeHtml(msg.text)}</p>
+                                    <div class="flex items-center justify-end space-x-1 mt-1">
+                                        <span class="text-[10px] text-yellow-100">${msg.time}</span>
+                                        <i class="fa-solid fa-check-double text-[10px] text-yellow-200"></i>
+                                    </div>
+                                </div>
+                                <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-slate-900 mb-1 flex items-center justify-center ring-1 ring-yellow-500">
+                                    ${adminLogoHtml}
+                                </div>
+                            </div>
+                        `);
+                    } else if (msg.type === 'image') {
+                        messageContainer.insertAdjacentHTML('beforeend', `
+                            <div class="flex items-end justify-end space-x-2 animate-fadeIn">
+                                <div class="max-w-[70%] sm:max-w-xs flex flex-col items-end">
+                                    <div class="rounded-xl overflow-hidden shadow-md bg-black/5 dark:bg-white/5 mb-1">
+                                        <img src="${msg.url}" alt="Sent Photo" class="w-full h-auto object-cover max-h-72 cursor-pointer hover:opacity-95" onclick="window.open('${msg.url}')">
+                                    </div>
+                                    <div class="flex items-center space-x-1 text-slate-400 pr-1">
+                                        <span class="text-[10px]">${msg.time}</span>
+                                        <i class="fa-solid fa-check-double text-[10px] text-yellow-500"></i>
+                                    </div>
+                                </div>
+                                <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-slate-900 mb-1 flex items-center justify-center ring-1 ring-yellow-500">
+                                    ${adminLogoHtml}
+                                </div>
+                            </div>
+                        `);
+                    } else if (msg.type === 'audio') {
+                        messageContainer.insertAdjacentHTML('beforeend', `
+                            <div class="flex items-end justify-end space-x-2 animate-fadeIn">
+                                <div class="max-w-[75%] sm:max-w-md bg-yellow-600 text-white rounded-2xl rounded-br-sm p-3.5 shadow-sm">
+                                    <div class="flex items-center space-x-3 mb-1">
+                                        <audio controls src="${msg.url}" class="h-9 w-48 sm:w-64"></audio>
+                                    </div>
+                                    <div class="flex items-center justify-end space-x-1">
+                                        <span class="text-[10px] text-yellow-100">${msg.time}</span>
+                                        <i class="fa-solid fa-check-double text-[10px] text-yellow-200"></i>
+                                    </div>
+                                </div>
+                                <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-slate-900 mb-1 flex items-center justify-center ring-1 ring-yellow-500">
+                                    ${adminLogoHtml}
+                                </div>
+                            </div>
+                        `);
+                    }
+                }
+            });
+            scrollToBottom();
+        }
+
+        function handleSendMessage(e) {
+            e.preventDefault();
+            const text = messageInput.value.trim();
+            if (!text || !activeCustomerId || !currentUser) return;
+
+            const senderRole = isAdmin ? 'admin' : 'customer';
+            const timeStr = getCurrentTime();
+            const messageData = {
+                sender: senderRole,
+                type: 'text',
+                text: text,
+                time: timeStr,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            db.collection("chats").doc(activeCustomerId).collection("messages").add(messageData)
+                .then(() => {
+                    db.collection("chats").doc(activeCustomerId).update({
+                        lastMsg: (isAdmin ? 'Admin: ' : '') + text,
+                        lastTime: timeStr
+                    });
+                    messageInput.value = '';
+                })
+                .catch(err => alert("Error: " + err.message));
+        }
+
+        function handleGalleryPhotoSelected(event) {
+            const file = event.target.files[0];
+            if (!file || !activeCustomerId || !currentUser) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const photoUrl = e.target.result;
+                const senderRole = isAdmin ? 'admin' : 'customer';
+                const timeStr = getCurrentTime();
+                const messageData = {
+                    sender: senderRole,
+                    type: 'image',
+                    url: photoUrl,
+                    time: timeStr,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                db.collection("chats").doc(activeCustomerId).collection("messages").add(messageData);
+                db.collection("chats").doc(activeCustomerId).update({
+                    lastMsg: '📷 Photo attachment',
+                    lastTime: timeStr
+                });
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        let mediaRecorder;
+        let audioChunks = [];
+        let recordingInterval;
+        let secondsCount = 0;
+        let isRecording = false;
+
+        async function toggleRecording() {
+            if (!currentUser || !activeCustomerId) return;
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+
+                    mediaRecorder.ondataavailable = event => {
+                        if (event.data.size > 0) audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const reader = new FileReader();
+                        reader.readAsDataURL(audioBlob);
+                        reader.onloadend = function() {
+                            sendAudioMessageToFirebase(reader.result);
+                        };
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+
+                    mediaRecorder.start();
+                    isRecording = true;
+                    recordingUI.classList.remove('hidden');
+                    recordingUI.classList.add('flex');
+                    document.getElementById('micBtn').classList.add('bg-red-500', 'text-white', 'animate-pulse');
+
+                    secondsCount = 0;
+                    updateTimerDisplay();
+                    recordingInterval = setInterval(() => {
+                        secondsCount++;
+                        updateTimerDisplay();
+                    }, 1000);
+                } catch (err) {
+                    alert('Microphone access denied!');
+                }
+            } else {
+                stopAndSendRecording();
+            }
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(secondsCount / 60).toString().padStart(2, '0');
+            const secs = (secondsCount % 60).toString().padStart(2, '0');
+            recordingTimer.innerText = `${mins}:${secs}`;
+        }
+
+        function stopAndSendRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                resetRecordingState();
+            }
+        }
+
+        function cancelRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.onstop = null;
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                resetRecordingState();
+            }
+        }
+
+        function resetRecordingState() {
+            isRecording = false;
+            clearInterval(recordingInterval);
+            recordingUI.classList.add('hidden');
+            recordingUI.classList.remove('flex');
+            document.getElementById('micBtn').classList.remove('bg-red-500', 'text-white', 'animate-pulse');
+        }
+
+        function sendAudioMessageToFirebase(audioUrl) {
+            if(!activeCustomerId || !currentUser) return;
+            const senderRole = isAdmin ? 'admin' : 'customer';
+            const timeStr = getCurrentTime();
+            const messageData = {
+                sender: senderRole,
+                type: 'audio',
+                url: audioUrl,
+                time: timeStr,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            db.collection("chats").doc(activeCustomerId).collection("messages").add(messageData);
+            db.collection("chats").doc(activeCustomerId).update({
+                lastMsg: '🎙️ Voice message',
+                lastTime: timeStr
+            });
+        }
+
+        function scrollToBottom() {
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+        function getCurrentTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+            return `${hours}:${minutes} ${ampm}`;
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>
+
+
