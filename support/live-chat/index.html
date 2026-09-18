@@ -49,8 +49,13 @@
         </div>
 
         <div class="flex items-center space-x-2 sm:space-x-3">
+            <!-- Refresh Page Button -->
+            <button onclick="window.location.reload()" title="Refresh Page" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                <i class="fa-solid fa-rotate-right text-xs"></i>
+            </button>
+
             <!-- Back to Home Button -->
-            <a href="../../index.html" class="flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-full text-xs font-semibold transition-all">
+            <a href="index.html" class="flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-full text-xs font-semibold transition-all">
                 <i class="fa-solid fa-house text-yellow-600 dark:text-yellow-400"></i>
                 <span class="hidden sm:inline">Home</span>
             </a>
@@ -108,6 +113,11 @@
         <!-- Chat Window Area -->
         <main class="flex-1 flex flex-col bg-slate-50 dark:bg-slate-950 overflow-hidden relative">
             
+            <!-- Pull-to-refresh Indicator Indicator -->
+            <div id="pullRefreshIndicator" class="absolute top-0 inset-x-0 h-12 flex items-center justify-center text-xs text-slate-500 dark:text-slate-400 bg-slate-200/50 dark:bg-slate-900/50 -translate-y-full transition-transform duration-200 z-10">
+                <i class="fa-solid fa-rotate-right animate-spin mr-1.5 text-yellow-600"></i> Refreshing chat...
+            </div>
+
             <!-- Message History Container -->
             <div id="messageContainer" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
                 <div class="flex justify-center">
@@ -423,7 +433,6 @@
                 const isMyMessage = (isAdmin && msg.sender === 'admin') || (!isAdmin && msg.sender === 'customer');
 
                 if (isMyMessage) {
-                    // --- MY MESSAGE (RIGHT SIDE) ---
                     if (msg.type === 'text') {
                         messageContainer.insertAdjacentHTML('beforeend', `
                             <div class="flex items-end justify-end space-x-2 animate-fadeIn">
@@ -475,7 +484,6 @@
                         `);
                     }
                 } else {
-                    // --- OTHER PARTY'S MESSAGE (LEFT SIDE) ---
                     const leftAvatarHtml = isAdmin ? `<img src="${customerAvatar}" class="w-full h-full object-cover" alt="Customer">` : adminLogoHtml;
 
                     if (msg.type === 'text') {
@@ -521,8 +529,41 @@
                     }
                 }
             });
-            scrollToBottom();
+            setTimeout(() => { scrollToBottom(); }, 50);
         }
+
+        // Pull-to-Refresh Gesture Logic
+        let touchStartY = 0;
+        const pullIndicator = document.getElementById('pullRefreshIndicator');
+
+        messageContainer.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        messageContainer.addEventListener('touchmove', (e) => {
+            const touchY = e.touches[0].clientY;
+            const diff = touchY - touchStartY;
+            if (messageContainer.scrollTop === 0 && diff > 80) {
+                pullIndicator.classList.remove('-translate-y-full');
+            }
+        }, { passive: true });
+
+        messageContainer.addEventListener('touchend', (e) => {
+            const touchEndY = e.changedTouches[0].clientY;
+            if (messageContainer.scrollTop === 0 && (touchEndY - touchStartY) > 100) {
+                pullIndicator.classList.remove('-translate-y-full');
+                setTimeout(() => {
+                    if (isAdmin && activeCustomerId) {
+                        listenToCustomerMessages(activeCustomerId);
+                    } else if (!isAdmin && currentUser) {
+                        listenToCustomerMessages(currentUser.uid);
+                    }
+                    pullIndicator.classList.add('-translate-y-full');
+                }, 800);
+            } else {
+                pullIndicator.classList.add('-translate-y-full');
+            }
+        }, { passive: true });
 
         function handleSendMessage(e) {
             e.preventDefault();
