@@ -1337,7 +1337,7 @@ onValue(ref(db, "reviews"), (snapshot) => {
 
 
 
-<!-- === START: Modern Floating Chat Widget (Customized for Gaule Topup) === -->
+<!-- === START: Modern Floating Chat Widget (Clickable "Need Help?" Label) === -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
@@ -1347,9 +1347,33 @@ onValue(ref(db, "reviews"), (snapshot) => {
         right: 20px;
         z-index: 9999;
         font-family: sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
-    /* Main Floating Button */
+    /* Side Need Help Label - Clickable with pointer */
+    .chat-help-label {
+        background: #ffffff;
+        color: #374151;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+        animation: fadeInUp 0.3s ease;
+    }
+
+    .chat-help-label:hover {
+        background: #4f46e5;
+        color: #ffffff;
+    }
+
+    /* Main Floating Button - Border pulse animation */
     .modern-chat-btn {
         background: #ffffff;
         color: #4f46e5;
@@ -1359,14 +1383,26 @@ onValue(ref(db, "reviews"), (snapshot) => {
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         font-size: 20px;
         text-decoration: none;
         border: 2px solid #4f46e5;
         cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transition: background 0.3s, color 0.3s;
         position: relative;
         z-index: 2;
+        animation: borderPulse 1.8s infinite cubic-bezier(0.4, 0, 0.6, 1);
+    }
+
+    @keyframes borderPulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.6);
+        }
+        70% {
+            box-shadow: 0 0 0 12px rgba(79, 70, 229, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+        }
     }
 
     /* Notification Badge */
@@ -1394,8 +1430,8 @@ onValue(ref(db, "reviews"), (snapshot) => {
     .modern-chat-btn:hover {
         background: #4f46e5;
         color: #ffffff;
-        transform: scale(1.1) rotate(5deg);
-        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+        animation: none;
+        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
     }
 
     /* Popup Options Menu Box */
@@ -1424,13 +1460,13 @@ onValue(ref(db, "reviews"), (snapshot) => {
         gap: 10px;
         text-decoration: none;
         opacity: 0;
-        transform: translateY(20px) scale(0.8);
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transform: translateY(20px);
+        transition: all 0.3s ease;
     }
 
     .chat-popup-menu.active .chat-option-row {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: translateY(0);
     }
 
     /* Circular Icon Style */
@@ -1445,10 +1481,9 @@ onValue(ref(db, "reviews"), (snapshot) => {
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
         font-size: 18px;
         border: 2px solid #e5e7eb;
-        transition: transform 0.2s;
     }
 
-    /* Name Label Style */
+    /* Name Label Style inside popup */
     .chat-name-label {
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(5px);
@@ -1463,13 +1498,13 @@ onValue(ref(db, "reviews"), (snapshot) => {
 
     /* Brand Colors */
     .chat-option-row.whatsapp .chat-circle-icon { color: #25D366; border-color: #25D366; }
-    .chat-option-row.whatsapp:hover .chat-circle-icon { background: #25D366; color: #ffffff; transform: scale(1.1); }
+    .chat-option-row.whatsapp:hover .chat-circle-icon { background: #25D366; color: #ffffff; }
 
     .chat-option-row.messenger .chat-circle-icon { color: #0084FF; border-color: #0084FF; }
-    .chat-option-row.messenger:hover .chat-circle-icon { background: #0084FF; color: #ffffff; transform: scale(1.1); }
+    .chat-option-row.messenger:hover .chat-circle-icon { background: #0084FF; color: #ffffff; }
 
     .chat-option-row.livechat .chat-circle-icon { color: #4f46e5; border-color: #4f46e5; }
-    .chat-option-row.livechat:hover .chat-circle-icon { background: #4f46e5; color: #ffffff; transform: scale(1.1); }
+    .chat-option-row.livechat:hover .chat-circle-icon { background: #4f46e5; color: #ffffff; }
 
     @keyframes fadeInUp {
         from { opacity: 0; }
@@ -1477,7 +1512,7 @@ onValue(ref(db, "reviews"), (snapshot) => {
     }
 </style>
 
-<div class="chat-widget-container">
+<div class="chat-widget-container" id="chatWidgetContainer">
     <!-- Popup Options Menu -->
     <div class="chat-popup-menu" id="chatPopupMenu">
         <!-- WhatsApp (9761081110) -->
@@ -1492,12 +1527,15 @@ onValue(ref(db, "reviews"), (snapshot) => {
             <div class="chat-circle-icon"><i class="fa-brands fa-facebook-messenger"></i></div>
         </a>
         
-        <!-- Live Chat (Tala / Last ma) -->
+        <!-- Live Chat -->
         <a href="https://roshantamang2.com.np/support/live-chat" class="chat-option-row livechat">
             <span class="chat-name-label">Live Chat</span>
             <div class="chat-circle-icon"><i class="fa-solid fa-headset"></i></div>
         </a>
     </div>
+
+    <!-- Side Label (Now Clickable) -->
+    <div class="chat-help-label" id="chatHelpLabel">Need Help?</div>
 
     <!-- Main Button -->
     <div class="modern-chat-btn" id="chatButton" title="Chat Options">
@@ -1508,7 +1546,9 @@ onValue(ref(db, "reviews"), (snapshot) => {
 
 <script>
     const hasNewMessage = true;
+    const chatWidget = document.getElementById('chatWidgetContainer');
     const chatBtn = document.getElementById('chatButton');
+    const chatHelpLabel = document.getElementById('chatHelpLabel');
     const chatMenu = document.getElementById('chatPopupMenu');
     const mainIcon = document.getElementById('mainIcon');
     const isClicked = localStorage.getItem('chatClicked');
@@ -1517,27 +1557,34 @@ onValue(ref(db, "reviews"), (snapshot) => {
         chatBtn.classList.add('has-notification');
     }
 
-    chatBtn.addEventListener('click', function(e) {
+    function closeChatMenu() {
+        chatMenu.classList.remove('active');
+        mainIcon.classList.remove('fa-xmark');
+        mainIcon.classList.add('fa-headset');
+    }
+
+    // Common toggle function for both button and label
+    function toggleChatMenu(e) {
         e.stopPropagation();
-        chatMenu.classList.toggle('active');
         
         localStorage.setItem('chatClicked', 'true');
         chatBtn.classList.remove('has-notification');
 
         if (chatMenu.classList.contains('active')) {
+            closeChatMenu();
+        } else {
+            chatMenu.classList.add('active');
             mainIcon.classList.remove('fa-headset');
             mainIcon.classList.add('fa-xmark');
-        } else {
-            mainIcon.classList.remove('fa-xmark');
-            mainIcon.classList.add('fa-headset');
         }
-    });
+    }
 
-    window.addEventListener('click', function() {
-        if (chatMenu.classList.contains('active')) {
-            chatMenu.classList.remove('active');
-            mainIcon.classList.remove('fa-xmark');
-            mainIcon.classList.add('fa-headset');
+    chatBtn.addEventListener('click', toggleChatMenu);
+    chatHelpLabel.addEventListener('click', toggleChatMenu);
+
+    window.addEventListener('click', function(e) {
+        if (!chatWidget.contains(e.target)) {
+            closeChatMenu();
         }
     });
 
