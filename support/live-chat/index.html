@@ -48,7 +48,13 @@
             </div>
         </div>
 
-        <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-2 sm:space-x-3">
+            <!-- Back to Home Button -->
+            <a href="../../index.html" class="flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-full text-xs font-semibold transition-all">
+                <i class="fa-solid fa-house text-yellow-600 dark:text-yellow-400"></i>
+                <span class="hidden sm:inline">Home</span>
+            </a>
+
             <!-- Theme Toggle -->
             <button id="themeToggleTop" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                 <i class="fa-solid fa-moon dark:hidden"></i>
@@ -56,15 +62,15 @@
             </button>
 
             <!-- Google Login Button (For Customers) -->
-            <button id="googleLoginBtn" onclick="loginWithGoogle()" class="flex items-center space-x-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/70 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-full text-xs font-semibold shadow-sm transition-all">
+            <button id="googleLoginBtn" onclick="loginWithGoogle()" class="flex items-center space-x-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/70 text-slate-700 dark:text-slate-200 px-3 sm:px-4 py-2 rounded-full text-xs font-semibold shadow-sm transition-all">
                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-4 h-4" alt="Google">
-                <span>Login with Google</span>
+                <span>Login</span>
             </button>
 
             <!-- Logged In Profile View -->
             <div id="customerProfileView" class="hidden items-center space-x-2">
                 <img id="loggedInCustomerPhoto" src="" class="w-8 h-8 rounded-full object-cover ring-1 ring-yellow-500" alt="Profile">
-                <div class="hidden sm:block text-left">
+                <div class="hidden md:block text-left">
                     <p id="loggedInCustomerName" class="text-xs font-bold leading-none text-slate-900 dark:text-white truncate max-w-[100px]"></p>
                     <p id="loggedInCustomerEmail" class="text-[9px] text-slate-400 truncate max-w-[120px]"></p>
                 </div>
@@ -285,7 +291,7 @@
                 messageContainer.innerHTML = `
                     <div class="flex justify-center">
                         <span class="px-4 py-2 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 text-xs rounded-xl shadow-sm border border-amber-200 dark:border-amber-900 font-medium text-center">
-                            <i class="fa-solid fa-lock mr-1"></i> Please click <b>'Login with Google'</b> on the top right to start chatting securely.
+                            <i class="fa-solid fa-lock mr-1"></i> Please click <b>'Login'</b> on the top right to start chatting securely.
                         </span>
                     </div>
                 `;
@@ -470,7 +476,6 @@
                     }
                 } else {
                     // --- OTHER PARTY'S MESSAGE (LEFT SIDE) ---
-                    // Admin le herda customer ko photo, Customer le herda admin ko logo dekhinxa
                     const leftAvatarHtml = isAdmin ? `<img src="${customerAvatar}" class="w-full h-full object-cover" alt="Customer">` : adminLogoHtml;
 
                     if (msg.type === 'text') {
