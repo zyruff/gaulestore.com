@@ -1337,15 +1337,20 @@ onValue(ref(db, "reviews"), (snapshot) => {
 
 
 
-
-<!-- === START: Live Chat Icon with Custom Link === -->
+<!-- === START: Modern Floating Chat Widget (Customized for Gaule Topup) === -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-    .modern-chat-btn {
+    .chat-widget-container {
         position: fixed;
-        bottom: 90px; /* Yo value badhaayera icon lai mathi lانا sakiyeko xa (pahile 20px thiyo) */
+        bottom: 90px;
         right: 20px;
+        z-index: 9999;
+        font-family: sans-serif;
+    }
+
+    /* Main Floating Button */
+    .modern-chat-btn {
         background: #ffffff;
         color: #4f46e5;
         width: 48px;
@@ -1355,14 +1360,16 @@ onValue(ref(db, "reviews"), (snapshot) => {
         align-items: center;
         justify-content: center;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-        z-index: 9999;
         font-size: 20px;
         text-decoration: none;
         border: 2px solid #4f46e5;
+        cursor: pointer;
         transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        z-index: 2;
     }
 
-    /* By default badge lukcha */
+    /* Notification Badge */
     .modern-chat-btn .badge {
         display: none; 
         position: absolute;
@@ -1380,7 +1387,6 @@ onValue(ref(db, "reviews"), (snapshot) => {
         border: 2px solid #ffffff;
     }
 
-    /* Notification aako bela badge dekhauna */
     .modern-chat-btn.has-notification .badge {
         display: flex;
     }
@@ -1388,29 +1394,155 @@ onValue(ref(db, "reviews"), (snapshot) => {
     .modern-chat-btn:hover {
         background: #4f46e5;
         color: #ffffff;
-        transform: scale(1.15) rotate(5deg);
+        transform: scale(1.1) rotate(5deg);
         box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+    }
+
+    /* Popup Options Menu Box */
+    .chat-popup-menu {
+        position: absolute;
+        bottom: 60px;
+        right: 0;
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+        border: none;
+        animation: fadeInUp 0.3s ease;
+        z-index: 1;
+        padding-bottom: 10px;
+    }
+
+    .chat-popup-menu.active {
+        display: flex;
+    }
+
+    /* Option Item with Circle Icon and Name */
+    .chat-option-row {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        text-decoration: none;
+        opacity: 0;
+        transform: translateY(20px) scale(0.8);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .chat-popup-menu.active .chat-option-row {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    /* Circular Icon Style */
+    .chat-circle-icon {
+        background: #ffffff;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+        font-size: 18px;
+        border: 2px solid #e5e7eb;
+        transition: transform 0.2s;
+    }
+
+    /* Name Label Style */
+    .chat-name-label {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(5px);
+        color: #374151;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        white-space: nowrap;
+    }
+
+    /* Brand Colors */
+    .chat-option-row.whatsapp .chat-circle-icon { color: #25D366; border-color: #25D366; }
+    .chat-option-row.whatsapp:hover .chat-circle-icon { background: #25D366; color: #ffffff; transform: scale(1.1); }
+
+    .chat-option-row.messenger .chat-circle-icon { color: #0084FF; border-color: #0084FF; }
+    .chat-option-row.messenger:hover .chat-circle-icon { background: #0084FF; color: #ffffff; transform: scale(1.1); }
+
+    .chat-option-row.livechat .chat-circle-icon { color: #4f46e5; border-color: #4f46e5; }
+    .chat-option-row.livechat:hover .chat-circle-icon { background: #4f46e5; color: #ffffff; transform: scale(1.1); }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
 </style>
 
-<!-- Yeta tapai ko full link rakhiyeko cha -->
-<a href="https://roshantamang2.com.np/support/live-chat" class="modern-chat-btn" id="chatButton" title="Live Chat">
-    <i class="fa-solid fa-headset"></i>
-    <span class="badge">1</span>
-</a>
+<div class="chat-widget-container">
+    <!-- Popup Options Menu -->
+    <div class="chat-popup-menu" id="chatPopupMenu">
+        <!-- WhatsApp (9761081110) -->
+        <a href="https://wa.me/9779761081110?text=Hello%20Gaule%20Store,%20I%20need%20help!" target="_blank" class="chat-option-row whatsapp">
+            <span class="chat-name-label">WhatsApp</span>
+            <div class="chat-circle-icon"><i class="fa-brands fa-whatsapp"></i></div>
+        </a>
+
+        <!-- Messenger (gauletopupcenter) -->
+        <a href="https://m.me/gauletopupcenter" target="_blank" class="chat-option-row messenger">
+            <span class="chat-name-label">Messenger</span>
+            <div class="chat-circle-icon"><i class="fa-brands fa-facebook-messenger"></i></div>
+        </a>
+        
+        <!-- Live Chat (Tala / Last ma) -->
+        <a href="https://roshantamang2.com.np/support/live-chat" class="chat-option-row livechat">
+            <span class="chat-name-label">Live Chat</span>
+            <div class="chat-circle-icon"><i class="fa-solid fa-headset"></i></div>
+        </a>
+    </div>
+
+    <!-- Main Button -->
+    <div class="modern-chat-btn" id="chatButton" title="Chat Options">
+        <i class="fa-solid fa-headset" id="mainIcon"></i>
+        <span class="badge">1</span>
+    </div>
+</div>
 
 <script>
-    const hasNewMessage = true; // Notification dekhawne ya nadekhawne control garne
+    const hasNewMessage = true;
     const chatBtn = document.getElementById('chatButton');
+    const chatMenu = document.getElementById('chatPopupMenu');
+    const mainIcon = document.getElementById('mainIcon');
     const isClicked = localStorage.getItem('chatClicked');
 
     if (hasNewMessage && !isClicked) {
         chatBtn.classList.add('has-notification');
     }
 
-    chatBtn.addEventListener('click', function() {
+    chatBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        chatMenu.classList.toggle('active');
+        
         localStorage.setItem('chatClicked', 'true');
         chatBtn.classList.remove('has-notification');
+
+        if (chatMenu.classList.contains('active')) {
+            mainIcon.classList.remove('fa-headset');
+            mainIcon.classList.add('fa-xmark');
+        } else {
+            mainIcon.classList.remove('fa-xmark');
+            mainIcon.classList.add('fa-headset');
+        }
+    });
+
+    window.addEventListener('click', function() {
+        if (chatMenu.classList.contains('active')) {
+            chatMenu.classList.remove('active');
+            mainIcon.classList.remove('fa-xmark');
+            mainIcon.classList.add('fa-headset');
+        }
+    });
+
+    chatMenu.addEventListener('click', function(e) {
+        e.stopPropagation();
     });
 </script>
-<!-- === END: Live Chat Icon with Custom Link === -->
+<!-- === END: Modern Floating Chat Widget === -->
