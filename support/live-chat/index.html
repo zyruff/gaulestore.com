@@ -34,11 +34,11 @@
                 <i class="fa-solid fa-bars text-xl"></i>
             </button>
             <div class="flex items-center space-x-2">
-                <div class="w-10 h-10 rounded-full overflow-hidden bg-slate-900 flex items-center justify-center ring-2 ring-yellow-500 shadow-sm cursor-pointer relative group" onclick="document.getElementById('adminLogoInput').click()">
+                <!-- Admin Logo Container (Only Admin can change logo via settings if needed, customers just view it) -->
+                <div id="adminLogoWrapper" class="w-10 h-10 rounded-full overflow-hidden bg-slate-900 flex items-center justify-center ring-2 ring-yellow-500 shadow-sm relative">
                     <div id="adminLogoContainer" class="w-full h-full flex items-center justify-center text-white font-bold">
                         <img src="logo.png" alt="Logo" class="w-full h-full object-cover">
                     </div>
-                    <div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center text-white text-[10px]">Edit</div>
                 </div>
                 <input type="file" id="adminLogoInput" class="hidden" accept="image/*" onchange="handleAdminLogoSelected(event)">
                 <div>
@@ -170,30 +170,17 @@
         const ADMIN_EMAIL = "gaulestore.np@gmail.com";
         const defaultLogoHtml = `<img src="logo.png" alt="Logo" class="w-full h-full object-cover">`;
 
-        let adminLogoHtml = localStorage.getItem('admin_logo_html') || defaultLogoHtml;
-        document.getElementById('adminLogoContainer').innerHTML = adminLogoHtml;
-
-        function handleAdminLogoSelected(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                adminLogoHtml = `<img src="${e.target.result}" class="w-full h-full object-cover" alt="Admin Logo">`;
-                localStorage.setItem('admin_logo_html', adminLogoHtml);
+        // Sync admin logo from Firebase database so all users (customers and admin) see the exact same admin logo
+        rtdb.ref('settings/adminLogo').on('value', (snapshot) => {
+            if (snapshot.exists()) {
+                adminLogoHtml = `<img src="${snapshot.val()}" class="w-full h-full object-cover" alt="Admin Logo">`;
                 document.getElementById('adminLogoContainer').innerHTML = adminLogoHtml;
-            };
-            reader.readAsDataURL(file);
-        }
+            } else {
+                document.getElementById('adminLogoContainer').innerHTML = defaultLogoHtml;
+            }
+        });
 
-        function loginWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).catch((error) => alert("Login Error: " + error.message));
-        }
-
-        function logoutGoogle() {
-            auth.signOut().then(() => window.location.reload());
-        }
-
+        let adminLogoHtml = defaultLogoHtml;
         let customers = [];
         let activeCustomerId = null;
         let currentUser = null;
@@ -228,6 +215,7 @@
             currentUser = user;
             const googleLoginBtn = document.getElementById('googleLoginBtn');
             const customerProfileView = document.getElementById('customerProfileView');
+            const adminLogoWrapper = document.getElementById('adminLogoWrapper');
 
             if (user) {
                 googleLoginBtn.classList.add('hidden');
@@ -238,6 +226,16 @@
                 document.getElementById('loggedInCustomerEmail').innerText = user.email || '';
 
                 isAdmin = (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+
+                // Enable logo editing ONLY for Admin
+                if (isAdmin) {
+                    adminLogoWrapper.classList.add('cursor-pointer', 'group');
+                    adminLogoWrapper.setAttribute('onclick', "document.getElementById('adminLogoInput').click()");
+                    adminLogoWrapper.innerHTML += `<div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center text-white text-[10px]">Edit</div>`;
+                } else {
+                    adminLogoWrapper.classList.remove('cursor-pointer', 'group');
+                    adminLogoWrapper.removeAttribute('onclick');
+                }
 
                 messageInput.disabled = false;
                 messageInput.placeholder = "Type your message...";
@@ -294,6 +292,27 @@
             }
         });
 
+        function handleAdminLogoSelected(event) {
+            if (!isAdmin) return;
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Img = e.target.result;
+                rtdb.ref('settings/adminLogo').set(base64Img);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function loginWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch((error) => alert("Login Error: " + error.message));
+        }
+
+        function logoutGoogle() {
+            auth.signOut().then(() => window.location.reload());
+        }
+
         function loadAllCustomersForAdmin() {
             rtdb.ref('chats').on('value', (snapshot) => {
                 customers = [];
@@ -311,7 +330,6 @@
                     });
                 });
 
-                // Sort newest message to top
                 customers.sort((a, b) => b.timestamp - a.timestamp);
 
                 if (customers.length > 0 && !activeCustomerId) {
@@ -395,9 +413,6 @@
             const customerAvatar = isAdmin ? (customers.find(c => c.id === activeCustomerId)?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150') : currentUser.photoURL;
             const customerName = isAdmin ? (customers.find(c => c.id === activeCustomerId)?.name || 'Customer') : currentUser.displayName;
 
-            // Force admin avatar to always be logo.png for customers, and keep admin logo for admin view
-            const adminAvatarHtml = `<img src="logo.png" class="w-full h-full object-cover" alt="Admin Logo">`;
-
             messages.forEach(msg => {
                 const isMyMessage = (isAdmin && msg.sender === 'admin') || (!isAdmin && msg.sender === 'customer');
 
@@ -414,7 +429,7 @@
                                     </div>
                                 </div>
                                 <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-slate-900 mb-1 flex items-center justify-center ring-1 ring-yellow-500">
-                                    ${isAdmin ? adminAvatarHtml : `<img src="logo.png" class="w-full h-full object-cover" alt="Admin Logo">`}
+                                    ${isAdmin ? adminLogoHtml : `<img src="${currentUser.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}" class="w-full h-full object-cover" alt="User">`}
                                 </div>
                             </div>
                         `);
@@ -431,7 +446,7 @@
                                     </div>
                                 </div>
                                 <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-slate-900 mb-1 flex items-center justify-center ring-1 ring-yellow-500">
-                                    ${isAdmin ? adminAvatarHtml : `<img src="logo.png" class="w-full h-full object-cover" alt="Admin Logo">`}
+                                    ${isAdmin ? adminLogoHtml : `<img src="${currentUser.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}" class="w-full h-full object-cover" alt="User">`}
                                 </div>
                             </div>
                         `);
@@ -448,21 +463,17 @@
                                     </div>
                                 </div>
                                 <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-slate-900 mb-1 flex items-center justify-center ring-1 ring-yellow-500">
-                                    ${isAdmin ? adminAvatarHtml : `<img src="logo.png" class="w-full h-full object-cover" alt="Admin Logo">`}
+                                    ${isAdmin ? adminLogoHtml : `<img src="${currentUser.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}" class="w-full h-full object-cover" alt="User">`}
                                 </div>
                             </div>
                         `);
                     }
                 } else {
                     // --- OTHER PARTY'S MESSAGE (LEFT SIDE) ---
-                    // If current user is a customer, the other party sending left-side messages is the Admin. Hence show logo.png!
-                    const leftAvatar = isAdmin ? customerAvatar : 'logo.png';
-                    const leftName = isAdmin ? customerName : 'Support Center';
-
                     if (msg.type === 'text') {
                         messageContainer.insertAdjacentHTML('beforeend', `
                             <div class="flex items-end space-x-2 animate-fadeIn">
-                                <img class="w-8 h-8 rounded-full object-cover mb-1 flex-shrink-0 ring-1 ring-slate-300 dark:ring-slate-700" src="${leftAvatar}" alt="${leftName}">
+                                <img class="w-8 h-8 rounded-full object-cover mb-1 flex-shrink-0 ring-1 ring-slate-300 dark:ring-slate-700" src="${customerAvatar}" alt="${customerName}">
                                 <div class="max-w-[75%] sm:max-w-md bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-2xl rounded-bl-sm p-3.5 shadow-sm border border-slate-100 dark:border-slate-700/60">
                                     <p class="text-sm leading-relaxed">${escapeHtml(msg.text)}</p>
                                     <span class="block text-[10px] text-slate-400 text-right mt-1">${msg.time}</span>
@@ -472,7 +483,7 @@
                     } else if (msg.type === 'image') {
                         messageContainer.insertAdjacentHTML('beforeend', `
                             <div class="flex items-end space-x-2 animate-fadeIn">
-                                <img class="w-8 h-8 rounded-full object-cover mb-1 flex-shrink-0 ring-1 ring-slate-300 dark:ring-slate-700" src="${leftAvatar}" alt="${leftName}">
+                                <img class="w-8 h-8 rounded-full object-cover mb-1 flex-shrink-0 ring-1 ring-slate-300 dark:ring-slate-700" src="${customerAvatar}" alt="${customerName}">
                                 <div class="max-w-[70%] sm:max-w-xs flex flex-col items-start">
                                     <div class="rounded-xl overflow-hidden shadow-md bg-black/5 dark:bg-white/5 mb-1">
                                         <img src="${msg.url}" alt="Attachment" class="w-full h-auto object-cover max-h-72 cursor-pointer hover:opacity-95" onclick="window.open('${msg.url}')">
@@ -484,7 +495,7 @@
                     } else if (msg.type === 'audio') {
                         messageContainer.insertAdjacentHTML('beforeend', `
                             <div class="flex items-end space-x-2 animate-fadeIn">
-                                <img class="w-8 h-8 rounded-full object-cover mb-1 flex-shrink-0 ring-1 ring-slate-300 dark:ring-slate-700" src="${leftAvatar}" alt="${leftName}">
+                                <img class="w-8 h-8 rounded-full object-cover mb-1 flex-shrink-0 ring-1 ring-slate-300 dark:ring-slate-700" src="${customerAvatar}" alt="${customerName}">
                                 <div class="max-w-[75%] sm:max-w-md bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-2xl rounded-bl-sm p-3.5 shadow-sm border border-slate-100 dark:border-slate-700/60">
                                     <div class="flex items-center space-x-3 mb-1">
                                         <audio controls src="${msg.url}" class="h-9 w-48 sm:w-64"></audio>
@@ -565,6 +576,10 @@
                     mediaRecorder = new MediaRecorder(stream);
                     audioChunks = [];
 
+                    mediaRecorder.ondataavailable = event => {
+                        if (event.data.size > 0) audioChunks.data(event.data); // Fixed array push below
+                    };
+                    // Correction for chunk push
                     mediaRecorder.ondataavailable = event => {
                         if (event.data.size > 0) audioChunks.push(event.data);
                     };
@@ -661,7 +676,7 @@
             return `${hours}:${minutes} ${ampm}`;
         }
 
-        function escapeHtml(text> {
+        function escapeHtml(text) {
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return text.replace(/[&<>"']/g, m => map[m]);
         }
