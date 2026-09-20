@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+     <link rel="canonical" href="https://roshantamang2.com.np/" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Open Graph Tags (Facebook, WhatsApp Preview ke liye) -->
-<meta property="og:title" content="Gaule Store - Free Fire Diamond in Nepal" />
-<meta property="og:description" content="Buy Free Fire Diamond in Nepal at the cheapest price with Gaule Store. 1-5 min instant delivery." />
-<meta property="og:image" content="https://roshantamang2.com.np/product/free-fire-top-up-nepal/free_fire.png" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
-<meta property="og:image:type" content="image/png" />
-<meta property="og:url" content="https://roshantamang2.com.np/product/free-fire-top-up-nepal" />
-<meta property="og:type" content="website" />
+    <title>Gaule Store | Free Fire Top Up Nepal</title>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<meta name="description" content="Gaule Store provides fast and secure gaming top-up services in Nepal.">
+<link rel="manifest" href="manifest.json">
 
+<meta property="og:site_name" content="Gaule Store">
+<meta property="og:title" content="Gaule Store | Free Fire Top Up Nepal">
 
-    <!-- Twitter Preview को लागि (वैकल्पिक) -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <title>Gaule Store</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Gaule Store",
+  "alternateName": "GAULE STORE",
+  "url": "https://roshantamang2.com.np/"
+}
+</script>
+     
 
     <style>
         body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; }
@@ -35,6 +40,7 @@
         .change-name { font-size: 11px; color: #dc2626; text-decoration: none; display: block; margin-bottom: 15px; }
         .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; cursor: pointer; border-radius: 4px; }
         #nav-menu a { display: block; padding: 12px 0; color: black; text-decoration: none; border-bottom: 1px solid #eee; }
+        .order-card { background: white; border-left: 5px solid #dc2626; padding: 10px; margin-bottom: 8px; border-radius: 5px; box-shadow: 0 2px 5px #ddd; }
         .store-title { font-size: 1.5rem; font-weight: bold; }
         .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
     </style>
@@ -68,14 +74,17 @@
         <button onclick="alert('Searching...')">Search</button>
     </div>
     <a href="../index.html">Home</a>
-    <a href="shop.html">Shop</a>
+    <div id="my-orders-link" style="display:none;"><a href="#" onclick="showOrders()">My Orders</a></div>
+    <a href="shop/">Shop</a>
     <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
 </div>
+
+
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, query, orderByChild, equalTo, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
@@ -97,8 +106,60 @@
     window.googleLogin = () => signInWithPopup(auth, provider);
     window.logoutUser = () => signOut(auth).then(() => location.reload());
 
+    window.showOrders = () => {
+        toggleMenu();
+        const user = auth.currentUser;
+        if (!user) return;
+        
+        const area = document.getElementById("content-area");
+        
+        // पछाडि फर्किने बटन र हेडिङ
+        area.innerHTML = `
+            <button onclick="location.reload()" style="margin-bottom:15px; padding:8px 15px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer;">
+                ← Back
+            </button>
+            <h2>My Orders</h2>
+        `;
+
+        const ordersRef = query(ref(db, 'orders'), orderByChild('userId'), equalTo(user.uid));
+        
+        onValue(ordersRef, (snapshot) => {
+            // अर्डर सूची देखाउनु अघि 'Back' बटन यथावत राख्न
+            let orderHtml = `
+                <button onclick="location.reload()" style="margin-bottom:15px; padding:8px 15px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer;">
+                    ← Back
+                </button>
+                <h2>My Orders</h2>
+            `;
+            
+            let orderArray = [];
+            snapshot.forEach((s) => { orderArray.push(s.val()); });
+            orderArray.reverse(); 
+
+            if (orderArray.length > 0) {
+                orderArray.forEach((o) => {
+                    let statusColor = '#eab308';
+                    if (o.status === 'Complete') statusColor = 'green';
+                    else if (o.status === 'Rejected') statusColor = 'red';
+
+                    orderHtml += `
+                        <div class="order-card">
+                            <p style="font-size: 14px; margin: 3px 0;">Product: <b>${o.product || "N/A"}</b></p>
+                            <p style="font-size: 14px; margin: 3px 0;">Player ID: <b>${o.uid || "N/A"}</b></p>
+                            <p style="font-size: 14px; margin: 3px 0;">Status: <b style="color:${statusColor}">${o.status}</b></p>
+                        </div>`;
+                });
+                area.innerHTML = orderHtml;
+            } else { 
+                area.innerHTML = orderHtml + "<p>No Order History</p>"; 
+            }
+        });
+    };
+
+
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            document.getElementById("my-orders-link").style.display = "block";
             document.getElementById("login-container").style.display = "none";
             document.getElementById("profile-pic").style.display = "block";
             document.getElementById("profile-pic").src = user.photoURL;
@@ -108,7 +169,10 @@
     });
 </script>
 </body>
-</html>
+
+
+
+
 
 
 
@@ -117,390 +181,265 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaule Store - Official Custom Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gaule Store - Order History</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
     
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { background-color: #f7fafc; color: #2d3748; padding-bottom: 160px; }
-        .banner-container { padding: 16px; background: linear-gradient(180deg, #ffffff 0%, #f7fafc 100%); border-bottom: 1px solid #e2e8f0; }
-        .badges-wrapper { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
-        .badge { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
-        .badge.instant { background-color: rgba(255, 179, 0, 0.15); color: #b7791f; }
-        .badge.official { background-color: rgba(46, 213, 115, 0.15); color: #1e7e34; }
-        .banner-flex { display: flex; gap: 12px; align-items: center; }
-        .avatar-img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #ffb300; object-fit: cover; }
-        .banner-desc { font-size: 13px; color: #4a5568; line-height: 1.4; }
-        .tabs-container { display: flex; gap: 8px; padding: 0 16px; overflow-x: auto; margin-bottom: 20px; margin-top: 10px; }
-        .tab { background-color: #edf2f7; color: #4a5568; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; }
-        .tab.active { background-color: #ffffff; color: #1a202c; border: 1px solid #cbd5e0; }
-        .section-box { margin: 0 16px 20px 16px; }
-        .section-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .box-title { font-size: 15px; text-transform: uppercase; font-weight: 700; color: #1a202c; }
-        .input-card-panel { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .input-label { font-size: 11px; font-weight: 600; color: #718096; text-transform: uppercase; margin-bottom: 8px; }
-        .uid-input-group { display: flex; gap: 8px; }
-        .uid-input { flex: 1; background-color: #f7fafc; border: 1px solid #cbd5e0; border-radius: 8px; padding: 12px 14px; color: #1a202c; font-size: 14px; outline: none; transition: all 0.2s; }
-        .uid-input.error-border { border: 1px solid #e53e3e !important; background-color: #fff5f5 !important; }
-        .error-message { color: #e53e3e; font-size: 12px; margin-top: 8px; display: none; align-items: center; gap: 6px; font-weight: 500; }
-        .instruction-text { font-size: 11px; color: #718096; display: flex; gap: 8px; line-height: 1.4; margin-top: 10px; }
-        .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 4px; border-radius: 14px; border: 2px solid transparent; transition: all 0.2s ease; }
-        .cards-grid.error-border { border: 2px solid #e53e3e !important; background-color: #fff5f5; padding: 8px; }
-        .pack-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; position: relative; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: transform 0.1s, border-color 0.2s; }
-        .pack-card:active { transform: scale(0.98); }
-        .pack-card.selected { border: 2px solid #ffb300 !important; background-color: #fffdf5; }
-        .pack-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1a202c; }
-        .pack-price { font-size: 15px; font-weight: 700; color: #ffb300; }
-        .diamond-icon { position: absolute; bottom: 14px; right: 14px; color: #3182ce; font-size: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: #f1f5f9; color: #0f172a; padding-bottom: 40px; }
         
-        .bottom-drawer { position: fixed; bottom: 55px; left: 2px; right: 2px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); z-index: 100; }
-        .drawer-inner { max-width: 600px; margin: 0 auto; }
-        .row-detail { display: flex; justify-content: space-between; font-size: 13px; color: #4a5568; margin-bottom: 8px; }
-        .row-detail .val-white { color: #1a202c; font-weight: 500; }
-        .total-row { margin-top: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
-        .total-price { font-size: 20px; font-weight: 700; color: #ffb300; }
-        .action-btn { display: flex; justify-content: center; align-items: center; gap: 8px; border: none; cursor: pointer; font-weight: 700; color: #ffffff; background-color: #ffb300; transition: background 0.2s; width: 200px; height: 42px; font-size: 14px; border-radius: 25px; margin: 0 auto; }
-        .action-btn.login-needed { background-color: #dc2626; }
-        .qr-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 200; opacity: 0; pointer-events: none; transition: all 0.3s ease; padding: 20px; }
-        .qr-modal.show { opacity: 1; pointer-events: auto; }
-        .qr-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; max-width: 380px; width: 100%; text-align: center; position: relative; transform: scale(0.8); transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .qr-modal.show .qr-card { transform: scale(1); }
-        .close-modal { position: absolute; top: 15px; right: 15px; font-size: 20px; color: #718096; cursor: pointer; }
-        .qr-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; color: #1a202c; }
-        .qr-subtitle { font-size: 13px; color: #4a5568; margin-bottom: 12px; }
-        .account-details-box { background: #fffdf5; border: 1px solid #ffb300; padding: 10px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; text-align: left; line-height: 1.5; }
-        .qr-image-wrapper { background-color: #f7fafc; padding: 12px; border-radius: 12px; display: inline-block; margin-bottom: 15px; border: 1px solid #e2e8f0; }
-        .qr-image-wrapper img { width: 180px; height: 180px; display: block; object-fit: contain; margin: 0 auto; }
-        .txid-container { text-align: left; margin-bottom: 5px; }
-        .txid-label { font-size: 12px; font-weight: 600; color: #4a5568; margin-bottom: 6px; display: block; }
-        .txid-input-wrapper { position: relative; display: flex; align-items: center; }
-        .txid-input-wrapper i { position: absolute; left: 12px; color: #a0aec0; }
-        .txid-input { width: 100%; background-color: #f7fafc; border: 1px solid #cbd5e0; border-radius: 8px; padding: 12px 12px 12px 38px; color: #1a202c; font-size: 14px; outline: none; transition: all 0.2s; }
-        .txid-input.error-border { border: 1px solid #e53e3e !important; background-color: #fff5f5 !important; }
-        .txid-error-message { color: #e53e3e; font-size: 11px; margin-top: 4px; margin-bottom: 10px; display: none; align-items: center; gap: 4px; }
-        .payment-summary-box { background-color: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; text-align: left; margin-top: 10px; margin-bottom: 15px; }
-        .pay-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
-        .pay-row span:first-child { color: #4a5568; }
-        .pay-row span:last-child { color: #1a202c; font-weight: 500; }
-        .pay-row .highlight-total { color: #ffb300 !important; font-weight: 700; }
-        .done-btn { background-color: #ffb300; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; }
-        .done-btn:disabled { background-color: #cbd5e0; cursor: not-allowed; }
-        .success-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 300; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out; }
-        .success-modal.show { opacity: 1; pointer-events: auto; }
-        .success-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(30px); transition: all 0.3s ease-in-out; }
-        .success-modal.show .success-card { transform: translateY(0); }
-        .success-checkmark { width: 72px; height: 72px; background: #2ed573; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; animation: pulseCircle 1.6s infinite cubic-bezier(0.66, 0, 0, 1); }
-        .success-checkmark i { color: white; font-size: 32px; transform: scale(0); animation: scaleCheck 0.4s 0.2s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes pulseCircle { 0% { box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(46, 213, 115, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 213, 115, 0); } }
-        @keyframes scaleCheck { 0% { transform: scale(0); } 100% { transform: scale(1); } }
-        .success-title { font-size: 22px; font-weight: 700; color: #1a202c; margin-bottom: 8px; }
-        .success-msg { font-size: 14px; color: #4a5568; line-height: 1.5; margin-bottom: 18px; }
-        .success-receipt-info { background-color: #f7fafc; border: 1px dashed #cbd5e0; border-radius: 8px; padding: 12px; text-align: left; font-size: 13px; margin-bottom: 20px; }
-        .receipt-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
-        .receipt-row span:first-child { color: #718096; }
-        .receipt-row span:last-child { color: #2d3748; font-weight: 600; }
-        .success-close-btn { background-color: #1a202c; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; }
+        .mobile-container { 
+            width: 100%;
+            max-width: 480px; 
+            margin: 0 auto; 
+            min-height: 100vh; 
+            background: linear-gradient(rgba(248, 250, 252, 0.88), rgba(248, 250, 252, 0.88)), url('gaulestore.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05); 
+            position: relative; 
+        }
+
+        @media (min-width: 768px) {
+            .mobile-container {
+                max-width: 820px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+                border-left: 1px solid #e2e8f0;
+                border-right: 1px solid #e2e8f0;
+            }
+            #orders-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .no-data, .login-prompt-btn {
+                grid-column: span 2;
+            }
+        }
+
+        .app-header { 
+            background: rgba(255, 255, 255, 0.9); 
+            backdrop-filter: blur(12px); 
+            padding: 16px 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .header-title-box { display: flex; align-items: center; gap: 8px; }
+        .header-title { font-size: 18px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; }
+        .admin-tag { font-size: 9px; background: #e0f2fe; color: #0284c7; padding: 3px 8px; border-radius: 6px; font-weight: 700; display: none; }
+        .header-actions { display: flex; gap: 8px; align-items: center; }
+        
+        .icon-btn {
+            width: 38px; height: 38px;
+            background: #f1f5f9;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #334155;
+            border: none;
+            font-size: 14px;
+        }
+        .icon-btn:hover { background: #e2e8f0; }
+
+        .search-bar-container {
+            padding: 12px 20px 0 20px;
+            background: rgba(255, 255, 255, 0.9);
+            position: sticky;
+            top: 71px;
+            z-index: 99;
+            display: none;
+            backdrop-filter: blur(12px);
+        }
+        .search-bar-container.active { display: block; }
+        .search-input-wrap { position: relative; display: flex; align-items: center; }
+        .search-input-wrap i { position: absolute; left: 14px; color: #94a3b8; font-size: 13px; }
+        .search-input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #0f172a;
+            outline: none;
+        }
+        .search-input:focus { border-color: #0284c7; background: #fff; }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 12px 20px;
+            background: rgba(248, 250, 252, 0.9);
+            position: sticky;
+            top: 71px;
+            z-index: 98;
+            overflow-x: auto;
+            border-bottom: 1px solid #e2e8f0;
+            scrollbar-width: none;
+        }
+        .filter-tabs::-webkit-scrollbar { display: none; }
+        .filter-tabs.shifted { top: 135px; }
+
+        .filter-btn {
+            flex: 1;
+            padding: 6px 10px;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            white-space: nowrap;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .filter-btn.active {
+            background-color: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+        }
+
+        #orders-list { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+        .order-card { 
+            background: #ffffff; 
+            border-radius: 16px; 
+            padding: 16px; 
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            height: fit-content;
+        }
+        
+        .order-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #f1f5f9;
+        }
+        
+        .order-id { font-size: 12px; font-weight: 700; color: #64748b; background: #f8fafc; padding: 3px 8px; border-radius: 6px; }
+        
+        .order-status { 
+            font-size: 10px; 
+            font-weight: 800; 
+            padding: 4px 10px; 
+            border-radius: 6px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+        }
+        .status-completed { background-color: #dcfce7; color: #166534; }
+        .status-pending { background-color: #fef3c7; color: #b45309; }
+        .status-rejected { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+
+        .item-details { display: flex; flex-direction: column; gap: 6px; }
+        .product-name { font-size: 15px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 6px; }
+        .product-name i { color: #0ea5e9; font-size: 13px; }
+        
+        .info-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #475569; font-weight: 500; word-break: break-all; }
+        .info-row i { width: 14px; color: #94a3b8; flex-shrink: 0; }
+        
+        .price-tag { font-size: 15px; font-weight: 800; color: #059669; margin-top: 4px; }
+
+        .admin-action-box { display: none; flex-direction: column; gap: 6px; margin-top: 14px; border-top: 1px solid #f1f5f9; padding-top: 12px; }
+        .admin-action-box.visible { display: flex; }
+        .admin-btn-row { display: flex; gap: 6px; }
+        
+        .adm-btn { 
+            flex: 1; 
+            padding: 7px 0; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 11px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .btn-complete { background: #dcfce7; color: #166534; }
+        .btn-reject { background: #fee2e2; color: #991b1b; }
+        .btn-topup { background: #e0f2fe; color: #0284c7; }
+        .btn-delete { background: #0f172a; color: #ffffff; width: 100%; }
+
+        .no-data { text-align: center; padding: 50px 20px; color: #64748b; font-size: 13px; font-weight: 500; }
+        
+        .login-prompt-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 16px;
+            padding: 11px 22px;
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            transition: 0.2s;
+        }
+        .login-prompt-btn:hover { background: #f8fafc; border-color: #94a3b8; }
     </style>
 </head>
 <body>
- 
-   <div class="banner-container">
-        <div class="badges-wrapper">
-            <div class="badge instant">1 min - 5 min Delivery</div>
-            <div class="badge official"><i class="fa-solid fa-circle-check"></i> Official Supply</div>
-        </div>
-        <div class="banner-flex">
-            <img class="avatar-img" src="free_fire.png" alt="Free Fire">
-            <div>
-                <div class="badge Region">Nepal/Bangladesh</div>
-                <p class="banner-desc">Buy Garena Free Fire Diamonds in Nepal at the cheapest price with Gaule Store.</p>
+
+    <div class="mobile-container">
+        <!-- Header -->
+        <div class="app-header">
+            <div class="header-title-box">
+                <span class="header-title">Order History</span>
+                <span class="admin-tag" id="adminTag">ADMIN</span>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="toggleSearchbar()" title="Search">
+                    <i class="fa-solid fa-magnifying-glass" id="searchIconToggle"></i>
+                </button>
             </div>
         </div>
-    </div>
 
-    <div class="tabs-container">
-        <div class="tab active" onclick="switchTab('diamonds', this)">Diamonds</div>
-        <div class="tab" onclick="switchTab('membership', this)">Membership</div>
-    </div>
-
-<div class="section-box">
-    <div class="section-header-flex">
-        <div class="box-title">Game ID <span style="color: #e53e3e;">*</span></div>
-    </div>
-    <div class="input-card-panel">
-        <div class="input-label">User ID (uid)</div>
-        
-        <div class="uid-input-group">
-            <input type="text" id="game-uid" class="uid-input" placeholder="PLAYER ID (UID)" oninput="validateUIDLive()">
-        </div>
-        
-        <div class="error-message" id="uid-error">
-            <i class="fa-solid fa-circle-exclamation"></i> <span>Invalid or Missing UID!</span>
-        </div>
-        
-        <div class="instruction-text">
-            <i class="fa-solid fa-circle-info"></i>
-            <span>Open Free fire, Click on Profile icon, you will get your UID.</span>
-        </div>
-    </div>
-</div>
-
-    <div class="section-box">
-        <div class="section-header-flex">
-            <div class="box-title">Diamonds <span style="color: #e53e3e;">*</span></div>
-        </div>
-        
-        <div class="error-message" id="pack-error" style="margin-bottom: 8px; display: none;">
-            <i class="fa-solid fa-circle-exclamation"></i> <span>Please select a Diamond pack to proceed!</span>
-        </div>
-
-        <div class="cards-grid" id="diamonds-wrapper">
-            <div class="pack-card" onclick="selectPack(this, '25 Diamonds', '30')">
-                <div class="pack-title">25 Diamonds</div>
-                <div class="pack-price">Rs30</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-            <div class="pack-card" onclick="selectPack(this, '50 Diamonds', '56')">
-                <div class="pack-title">50 Diamonds</div>
-                <div class="pack-price">Rs56</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-        
-            <div class="pack-card" onclick="selectPack(this, '115 Diamonds', '100')">
-                <div class="pack-title">115 Diamonds</div>
-                <div class="pack-price">Rs100</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-            <div class="pack-card" onclick="selectPack(this, '240 Diamonds', '200')">
-                <div class="pack-title">240 Diamonds</div>
-                <div class="pack-price">Rs200</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-            <div class="pack-card" onclick="selectPack(this, '480 Diamonds', '400')">
-                <div class="pack-title">480 Diamonds</div>
-                <div class="pack-price">Rs400</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-            <div class="pack-card" onclick="selectPack(this, '610 Diamonds', '505')">
-                <div class="pack-title">610 Diamonds</div>
-                <div class="pack-price">Rs505</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-            <div class="pack-card" onclick="selectPack(this, '850 Diamonds', '705')">
-                <div class="pack-title">850 Diamonds</div>
-                <div class="pack-price">Rs705</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-            <div class="pack-card" onclick="selectPack(this, '1090 Diamonds', '905')">
-                <div class="pack-title">1090 Diamonds</div>
-                <div class="pack-price">Rs905</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-            <div class="pack-card" onclick="selectPack(this, '1240 Diamonds', '1010')">
-                <div class="pack-title">1240 Diamonds</div>
-                <div class="pack-price">Rs1010</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-            <div class="pack-card" onclick="selectPack(this, '1460 Diamonds', '1210')">
-                <div class="pack-title">1460 Diamonds</div>
-                <div class="pack-price">Rs1210</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-            <div class="pack-card" onclick="selectPack(this, '1850 Diamonds', '1515')">
-                <div class="pack-title">1850 Diamonds</div>
-                <div class="pack-price">Rs1515</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-            <div class="pack-card" onclick="selectPack(this, '2530 Diamonds', '2030')">
-                <div class="pack-title">2530 Diamonds</div>
-                <div class="pack-price">Rs2030</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-            <div class="box-title" id="membership-section" style="grid-column: span 2; margin-top: 10px;">
-                Membership <span style="color:#e53e3e;">*</span>
-            </div>
-
-            <div class="pack-card" onclick="selectPack(this, 'Weekly Membership', '200')">
-                <img src="weekly.png" alt="Weekly Membership" style="width: 90px; height: 65px; display: block; margin: 1px auto;">
-                <div class="pack-title">Weekly Membership</div>
-                <div class="pack-price">Rs200</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-            <div class="pack-card" onclick="selectPack(this, '2x Weekly Membership', '400')">
-                <img src="2weekly.png" alt="2x Weekly Membership" style="width: 90px; height: 65px; display: block; margin: 1px auto;">
-                <div class="pack-title">2x Weekly Membership</div>
-                <div class="pack-price">Rs400</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-            <div class="pack-card" onclick="selectPack(this, 'Monthly Membership', '1000')">
-                <img src="monthly.png" alt="Monthly Membership" style="width: 90px; height: 65px; display: block; margin: 1px auto;">
-                <div class="pack-title">Monthly Membership</div>
-                <div class="pack-price">Rs1000</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-            <div class="pack-card" onclick="selectPack(this, '2x Monthly Membership', '2000')">
-                <img src="2monthly.png" alt="2x Monthly Membership" style="width: 90px; height: 65px; display: block; margin: 1px auto;">
-                <div class="pack-title">2x Monthly Membership</div>
-                <div class="pack-price">Rs2000</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-            <div class="pack-card" onclick="selectPack(this, 'Weekly Lite', '65')">
-                <img src="weeklylite.png" alt="Weekly Lite" style="width: 90px; height: 65px; display: block; margin: 1px auto;">
-                <div class="pack-title">Weekly Lite</div>
-                <div class="pack-price">Rs65</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
-            </div>
-
-            <div class="pack-card" onclick="selectPack(this, '2x Weekly Lite', '130')">
-                <img src="2weeklylite.png" alt="2x Weekly Lite" style="width: 90px; height: 65px; display: block; margin: 1px auto;">
-                <div class="pack-title">2x Weekly Lite</div>
-                <div class="pack-price">Rs130</div>
-                <i class="fa-solid fa-gem diamond-icon"></i>
+        <!-- Search Bar -->
+        <div class="search-bar-container" id="searchBarContainer">
+            <div class="search-input-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="orderSearchInput" class="search-input" placeholder="Search Product, Email, UID, Player Name, Txn ID..." onkeyup="renderOrders()">
             </div>
         </div>
-    </div>
 
-    <div class="bottom-drawer">
-        <div class="drawer-inner">
-            <div class="row-detail">
-                <span>Item</span>
-                <span class="val-white" id="summary-item">-</span>
-            </div>
-            <div class="total-row">
-                <span class="total-label">Total</span>
-                <span class="total-price" id="summary-total">Rs 0.00</span>
-            </div>
-            
-            <button id="main-action-btn" class="action-btn">
-                <i class="fa-solid fa-basket-shopping"></i> Buy Now
-            </button>
+        <!-- Filter Tabs -->
+        <div class="filter-tabs" id="filterTabs">
+            <button class="filter-btn active" onclick="filterOrders('all', this)">All</button>
+            <button class="filter-btn" onclick="filterOrders('pending', this)">Pending</button>
+            <button class="filter-btn" onclick="filterOrders('complete', this)">Completed</button>
+            <button class="filter-btn" onclick="filterOrders('rejected', this)">Rejected</button>
         </div>
-    </div>
 
-    <div class="qr-modal" id="qrModal">
-        <div class="qr-card">
-            <i class="fa-solid fa-xmark close-modal" onclick="closePaymentModal()"></i>
-            <div class="qr-title">Scan to Pay</div>
-            <div class="qr-subtitle">Please scan the QR code via Khalti, eSewa or Fonepay</div>
-            
-            <div class="account-details-box">
-                <strong>Notice:</strong> Gaule Store <br>
-                <strong>Remark Code:</strong> <span id="dynamic-remark" style="color: #e53e3e; font-weight: bold; font-size: 15px;">-</span> <br>
-                <span style="font-size: 11px; color: #718096;">Please write this exact remark in your payment app. Do not write Free Fire Top Up.</span>
-            </div>
-
-            <div class="qr-image-wrapper">
-                <img id="dynamic-qr-img" src="qr_code.png" alt="Payment QR Code">
-            </div>
-
-            <div class="txid-container">
-                <label class="txid-label" for="txid">Transaction ID / Ref ID <span style="color: #e53e3e;">*</span></label>
-                <div class="txid-input-wrapper">
-                    <i class="fa-solid fa-receipt"></i>
-                    <input type="text" id="txid" class="txid-input" placeholder="Enter transaction ID after payment" oninput="validateTxIDLive()">
-                </div>
-                <div class="txid-error-message" id="txid-error">
-                    <i class="fa-solid fa-circle-exclamation"></i> <span>Transaction ID is required to verify payment!</span>
-                </div>
-            </div>
-
-            <div class="payment-summary-box">
-                <div class="pay-row">
-                    <span>Game UID:</span>
-                    <span id="modal-uid" style="font-weight: bold; color: #1a202c;">-</span>
-                </div>
-                <div class="pay-row">
-                    <span>Selected Pack:</span>
-                    <span id="modal-item">-</span>
-                </div>
-                <div class="pay-row">
-                    <span>Amount Due:</span>
-                    <span class="highlight-total" id="modal-total">Rs 0.00</span>
-                </div>
-            </div>
-
-            <button id="submit-btn" class="done-btn" onclick="submitPayment()">Submit Payment</button>
-        </div>
-    </div>
-
-    <div class="success-modal" id="successModal">
-        <div class="success-card">
-            <div class="success-checkmark">
-                <i class="fa-solid fa-check"></i>
-            </div>
-            <div class="success-title">Order Submitted!</div>
-            <p class="success-msg">Your order has been received. Our team will verify and top-up your diamonds instantly.</p>
-            
-            <div class="success-receipt-info">
-                <div class="receipt-row">
-                    <span>Game ID:</span>
-                    <span id="receipt-uid">-</span>
-                </div>
-                <div class="receipt-row">
-                    <span>Item:</span>
-                    <span id="receipt-item">-</span>
-                </div>
-                <div class="receipt-row">
-                    <span>Price:</span>
-                    <span id="receipt-price" style="color: #2ed573;">-</span>
-                </div>
-                <div class="receipt-row">
-                    <span>Status:</span>
-                    <span style="color: #ffb300;">Pending Verification</span>
-                </div>
-            </div>
-
-            <button class="success-close-btn" onclick="closeSuccessModal()">Great, Thanks!</button>
+        <!-- Orders List Wrapper -->
+        <div id="orders-list">
+            <div class="no-data"><i class="fa-solid fa-spinner fa-spin"></i> Loading orders...</div>
         </div>
     </div>
 
     <script>
-        function switchTab(type, element) {
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            element.classList.add('active');
-
-            if (type === 'membership') {
-                const membershipEl = document.getElementById('membership-section');
-                membershipEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }
-
-        function generateRandomRemark() {
-            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            let result = "";
-            for (let i = 0; i < 6; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        }
-
-        let currentRemark = "";
-    </script>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
         const firebaseConfig = {
             apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
             authDomain: "gaule-top-up-center.firebaseapp.com",
@@ -508,168 +447,226 @@
             projectId: "gaule-top-up-center",
             storageBucket: "gaule-top-up-center.firebasestorage.app",
             messagingSenderId: "645605489690",
-            appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+            appId: "1:645605489690:web:0b0f2898d295be03c1e5a3"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
-        const provider = new GoogleAuthProvider();
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        let currentUser = null;
-        let selectedItemName = "";
-        let selectedItemPrice = "";
+        let isAdmin = false;
+        let globalOrders = {};
+        let currentStatusFilter = 'all';
 
-        const mainActionBtn = document.getElementById('main-action-btn');
-        const gameUidInput = document.getElementById('game-uid');
-        const uidError = document.getElementById('uid-error');
-        const packError = document.getElementById('pack-error');
-        const diamondsWrapper = document.getElementById('diamonds-wrapper');
-        const txidInput = document.getElementById('txid');
-        const txidError = document.getElementById('txid-error');
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                mainActionBtn.innerHTML = `<i class="fa-solid fa-basket-shopping"></i> Buy Now`;
-                mainActionBtn.classList.remove('login-needed');
+        auth.onAuthStateChanged((user) => {
+            isAdmin = (user && user.email === "gaulestore.np@gmail.com");
+            const adminTag = document.getElementById('adminTag');
+            
+            if (user && isAdmin) {
+                adminTag.style.display = 'inline-block';
             } else {
-                currentUser = null;
-                mainActionBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login to Buy`;
-                mainActionBtn.classList.add('login-needed');
+                adminTag.style.display = 'none';
             }
+            renderOrders();
         });
 
-        mainActionBtn.onclick = function() {
-            if (!currentUser) {
-                signInWithPopup(auth, provider).then((result) => {
-                    console.log("Logged in!");
-                }).catch((error) => {
-                    alert("लगइन असफल भयो: " + error.message);
-                });
-                return;
-            }
+        db.ref('orders').on('value', (snapshot) => {
+            globalOrders = snapshot.val() || {};
+            renderOrders();
+        }, (error) => {
+            console.error(error);
+            document.getElementById('orders-list').innerHTML = '<div class="no-data">Failed to load database orders!</div>';
+        });
 
-            let isFormValid = true;
-
-            if (!selectedItemName) {
-                diamondsWrapper.classList.add('error-border');
-                packError.style.display = "flex";
-                diamondsWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                isFormValid = false;
-            }
-
-            let uidValue = gameUidInput.value.trim();
-            if (uidValue === "") {
-                gameUidInput.classList.add('error-border');
-                uidError.style.display = "flex";
-                uidError.querySelector("span").innerText = "Please enter your Game UID!";
-                if(isFormValid) gameUidInput.focus();
-                isFormValid = false;
-            }
-
-            if(!isFormValid) return;
-            openPaymentModal(uidValue);
-        };
-
-        window.selectPack = function(element, name, price) {
-            diamondsWrapper.classList.remove('error-border');
-            packError.style.display = "none";
-
-            document.querySelectorAll('.pack-card').forEach(card => card.classList.remove('selected'));
-            element.classList.add('selected');
+        function formatOrderDate(order) {
+            let timestamp = order.timestamp || order.date || order.createdAt;
+            if (!timestamp) return '';
+            let dateObj = new Date(timestamp);
+            if (isNaN(dateObj.getTime())) return '';
             
-            selectedItemName = name;
-            selectedItemPrice = price;
-
-            document.getElementById('summary-item').innerText = name;
-            document.getElementById('summary-total').innerText = 'Rs ' + price;
-        };
-
-        window.validateUIDLive = function() {
-            if (gameUidInput.value.trim() !== "") {
-                gameUidInput.classList.remove('error-border');
-                uidError.style.display = "none";
-            }
-        };
-
-        window.validateTxIDLive = function() {
-            if (txidInput.value.trim() !== "") {
-                txidInput.classList.remove('error-border');
-                txidError.style.display = "none";
-            }
-        };
-
-        function openPaymentModal(uid) {
-            currentRemark = generateRandomRemark();
-            document.getElementById('dynamic-remark').innerText = currentRemark;
-            document.getElementById('modal-uid').innerText = uid;
-            document.getElementById('modal-item').innerText = selectedItemName;
-            document.getElementById('modal-total').innerText = 'Rs ' + selectedItemPrice;
-            
-            txidInput.value = ""; 
-            txidInput.classList.remove('error-border');
-            txidError.style.display = "none";
-
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Submit Payment";
-
-            document.getElementById('qrModal').classList.add('show');
+            return dateObj.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         }
 
-        window.closePaymentModal = function() {
-            document.getElementById('qrModal').classList.remove('show');
-        };
-
-        window.submitPayment = function() {
-            let txidValue = txidInput.value.trim();
-            let uidValue = gameUidInput.value.trim();
+        function renderOrders() {
+            const container = document.getElementById('orders-list');
+            container.innerHTML = '';
             
-            if (txidValue === "") {
-                txidInput.classList.add('error-border');
-                txidError.style.display = "flex";
-                txidInput.focus();
+            const currentUser = auth.currentUser;
+            
+            if (!currentUser) {
+                container.innerHTML = `
+                    <div class="no-data">
+                        <p style="font-weight: 800; color: #0f172a; font-size: 17px;"><br><br><br><br><br><br>Welcome to Gaule Store</p>
+                        <p style="color: #475569; font-size: 13px; margin-top: 6px; font-weight: 600;">Please login to view your order history</p>
+                        <button class="login-prompt-btn" onclick="handleAuthAction()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+                            </svg>
+                            Continue with Google
+                        </button>
+                    </div>
+                `;
                 return;
             }
 
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Submitting...";
+            const keys = Object.keys(globalOrders);
+            if (keys.length === 0) {
+                container.innerHTML = '<div class="no-data"><i class="fa-regular fa-folder-open" style="font-size: 24px; margin-bottom: 8px; display: block;"></i>No orders found in database!</div>';
+                return;
+            }
 
-            const now = new Date();
-            const orderRef = push(ref(db, 'orders'));
-            
-            set(orderRef, {
-                date: now.toLocaleDateString(),
-                time: now.toLocaleTimeString(),
-                timestamp: Date.now(),
-                email: currentUser.email,
-                name: currentUser.displayName || "User",
-                userId: currentUser.uid,
-                product: selectedItemName,
-                amountDue: selectedItemPrice,
-                uid: uidValue,
-                transactionId: txidValue,
-                remark: currentRemark, // यो लाइनले Firebase मा random remark सेभ गर्छ
-                status: "Pending"
-            }).then(() => {
-                closePaymentModal();
-                document.getElementById('receipt-uid').innerText = uidValue;
-                document.getElementById('receipt-item').innerText = selectedItemName;
-                document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
-                document.getElementById('successModal').classList.add('show');
-            }).catch((error) => {
-                alert("अर्डर पठाउन समस्या भयो: " + error.message);
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Submit Payment";
+            const searchQuery = document.getElementById('orderSearchInput') ? document.getElementById('orderSearchInput').value.toLowerCase().trim() : '';
+            let visibleCount = 0;
+
+            // Reverse the array so the newest orders appear at the top
+            const reversedKeys = [...keys].reverse();
+            const totalOrdersCount = keys.length;
+
+            reversedKeys.forEach((key, index) => {
+                const order = globalOrders[key];
+                
+                const orderEmail = (order.email || order.authEmail || '').toLowerCase();
+                const currentEmail = (currentUser.email || '').toLowerCase();
+                const orderUserId = order.userId || '';
+                const currentUserId = currentUser.uid || '';
+
+                const isOwner = (orderEmail && currentEmail && orderEmail === currentEmail) || 
+                                (orderUserId && currentUserId && orderUserId === currentUserId);
+                
+                if (!isAdmin && !isOwner) return;
+
+                const displayUID = (order.uid && order.uid.length < 20) ? order.uid : (order.playerId || order.gameId || order.playerUID || '');
+                const displayPlayerName = order.playerName || '';
+                const displayZoneId = order.zoneid || order.zoneId || order.zone || order.server || order.zoneID || '';
+                const displayEmail = order.email || order.userEmail || order.authEmail || '';
+                const productTitle = order.product || order.productName || order.title || 'Game Topup';
+                let orderStatus = (order.status || 'pending').toLowerCase();
+                
+                if (orderStatus === 'cancelled') orderStatus = 'rejected';
+
+                const orderAmount = order.amountDue !== undefined ? order.amountDue : (order.amount !== undefined ? order.amount : (order.price !== undefined ? order.price : (order.total || '0')));
+                
+                // Calculate sequential number: First order placed is #1, going up to total count for the newest
+                const sequentialNumber = totalOrdersCount - index;
+                const orderIdStr = '#' + sequentialNumber;
+
+                const orderDateStr = formatOrderDate(order);
+                const transactionId = order.transactionId || order.txnId || order.transactionID || '';
+
+                const matchesStatus = (currentStatusFilter === 'all' || orderStatus === currentStatusFilter || (currentStatusFilter === 'complete' && (orderStatus === 'completed' || orderStatus === 'complete')));
+                const searchString = `${orderIdStr} ${productTitle} ${displayEmail} ${displayUID} ${displayPlayerName} ${displayZoneId} ${orderAmount} ${order.redeemCode || ''} ${transactionId} ${orderDateStr}`.toLowerCase();
+                const matchesSearch = searchString.includes(searchQuery);
+
+                if (matchesStatus && matchesSearch) {
+                    visibleCount++;
+
+                    let statusClass = 'status-pending';
+                    if (orderStatus === 'completed' || orderStatus === 'complete') statusClass = 'status-completed';
+                    else if (orderStatus === 'rejected') statusClass = 'status-rejected';
+
+                    const cardHTML = `
+                        <div class="order-card">
+                            <div class="order-header">
+                                <span class="order-id">${orderIdStr}</span>
+                                <span class="order-status ${statusClass}">${orderStatus}</span>
+                            </div>
+                            <div class="item-details">
+                                <div class="product-name"><i class="fa-solid fa-gem"></i> ${productTitle}</div>
+                                ${orderDateStr ? `<div class="info-row"><i class="fa-solid fa-calendar-days"></i> ${orderDateStr}</div>` : ''}
+                                ${displayEmail ? `<div class="info-row"><i class="fa-solid fa-envelope"></i> ${displayEmail}</div>` : ''}
+                                ${displayUID ? `<div class="info-row"><i class="fa-solid fa-gamepad"></i> UID: <b>${displayUID}</b></div>` : ''}
+                                ${displayPlayerName && displayPlayerName !== "Unknown" ? `<div class="info-row"><i class="fa-solid fa-user-check"></i> Player: <b style="color: #0284c7;">${displayPlayerName}</b></div>` : ''}
+                                ${displayZoneId ? `<div class="info-row"><i class="fa-solid fa-server"></i> Zone ID: <b>${displayZoneId}</b></div>` : ''}
+                                ${order.redeemCode ? `<div class="info-row" style="color:#2563eb;"><i class="fa-solid fa-key"></i> Code: <b>${order.redeemCode}</b></div>` : ''}
+                                
+                                <div class="admin-action-box ${isAdmin ? 'visible' : ''}" style="margin-top: 6px; margin-bottom: 0px; border-top: none; padding-top: 0px;">
+                                    ${transactionId ? `<div class="info-row" style="color:#059669;"><i class="fa-solid fa-receipt"></i> Txn ID: <b>${transactionId}</b></div>` : `<div class="info-row" style="color:#6b7280;"><i class="fa-solid fa-receipt"></i> Txn ID: <b>Not Provided</b></div>`}
+                                </div>
+
+                                <div class="price-tag">Rs. ${orderAmount}</div>
+                            </div>
+                            <div class="admin-action-box ${isAdmin ? 'visible' : ''}">
+                                <div class="admin-btn-row">
+                                    <button class="adm-btn btn-complete" onclick="completeOrder('${key}')"><i class="fa-solid fa-check"></i> Complete</button>
+                                    <button class="adm-btn btn-reject" onclick="updateStatus('${key}', 'rejected')"><i class="fa-solid fa-xmark"></i> Reject</button>
+                                </div>
+                                <div class="admin-btn-row">
+                                    <a href="https://shop.garena.my" target="_blank" class="adm-btn btn-topup"><i class="fa-solid fa-external-link-alt"></i> Top Up</a>
+                                </div>
+                                <button class="adm-btn btn-delete" onclick="deleteOrder('${key}')"><i class="fa-solid fa-trash"></i> Delete Order</button>
+                            </div>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', cardHTML);
+                }
             });
-        };
 
-        window.closeSuccessModal = function() {
-            document.getElementById('successModal').classList.remove('show');
-            location.reload();
-        };
+            if (visibleCount === 0) {
+                container.innerHTML = '<div class="no-data">No orders found for this account!</div>';
+            }
+        }
+
+        function toggleSearchbar() {
+            const searchBar = document.getElementById('searchBarContainer');
+            const filterTabs = document.getElementById('filterTabs');
+            const searchIcon = document.getElementById('searchIconToggle');
+            const input = document.getElementById('orderSearchInput');
+
+            searchBar.classList.toggle('active');
+            filterTabs.classList.toggle('shifted');
+
+            if (searchBar.classList.contains('active')) {
+                searchIcon.className = "fa-solid fa-xmark";
+                input.focus();
+            } else {
+                searchIcon.className = "fa-solid fa-magnifying-glass";
+                input.value = '';
+                renderOrders();
+            }
+        }
+
+        function filterOrders(status, button) {
+            currentStatusFilter = status;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            renderOrders();
+        }
+
+        function completeOrder(key) {
+            const redeemCode = prompt("Enter the Unipin / Redeem Code (Optional - click OK/Cancel to leave empty):");
+            let updateData = { status: 'complete' };
+            
+            if (redeemCode !== null && redeemCode.trim() !== "") {
+                updateData.redeemCode = redeemCode.trim();
+            }
+
+            db.ref('orders/' + key).update(updateData).catch(err => alert(err.message));
+        }
+
+        function updateStatus(key, status) {
+            db.ref('orders/' + key).update({ status: status }).catch(err => alert(err.message));
+        }
+
+        function deleteOrder(key) {
+            if (confirm("Yo order database bata permanent delete garne ho?")) {
+                db.ref('orders/' + key).remove().catch(err => alert(err.message));
+            }
+        }
+
+        function handleAuthAction() {
+            if (!auth.currentUser) {
+                auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(err => alert(err.message));
+            }
+        }
     </script>
 </body>
 </html>
@@ -681,25 +678,27 @@
 
 
 
-<br>
-<br>
-<br>
 
 
+
+
+
+
+<br>
 <div class="bottom-nav">
-    <a href="../../index.html" class="nav-item">
+    <a href="../index.html" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
         <span>Home</span>
     </a>
-    <a href="../../index.html" class="nav-item">
+    <a href="../shop" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
         <span>Shop</span>
     </a>
-    <a href="../../order" class="nav-item">
+    <a href="index.html" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         <span>Order</span>
     </a>
-    <a href="../../account" class="nav-item">
+    <a href="../account" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         <span>Account</span>
     </a>
