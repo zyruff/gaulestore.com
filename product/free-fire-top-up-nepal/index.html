@@ -220,7 +220,6 @@
         </div>
     </div>
 
-    <!-- यहाँ ट्याबहरूमा क्लिक गर्दा काम गर्ने बनाइएको छ -->
     <div class="tabs-container">
         <div class="tab active" onclick="switchTab('diamonds', this)">Diamonds</div>
         <div class="tab" onclick="switchTab('membership', this)">Membership</div>
@@ -330,7 +329,6 @@
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <!-- membership-section मा id राखिएको छ ताकि सजिलै स्क्रोल गर्न मिलोस् -->
             <div class="box-title" id="membership-section" style="grid-column: span 2; margin-top: 10px;">
                 Membership <span style="color:#e53e3e;">*</span>
             </div>
@@ -404,7 +402,8 @@
             
             <div class="account-details-box">
                 <strong>Notice:</strong> Gaule Store <br>
-                <strong>Remark:</strong> Please write your real name in the remarks. Do not write Free Fire Top Up.
+                <strong>Remark Code:</strong> <span id="dynamic-remark" style="color: #e53e3e; font-weight: bold; font-size: 15px;">-</span> <br>
+                <span style="font-size: 11px; color: #718096;">Please write this exact remark in your payment app. Do not write Free Fire Top Up.</span>
             </div>
 
             <div class="qr-image-wrapper">
@@ -473,7 +472,6 @@
     </div>
 
     <script>
-        // ट्याब क्लिक गर्दा काम गर्ने फंक्शन
         function switchTab(type, element) {
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             element.classList.add('active');
@@ -485,6 +483,18 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
+
+        // Random Remark Generator (e.g. EV17BE)
+        function generateRandomRemark() {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let result = "";
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        let currentRemark = "";
     </script>
 
     <script type="module">
@@ -592,6 +602,8 @@
         };
 
         function openPaymentModal(uid) {
+            currentRemark = generateRandomRemark();
+            document.getElementById('dynamic-remark').innerText = currentRemark;
             document.getElementById('modal-uid').innerText = uid;
             document.getElementById('modal-item').innerText = selectedItemName;
             document.getElementById('modal-total').innerText = 'Rs ' + selectedItemPrice;
@@ -608,7 +620,6 @@
         }
 
         window.closePaymentModal = function() {
-            document.getElementById('qrModal').classList.remove('now');
             document.getElementById('qrModal').classList.remove('show');
         };
 
@@ -640,7 +651,8 @@
                 product: selectedItemName,
                 amountDue: selectedItemPrice,
                 uid: uidValue,
-                    transactionId: txidValue,
+                transactionId: txidValue,
+                remark: currentRemark,
                 status: "Pending"
             }).then(() => {
                 closePaymentModal();
@@ -662,6 +674,7 @@
     </script>
 </body>
 </html>
+
 
 
 
