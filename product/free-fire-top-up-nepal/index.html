@@ -109,8 +109,6 @@
 
 
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -132,7 +130,7 @@
         .avatar-img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #ffb300; object-fit: cover; }
         .banner-desc { font-size: 13px; color: #4a5568; line-height: 1.4; }
         .tabs-container { display: flex; gap: 8px; padding: 0 16px; overflow-x: auto; margin-bottom: 20px; margin-top: 10px; }
-        .tab { background-color: #edf2f7; color: #4a5568; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 500; white-space: nowrap; }
+        .tab { background-color: #edf2f7; color: #4a5568; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; }
         .tab.active { background-color: #ffffff; color: #1a202c; border: 1px solid #cbd5e0; }
         .section-box { margin: 0 16px 20px 16px; }
         .section-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -218,9 +216,10 @@
         </div>
     </div>
 
+    <!-- यहाँ ट्याबहरूमा क्लिक गर्दा काम गर्ने बनाइएको छ -->
     <div class="tabs-container">
-        <div class="tab active">Diamonds</div>
-        <div class="tab">Membership</div>
+        <div class="tab active" onclick="switchTab('diamonds', this)">Diamonds</div>
+        <div class="tab" onclick="switchTab('membership', this)">Membership</div>
     </div>
 
 <div class="section-box">
@@ -327,7 +326,8 @@
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
 
-            <div class="box-title" style="grid-column: span 2; margin-top: 10px;">
+            <!-- membership-section मा id राखिएको छ ताकि सजिलै स्क्रोल गर्न मिलोस् -->
+            <div class="box-title" id="membership-section" style="grid-column: span 2; margin-top: 10px;">
                 Membership <span style="color:#e53e3e;">*</span>
             </div>
 
@@ -468,6 +468,21 @@
         </div>
     </div>
 
+    <script>
+        // ट्याब क्लिक गर्दा काम गर्ने फंक्शन
+        function switchTab(type, element) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+
+            if (type === 'membership') {
+                const membershipEl = document.getElementById('membership-section');
+                membershipEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+    </script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -589,6 +604,7 @@
         }
 
         window.closePaymentModal = function() {
+            document.getElementById('qrModal').classList.remove('now');
             document.getElementById('qrModal').classList.remove('show');
         };
 
@@ -620,7 +636,7 @@
                 product: selectedItemName,
                 amountDue: selectedItemPrice,
                 uid: uidValue,
-                transactionId: txidValue,
+                    transactionId: txidValue,
                 status: "Pending"
             }).then(() => {
                 closePaymentModal();
@@ -642,9 +658,6 @@
     </script>
 </body>
 </html>
-
-
-
 
 
 
