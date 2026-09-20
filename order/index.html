@@ -421,7 +421,7 @@
         <div class="search-bar-container" id="searchBarContainer">
             <div class="search-input-wrap">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="orderSearchInput" class="search-input" placeholder="Search Product, Email, UID, Player Name, Txn ID, Remark..." onkeyup="renderOrders()">
+                <input type="text" id="orderSearchInput" class="search-input" placeholder="Search Product, Email, UID, Player Name, Txn ID..." onkeyup="renderOrders()">
             </div>
         </div>
 
@@ -527,6 +527,7 @@
             const searchQuery = document.getElementById('orderSearchInput') ? document.getElementById('orderSearchInput').value.toLowerCase().trim() : '';
             let visibleCount = 0;
 
+            // Reverse the array so the newest orders appear at the top
             const reversedKeys = [...keys].reverse();
             const totalOrdersCount = keys.length;
 
@@ -554,15 +555,15 @@
 
                 const orderAmount = order.amountDue !== undefined ? order.amountDue : (order.amount !== undefined ? order.amount : (order.price !== undefined ? order.price : (order.total || '0')));
                 
+                // Calculate sequential number: First order placed is #1, going up to total count for the newest
                 const sequentialNumber = totalOrdersCount - index;
                 const orderIdStr = '#' + sequentialNumber;
 
                 const orderDateStr = formatOrderDate(order);
                 const transactionId = order.transactionId || order.txnId || order.transactionID || '';
-                const orderRemark = order.remark || ''; // Firebase बाट Remark तानेको
 
                 const matchesStatus = (currentStatusFilter === 'all' || orderStatus === currentStatusFilter || (currentStatusFilter === 'complete' && (orderStatus === 'completed' || orderStatus === 'complete')));
-                const searchString = `${orderIdStr} ${productTitle} ${displayEmail} ${displayUID} ${displayPlayerName} ${displayZoneId} ${orderAmount} ${order.redeemCode || ''} ${transactionId} ${orderRemark} ${orderDateStr}`.toLowerCase();
+                const searchString = `${orderIdStr} ${productTitle} ${displayEmail} ${displayUID} ${displayPlayerName} ${displayZoneId} ${orderAmount} ${order.redeemCode || ''} ${transactionId} ${orderDateStr}`.toLowerCase();
                 const matchesSearch = searchString.includes(searchQuery);
 
                 if (matchesStatus && matchesSearch) {
@@ -590,9 +591,6 @@
                                 <div class="admin-action-box ${isAdmin ? 'visible' : ''}" style="margin-top: 6px; margin-bottom: 0px; border-top: none; padding-top: 0px;">
                                     ${transactionId ? `<div class="info-row" style="color:#059669;"><i class="fa-solid fa-receipt"></i> Txn ID: <b>${transactionId}</b></div>` : `<div class="info-row" style="color:#6b7280;"><i class="fa-solid fa-receipt"></i> Txn ID: <b>Not Provided</b></div>`}
                                 </div>
-
-                                <!-- Remark Code display: युजरले आफ्नो मात्र देख्छ, Admin ले सबैको देख्छ -->
-                                ${orderRemark ? `<div class="info-row" style="color:#e53e3e; margin-top: 4px;"><i class="fa-solid fa-tag" style="color:#e53e3e;"></i> Remark: <b>${orderRemark}</b></div>` : ''}
 
                                 <div class="price-tag">Rs. ${orderAmount}</div>
                             </div>
@@ -672,7 +670,6 @@
     </script>
 </body>
 </html>
-
 
 
 
