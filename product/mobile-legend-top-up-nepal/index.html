@@ -4,16 +4,15 @@
     <link rel="canonical" href="https://roshantamang2.com.np/" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Open Graph Tags (Facebook, WhatsApp Preview को लागि) -->
+    <!-- Open Graph Tags -->
     <meta property="og:title" content="Gaule Store - Buy Mobile Legend Diamond in Nepal" />
     <meta property="og:description" content="Buy Mobile Legend Diamond And Subscription  in Nepal at the cheapest price with Gaule Store. 1-5 min instant delivery." />
     <meta property="og:image" content="https://roshantamang2.com.np/product/mobile-legend-top-up-nepal/mbl.png" />
     <meta property="og:url" content="https://roshantamang2.com.np/product/mobile-legend-top-up-nepal" />
     <meta property="og:type" content="website" />
 
-    <!-- Twitter Preview को लागि (वैकल्पिक) -->
+    <!-- Twitter Preview -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gaule Store - Official Custom Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -30,20 +29,15 @@
         .search-box { display: flex; gap: 5px; margin-bottom: 20px; }
         #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
         .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
-        #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; }
+        #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; object-fit: cover; }
         #profile-dropdown { display: none; position: absolute; top: 50px; right: 0; background: white; border: 1px solid #ccc; padding: 15px; width: 200px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); border-radius: 8px; text-align: center; z-index: 1000; }
         .user-name { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
         .user-email { font-size: 12px; color: #666; margin-bottom: 10px; }
         .change-name { font-size: 11px; color: #dc2626; text-decoration: none; display: block; margin-bottom: 15px; }
         .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; cursor: pointer; border-radius: 4px; }
         #nav-menu a { display: block; padding: 12px 0; color: black; text-decoration: none; border-bottom: 1px solid #eee; }
-        .order-card { background: white; border-left: 5px solid #dc2626; padding: 10px; margin-bottom: 8px; border-radius: 5px; box-shadow: 0 2px 5px #ddd; }
         .store-title { font-size: 1.5rem; font-weight: bold; }
         .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
-
-        /* --- BACK HOME BUTTON --- */
-        .elegant-back-btn { display: inline-block; padding: 8px 16px; background-color: #e74c3c; color: white; text-decoration: none; border-radius: 5px; font-size: 14px; font-weight: bold; box-shadow: 0 3px 6px rgba(0,0,0,0.2); transition: background 0.3s, transform 0.2s; margin: 15px; }
-        .elegant-back-btn:hover { background-color: #c0392b; transform: translateY(-2px); }
 
         /* --- BANNER SECTION --- */
         .banner-container { padding: 16px; background: linear-gradient(180deg, #ffffff 0%, #f7fafc 100%); border-bottom: 1px solid #e2e8f0; }
@@ -67,7 +61,7 @@
         .box-title { font-size: 15px; text-transform: uppercase; font-weight: 700; color: #1a202c; }
         .input-card-panel { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         .input-label { font-size: 11px; font-weight: 600; color: #718096; text-transform: uppercase; margin-bottom: 8px; margin-top: 10px; }
-        .uid-input { width: 100%; background-color: #f7fafc; border: 1px solid #cbd5e0; border-radius: 8px; padding: 14px; color: #1a202c; font-size: 14px; outline: none; margin-bottom: 4px; transition: all 0.2s; }
+        .uid-input { width: 100%; background-color: #f7fafc; border: 1px solid #cbd5e0; border-radius: 8px; padding: 14px; color: #1a202c; font-size: 14px; outline: none; margin-bottom: 4px; transition: all 0.2s; box-sizing: border-box; }
         .uid-input.error-border { border: 1px solid #e53e3e !important; background-color: #fff5f5 !important; }
         .error-message { color: #e53e3e; font-size: 12px; margin-bottom: 10px; display: none; align-items: center; gap: 6px; font-weight: 500; margin-top: 4px; }
         .instruction-text { font-size: 11px; color: #718096; display: flex; gap: 8px; line-height: 1.4; margin-top: 12px; }
@@ -96,72 +90,18 @@
         .action-btn { display: flex; justify-content: center; align-items: center; gap: 8px; border: none; cursor: pointer; font-weight: 700; color: #ffffff; background-color: #ffb300; transition: background 0.2s; width: 200px; height: 42px; font-size: 14px; border-radius: 25px; margin: 0 auto; }
         .action-btn.login-needed { background-color: #dc2626; }
 
-        /* --- QR MODAL FIXED CENTER --- */
-        .qr-modal { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background-color: rgba(0, 0, 0, 0.5); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 200; 
-            opacity: 0; 
-            pointer-events: none; 
-            transition: all 0.3s ease; 
-            padding: 16px; 
-            box-sizing: border-box;
-        }
-        .qr-modal.show { 
-            opacity: 1; 
-            pointer-events: auto; 
-        }
-        .qr-card { 
-            background-color: #ffffff; 
-            border: 1px solid #e2e8f0; 
-            border-radius: 16px; 
-            padding: 20px; 
-            max-width: 380px; 
-            width: 100%; 
-            text-align: center; 
-            position: relative; 
-            transform: scale(0.8); 
-            transition: all 0.3s ease; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            box-sizing: border-box;
-            margin: 0 auto;
-        }
-        .qr-modal.show .qr-card { 
-            transform: scale(1); 
-        }
+        /* --- QR MODAL --- */
+        .qr-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 200; opacity: 0; pointer-events: none; transition: all 0.3s ease; padding: 16px; box-sizing: border-box; }
+        .qr-modal.show { opacity: 1; pointer-events: auto; }
+        .qr-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; max-width: 380px; width: 100%; text-align: center; position: relative; transform: scale(0.8); transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.1); box-sizing: border-box; margin: 0 auto; }
+        .qr-modal.show .qr-card { transform: scale(1); }
         .close-modal { position: absolute; top: 15px; right: 15px; font-size: 20px; color: #718096; cursor: pointer; }
         .qr-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; color: #1a202c; }
         .qr-subtitle { font-size: 13px; color: #4a5568; margin-bottom: 12px; }
         .account-details-box { background: #fffdf5; border: 1px solid #ffb300; padding: 10px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; text-align: left; line-height: 1.5; }
         
-        /* --- QR IMAGE WRAPPER CENTERED (CLEANED) --- */
-        .qr-image-wrapper { 
-            background-color: #f7fafc; 
-            padding: 12px; 
-            border-radius: 12px; 
-            display: flex; 
-            justify-content: center;
-            align-items: center;
-            margin: 0 auto 15px auto; 
-            border: 1px solid #e2e8f0; 
-            max-width: 200px;
-            width: 100%;
-            height: 200px;
-            box-sizing: border-box;
-        }
-        .qr-image-wrapper img { 
-            max-width: 100%; 
-            max-height: 100%; 
-            object-fit: contain; 
-            display: block; 
-        }
+        .qr-image-wrapper { background-color: #f7fafc; padding: 12px; border-radius: 12px; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px auto; border: 1px solid #e2e8f0; max-width: 200px; width: 100%; height: 200px; box-sizing: border-box; }
+        .qr-image-wrapper img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
         
         .txid-container { text-align: left; margin-bottom: 5px; }
         .txid-label { font-size: 12px; font-weight: 600; color: #4a5568; margin-bottom: 6px; display: block; }
@@ -232,12 +172,6 @@
     <a href="shop.html">Shop</a>
     <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
 </div>
-
-</body>
-</html>
-
-
-
 
 <!-- MAIN BANNER -->
 <div class="banner-container">
@@ -429,12 +363,11 @@
         <div class="qr-subtitle">Please scan the QR code via Khalti, eSewa or Fonepay</div>
         
         <div class="account-details-box">
-            <strong> Notice:</strong> Gaule Store <br>
-            <strong> Remark:</strong> Please write your real name in the remarks. Do not write Free Fire Top Up.
+            <strong>Notice:</strong> Gaule Store <br>
+            <strong>Remark:</strong> Please write your real name in the remarks. Do not write Free Fire Top Up.
         </div>
 
         <div class="qr-image-wrapper">
-            <!-- यहाँ qr_code.png राखिएको छ र देखाउन नमिल्ने नियमहरू हटाइएका छन् -->
             <img src="qr_code.png" alt="Payment QR Code">
         </div>
 
@@ -504,7 +437,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, query, orderByChild, equalTo, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
@@ -541,54 +474,10 @@
     window.googleLogin = () => signInWithPopup(auth, provider);
     window.logoutUser = () => signOut(auth).then(() => location.reload());
 
-    // Order History Dashboard Screen
-    window.showOrders = () => {
-        toggleMenu();
-        const user = auth.currentUser;
-        if (!user) return;
-        
-        const area = document.getElementById("content-area");
-        const ordersRef = query(ref(db, 'orders'), orderByChild('userId'), equalTo(user.uid));
-        
-        onValue(ordersRef, (snapshot) => {
-            let orderHtml = `
-                <button onclick="location.reload()" style="margin-top:15px; margin-bottom:15px; padding:8px 15px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer;">
-                    ← Back Dashboard
-                </button>
-                <h2>My Orders</h2>
-            `;
-            
-            let orderArray = [];
-            snapshot.forEach((s) => { orderArray.push(s.val()); });
-            orderArray.reverse(); 
-
-            if (orderArray.length > 0) {
-                orderArray.forEach((o) => {
-                    let statusColor = '#eab308';
-                    if (o.status === 'Complete') statusColor = 'green';
-                    else if (o.status === 'Rejected') statusColor = 'red';
-
-                    orderHtml += `
-                        <div class="order-card">
-                            <p style="font-size: 14px; margin: 3px 0;">Product: <b>${o.product || "N/A"}</b></p>
-                            <p style="font-size: 14px; margin: 3px 0;">Player ID: <b>${o.uid || "N/A"}</b></p>
-                            <p style="font-size: 14px; margin: 3px 0;">Zone ID: <b>${o.zoneid || "N/A"}</b></p>
-                            <p style="font-size: 14px; margin: 3px 0;">Status: <b style="color:${statusColor}">${o.status}</b></p>
-                        </div>`;
-                });
-                area.innerHTML = orderHtml;
-            } else { 
-                area.innerHTML = orderHtml + "<p>No Order History</p>"; 
-            }
-            area.scrollIntoView({ behavior: 'smooth' });
-        });
-    };
-
     // Auth Change Handle
     onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUser = user;
-            document.getElementById("my-orders-link").style.display = "block";
             document.getElementById("login-container").style.display = "none";
             document.getElementById("profile-pic").style.display = "block";
             document.getElementById("profile-pic").src = user.photoURL;
@@ -599,6 +488,10 @@
             mainActionBtn.classList.remove('login-needed');
         } else {
             currentUser = null;
+            document.getElementById("login-container").style.display = "block";
+            document.getElementById("profile-pic").style.display = "none";
+            document.getElementById("profile-dropdown").style.display = "none";
+
             mainActionBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login to Buy`;
             mainActionBtn.classList.add('login-needed');
         }
@@ -688,7 +581,6 @@
         txidInput.classList.remove('error-border');
         txidError.style.display = "none";
 
-        // यदि पहिले बटन डिसेबल भएको थियो भने फेरि रिसेट गर्ने
         const doneBtn = document.querySelector('.done-btn');
         doneBtn.disabled = false;
         doneBtn.style.opacity = "1";
@@ -702,7 +594,6 @@
         document.getElementById('qrModal').classList.remove('show');
     };
 
-    // Submit Order to Firebase Realtime DB (With Double Click Protection)
     window.submitPayment = function() {
         let txidValue = txidInput.value.trim();
         let uidValue = gameUidInput.value.trim();
@@ -715,11 +606,9 @@
             return;
         }
 
-        // --- DOUBLE SUBMISSION PREVENTION ---
         const doneBtn = document.querySelector('.done-btn');
-        if (doneBtn.disabled) return; // पहिले नै प्रोसेसमा छ भने दोहोर्याएर क्लिक हुन नदिने
+        if (doneBtn.disabled) return;
         
-        // बटनलाई लक गर्ने र "Submitting..." राख्ने
         doneBtn.disabled = true;
         doneBtn.style.opacity = "0.7";
         doneBtn.style.cursor = "not-allowed";
@@ -750,7 +639,6 @@
         }).catch((error) => {
             alert("अर्डर पठाउन समस्या भयो: " + error.message);
             
-            // फेल खाएमा बटन फेरि एक्टिभ बनाउने
             doneBtn.disabled = false;
             doneBtn.style.opacity = "1";
             doneBtn.style.cursor = "pointer";
@@ -765,6 +653,7 @@
 </script>
 </body>
 </html>
+
 
 
 <br>
