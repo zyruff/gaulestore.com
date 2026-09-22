@@ -43,6 +43,63 @@
         .store-title { font-size: 1.5rem; font-weight: bold; }
         .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
     </style>
+
+
+
+<script>
+let deferredPrompt;
+const installBtn = document.getElementById('installAppBtn');
+
+// १. यदि एप पहिले नै इन्स्टल भइसकेको छ (Standalone mode मा छ) भने सुरुमै बटन लुकाउने
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+    if (installBtn) {
+        installBtn.style.display = 'none';
+    }
+}
+
+// २. ब्राउजरले इन्स्टल गर्न मिल्ने अनुमति दिएपछि मात्र बटन देखाउने
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // फेरि एकपटक इन्स्टल भयो/भएन चेक गरेर मात्र देखाउने
+    if (installBtn && !(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true)) {
+        installBtn.style.display = 'flex';
+    }
+});
+
+// ३. बटनमा क्लिक गर्दा पपअप खोल्ने
+if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        
+        deferredPrompt.prompt();
+        
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+            installBtn.style.display = 'none';
+        }
+        
+        deferredPrompt = null;
+    });
+}
+
+// ४. एप सफलतापूर्वक इन्स्टल भएपछि बटन लुकाउने
+window.addEventListener('appinstalled', () => {
+    if (installBtn) {
+        installBtn.style.display = 'none';
+    }
+    deferredPrompt = null;
+    console.log('App was successfully installed');
+});
+</script>
+
+
+
+
+
+
 </head>
 <body>
 
