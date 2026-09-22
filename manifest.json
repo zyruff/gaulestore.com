@@ -1,10 +1,10 @@
 {
   "name": "Gaule Gaming Store",
-  "short_name": "Gaule Top Up",
+  "short_name": "Gaule Top Up Store",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#dc2626",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "icons": [
     {
       "src": "owner.png",
