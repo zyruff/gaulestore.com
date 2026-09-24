@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <link rel="canonical" href="https://roshantamang2.com.np/" />
+     <link rel="canonical" href="https://roshantamang2.com.np" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Open Graph Tags (Facebook, WhatsApp Preview को लागि) -->
+    <meta property="og:title" content="Gaule Store - Less Is More in Nepal" />
+    <meta property="og:description" content="Buy Free Fire Less Is More in Nepal at the cheapest price with Gaule Store. 1-5 min instant delivery." />
+    <meta property="og:image" content="https://roshantamang2.com.np/product/less-is-more-nepal/less_is_more.png" />
+    <meta property="og:url" content="https://roshantamang2.com.np/product/less-is-more-nepal" />
+    <meta property="og:type" content="website" />
+
+    <!-- Twitter Preview को लागि (वैकल्पिक) -->
+    <meta name="twitter:card" content="summary_large_image" />
     <title>Gaule Store</title>
+
     <style>
         body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; }
         .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #dc2626; justify-content: space-between; }
