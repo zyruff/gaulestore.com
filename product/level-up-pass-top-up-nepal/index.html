@@ -236,14 +236,8 @@
             margin-bottom: 8px;
         }
 
-        .uid-flex-box {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
         .uid-input {
-            flex: 1;
+            width: 100%;
             background-color: #f7fafc;
             border: 1px solid #cbd5e0;
             border-radius: 8px;
@@ -252,28 +246,12 @@
             font-size: 14px;
             outline: none;
             transition: all 0.2s;
+            margin-bottom: 8px;
         }
 
         .uid-input.error-border {
             border: 1px solid #e53e3e !important;
             background-color: #fff5f5 !important;
-        }
-
-        .check-uid-btn {
-            background-color: #1a202c;
-            color: #ffffff;
-            border: none;
-            padding: 0 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-
-        .check-uid-btn:hover {
-            background-color: #2d3748;
         }
 
         .error-message {
@@ -421,15 +399,7 @@
         <div class="input-card-panel">
             <div class="input-label">Your Game ID (UID)</div>
             
-            <div class="uid-flex-box">
-                <input type="text" id="game-uid" class="uid-input" placeholder="PLAYER ID (UID)" oninput="clearUidError()">
-                <button type="button" class="check-uid-btn" onclick="checkPlayerName()">Check</button>
-            </div>
-
-            <div id="player-name-display" style="margin-top: 10px; padding: 10px; border-radius: 8px; background: #f0fff4; border: 1px solid #9ae6b4; display: none;">
-                <i class="fa-solid fa-user-check" style="color: #22543d;"></i> 
-                <span id="player-name" style="font-weight: 600; color: #22543d; font-size: 14px;">Searching...</span>
-            </div>
+            <input type="text" id="game-uid" class="uid-input" placeholder="PLAYER ID (UID)" oninput="clearUidError()">
             
             <div class="error-message" id="uid-error" style="display: none; color: #e53e3e; font-size: 12px; margin-top: 8px;">
                 <i class="fa-solid fa-circle-exclamation"></i> <span>Invalid or Missing UID!</span>
@@ -450,7 +420,6 @@
         <div class="error-message" id="pack-error" style="margin-bottom: 8px; display: none;">
             <i class="fa-solid fa-circle-exclamation"></i> <span>Please select a Level Up Pass!</span>
         </div>
-
       
 <style>
     .section-box { margin: 15px 15px; }
@@ -608,11 +577,6 @@
                     <span>User ID:</span>
                     <span id="modal-uid" style="font-weight: bold; color: #1a202c;">-</span>
                 </div>
-                <!-- प्लेयर नेम यहाँ थपिएको छ -->
-                <div class="pay-row">
-                    <span>Player Name:</span>
-                    <span id="modal-player-name" style="font-weight: bold; color: #2ed573;">-</span>
-                </div>
                 <div class="pay-row">
                     <span>Selected Pack:</span>
                     <span id="modal-item">-</span>
@@ -681,8 +645,6 @@
         let currentUser = null;
         let selectedItemName = "";
         let selectedItemPrice = "";
-        let fetchedPlayerName = "Unknown";
-        const apiKey = "8-kVJLu1Bxy5Mj6tmJupzSwK3WSJJ22wj29FGVvwwm4";
 
         const mainActionBtn = document.getElementById('main-action-btn');
         const gameUidInput = document.getElementById('game-uid');
@@ -709,50 +671,6 @@
             if (uid !== "") {
                 gameUidInput.classList.remove('error-border');
                 uidError.style.display = "none";
-            }
-        };
-
-        window.checkPlayerName = async function() {
-            const uid = gameUidInput.value.trim();
-            const display = document.getElementById("player-name-display");
-            const nameSpan = document.getElementById("player-name");
-
-            if (uid === "" || uid.length < 8) {
-                gameUidInput.classList.add('error-border');
-                uidError.style.display = "flex";
-                display.style.display = "none";
-                return;
-            }
-
-            gameUidInput.classList.remove('error-border');
-            uidError.style.display = "none";
-            display.style.display = "block";
-            nameSpan.innerText = "Searching...";
-            display.style.background = "#f0fff4";
-            display.style.borderColor = "#9ae6b4";
-
-            try {
-                const response = await fetch(`https://api.gameskinbo.com/ff-info/get?uid=${uid}&region=BD`, {
-                    headers: { 'x-api-key': apiKey }
-                });
-                const data = await response.json();
-
-                if (data.AccountInfo && data.AccountInfo.AccountName) {
-                    fetchedPlayerName = data.AccountInfo.AccountName;
-                    nameSpan.innerText = "Player: " + fetchedPlayerName;
-                    display.style.background = "#f0fff4";
-                    display.style.borderColor = "#9ae6b4";
-                } else {
-                    fetchedPlayerName = "Invalid ID";
-                    nameSpan.innerText = "Invalid ID (Not Found)";
-                    display.style.background = "#fff5f5";
-                    display.style.borderColor = "#feb2b2";
-                }
-            } catch (error) {
-                fetchedPlayerName = "Unknown";
-                nameSpan.innerText = "Error fetching player name!";
-                display.style.background = "#fff5f5";
-                display.style.borderColor = "#feb2b2";
             }
         };
 
@@ -810,7 +728,6 @@
 
         function openPaymentModal(uid) {
             document.getElementById('modal-uid').innerText = uid;
-            document.getElementById('modal-player-name').innerText = fetchedPlayerName; // प्लेयर नेम पास गरिएको
             document.getElementById('modal-item').innerText = selectedItemName;
             document.getElementById('modal-total').innerText = 'Rs ' + selectedItemPrice;
             
@@ -865,7 +782,6 @@
                 product: selectedItemName,
                 amountDue: selectedItemPrice,
                 uid: uidValue,
-                playerName: fetchedPlayerName,
                 transactionId: txidValue,
                 status: "Pending"
             }).then(() => {
