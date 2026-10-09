@@ -236,7 +236,8 @@
     }
 </style>
 
-<!-- Content (HTML) -->
+
+   <!-- Content (HTML) -->
 <div class="gs-header-container">
     <div class="gs-title-wrapper">
         <h1 class="gs-main-title">GAMING TOPUP & GIFT CARD</h1>
@@ -250,7 +251,53 @@
         100% TRUSTED & FAST SERVICE NEPAL
     </div>
 </div>
-   
+
+<style>
+.gs-header-container {
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-family: sans-serif;
+}
+
+.gs-title-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.gs-main-title {
+    margin: 0;
+    font-weight: 800;
+    
+    /* Side glow hataera solid black with a sharp clean gold light pass */
+    color: #000000;
+    background: linear-gradient(90deg, #000000 0%, #000000 42%, #f59e0b 50%, #fef08a 52%, #000000 58%, #000000 100%);
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: goldShimmer 7s linear infinite;
+}
+
+@keyframes goldShimmer {
+    0% { background-position: 100% center; }
+    100% { background-position: -200% center; }
+}
+
+.gs-sub-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #334155;
+    font-weight: 600;
+}
+
+.gs-sub-title svg {
+    width: 14px;
+    height: 14px;
+}
+</style>
+
 
 
     </p>
