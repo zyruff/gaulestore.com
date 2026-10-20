@@ -534,10 +534,28 @@
             submitBtn.innerText = "Submitting...";
 
             const now = new Date();
+            let itemNameLower = selectedItemName.toLowerCase();
+            let isMembership = itemNameLower.includes('weekly membership') || itemNameLower.includes('monthly membership');
+            let membershipType = itemNameLower.includes('monthly membership') ? 'monthly' : 'weekly';
+
+            // १. यदि मेम्बरसिप खरिद गर्न लागिएको हो भने पहिले स्टक (Voucher) चेक गर्ने
+            if (isMembership) {
+                const voucherRef = ref(db, `auto-top-up/${membershipType}`);
+                const snapshot = await get(voucherRef);
+
+                // यदि डेटाबेस शून्य (0) वा खाली छ भने
+                if (!snapshot.exists() || !snapshot.val() || Object.keys(snapshot.val()).length === 0) {
+                    alert("Out of Stock! यो मेम्बरसिपको भौचर स्टकमा उपलब्ध छैन। कृपया पछि प्रयास गर्नुहोस्।");
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Submit Payment";
+                    return; // स्टक ० भयो भने अर्डर अगाडि बढ्दैन
+                }
+            }
+
             const orderRef = push(ref(db, 'orders'));
             
             try {
-                // १. अर्डर Firebase को orders मा सेभ गर्ने
+                // २. अर्डर Firebase को orders मा सेभ गर्ने
                 await set(orderRef, {
                     date: now.toLocaleDateString(),
                     time: now.toLocaleTimeString(),
@@ -552,12 +570,9 @@
                     status: "Pending"
                 });
 
-                // २. यदि खरिद गरिएको वस्तु Membership हो भने अटोमेटिक टप-अप प्रोसेस गर्ने
-                let itemNameLower = selectedItemName.toLowerCase();
-                if (itemNameLower.includes('weekly membership')) {
-                    await processAutoTopUpApi(uidValue, 'weekly');
-                } else if (itemNameLower.includes('monthly membership')) {
-                    await processAutoTopUpApi(uidValue, 'monthly');
+                // ३. स्टक भएको अवस्थामा अटोमेटिक टप-अप प्रोसेस गर्ने
+                if (isMembership) {
+                    await processAutoTopUpApi(uidValue, membershipType);
                 }
 
                 closePaymentModal();
@@ -573,7 +588,7 @@
             }
         };
 
-        // ३. Firebase बाट भौचर तानेर Render ब्याकएन्डमार्फत AndroidArtist API मा पठाउने फङ्‍सन
+        // ४. Firebase बाट भौचर तानेर Render ब्याकएन्डमार्फत AndroidArtist API मा पठाउने फङ्‍सन
         async function processAutoTopUpApi(playerId, membershipType) {
             try {
                 const voucherRef = ref(db, `auto-top-up/${membershipType}`);
@@ -586,6 +601,12 @@
 
                 const vouchers = snapshot.val();
                 const voucherKeys = Object.keys(vouchers);
+
+                if (voucherKeys.length === 0) {
+                    console.error("No voucher keys found");
+                    return;
+                }
+
                 const selectedKey = voucherKeys[0];
                 const voucherCode = vouchers[selectedKey];
 
@@ -606,9 +627,10 @@
                 const result = await response.json();
                 console.log("Auto Top-up Response:", result);
 
-                if (result.status === 'success' || result.success) {
-                    // सफल भएपछि Firebase बाट प्रयोग भइसकेको भौचर अटोमेटिक हटाउने
+                // सफल भएपछि मात्र Firebase बाट प्रयोग भइसकेको भौचर अटोमेटिक हटाउने
+                if (result.status === 'success' || result.status === 200 || result.success) {
                     await remove(ref(db, `auto-top-up/${membershipType}/${selectedKey}`));
+                    console.log(`Voucher ${selectedKey} deleted successfully.`);
                 }
             } catch (err) {
                 console.error("Auto Top-up Error:", err);
@@ -622,6 +644,7 @@
     </script>
 </body>
 </html>
+
 
 <br>
 <br>
