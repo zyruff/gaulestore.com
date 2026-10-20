@@ -1,50 +1,39 @@
-async function processAutoTopUp(playerId, membershipType) {
-  // membershipType को नाम Firebase सँग मिल्नुपर्छ: 'weekly-membership' वा 'monthly-membership'
-  const voucherRef = firebase.database().ref(`auto-top-up/${membershipType}`);
+const express = require('express');
+const axios = require('axios');
+const cors = require('cors');
 
-  voucherRef.once('value', async (snapshot) => {
-    const vouchers = snapshot.val();
+const app = express();
+app.use(express.json());
+app.use(cors());
 
-    if (!vouchers) {
-      alert("Out of Stock! यो मेम्बरसिपको भौचर अहिले उपलब्ध छैन।");
-      return;
-    }
+// TopUp API Request Endpoint
+app.post('/api/process-topup', async (req, res) => {
+  try {
+    const apiKey = process.env.API_SECRET;
 
-    // पहिलो उपलब्ध भौचरको Key र Code लिने (जस्तै v1)
-    const voucherKeys = Object.keys(vouchers);
-    const selectedKey = voucherKeys[0];
-    const voucherCode = vouchers[selectedKey];
+    const payload = {
+      secret: apiKey,
+      ...req.body
+    };
 
-    if (!voucherCode) {
-      alert("Out of Stock! भौचर कोड खाली छ।");
-      return;
-    }
+    const response = await axios.post('https://androidartist.com/api/process-topup', payload);
+    res.json(response.data);
+  } catch (error) {
+    console.error("API Error:", error.response ? error.response.data : error.message);
+    res.status(500).json({ 
+      error: error.message,
+      details: error.response ? error.response.data : null 
+    });
+  }
+});
 
-    try {
-      // १. Render ब्याकएन्डमा रिक्वेस्ट पठाउने
-      const response = await fetch('https://gaule-store.onrender.com/api/process-topup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          orderid: "GAULE_" + Date.now(),
-          playerid: playerId,
-          code: voucherCode
-        })
-      });
+// Webhook Listener
+app.post('/api/webhook', (req, res) => {
+  console.log("Webhook Notification Received:", req.body);
+  res.status(200).json({ status: "received" });
+});
 
-      const result = await response.json();
-      console.log("Top-up Response:", result);
-
-      if (result.status === 'success' || result.success) {
-        // २. सफल भएपछि प्रयोग भइसकेको भौचर Firebase बाट अटोमेटिक हटाउने
-        await firebase.database().ref(`auto-top-up/${membershipType}/${selectedKey}`).remove();
-        alert("Top-up Successful! डाइमण्ड सफलतापूर्वक अकाउन्टमा गयो।");
-      } else {
-        alert("Top-up Failed: " + (result.message || JSON.stringify(result)));
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Server Error! कृपया पछि फेري प्रयास गर्नुहोस्।");
-    }
-  });
-}
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
