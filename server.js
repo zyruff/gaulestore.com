@@ -9,10 +9,23 @@ app.use(cors());
 // TopUp API Request Endpoint
 app.post('/api/process-topup', async (req, res) => {
   try {
-    const response = await axios.post('https://androidartist.com/api/process-topup', req.body);
+    // Render को Environment Variable बाट API Key लिने
+    const apiKey = process.env.API_SECRET;
+
+    // Request payload मा secret key स्वतः थप्ने
+    const payload = {
+      secret: apiKey,
+      ...req.body
+    };
+
+    const response = await axios.post('https://androidartist.com/api/process-topup', payload);
     res.json(response.data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("API Error:", error.response ? error.response.data : error.message);
+    res.status(500).json({ 
+      error: error.message,
+      details: error.response ? error.response.data : null 
+    });
   }
 });
 
