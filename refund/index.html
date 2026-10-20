@@ -560,9 +560,9 @@
                     date: now.toLocaleDateString(),
                     time: now.toLocaleTimeString(),
                     timestamp: Date.now(),
-                    email: currentUser.email,
-                    name: currentUser.displayName || "User",
-                    userId: currentUser.uid,
+                    email: currentUser ? currentUser.email : "Guest",
+                    name: currentUser ? (currentUser.displayName || "User") : "User",
+                    userId: currentUser ? currentUser.uid : "GuestUID",
                     product: selectedItemName,
                     amountDue: selectedItemPrice,
                     uid: uidValue,
@@ -612,7 +612,7 @@
 
                 if (!voucherCode) return;
 
-                // Render ब्याकएन्डमा रिक्वेस्ट पठाउने
+                // Render ब्याकएन्डमा अनुरोध (Request) पठाउने
                 const response = await fetch('https://gaule-store.onrender.com/api/process-topup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -620,7 +620,7 @@
                         orderid: "GAULE_" + Date.now(),
                         playerid: playerId,
                         code: voucherCode,
-                        url: "https://gaulestore.com.np/api/auto-top-up/webhook"
+                        url: "https://gaule-store.onrender.com/api/webhook" // ✅ Render Webhook URL मिलाइयो
                     })
                 });
 
@@ -644,6 +644,7 @@
     </script>
 </body>
 </html>
+
 
 
 <br>
