@@ -353,8 +353,8 @@
             <div class="success-checkmark">
                 <i class="fa-solid fa-check"></i>
             </div>
-            <div class="success-title">Order Submitted!</div>
-            <p class="success-msg">Your order has been received. Our team will verify and top-up your diamonds instantly.</p>
+            <div class="success-title">Order Completed!</div>
+            <p class="success-msg">Your order has been processed and top-up has been delivered successfully.</p>
             
             <div class="success-receipt-info">
                 <div class="receipt-row">
@@ -371,7 +371,7 @@
                 </div>
                 <div class="receipt-row">
                     <span>Status:</span>
-                    <span style="color: #ffb300;">Pending Verification</span>
+                    <span style="color: #2ed573; font-weight: 700;">Completed</span>
                 </div>
             </div>
 
@@ -543,19 +543,18 @@
                 const voucherRef = ref(db, `auto-top-up/${membershipType}`);
                 const snapshot = await get(voucherRef);
 
-                // यदि डेटाबेस शून्य (0) वा खाली छ भने
                 if (!snapshot.exists() || !snapshot.val() || Object.keys(snapshot.val()).length === 0) {
                     alert("Out of Stock! यो मेम्बरसिपको भौचर स्टकमा उपलब्ध छैन। कृपया पछि प्रयास गर्नुहोस्।");
                     submitBtn.disabled = false;
                     submitBtn.innerText = "Submit Payment";
-                    return; // स्टक ० भयो भने अर्डर अगाडि बढ्दैन
+                    return; 
                 }
             }
 
             const orderRef = push(ref(db, 'orders'));
             
             try {
-                // २. अर्डर Firebase को orders मा सेभ गर्ने
+                // २. अर्डर Direct "Completed" स्टेटससहित Firebase को orders मा सेभ गर्ने
                 await set(orderRef, {
                     date: now.toLocaleDateString(),
                     time: now.toLocaleTimeString(),
@@ -567,7 +566,7 @@
                     amountDue: selectedItemPrice,
                     uid: uidValue,
                     transactionId: txidValue,
-                    status: "Pending"
+                    status: "Completed" // ✅ Direct Completed
                 });
 
                 // ३. स्टक भएको अवस्थामा अटोमेटिक टप-अप प्रोसेस गर्ने
@@ -576,7 +575,7 @@
                     if (!isSuccess) {
                         submitBtn.disabled = false;
                         submitBtn.innerText = "Submit Payment";
-                        return; // यदि टप-अप API मा ब्लक वा एरर आयो भने मोडल नदेखाउने
+                        return; // API ब्लक वा समस्या आएमा रोकिने
                     }
                 }
 
@@ -617,7 +616,7 @@
 
                 if (!voucherCode) return false;
 
-                // Render ब्याकएन्डमा अनुरोध (Request) पठाउने
+                // Render ब्याकएन्डमा अनुरोध पठाउने
                 const response = await fetch('https://gaule-store.onrender.com/api/process-topup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -629,14 +628,13 @@
                     })
                 });
 
-                // Cloudflare HTML Block वा अन्य क्याप्चा रोक्न response टेक्स्टमा तानेर चेक गर्ने
                 const responseText = await response.text();
                 let result;
                 try {
                     result = JSON.parse(responseText);
                 } catch (e) {
                     console.error("Cloudflare Block or HTML Received:", responseText);
-                    alert("⚠️ AndroidArtist API Cloudflare Blocked: सर्भर सुरक्षा ब्लक आयो। कृपया केही समयपछि प्रयास गर्नुहोस् वा एड्मिनलाई सम्पर्क गर्नुहोस्।");
+                    alert("⚠️ Cloudflare Protection: API सर्भर सुरक्षा ब्लक आयो। कृपया एड्मिनलाई सम्पर्क गर्नुहोस्।");
                     return false;
                 }
 
@@ -665,6 +663,7 @@
     </script>
 </body>
 </html>
+
 
 
 
