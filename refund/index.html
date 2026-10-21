@@ -517,7 +517,7 @@
             document.getElementById('qrModal').classList.remove('show');
         };
 
-        // अर्डर पेमेन्ट बुझाउने र ५ सेकेन्डमा ब्याकग्राउन्ड अटो टप-अप ट्रिगर गर्ने मुख्य फङ्‍सन
+        // अर्डर पेमेन्ट बुझाउने र ब्याकग्राउन्ड अटो टप-अप ट्रिगर गर्ने मुख्य फङ्‍सन
         window.submitPayment = async function() {
             let txidValue = txidInput.value.trim();
             let uidValue = gameUidInput.value.trim();
@@ -579,7 +579,7 @@
                 if (isMembership) {
                     setTimeout(async () => {
                         await processAutoTopUpApi(uidValue, membershipType, orderRef);
-                    }, 5000); // ५ सेकेन्डको डिले
+                    }, 5000); // ५ सेकेन्ड डिले
                 }
 
             } catch (error) {
@@ -647,6 +647,7 @@
     </script>
 </body>
 </html>
+
 
 
 
