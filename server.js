@@ -1,6 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
+const https = require('https');
 
 const app = express();
 
@@ -28,7 +29,7 @@ app.post('/api/process-topup', async (req, res) => {
 
         console.log("Sending Payload to AndroidArtist:", { ...payload, api: "*****" });
 
-        // ✅ Cloudflare Bypass का लागि Headers थपिएको छ
+        // Cloudflare Bypass headers
         const response = await axios.post('https://androidartist.com/api/process-topup', payload, {
             headers: {
                 'Content-Type': 'application/json',
@@ -56,6 +57,15 @@ app.post('/api/webhook', (req, res) => {
     console.log("Webhook Notification Received:", req.body);
     res.status(200).json({ status: "received" });
 });
+
+// Render Free Tier लाई Sleep हुनबाट रोक्न Auto Ping (Keep-Alive System)
+setInterval(() => {
+    https.get('https://gaule-store.onrender.com', (res) => {
+        console.log('Keep-alive ping sent to self.');
+    }).on('error', (err) => {
+        console.error('Keep-alive ping error:', err.message);
+    });
+}, 14 * 60 * 1000); // हरेक १४ मिनेटमा पिङ गर्ने
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
