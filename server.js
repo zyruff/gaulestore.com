@@ -18,9 +18,8 @@ app.post('/api/process-topup', async (req, res) => {
         const apiKey = process.env.API_SECRET;
         const { orderid, playerid, code, url } = req.body;
 
-        // AndroidArtist Documentation अनुसार सही Payload[span_4](start_span)[span_4](end_span)
         const payload = {
-            api: apiKey, // Docs अनुसार 'api' नाम हुनुपर्छ[span_5](start_span)[span_5](end_span)
+            api: apiKey,
             orderid: orderid,
             playerid: playerid,
             code: code,
@@ -29,9 +28,13 @@ app.post('/api/process-topup', async (req, res) => {
 
         console.log("Sending Payload to AndroidArtist:", { ...payload, api: "*****" });
 
+        // ✅ Cloudflare Bypass का लागि Headers थपिएको छ
         const response = await axios.post('https://androidartist.com/api/process-topup', payload, {
             headers: {
-                'Content-Type': 'application/json' // Docs अनुसार Content-Type[span_6](start_span)[span_6](end_span)
+                'Content-Type': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+                'Accept': 'application/json, text/plain, */*',
+                'Accept-Language': 'en-US,en;q=0.9'
             }
         });
 
@@ -48,7 +51,7 @@ app.post('/api/process-topup', async (req, res) => {
     }
 });
 
-// Webhook Listener[span_7](start_span)[span_7](end_span)
+// Webhook Listener
 app.post('/api/webhook', (req, res) => {
     console.log("Webhook Notification Received:", req.body);
     res.status(200).json({ status: "received" });
