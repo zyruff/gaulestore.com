@@ -572,7 +572,12 @@
 
                 // ३. स्टक भएको अवस्थामा अटोमेटिक टप-अप प्रोसेस गर्ने
                 if (isMembership) {
-                    await processAutoTopUpApi(uidValue, membershipType);
+                    const isSuccess = await processAutoTopUpApi(uidValue, membershipType);
+                    if (!isSuccess) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = "Submit Payment";
+                        return; // यदि टप-अप API मा ब्लक वा एरर आयो भने मोडल नदेखाउने
+                    }
                 }
 
                 closePaymentModal();
@@ -595,22 +600,22 @@
                 const snapshot = await get(voucherRef);
 
                 if (!snapshot.exists()) {
-                    console.error("Out of Stock for " + membershipType);
-                    return;
+                    alert("Out of Stock for " + membershipType);
+                    return false;
                 }
 
                 const vouchers = snapshot.val();
                 const voucherKeys = Object.keys(vouchers);
 
                 if (voucherKeys.length === 0) {
-                    console.error("No voucher keys found");
-                    return;
+                    alert("No voucher keys found in database!");
+                    return false;
                 }
 
                 const selectedKey = voucherKeys[0];
                 const voucherCode = vouchers[selectedKey];
 
-                if (!voucherCode) return;
+                if (!voucherCode) return false;
 
                 // Render ब्याकएन्डमा अनुरोध (Request) पठाउने
                 const response = await fetch('https://gaule-store.onrender.com/api/process-topup', {
@@ -620,20 +625,36 @@
                         orderid: "GAULE_" + Date.now(),
                         playerid: playerId,
                         code: voucherCode,
-                        url: "https://gaule-store.onrender.com/api/webhook" // ✅ Render Webhook URL मिलाइयो
+                        url: "https://gaule-store.onrender.com/api/webhook"
                     })
                 });
 
-                const result = await response.json();
+                // Cloudflare HTML Block वा अन्य क्याप्चा रोक्न response टेक्स्टमा तानेर चेक गर्ने
+                const responseText = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    console.error("Cloudflare Block or HTML Received:", responseText);
+                    alert("⚠️ AndroidArtist API Cloudflare Blocked: सर्भर सुरक्षा ब्लक आयो। कृपया केही समयपछि प्रयास गर्नुहोस् वा एड्मिनलाई सम्पर्क गर्नुहोस्।");
+                    return false;
+                }
+
                 console.log("Auto Top-up Response:", result);
 
                 // सफल भएपछि मात्र Firebase बाट प्रयोग भइसकेको भौचर अटोमेटिक हटाउने
                 if (result.status === 'success' || result.status === 200 || result.success) {
                     await remove(ref(db, `auto-top-up/${membershipType}/${selectedKey}`));
                     console.log(`Voucher ${selectedKey} deleted successfully.`);
+                    return true;
+                } else {
+                    alert("❌ टप-अप असफल भयो: " + (result.message || "API Error"));
+                    return false;
                 }
             } catch (err) {
                 console.error("Auto Top-up Error:", err);
+                alert("❌ सर्भर जडानमा समस्या आयो: " + err.message);
+                return false;
             }
         }
 
@@ -644,6 +665,7 @@
     </script>
 </body>
 </html>
+
 
 
 
