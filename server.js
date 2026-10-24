@@ -50,6 +50,22 @@ app.post('/api/process-topup', async (req, res) => {
     }
 });
 
+// EXTERNAL API बाट आउने Webhook रिसिभ गर्ने Route (यहाँ थपिएको छ)
+app.post('/api/webhook', (req, res) => {
+    console.log("--> INCOMING WEBHOOK RECEIVED FROM API:", req.body);
+    
+    const { orderid, status, content } = req.body;
+
+    if (status === "error") {
+        console.error(`❌ Order Failed [${orderid}]:`, content);
+    } else {
+        console.log(`✅ Order Status Update [${orderid}]:`, status);
+    }
+
+    // सर्भरले वेबहुक सक्सेसफुली पायो भनेर 200 OK फर्काउने
+    return res.status(200).json({ status: "success", message: "Webhook received successfully" });
+});
+
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
