@@ -6,15 +6,22 @@ const https = require('https');
 const app = express();
 
 app.use(express.json());
-app.use(cors());
 
-// Root endpoint for testing
+// Frontend बाट सीधै रिक्वेस्ट आउन दिन CORS खुला गरिएको छ
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Accept', 'Authorization']
+}));
+
+// Root endpoint for testing & warm-up
 app.get('/', (req, res) => {
     res.send("Gaule Store Top-Up Backend is Running Live!");
 });
 
 // TopUp API Request Endpoint
 app.post('/api/process-topup', async (req, res) => {
+    console.log("--> Incoming Request from Frontend:", req.body);
     try {
         const apiKey = process.env.API_SECRET;
         const { orderid, playerid, code, url } = req.body;
@@ -58,14 +65,14 @@ app.post('/api/webhook', (req, res) => {
     res.status(200).json({ status: "received" });
 });
 
-// Render Free Tier लाई Sleep हुनबाट रोक्न Auto Ping (Keep-Alive System)
+// Render Free Tier सधैं ब्युँझाइराख्न Keep-Alive Ping System
 setInterval(() => {
     https.get('https://gaule-store.onrender.com', (res) => {
-        console.log('Keep-alive ping sent to self.');
+        console.log('Keep-alive ping executed.');
     }).on('error', (err) => {
-        console.error('Keep-alive ping error:', err.message);
+        console.error('Keep-alive error:', err.message);
     });
-}, 14 * 60 * 1000); // हरेक १४ मिनेटमा पिङ गर्ने
+}, 14 * 60 * 1000); // 14 मिनेटमा
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
