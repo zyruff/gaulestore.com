@@ -6,12 +6,10 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Render live check
 app.get('/', (req, res) => {
-    res.send("Backend is Running Live!");
+    res.send("Gaule Store Backend is Live!");
 });
 
-// Top-up API Endpoint
 app.post('/api/process-topup', async (req, res) => {
     console.log("--> INCOMING REQUEST RECEIVED FROM FRONTEND:", req.body);
     try {
@@ -26,17 +24,33 @@ app.post('/api/process-topup', async (req, res) => {
             url: url || "https://gaule-store.onrender.com/api/webhook"
         };
 
+        // Cloudflare & Browser Headers bypass
         const response = await axios.post('https://androidartist.com/api/process-topup', payload, {
-            headers: { 'Content-Type': 'application/json' }
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+                'Accept': 'application/json, text/plain, */*',
+                'Origin': 'https://androidartist.com',
+                'Referer': 'https://androidartist.com/'
+            }
         });
 
-        console.log("AndroidArtist Response:", response.data);
+        console.log("AndroidArtist Success Response:", response.data);
         res.json(response.data);
 
     } catch (error) {
-        console.error("API Error:", error.message);
-        res.status(500).json({ success: false, error: error.message });
+        console.error("API Error Details:", error.response ? error.response.data : error.message);
+        res.status(500).json({ 
+            success: false, 
+            error: error.message,
+            details: error.response ? error.response.data : null 
+        });
     }
+});
+
+app.post('/api/webhook', (req, res) => {
+    console.log("Webhook Received:", req.body);
+    res.status(200).json({ status: "ok" });
 });
 
 const PORT = process.env.PORT || 10000;
