@@ -32,16 +32,36 @@
         .search-box { display: flex; gap: 5px; margin-bottom: 20px; }
         #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
         .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
+        
+        /* Header Wallet Badge Style */
+        .header-wallet {
+            display: none; /* Login भएपछि JS ले 'flex' बनाउँछ */
+            align-items: center;
+            gap: 5px;
+            background-color: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #dc2626;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .header-wallet:hover {
+            background-color: #fee2e2;
+        }
+        .header-wallet svg {
+            width: 16px;
+            height: 16px;
+            fill: #dc2626;
+        }
+
         #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; }
         #profile-dropdown { display: none; position: absolute; top: 50px; right: 0; background: white; border: 1px solid #ccc; padding: 15px; width: 200px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); border-radius: 8px; text-align: center; z-index: 1000; }
         .user-name { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
         .user-email { font-size: 12px; color: #666; margin-bottom: 10px; }
-        
-        /* Wallet UI Styles */
-        .wallet-box { background: #fef2f2; border: 1px solid #fca5a5; padding: 8px; border-radius: 6px; margin-bottom: 10px; }
-        .wallet-title { font-size: 11px; color: #666; text-transform: uppercase; }
-        .wallet-amount { font-size: 16px; font-weight: bold; color: #dc2626; }
-        
         .change-name { font-size: 11px; color: #dc2626; text-decoration: none; display: block; margin-bottom: 15px; }
         .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; cursor: pointer; border-radius: 4px; width: 100%; }
         #nav-menu a { display: block; padding: 12px 0; color: black; text-decoration: none; border-bottom: 1px solid #eee; }
@@ -54,21 +74,29 @@
 <div class="header">
     <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
     <div class="store-title">GAULE <span style="color:#dc2626;">STORE</span></div>
+    
     <div class="header-right">
+        <!-- Login नभएको अवस्थामा देखिने Icon -->
         <div id="login-container" onclick="googleLogin()">
             <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
+
+        <!-- Login भएपछि Profile को देब्रेपट्टी देखिने Wallet Balance -->
+        <a href="my-wallet.html" id="header-wallet-btn" class="header-wallet">
+            <svg viewBox="0 0 24 24">
+                <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+            </svg>
+            <span>Rs. <span id="header-user-balance">0</span></span>
+        </a>
+
+        <!-- Profile Picture -->
         <img id="profile-pic" onclick="toggleProfile()">
+        
+        <!-- Profile Dropdown -->
         <div id="profile-dropdown">
             <div id="display-name" class="user-name"></div>
             <div id="display-email" class="user-email"></div>
-            
-            <!-- Wallet Display Box -->
-            <div class="wallet-box">
-                <div class="wallet-title">Wallet Balance</div>
-                <div class="wallet-amount">Rs. <span id="user-balance">0</span></div>
-            </div>
-
+            <a href="my-wallet.html" style="display:block; margin-bottom: 10px; color:#dc2626; font-size:12px; font-weight:bold; text-decoration:none;">My Wallet</a>
             <a href="https://myaccount.google.com/personal-info" target="_blank" class="change-name">Change Name</a>
             <button class="logout-btn" onclick="logoutUser()">Logout</button>
         </div>
@@ -87,6 +115,7 @@
     <div id="search-results" style="margin-bottom: 15px; max-height: 200px; overflow-y: auto;"></div>
     <a href="index.html">Home</a>
     <a href="shop/">Shop</a>
+    <a href="my-wallet.html">My Wallet</a>
     <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
 </div>
 
@@ -95,7 +124,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
@@ -119,26 +148,28 @@
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            // UI Switch on Login
             document.getElementById("login-container").style.display = "none";
+            document.getElementById("header-wallet-btn").style.display = "flex"; // Header ma Wallet देखाइदिने
             document.getElementById("profile-pic").style.display = "block";
             document.getElementById("profile-pic").src = user.photoURL;
             document.getElementById("display-name").innerText = user.displayName;
             document.getElementById("display-email").innerText = user.email;
 
-            // Wallet Data Fetch गर्ने र नभएको खण्डमा Create गर्ने
+            // Firebase Database बाट balance तान्ने
             const userRef = ref(db, 'users/' + user.uid);
             onValue(userRef, (snapshot) => {
                 if (snapshot.exists()) {
                     const data = snapshot.val();
-                    document.getElementById("user-balance").innerText = data.balance || 0;
+                    document.getElementById("header-user-balance").innerText = data.balance || 0;
                 } else {
-                    // नयाँ युजरको लागि Wallet Balance = 0 सेट गर्ने
+                    // यदि नयाँ युजर हो भने Database मा create गरी balance 0 राख्ने
                     set(userRef, {
                         name: user.displayName,
                         email: user.email,
                         balance: 0
                     });
-                    document.getElementById("user-balance").innerText = 0;
+                    document.getElementById("header-user-balance").innerText = 0;
                 }
             });
         }
@@ -146,9 +177,6 @@
 </script>
 </body>
 </html>
-
-
-
 
 
 
