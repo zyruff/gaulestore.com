@@ -3,117 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Wallet | Gaule Store</title>
+    <title>Admin Panel | Gaule Store Top-Up Requests</title>
     <style>
         * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f8fafc; color: #1e293b; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f1f5f9; color: #1e293b; padding: 20px; }
         
-        /* Header Styling */
-        .header { display: flex; align-items: center; padding: 15px 25px; background: white; border-bottom: 1px solid #e2e8f0; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .store-title { font-size: 1.4rem; font-weight: 800; color: #0f172a; text-decoration: none; letter-spacing: -0.5px; }
-        .store-title span { color: #dc2626; }
+        .admin-container { max-width: 1000px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* Main Container */
-        .container { max-width: 480px; margin: 30px auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
-        
-        /* Wallet Card */
-        .wallet-card { background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%); color: white; padding: 25px; border-radius: 12px; text-align: center; margin-bottom: 25px; box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.25); }
-        .wallet-amount { font-size: 34px; font-weight: 800; letter-spacing: -1px; }
-        
-        /* Section Title */
-        h3 { margin-top: 0; margin-bottom: 20px; color: #0f172a; font-size: 17px; font-weight: 700; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
-        
-        /* Form Controls */
-        .form-group { margin-bottom: 18px; }
-        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #475569; }
-        input, select { width: 100%; padding: 12px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 14px; outline: none; background-color: #f8fafc; transition: all 0.2s ease; }
-        input:focus, select:focus { border-color: #dc2626; background-color: #fff; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1); }
-        
-        /* Quick Amount Buttons Styling */
-        .quick-amounts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
-        .amt-btn { background: #f1f5f9; border: 1.5px solid #cbd5e1; color: #334155; padding: 8px 0; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-        .amt-btn:hover { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
-        .amt-btn.active { background: #dc2626; border-color: #dc2626; color: white; }
+        .stats-bar { display: flex; gap: 15px; margin-bottom: 20px; }
+        .stat-card { flex: 1; background: #f8fafc; border: 1px solid #cbd5e1; padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-card h4 { margin: 0 0 5px 0; color: #64748b; font-size: 13px; text-transform: uppercase; }
+        .stat-card div { font-size: 22px; font-weight: 800; color: #dc2626; }
 
-        /* QR Section */
-        .qr-section { text-align: center; margin-bottom: 25px; background: #fff1f2; padding: 20px; border: 1.5px dashed #fecdd3; border-radius: 12px; }
-        .qr-section p { margin: 0; font-size: 13px; color: #475569; }
-        .qr-section img { width: 160px; height: 160px; object-fit: contain; margin-top: 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; padding: 5px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .id-badge { display: inline-block; background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { text-align: left; padding: 12px 15px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+        th { background-color: #f8fafc; color: #475569; font-weight: 700; }
         
-        /* Submit Button */
-        .submit-btn { background: #dc2626; color: white; border: none; padding: 14px; width: 100%; font-size: 15px; font-weight: 700; cursor: pointer; border-radius: 8px; transition: background 0.2s, transform 0.1s; box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2); }
-        .submit-btn:hover { background: #b91c1c; }
-        .submit-btn:active { transform: scale(0.98); }
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 700; display: inline-block; }
+        .badge-pending { background: #fef3c7; color: #b45309; }
+        .badge-approved { background: #dcfce7; color: #15803d; }
+        .badge-rejected { background: #fee2e2; color: #b91c1c; }
+
+        .btn { border: none; padding: 6px 12px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 12px; margin-right: 5px; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.85; }
+        .btn-approve { background: #16a34a; color: white; }
+        .btn-reject { background: #dc2626; color: white; }
+        
+        .no-data { text-align: center; padding: 30px; color: #64748b; font-weight: 600; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <a href="../index.html" class="store-title">GAULE <span>STORE</span></a>
-</div>
+<div class="admin-container">
+    <h2>
+        <span>Gaule Store - Wallet Top-Up Requests</span>
+        <button onclick="location.reload()" style="padding: 6px 12px; cursor:pointer;">Refresh</button>
+    </h2>
 
-<div class="container">
-    <!-- Wallet Balance Card -->
-    <div class="wallet-card">
-        <div class="wallet-amount">Rs. <span id="my-wallet-balance">0</span></div>
-    </div>
-
-    <h3>Add Balance to Wallet</h3>
-    
-    <!-- Payment QR Section -->
-    <div class="qr-section">
-        <p>Scan QR via <b>eSewa / Khalti</b> to Pay</p>
-        <img src="../qr.png" alt="Payment QR Code" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=GAULE_STORE_PAYMENT'">
-        <div>
-            <span class="id-badge">ID: 9761081110 (Roshan Tamang)</span>
+    <div class="stats-bar">
+        <div class="stat-card">
+            <h4>Pending Requests</h4>
+            <div id="count-pending">0</div>
+        </div>
+        <div class="stat-card">
+            <h4>Approved Requests</h4>
+            <div id="count-approved" style="color:#16a34a;">0</div>
         </div>
     </div>
 
-    <!-- Top-up Request Form -->
-    <form id="topup-form">
-        <div class="form-group">
-            <label for="payment-method">Payment Method</label>
-            <select id="payment-method" required>
-                <option value="eSewa">eSewa</option>
-                <option value="Khalti">Khalti</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="deposit-amount">Amount Sent (Rs.)</label>
-            <!-- Quick Amount Selector Buttons -->
-            <div class="quick-amounts">
-                <button type="button" class="amt-btn" onclick="setAmount(100, event)">100</button>
-                <button type="button" class="amt-btn" onclick="setAmount(200, event)">200</button>
-                <button type="button" class="amt-btn" onclick="setAmount(500, event)">500</button>
-                <button type="button" class="amt-btn" onclick="setAmount(1000, event)">1000</button>
-            </div>
-            <input type="number" id="deposit-amount" placeholder="Or enter custom amount" required min="10">
-        </div>
-
-        <div class="form-group">
-            <label for="transaction-id">Transaction ID / Reference ID</label>
-            <input type="text" id="transaction-id" placeholder="Enter Transaction ID" required>
-        </div>
-
-        <button type="submit" class="submit-btn">Submit Request</button>
-    </form>
+    <table>
+        <thead>
+            <tr>
+                <th>User Details</th>
+                <th>Method</th>
+                <th>Amount</th>
+                <th>Transaction ID</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="requests-list">
+            <tr><td colspan="6" class="no-data">Loading requests...</td></tr>
+        </tbody>
+    </table>
 </div>
-
-<script>
-    function setAmount(amount, event) {
-        document.getElementById('deposit-amount').value = amount;
-        let buttons = document.querySelectorAll('.amt-btn');
-        buttons.forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-    }
-</script>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, onValue, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
@@ -129,57 +88,106 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    let currentUser = null;
+    // 1. Realtime Top-up Requests Load गर्ने
+    const requestsRef = ref(db, 'topup_requests');
+    
+    onValue(requestsRef, (snapshot) => {
+        const tbody = document.getElementById("requests-list");
+        tbody.innerHTML = "";
 
-    // Login भएको युजरको Realtime Balance फेच गर्ने
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            currentUser = user;
-            const userRef = ref(db, 'users/' + user.uid);
-            onValue(userRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    document.getElementById("my-wallet-balance").innerText = data.balance || 0;
-                } else {
-                    document.getElementById("my-wallet-balance").innerText = 0;
-                }
-            });
-        } else {
-            alert("Please login first to access wallet!");
-            window.location.href = "../index.html";
+        if (!snapshot.exists()) {
+            tbody.innerHTML = '<tr><td colspan="6" class="no-data">No top-up requests found.</td></tr>';
+            return;
         }
-    });
 
-    // Top-up Request Firebase मा पठाउने
-    const form = document.getElementById("topup-form");
-    form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        
-        if (!currentUser) return;
+        let pendingCount = 0;
+        let approvedCount = 0;
 
-        const method = document.getElementById("payment-method").value;
-        const amount = document.getElementById("deposit-amount").value;
-        const txId = document.getElementById("transaction-id").value;
+        const data = snapshot.val();
+        // Request हरूलाई अर्डर मिलाउने (Newest First)
+        const keys = Object.keys(data).reverse();
 
-        const requestsRef = ref(db, 'topup_requests');
-        
-        push(requestsRef, {
-            uid: currentUser.uid,
-            name: currentUser.displayName,
-            email: currentUser.email,
-            method: method,
-            amount: Number(amount),
-            transactionId: txId,
-            status: "Pending",
-            timestamp: serverTimestamp()
-        }).then(() => {
-            alert("Top-up request sent successfully! Admin will verify your transaction and add balance soon.");
-            form.reset();
-            document.querySelectorAll('.amt-btn').forEach(btn => btn.classList.remove('active'));
-        }).catch((error) => {
-            alert("Error sending request: " + error.message);
+        keys.forEach((reqId) => {
+            const item = data[reqId];
+            
+            if (item.status === "Pending") pendingCount++;
+            if (item.status === "Approved") approvedCount++;
+
+            const tr = document.createElement("tr");
+
+            let actionButtons = "";
+            if (item.status === "Pending") {
+                actionButtons = `
+                    <button class="btn btn-approve" onclick="approveRequest('${reqId}', '${item.uid}', ${item.amount})">Approve & Add Balance</button>
+                    <button class="btn btn-reject" onclick="rejectRequest('${reqId}')">Reject</button>
+                `;
+            } else {
+                actionButtons = `<span style="color:#64748b; font-size:12px;">Processed</span>`;
+            }
+
+            let badgeClass = "badge-pending";
+            if (item.status === "Approved") badgeClass = "badge-approved";
+            if (item.status === "Rejected") badgeClass = "badge-rejected";
+
+            tr.innerHTML = `
+                <td>
+                    <b>${item.name || 'User'}</b><br>
+                    <small style="color:#64748b;">${item.email || ''}</small>
+                </td>
+                <td><b>${item.method}</b></td>
+                <td><b style="color:#dc2626;">Rs. ${item.amount}</b></td>
+                <td><code>${item.transactionId}</code></td>
+                <td><span class="badge ${badgeClass}">${item.status}</span></td>
+                <td>${actionButtons}</td>
+            `;
+
+            tbody.appendChild(tr);
         });
+
+        document.getElementById("count-pending").innerText = pendingCount;
+        document.getElementById("count-approved").innerText = approvedCount;
     });
+
+    // 2. Request Approve गर्ने र User Balance थप्ने Function
+    window.approveRequest = async (requestId, userUid, amount) => {
+        if (!confirm(`Are you sure you want to approve Rs. ${amount} for this user?`)) return;
+
+        const requestRef = ref(db, `topup_requests/${requestId}`);
+        const userBalanceRef = ref(db, `users/${userUid}/balance`);
+
+        try {
+            // A. Request Status update गर्ने
+            await update(requestRef, {
+                status: "Approved",
+                approvedAt: new Date().toISOString()
+            });
+
+            // B. Safe तरिकाले युजरको ब्यालेन्स थप्ने
+            await runTransaction(userBalanceRef, (currentBalance) => {
+                return (currentBalance || 0) + Number(amount);
+            });
+
+            alert("✅ Request Approved and Balance Successfully Added!");
+        } catch (err) {
+            alert("Error: " + err.message);
+        }
+    };
+
+    // 3. Request Reject गर्ने Function
+    window.rejectRequest = async (requestId) => {
+        if (!confirm("Are you sure you want to REJECT this request?")) return;
+
+        const requestRef = ref(db, `topup_requests/${requestId}`);
+        try {
+            await update(requestRef, {
+                status: "Rejected",
+                rejectedAt: new Date().toISOString()
+            });
+            alert("Request Rejected.");
+        } catch (err) {
+            alert("Error: " + err.message);
+        }
+    };
 </script>
 
 </body>
