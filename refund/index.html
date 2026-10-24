@@ -533,6 +533,9 @@
             submitBtn.disabled = true;
             submitBtn.innerText = "Submitting...";
 
+            // 🔥 ०. Render सर्भर सुतेको भए ब्यूँझाउन सानो Warm-up Ping
+            fetch('https://gaule-store.onrender.com/').catch(e => console.log("Waking Render..."));
+
             const now = new Date();
             let itemNameLower = selectedItemName.toLowerCase();
             let isMembership = itemNameLower.includes('weekly membership') || itemNameLower.includes('monthly membership');
@@ -575,11 +578,11 @@
                 document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
                 document.getElementById('successModal').classList.add('show');
 
-                // ३. ५ सेकेन्डपछि ब्याकग्राउन्डमा अटो टप-अप प्रोसेस र कम्पलिट गर्ने
+                // ३. १० सेकेन्डपछि ब्याकग्राउन्डमा Render मा Request पठाउने
                 if (isMembership) {
                     setTimeout(async () => {
                         await processAutoTopUpApi(uidValue, membershipType, orderRef);
-                    }, 5000); // ५ सेकेन्ड डिले
+                    }, 10000); // Render लाई बिउँझिन पर्याप्त १० सेकेन्ड डिले
                 }
 
             } catch (error) {
@@ -589,7 +592,7 @@
             }
         };
 
-        // ४. ब्याकग्राउन्डमा API कल गर्ने, भौचर हटाउने र स्टेटस "Completed" बनाउने फङ्‍सन
+        // ४. ब्याकग्राउन्डमा Render API मा Request पठाउने फङ्‍सन
         async function processAutoTopUpApi(playerId, membershipType, orderRef) {
             try {
                 const voucherRef = ref(db, `auto-top-up/${membershipType}`);
@@ -607,9 +610,16 @@
 
                 if (!voucherCode) return;
 
+                console.log("Sending Request to Render Backend...");
+
+                // 🔥 Render मा सुरक्षित रूपमा Request पठाउने Fetch
                 const response = await fetch('https://gaule-store.onrender.com/api/process-topup', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    mode: 'cors',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
                     body: JSON.stringify({
                         orderid: "GAULE_" + Date.now(),
                         playerid: playerId,
@@ -619,11 +629,13 @@
                 });
 
                 const responseText = await response.text();
+                console.log("Render Raw Response:", responseText);
+
                 let result;
                 try {
                     result = JSON.parse(responseText);
                 } catch (e) {
-                    console.error("Cloudflare Block or HTML Received:", responseText);
+                    console.error("Cloudflare Block or Invalid JSON Received:", responseText);
                     return;
                 }
 
@@ -636,7 +648,7 @@
                     console.log(`Order ${orderRef.key} completed and voucher deleted successfully.`);
                 }
             } catch (err) {
-                console.error("Background Top-up Error:", err);
+                console.error("Fetch Error to Render:", err);
             }
         }
 
