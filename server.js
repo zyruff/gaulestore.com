@@ -6,16 +6,17 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// Root URL Check
 app.get('/', (req, res) => {
-    res.send("Gaule Store Backend is Live!");
+    res.send("Gaule Store Top-Up Backend is Live!");
 });
 
+// Top-Up Request Handler
 app.post('/api/process-topup', async (req, res) => {
-    const { orderid, playerid, code, url, packType } = req.body;
+    const { orderid, playerid, code, packType, url } = req.body;
 
-    // 🔥 Render Logs मा कुन प्याक (Weekly/Monthly) हो प्रस्ट देखाउने
     console.log("--------------------------------------------------");
-    console.log(`📦 NEW ORDER RECEIVED [${packType || 'MEMBERSHIP'}]`);
+    console.log(`📦 NEW TOP-UP REQUEST [${packType || 'MEMBERSHIP'}]`);
     console.log(`🆔 Order ID : ${orderid}`);
     console.log(`👤 Player ID: ${playerid}`);
     console.log(`🎟️ Voucher  : ${code}`);
@@ -24,6 +25,7 @@ app.post('/api/process-topup', async (req, res) => {
     try {
         const apiKey = process.env.API_SECRET;
 
+        // AndroidArtist API Payload Structure
         const payload = {
             api: apiKey,
             orderid: orderid,
@@ -32,6 +34,7 @@ app.post('/api/process-topup', async (req, res) => {
             url: url || "https://gaule-store.onrender.com/api/webhook"
         };
 
+        // Forward request to AndroidArtist API with Browser Headers
         const response = await axios.post('https://androidartist.com/api/process-topup', payload, {
             headers: {
                 'Content-Type': 'application/json',
@@ -42,22 +45,26 @@ app.post('/api/process-topup', async (req, res) => {
             }
         });
 
-        console.log("✅ AndroidArtist Success Response:", response.data);
+        console.log("✅ AndroidArtist API Response:", response.data);
         res.json(response.data);
 
     } catch (error) {
-        console.error("❌ API Error Details:", error.response ? error.response.data : error.message);
-        res.status(500).json({ 
-            success: false, 
-            error: error.message,
-            details: error.response ? error.response.data : null 
+        console.error("❌ API Request Error:", error.response ? error.response.data : error.message);
+        res.status(error.response ? error.response.status : 500).json({ 
+            status: "error",
+            message: error.message,
+            content: error.response ? error.response.data : "Internal Server Error"
         });
     }
 });
 
+// AndroidArtist Webhook Receiver
 app.post('/api/webhook', (req, res) => {
-    console.log("Webhook Received:", req.body);
-    res.status(200).json({ status: "ok" });
+    console.log("--------------------------------------------------");
+    console.log("🔔 WEBHOOK NOTIFICATION RECEIVED FROM ANDROIDARTIST:");
+    console.log(JSON.stringify(req.body, null, 2));
+    console.log("--------------------------------------------------");
+    res.status(200).json({ status: "received" });
 });
 
 const PORT = process.env.PORT || 10000;
