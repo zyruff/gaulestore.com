@@ -11,10 +11,18 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/process-topup', async (req, res) => {
-    console.log("--> INCOMING REQUEST RECEIVED FROM FRONTEND:", req.body);
+    const { orderid, playerid, code, url, packType } = req.body;
+
+    // 🔥 Render Logs मा कुन प्याक (Weekly/Monthly) हो प्रस्ट देखाउने
+    console.log("--------------------------------------------------");
+    console.log(`📦 NEW ORDER RECEIVED [${packType || 'MEMBERSHIP'}]`);
+    console.log(`🆔 Order ID : ${orderid}`);
+    console.log(`👤 Player ID: ${playerid}`);
+    console.log(`🎟️ Voucher  : ${code}`);
+    console.log("--------------------------------------------------");
+
     try {
         const apiKey = process.env.API_SECRET;
-        const { orderid, playerid, code, url } = req.body;
 
         const payload = {
             api: apiKey,
@@ -24,7 +32,6 @@ app.post('/api/process-topup', async (req, res) => {
             url: url || "https://gaule-store.onrender.com/api/webhook"
         };
 
-        // Cloudflare & Browser Headers bypass
         const response = await axios.post('https://androidartist.com/api/process-topup', payload, {
             headers: {
                 'Content-Type': 'application/json',
@@ -35,11 +42,11 @@ app.post('/api/process-topup', async (req, res) => {
             }
         });
 
-        console.log("AndroidArtist Success Response:", response.data);
+        console.log("✅ AndroidArtist Success Response:", response.data);
         res.json(response.data);
 
     } catch (error) {
-        console.error("API Error Details:", error.response ? error.response.data : error.message);
+        console.error("❌ API Error Details:", error.response ? error.response.data : error.message);
         res.status(500).json({ 
             success: false, 
             error: error.message,
