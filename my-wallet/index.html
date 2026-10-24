@@ -150,7 +150,7 @@
         }
     });
 
-    // Top-up Request Firebase मा पठाउने (सहित Server Timestamp)
+    // Top-up Request Firebase मा पठाउने (Processing status र Date सहित)
     const form = document.getElementById("topup-form");
     form.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -161,6 +161,10 @@
         const amount = document.getElementById("deposit-amount").value;
         const txId = document.getElementById("transaction-id").value;
 
+        // Nepal Timezone अनुसार स्पष्ट Date & Time स्ट्रिङ बनाउने
+        const now = new Date();
+        const formattedDate = now.toLocaleString('en-US', { timeZone: 'Asia/Kathmandu' });
+
         const requestsRef = ref(db, 'topup_requests');
         
         push(requestsRef, {
@@ -170,7 +174,8 @@
             method: method,
             amount: Number(amount),
             transactionId: txId,
-            status: "Pending",
+            status: "Processing",     // 👈 अब "Pending" को सट्टा "Processing" बस्छ
+            date: formattedDate,       // 👈 स्पष्ट मिति र समय (Date & Time) सेभ हुन्छ
             timestamp: serverTimestamp()
         }).then(() => {
             alert("Top-up request sent successfully! Admin will verify your transaction and add balance soon.");
