@@ -45,6 +45,30 @@
         .submit-btn { background: #dc2626; color: white; border: none; padding: 14px; width: 100%; font-size: 15px; font-weight: 700; cursor: pointer; border-radius: 8px; transition: background 0.2s, transform 0.1s; box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2); }
         .submit-btn:hover { background: #b91c1c; }
         .submit-btn:active { transform: scale(0.98); }
+
+        /* Modern Success Modal Styling */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal-card { background: white; border-radius: 20px; max-width: 420px; width: 100%; padding: 28px 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: scale(0.9); opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .modal-overlay.active { display: flex; }
+        .modal-overlay.active .modal-card { transform: scale(1); opacity: 1; }
+
+        /* Animated Check Icon */
+        .success-icon-wrapper { width: 70px; height: 70px; background: #dcfce7; color: #16a34a; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; font-size: 36px; box-shadow: 0 0 0 10px #f0fdf4; }
+        
+        .modal-title { font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+        .modal-desc { font-size: 13px; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
+        
+        /* Order Receipt Details */
+        .receipt-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; text-align: left; }
+        .receipt-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
+        .receipt-row:last-child { margin-bottom: 0; }
+        .receipt-label { color: #64748b; font-weight: 500; }
+        .receipt-value { color: #0f172a; font-weight: 700; }
+        
+        .status-badge-processing { background: #fef3c7; color: #d97706; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; }
+
+        .modal-btn { background: #0f172a; color: white; border: none; padding: 12px; width: 100%; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+        .modal-btn:hover { background: #1e293b; }
     </style>
 </head>
 <body>
@@ -97,8 +121,38 @@
             <input type="text" id="transaction-id" placeholder="Enter Transaction ID" required>
         </div>
 
-        <button type="submit" class="submit-btn">Submit Request</button>
+        <button type="submit" class="submit-btn" id="submit-btn-text">Submit Request</button>
     </form>
+</div>
+
+<!-- Beautiful Order Success Modal -->
+<div class="modal-overlay" id="success-modal">
+    <div class="modal-card">
+        <div class="success-icon-wrapper">✓</div>
+        <div class="modal-title">Request Submitted!</div>
+        <div class="modal-desc">तपाईंको Request सफलतापुर्वक पठाएको छ। Admin ले Verification गरेपछि तपाईंको Balance तुरुन्तै थपिनेछ।</div>
+        
+        <div class="receipt-box">
+            <div class="receipt-row">
+                <span class="receipt-label">Amount:</span>
+                <span class="receipt-value" id="modal-amount">Rs. 0</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">Method:</span>
+                <span class="receipt-value" id="modal-method">-</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">Trx ID:</span>
+                <span class="receipt-value" id="modal-txid">-</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">Status:</span>
+                <span class="status-badge-processing">Processing</span>
+            </div>
+        </div>
+
+        <button class="modal-btn" onclick="closeModal()">Done / Close</button>
+    </div>
 </div>
 
 <script>
@@ -107,6 +161,10 @@
         let buttons = document.querySelectorAll('.amt-btn');
         buttons.forEach(btn => btn.classList.remove('active'));
         event.target.classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('success-modal').classList.remove('active');
     }
 </script>
 
@@ -152,10 +210,15 @@
 
     // Top-up Request Firebase मा पठाउने (Processing status र Date सहित)
     const form = document.getElementById("topup-form");
+    const submitBtn = document.getElementById("submit-btn-text");
+
     form.addEventListener("submit", (e) => {
         e.preventDefault();
         
         if (!currentUser) return;
+
+        submitBtn.innerText = "Submitting...";
+        submitBtn.disabled = true;
 
         const method = document.getElementById("payment-method").value;
         const amount = document.getElementById("deposit-amount").value;
@@ -169,26 +232,39 @@
         
         push(requestsRef, {
             uid: currentUser.uid,
-            name: currentUser.displayName,
-            email: currentUser.email,
+            name: currentUser.displayName || "User",
+            email: currentUser.email || "",
             method: method,
             amount: Number(amount),
             transactionId: txId,
-            status: "Processing",     // 👈 अब "Pending" को सट्टा "Processing" बस्छ
-            date: formattedDate,       // 👈 स्पष्ट मिति र समय (Date & Time) सेभ हुन्छ
+            status: "Processing",
+            date: formattedDate,
             timestamp: serverTimestamp()
         }).then(() => {
-            alert("Top-up request sent successfully! Admin will verify your transaction and add balance soon.");
+            // Fill values in modal
+            document.getElementById("modal-amount").innerText = "Rs. " + amount;
+            document.getElementById("modal-method").innerText = method;
+            document.getElementById("modal-txid").innerText = txId;
+
+            // Show Success Modal
+            document.getElementById("success-modal").classList.add("active");
+
+            // Reset Form & Button
             form.reset();
+            submitBtn.innerText = "Submit Request";
+            submitBtn.disabled = false;
             document.querySelectorAll('.amt-btn').forEach(btn => btn.classList.remove('active'));
         }).catch((error) => {
             alert("Error sending request: " + error.message);
+            submitBtn.innerText = "Submit Request";
+            submitBtn.disabled = false;
         });
     });
 </script>
 
 </body>
 </html>
+
 
 
 
