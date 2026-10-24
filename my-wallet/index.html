@@ -189,3 +189,293 @@
 
 </body>
 </html>
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Gaule Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #dc2626;
+            --bg-body: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --success-bg: #dcfce7;
+            --warning: #d97706;
+            --warning-bg: #fef3c7;
+            --danger: #dc2626;
+            --danger-bg: #fee2e2;
+            --radius: 12px;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); padding: 16px 12px; }
+        .wrapper { max-width: 800px; margin: 0 auto; }
+        
+        .navbar { background: var(--surface); padding: 14px 18px; border-radius: var(--radius); box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border: 1px solid var(--border); }
+        .page-title { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+        .page-title i { color: var(--primary); font-size: 20px; }
+
+        /* Tabs */
+        .admin-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .tab-nav-btn { flex: 1; padding: 10px; border: none; background: var(--surface); border-radius: var(--radius); font-weight: 700; font-size: 13px; cursor: pointer; color: var(--text-muted); box-shadow: var(--shadow); border: 1px solid var(--border); text-align: center; }
+        .tab-nav-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .section-box { display: none; }
+        .section-box.active { display: block; }
+
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); margin-bottom: 12px; border-left: 4px solid var(--border); }
+        .card.border-processing { border-left-color: var(--warning); }
+        .card.border-approved { border-left-color: var(--success); }
+        .card.border-rejected { border-left-color: var(--danger); }
+
+        .card-top { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9; margin-bottom: 8px; }
+        .user-info strong { font-size: 14px; color: var(--text-main); display: block; }
+        .user-info small { font-size: 11px; color: var(--text-muted); }
+
+        .card-details { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; font-size: 12px; margin-bottom: 12px; }
+        .detail-item span { display: block; color: var(--text-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; }
+        .detail-item strong { font-size: 13px; color: var(--text-main); }
+        .tx-badge { font-family: monospace; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: 700; color: #dc2626; }
+
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; }
+        .badge-processing { background: var(--warning-bg); color: var(--warning); }
+        .badge-approved { background: var(--success-bg); color: var(--success); }
+        .badge-rejected { background: var(--danger-bg); color: var(--danger); }
+
+        .card-actions { display: flex; gap: 8px; padding-top: 10px; border-top: 1px solid #f1f5f9; }
+        .btn { border: none; padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; flex: 1; }
+        .btn-approve { background: var(--success); color: white; }
+        .btn-reject { background: var(--danger-bg); color: var(--danger); }
+        .btn-delete { background: #f1f5f9; color: var(--text-muted); flex: 0 0 auto; padding: 8px 10px; }
+        .btn-delete:hover { background: var(--danger-bg); color: var(--danger); }
+
+        .access-denied { text-align: center; padding: 50px; font-size: 16px; font-weight: 700; color: var(--danger); }
+        .no-data { text-align: center; padding: 35px; color: var(--text-muted); font-size: 13px; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div class="wrapper" id="admin-wrapper" style="display:none;">
+    <div class="navbar">
+        <div class="page-title"><i class="ri-shield-user-line"></i> Gaule Store Admin Panel</div>
+        <button onclick="location.reload()" style="background:#f1f5f9; border:1px solid var(--border); padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer;">Refresh</button>
+    </div>
+
+    <!-- Tab Switcher -->
+    <div class="admin-tabs">
+        <button class="tab-nav-btn active" onclick="switchTab('deposits', this)">💰 Wallet Deposits</button>
+        <button class="tab-nav-btn" onclick="switchTab('orders', this)">🎮 Game Orders</button>
+    </div>
+
+    <!-- 1. Deposits Section -->
+    <div id="deposits-section" class="section-box active">
+        <div id="deposits-container">
+            <div class="no-data"><i class="ri-loader-4-line ri-spin"></i> Loading deposits...</div>
+        </div>
+    </div>
+
+    <!-- 2. Orders Section -->
+    <div id="orders-section" class="section-box">
+        <div id="orders-container">
+            <div class="no-data"><i class="ri-loader-4-line ri-spin"></i> Loading orders...</div>
+        </div>
+    </div>
+</div>
+
+<div id="denied-wrapper" class="access-denied" style="display:none;">
+    🚫 Access Denied! Only <b>gaulestore.np@gmail.com</b> can access this admin panel.
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, onValue, update, remove, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+        authDomain: "gaule-top-up-center.firebaseapp.com",
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+        projectId: "gaule-top-up-center",
+        storageBucket: "gaule-top-up-center.firebasestorage.app",
+        messagingSenderId: "645605489690",
+        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            alert("Please login first!");
+            window.location.href = "../index.html";
+            return;
+        }
+
+        if (user.email !== "gaulestore.np@gmail.com") {
+            document.getElementById("denied-wrapper").style.display = "block";
+            return;
+        }
+
+        document.getElementById("admin-wrapper").style.display = "block";
+
+        // Load Deposits
+        loadDeposits();
+        // Load Orders
+        loadOrders();
+    });
+
+    // Tab Switcher Function
+    window.switchTab = (tabName, btn) => {
+        document.querySelectorAll('.section-box').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-nav-btn').forEach(el => el.classList.remove('active'));
+        
+        if(tabName === 'deposits') {
+            document.getElementById('deposits-section').classList.add('active');
+        } else {
+            document.getElementById('orders-section').classList.add('active');
+        }
+        btn.classList.add('active');
+    };
+
+    // 1. Load Deposits Function
+    function loadDeposits() {
+        const refDep = ref(db, 'topup_requests');
+        onValue(refDep, (snapshot) => {
+            const container = document.getElementById("deposits-container");
+            container.innerHTML = "";
+            if (!snapshot.exists()) {
+                container.innerHTML = '<div class="no-data">No deposit requests found.</div>';
+                return;
+            }
+            const data = snapshot.val();
+            Object.keys(data).reverse().forEach(key => {
+                const item = data[key];
+                let status = item.status || "Processing";
+                let badgeClass = status === "Approved" ? "badge-approved" : (status === "Rejected" ? "badge-rejected" : "badge-processing");
+                let borderClass = status === "Approved" ? "border-approved" : (status === "Rejected" ? "border-rejected" : "border-processing");
+                let isPending = (status === "Processing" || status === "Pending");
+
+                const card = document.createElement("div");
+                card.className = `card ${borderClass}`;
+                card.innerHTML = `
+                    <div class="card-top">
+                        <div class="user-info"><strong>${item.name || 'User'}</strong><small>${item.email || ''}</small></div>
+                        <span class="badge ${badgeClass}">${status}</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-item"><span>Amount</span><strong style="color:var(--primary);">Rs. ${item.amount}</strong></div>
+                        <div class="detail-item"><span>Method</span><strong>${item.method || 'eSewa'}</strong></div>
+                        <div class="detail-item"><span>TX ID</span><span class="tx-badge">${item.transactionId || 'N/A'}</span></div>
+                        <div class="detail-item"><span>Date</span><strong>${item.date || 'N/A'}</strong></div>
+                    </div>
+                    <div class="card-actions">
+                        ${isPending ? `
+                            <button class="btn btn-approve" onclick="approveDeposit('${key}', '${item.uid}', ${item.amount})">Approve</button>
+                            <button class="btn btn-reject" onclick="rejectDeposit('${key}')">Reject</button>
+                        ` : ''}
+                        <button class="btn btn-delete" onclick="deleteDeposit('${key}')"><i class="ri-delete-bin-line"></i> Delete</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        });
+    }
+
+    // 2. Load Orders Function
+    function loadOrders() {
+        const refOrd = ref(db, 'orders');
+        onValue(refOrd, (snapshot) => {
+            const container = document.getElementById("orders-container");
+            container.innerHTML = "";
+            if (!snapshot.exists()) {
+                container.innerHTML = '<div class="no-data">No orders found.</div>';
+                return;
+            }
+            const data = snapshot.val();
+            Object.keys(data).reverse().forEach(key => {
+                const item = data[key];
+                let status = item.status || "Pending";
+                let badgeClass = (status === "Approved" || status === "Completed") ? "badge-approved" : (status === "Rejected" ? "badge-rejected" : "badge-processing");
+                let borderClass = (status === "Approved" || status === "Completed") ? "border-approved" : (status === "Rejected" ? "border-rejected" : "border-processing");
+                let isPending = (status === "Pending" || status === "Processing");
+
+                const card = document.createElement("div");
+                card.className = `card ${borderClass}`;
+                card.innerHTML = `
+                    <div class="card-top">
+                        <div class="user-info"><strong>${item.name || 'User'}</strong><small>${item.email || ''}</small></div>
+                        <span class="badge ${badgeClass}">${status}</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-item"><span>Package & Price</span><strong>${item.packageName || 'Package'} (Rs. ${item.price || 0})</strong></div>
+                        <div class="detail-item"><span>Game UID</span><span class="tx-badge">${item.gameUid || 'N/A'}</span></div>
+                        <div class="detail-item" style="grid-column: span 2;"><span>Date</span><strong>${item.date || 'N/A'}</strong></div>
+                    </div>
+                    <div class="card-actions">
+                        ${isPending ? `
+                            <button class="btn btn-approve" onclick="approveOrder('${key}')">Approve</button>
+                            <button class="btn btn-reject" onclick="rejectOrder('${key}')">Reject</button>
+                        ` : ''}
+                        <button class="btn btn-delete" onclick="deleteOrder('${key}')"><i class="ri-delete-bin-line"></i> Delete</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        });
+    }
+
+    // Actions for Deposits
+    window.approveDeposit = async (id, uid, amount) => {
+        if (!confirm(`Approve Rs. ${amount} and add to user wallet?`)) return;
+        try {
+            await update(ref(db, `topup_requests/${id}`), { status: "Approved" });
+            await runTransaction(ref(db, `users/${uid}/balance`), (curr) => (curr || 0) + Number(amount));
+            alert("✅ Deposit Approved & Balance Added!");
+        } catch (err) { alert("Error: " + err.message); }
+    };
+
+    window.rejectDeposit = async (id) => {
+        if (!confirm("Reject this deposit request?")) return;
+        await update(ref(db, `topup_requests/${id}`), { status: "Rejected" });
+    };
+
+    window.deleteDeposit = async (id) => {
+        if (!confirm("Delete this deposit request?")) return;
+        await remove(ref(db, `topup_requests/${id}`));
+    };
+
+    // Actions for Orders
+    window.approveOrder = async (id) => {
+        if (!confirm("Approve this order?")) return;
+        await update(ref(db, `orders/${id}`), { status: "Approved" });
+    };
+
+    window.rejectOrder = async (id) => {
+        if (!confirm("Reject this order?")) return;
+        await update(ref(db, `orders/${id}`), { status: "Rejected" });
+    };
+
+    window.deleteOrder = async (id) => {
+        if (!confirm("Delete this order?")) return;
+        await remove(ref(db, `orders/${id}`));
+    };
+</script>
+
+</body>
+</html>
+
