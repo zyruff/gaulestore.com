@@ -8,11 +8,6 @@
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f8fafc; color: #1e293b; }
         
-        /* Header Styling */
-        .header { display: flex; align-items: center; padding: 15px 25px; background: white; border-bottom: 1px solid #e2e8f0; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .store-title { font-size: 1.4rem; font-weight: 800; color: #0f172a; text-decoration: none; letter-spacing: -0.5px; }
-        .store-title span { color: #dc2626; }
-        
         /* Main Container */
         .container { max-width: 480px; margin: 30px auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
         
@@ -113,10 +108,6 @@
 </head>
 <body>
 
-<div class="header">
-    <a href="../index.html" class="store-title">GAULE <span>STORE</span></a>
-</div>
-
 <div class="container">
     <!-- Wallet Balance Card -->
     <div class="wallet-card">
@@ -165,7 +156,7 @@
     </form>
 </div>
 
-<!-- Updated English Order Success Modal with Blinking Animation Icon -->
+<!-- English Order Success Modal with Blinking Animation Icon -->
 <div class="modal-overlay" id="success-modal">
     <div class="modal-card">
         <div class="icon-circle-outer">
@@ -232,7 +223,7 @@
 
     let currentUser = null;
 
-    // Login aina user Realtime Balance fetch cheyadam
+    // Login user Realtime Balance fetch
     onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUser = user;
@@ -251,7 +242,7 @@
         }
     });
 
-    // Top-up Request Firebase ki pampadam
+    // Top-up Request Submit
     const form = document.getElementById("topup-form");
     const submitBtn = document.getElementById("submit-btn-text");
 
@@ -267,7 +258,7 @@
         const amount = document.getElementById("deposit-amount").value;
         const txId = document.getElementById("transaction-id").value;
 
-        // Nepal Timezone prakaram clear Date & Time
+        // Nepal Timezone
         const now = new Date();
         const formattedDate = now.toLocaleString('en-US', { timeZone: 'Asia/Kathmandu' });
 
@@ -307,6 +298,7 @@
 
 </body>
 </html>
+
 
 
 
