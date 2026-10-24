@@ -7,14 +7,14 @@ const app = express();
 
 app.use(express.json());
 
-// Frontend बाट सीधै रिक्वेस्ट आउन दिन CORS खुला गरिएको छ
+// Frontend (वेबसाइट) बाट सीधै रिक्वेस्ट आउन दिन CORS open गरिएको
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Accept', 'Authorization']
 }));
 
-// Root endpoint for testing & warm-up
+// Root endpoint (चेक गर्नका लागि)
 app.get('/', (req, res) => {
     res.send("Gaule Store Top-Up Backend is Running Live!");
 });
@@ -65,16 +65,17 @@ app.post('/api/webhook', (req, res) => {
     res.status(200).json({ status: "received" });
 });
 
-// Render Free Tier सधैं ब्युँझाइराख्न Keep-Alive Ping System
+// Render Free Tier सुत्न नदिन Auto-Ping (Keep-Alive)
 setInterval(() => {
     https.get('https://gaule-store.onrender.com', (res) => {
         console.log('Keep-alive ping executed.');
     }).on('error', (err) => {
         console.error('Keep-alive error:', err.message);
     });
-}, 14 * 60 * 1000); // 14 मिनेटमा
+}, 14 * 60 * 1000); // १४ मिनेटमा
 
+// Render को पोर्ट मिलाइएको (Default 10000 वा Environment Port)
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });
