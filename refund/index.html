@@ -402,6 +402,7 @@
             document.getElementById('qrModal').classList.remove('show');
         };
 
+        // अर्डर पेमेन्ट बुझाउने र ब्याकग्राउन्ड अटो टप-अप ट्रिगर गर्ने फङ्‍सन
         window.submitPayment = async function() {
             let txidValue = txidInput.value.trim();
             let uidValue = gameUidInput.value.trim();
@@ -417,11 +418,12 @@
             submitBtn.disabled = true;
             submitBtn.innerText = "Submitting...";
 
-            // Warm-up Ping
+            // 🔥 Render सुतेको भए ब्युँझाउन Warm-up Ping
             fetch('https://gaule-store.onrender.com/').catch(e => console.log("Waking Render..."));
 
             const now = new Date();
-            let itemNameLower = selectedItemName.toLowerCase();
+            const currentItem = selectedItemName;
+            let itemNameLower = currentItem.toLowerCase();
             
             let isMembership = itemNameLower.includes('weekly') || itemNameLower.includes('monthly');
             let membershipType = itemNameLower.includes('monthly') ? 'monthly' : 'weekly';
@@ -454,7 +456,7 @@
                     email: currentUser ? currentUser.email : "Guest",
                     name: currentUser ? (currentUser.displayName || "User") : "User",
                     userId: currentUser ? currentUser.uid : "GuestUID",
-                    product: selectedItemName,
+                    product: currentItem,
                     amountDue: selectedItemPrice,
                     uid: uidValue,
                     transactionId: txidValue,
@@ -463,14 +465,15 @@
 
                 closePaymentModal();
                 document.getElementById('receipt-uid').innerText = uidValue;
-                document.getElementById('receipt-item').innerText = selectedItemName;
+                document.getElementById('receipt-item').innerText = currentItem;
                 document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
                 document.getElementById('successModal').classList.add('show');
 
                 // ३. ५ सेकेन्डपछि Render मा Request पठाउने
                 if (isMembership) {
+                    console.log("Triggering Auto Topup in 5s for:", currentItem);
                     setTimeout(() => {
-                        processAutoTopUpApi(uidValue, membershipType, orderRef, selectedItemName);
+                        processAutoTopUpApi(uidValue, membershipType, orderRef, currentItem);
                     }, 5000);
                 }
 
@@ -481,7 +484,7 @@
             }
         };
 
-        // ४. Render API Response Mapped Function
+        // ४. Render API मा Request पठाउने र Voucher हटाउने फङ्‍सन
         async function processAutoTopUpApi(playerId, membershipType, orderRef, packName) {
             try {
                 const voucherRef = ref(db, `auto-top-up/${membershipType}`);
@@ -497,7 +500,7 @@
                 const voucherCode = vouchers[selectedKey];
                 if (!voucherCode) return;
 
-                console.log("Sending Request to Render Backend...");
+                console.log("Sending Request to Render Backend for:", packName);
 
                 const response = await fetch('https://gaule-store.onrender.com/api/process-topup', {
                     method: 'POST',
@@ -518,13 +521,12 @@
 
                 let result = JSON.parse(responseText);
 
-                // 🔥 AndroidArtist API Response Validation ("status": "success")
                 if (result.status === 'success' || result.status === 200 || result.success) {
+                    // प्रयोग भइसकेको भौचर हटाउने
                     await remove(ref(db, `auto-top-up/${membershipType}/${selectedKey}`));
+                    // Status Completed बनाउने
                     await set(ref(db, `orders/${orderRef.key}/status`), "Completed");
                     console.log("Top Up Completed & Voucher Deleted Successfully!");
-                } else {
-                    console.error("Topup Failed:", result.message || result.content);
                 }
             } catch (err) {
                 console.error("Auto Top Up Process Error:", err);
