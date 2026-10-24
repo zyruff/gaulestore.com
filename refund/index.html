@@ -402,7 +402,6 @@
             document.getElementById('qrModal').classList.remove('show');
         };
 
-        // अर्डर पेमेन्ट बुझाउने र ब्याकग्राउन्ड अटो टप-अप ट्रिगर गर्ने फङ्‍सन
         window.submitPayment = async function() {
             let txidValue = txidInput.value.trim();
             let uidValue = gameUidInput.value.trim();
@@ -418,7 +417,7 @@
             submitBtn.disabled = true;
             submitBtn.innerText = "Submitting...";
 
-            // 🔥 Render सुतेको भए ब्युँझाउन Warm-up Ping
+            // Warm-up Ping
             fetch('https://gaule-store.onrender.com/').catch(e => console.log("Waking Render..."));
 
             const now = new Date();
@@ -447,7 +446,7 @@
             const orderRef = push(ref(db, 'orders'));
             
             try {
-                // २. अर्डर Firebase मा Pending स्टेटससहित सेभ गर्ने
+                // २. अर्डर Firebase मा Pending सेभ गर्ने
                 await set(orderRef, {
                     date: now.toLocaleDateString(),
                     time: now.toLocaleTimeString(),
@@ -468,10 +467,10 @@
                 document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
                 document.getElementById('successModal').classList.add('show');
 
-                // ३. ५ सेकेन्डपछि ब्याकग्राउन्डमा Render मा Request पठाउने
+                // ३. ५ सेकेन्डपछि Render मा Request पठाउने
                 if (isMembership) {
                     setTimeout(() => {
-                        processAutoTopUpApi(uidValue, membershipType, orderRef);
+                        processAutoTopUpApi(uidValue, membershipType, orderRef, selectedItemName);
                     }, 5000);
                 }
 
@@ -482,8 +481,8 @@
             }
         };
 
-        // ४. Render API मा Request पठाउने र Voucher हटाउने फङ्‍सन (packType थपिएको)
-        async function processAutoTopUpApi(playerId, membershipType, orderRef) {
+        // ४. Render API Response Mapped Function
+        async function processAutoTopUpApi(playerId, membershipType, orderRef, packName) {
             try {
                 const voucherRef = ref(db, `auto-top-up/${membershipType}`);
                 const snapshot = await get(voucherRef);
@@ -509,7 +508,7 @@
                         orderid: "GAULE_" + Date.now(),
                         playerid: playerId,
                         code: voucherCode,
-                        packType: selectedItemName, // 🔥 यहाँबाट Render Logs मा Weekly/Monthly देखिनेछ
+                        packType: packName,
                         url: "https://gaule-store.onrender.com/api/webhook"
                     })
                 });
@@ -519,12 +518,13 @@
 
                 let result = JSON.parse(responseText);
 
+                // 🔥 AndroidArtist API Response Validation ("status": "success")
                 if (result.status === 'success' || result.status === 200 || result.success) {
-                    // प्रयोग भइसकेको भौचर हटाउने
                     await remove(ref(db, `auto-top-up/${membershipType}/${selectedKey}`));
-                    // Status Completed बनाउने
                     await set(ref(db, `orders/${orderRef.key}/status`), "Completed");
                     console.log("Top Up Completed & Voucher Deleted Successfully!");
+                } else {
+                    console.error("Topup Failed:", result.message || result.content);
                 }
             } catch (err) {
                 console.error("Auto Top Up Process Error:", err);
