@@ -201,13 +201,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Gaule Store</title>
+    <title>My Wallet & History | Gaule Store</title>
+    <!-- Inter Font & Remix Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
     <style>
         :root {
             --primary: #dc2626;
-            --bg-body: #f8fafc;
+            --primary-dark: #b91c1c;
+            --bg: #f8fafc;
             --surface: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
@@ -219,91 +222,154 @@
             --danger: #dc2626;
             --danger-bg: #fee2e2;
             --radius: 12px;
-            --shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
         }
+
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-body); color: var(--text-main); padding: 16px 12px; }
-        .wrapper { max-width: 800px; margin: 0 auto; }
+        body { background-color: var(--bg); color: var(--text-main); padding-bottom: 40px; }
+
+        /* Header */
+        .header { display: flex; align-items: center; padding: 15px 20px; background: var(--surface); border-bottom: 1px solid var(--border); justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .store-title { font-size: 1.2rem; font-weight: 800; color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .store-title span { color: var(--primary); }
+
+        .container { max-width: 480px; margin: 20px auto; padding: 0 15px; }
+
+        /* Wallet Card */
+        .wallet-card { background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%); color: white; padding: 22px; border-radius: var(--radius); text-align: center; margin-bottom: 20px; box-shadow: 0 10px 20px -5px rgba(220, 38, 38, 0.3); }
+        .wallet-label { font-size: 13px; opacity: 0.9; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        .wallet-amount { font-size: 36px; font-weight: 800; margin-top: 4px; letter-spacing: -1px; }
+
+        /* Card Box */
+        .card { background: var(--surface); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 20px; }
+        .section-title { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+
+        /* QR Section */
+        .qr-section { text-align: center; margin-bottom: 18px; background: #fff1f2; padding: 15px; border: 1.5px dashed #fecdd3; border-radius: 10px; }
+        .qr-section p { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+        .qr-section img { width: 130px; height: 130px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border); background: white; padding: 4px; }
+        .id-badge { display: inline-block; background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-top: 8px; }
+
+        /* Form Inputs */
+        .form-group { margin-bottom: 14px; }
+        label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: var(--text-muted); }
+        input, select { width: 100%; padding: 11px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; outline: none; background: #f8fafc; transition: all 0.2s; }
+        input:focus, select:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1); }
+
+        /* Quick Amounts */
+        .quick-amounts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
+        .amt-btn { background: #f1f5f9; border: 1.5px solid var(--border); color: var(--text-main); padding: 7px 0; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .amt-btn:hover { background: #fee2e2; border-color: #fca5a5; color: var(--primary); }
+        .amt-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+        .submit-btn { background: var(--primary); color: white; border: none; padding: 12px; width: 100%; font-size: 14px; font-weight: 700; cursor: pointer; border-radius: 8px; transition: background 0.2s, transform 0.1s; }
+        .submit-btn:hover { background: var(--primary-dark); }
+        .submit-btn:active { transform: scale(0.98); }
+
+        /* History List Inside Wallet */
+        .history-list { display: flex; flex-direction: column; gap: 10px; }
+        .history-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--border); }
         
-        .navbar { background: var(--surface); padding: 14px 18px; border-radius: var(--radius); box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border: 1px solid var(--border); }
-        .page-title { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
-        .page-title i { color: var(--primary); font-size: 20px; }
+        .history-card.border-processing { border-left-color: var(--warning); }
+        .history-card.border-approved { border-left-color: var(--success); }
+        .history-card.border-rejected { border-left-color: var(--danger); }
 
-        /* Tabs */
-        .admin-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-        .tab-nav-btn { flex: 1; padding: 10px; border: none; background: var(--surface); border-radius: var(--radius); font-weight: 700; font-size: 13px; cursor: pointer; color: var(--text-muted); box-shadow: var(--shadow); border: 1px solid var(--border); text-align: center; }
-        .tab-nav-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .history-left { display: flex; flex-direction: column; gap: 2px; }
+        .history-left strong { font-size: 13px; color: var(--text-main); }
+        .history-left small { font-size: 11px; color: var(--text-muted); }
+        .tx-id { font-family: monospace; font-size: 11px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; display: inline-block; width: fit-content; margin-top: 2px; color: #334155; font-weight: 700; }
 
-        .section-box { display: none; }
-        .section-box.active { display: block; }
+        .history-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+        .history-amount { font-size: 14px; font-weight: 800; color: var(--primary); }
 
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); margin-bottom: 12px; border-left: 4px solid var(--border); }
-        .card.border-processing { border-left-color: var(--warning); }
-        .card.border-approved { border-left-color: var(--success); }
-        .card.border-rejected { border-left-color: var(--danger); }
-
-        .card-top { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9; margin-bottom: 8px; }
-        .user-info strong { font-size: 14px; color: var(--text-main); display: block; }
-        .user-info small { font-size: 11px; color: var(--text-muted); }
-
-        .card-details { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; font-size: 12px; margin-bottom: 12px; }
-        .detail-item span { display: block; color: var(--text-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; }
-        .detail-item strong { font-size: 13px; color: var(--text-main); }
-        .tx-badge { font-family: monospace; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: 700; color: #dc2626; }
-
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; }
+        /* Badges */
+        .badge { padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; }
         .badge-processing { background: var(--warning-bg); color: var(--warning); }
         .badge-approved { background: var(--success-bg); color: var(--success); }
         .badge-rejected { background: var(--danger-bg); color: var(--danger); }
 
-        .card-actions { display: flex; gap: 8px; padding-top: 10px; border-top: 1px solid #f1f5f9; }
-        .btn { border: none; padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; flex: 1; }
-        .btn-approve { background: var(--success); color: white; }
-        .btn-reject { background: var(--danger-bg); color: var(--danger); }
-        .btn-delete { background: #f1f5f9; color: var(--text-muted); flex: 0 0 auto; padding: 8px 10px; }
-        .btn-delete:hover { background: var(--danger-bg); color: var(--danger); }
-
-        .access-denied { text-align: center; padding: 50px; font-size: 16px; font-weight: 700; color: var(--danger); }
-        .no-data { text-align: center; padding: 35px; color: var(--text-muted); font-size: 13px; font-weight: 600; }
+        .no-history { text-align: center; padding: 20px; color: var(--text-muted); font-size: 12px; font-weight: 600; }
     </style>
 </head>
 <body>
 
-<div class="wrapper" id="admin-wrapper" style="display:none;">
-    <div class="navbar">
-        <div class="page-title"><i class="ri-shield-user-line"></i> Gaule Store Admin Panel</div>
-        <button onclick="location.reload()" style="background:#f1f5f9; border:1px solid var(--border); padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer;">Refresh</button>
+<div class="header">
+    <a href="../index.html" class="store-title"><i class="ri-arrow-left-line"></i> GAULE <span>STORE</span></a>
+</div>
+
+<div class="container">
+    <!-- Wallet Card -->
+    <div class="wallet-card">
+        <div class="wallet-label">Available Wallet Balance</div>
+        <div class="wallet-amount">Rs. <span id="my-wallet-balance">0</span></div>
     </div>
 
-    <!-- Tab Switcher -->
-    <div class="admin-tabs">
-        <button class="tab-nav-btn active" onclick="switchTab('deposits', this)">💰 Wallet Deposits</button>
-        <button class="tab-nav-btn" onclick="switchTab('orders', this)">🎮 Game Orders</button>
-    </div>
-
-    <!-- 1. Deposits Section -->
-    <div id="deposits-section" class="section-box active">
-        <div id="deposits-container">
-            <div class="no-data"><i class="ri-loader-4-line ri-spin"></i> Loading deposits...</div>
+    <!-- Deposit Request Form -->
+    <div class="card">
+        <div class="section-title">
+            <i class="ri-add-circle-line" style="color:var(--primary); font-size:18px;"></i> Load Wallet Balance
         </div>
+
+        <div class="qr-section">
+            <p>Scan QR via <b>eSewa / Khalti</b> to Pay</p>
+            <img src="../qr.png" alt="Payment QR Code" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=GAULE_STORE_PAYMENT'">
+            <div>
+                <span class="id-badge">ID: 9761081110 (Roshan Tamang)</span>
+            </div>
+        </div>
+
+        <form id="topup-form">
+            <div class="form-group">
+                <label for="payment-method">Payment Method</label>
+                <select id="payment-method" required>
+                    <option value="eSewa">eSewa</option>
+                    <option value="Khalti">Khalti</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="deposit-amount">Amount Sent (Rs.)</label>
+                <div class="quick-amounts">
+                    <button type="button" class="amt-btn" onclick="setAmount(100, event)">100</button>
+                    <button type="button" class="amt-btn" onclick="setAmount(200, event)">200</button>
+                    <button type="button" class="amt-btn" onclick="setAmount(500, event)">500</button>
+                    <button type="button" class="amt-btn" onclick="setAmount(1000, event)">1000</button>
+                </div>
+                <input type="number" id="deposit-amount" placeholder="Enter custom amount" required min="10">
+            </div>
+
+            <div class="form-group">
+                <label for="transaction-id">Transaction ID / Reference ID</label>
+                <input type="text" id="transaction-id" placeholder="Enter Transaction ID" required>
+            </div>
+
+            <button type="submit" class="submit-btn">Submit Request</button>
+        </form>
     </div>
 
-    <!-- 2. Orders Section -->
-    <div id="orders-section" class="section-box">
-        <div id="orders-container">
-            <div class="no-data"><i class="ri-loader-4-line ri-spin"></i> Loading orders...</div>
+    <!-- Deposit History Section Inside Same Page -->
+    <div class="card">
+        <div class="section-title">
+            <i class="ri-history-line" style="color:var(--primary); font-size:18px;"></i> My Deposit History
+        </div>
+        <div class="history-list" id="deposit-history-container">
+            <div class="no-history"><i class="ri-loader-4-line ri-spin"></i> Loading history...</div>
         </div>
     </div>
 </div>
 
-<div id="denied-wrapper" class="access-denied" style="display:none;">
-    🚫 Access Denied! Only <b>gaulestore.np@gmail.com</b> can access this admin panel.
-</div>
+<script>
+    function setAmount(amount, event) {
+        document.getElementById('deposit-amount').value = amount;
+        document.querySelectorAll('.amt-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+</script>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, onValue, update, remove, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
@@ -319,161 +385,119 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
+    let currentUser = null;
+
     onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            alert("Please login first!");
+        if (user) {
+            currentUser = user;
+
+            // 1. Fetch Realtime User Balance
+            const userRef = ref(db, 'users/' + user.uid);
+            onValue(userRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    document.getElementById("my-wallet-balance").innerText = snapshot.val().balance || 0;
+                } else {
+                    document.getElementById("my-wallet-balance").innerText = 0;
+                }
+            });
+
+            // 2. Fetch Logged-in User's Deposit History in Realtime
+            loadUserDepositHistory(user.uid);
+
+        } else {
+            alert("Please login first to access wallet!");
             window.location.href = "../index.html";
-            return;
         }
-
-        if (user.email !== "gaulestore.np@gmail.com") {
-            document.getElementById("denied-wrapper").style.display = "block";
-            return;
-        }
-
-        document.getElementById("admin-wrapper").style.display = "block";
-
-        // Load Deposits
-        loadDeposits();
-        // Load Orders
-        loadOrders();
     });
 
-    // Tab Switcher Function
-    window.switchTab = (tabName, btn) => {
-        document.querySelectorAll('.section-box').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.tab-nav-btn').forEach(el => el.classList.remove('active'));
+    // Form Submit Logic
+    const form = document.getElementById("topup-form");
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (!currentUser) return;
+
+        const method = document.getElementById("payment-method").value;
+        const amount = document.getElementById("deposit-amount").value;
+        const txId = document.getElementById("transaction-id").value;
+        const formattedDate = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kathmandu' });
+
+        const requestsRef = ref(db, 'topup_requests');
         
-        if(tabName === 'deposits') {
-            document.getElementById('deposits-section').classList.add('active');
-        } else {
-            document.getElementById('orders-section').classList.add('active');
-        }
-        btn.classList.add('active');
-    };
+        push(requestsRef, {
+            uid: currentUser.uid,
+            name: currentUser.displayName || 'User',
+            email: currentUser.email,
+            method: method,
+            amount: Number(amount),
+            transactionId: txId,
+            status: "Processing",
+            date: formattedDate,
+            timestamp: serverTimestamp()
+        }).then(() => {
+            alert("✅ Deposit request sent successfully!");
+            form.reset();
+            document.querySelectorAll('.amt-btn').forEach(btn => btn.classList.remove('active'));
+        }).catch((error) => {
+            alert("Error: " + error.message);
+        });
+    });
 
-    // 1. Load Deposits Function
-    function loadDeposits() {
-        const refDep = ref(db, 'topup_requests');
-        onValue(refDep, (snapshot) => {
-            const container = document.getElementById("deposits-container");
-            container.innerHTML = "";
+    // Load History Function
+    function loadUserDepositHistory(uid) {
+        const historyContainer = document.getElementById("deposit-history-container");
+        const requestsRef = ref(db, 'topup_requests');
+
+        onValue(requestsRef, (snapshot) => {
+            historyContainer.innerHTML = "";
+
             if (!snapshot.exists()) {
-                container.innerHTML = '<div class="no-data">No deposit requests found.</div>';
+                historyContainer.innerHTML = '<div class="no-history">No deposit requests yet.</div>';
                 return;
             }
+
             const data = snapshot.val();
-            Object.keys(data).reverse().forEach(key => {
-                const item = data[key];
-                let status = item.status || "Processing";
-                let badgeClass = status === "Approved" ? "badge-approved" : (status === "Rejected" ? "badge-rejected" : "badge-processing");
-                let borderClass = status === "Approved" ? "border-approved" : (status === "Rejected" ? "border-rejected" : "border-processing");
-                let isPending = (status === "Processing" || status === "Pending");
+            const userHistory = Object.keys(data)
+                .map(key => ({ id: key, ...data[key] }))
+                .filter(item => item.uid === uid)
+                .reverse();
+
+            if (userHistory.length === 0) {
+                historyContainer.innerHTML = '<div class="no-history">No deposit history found.</div>';
+                return;
+            }
+
+            userHistory.forEach(item => {
+                let badgeClass = "badge-processing";
+                let borderClass = "border-processing";
+                let statusIcon = "ri-time-line";
+
+                if (item.status === "Approved") {
+                    badgeClass = "badge-approved";
+                    borderClass = "border-approved";
+                    statusIcon = "ri-checkbox-circle-line";
+                } else if (item.status === "Rejected") {
+                    badgeClass = "badge-rejected";
+                    borderClass = "border-rejected";
+                    statusIcon = "ri-close-circle-line";
+                }
 
                 const card = document.createElement("div");
-                card.className = `card ${borderClass}`;
+                card.className = `history-card ${borderClass}`;
                 card.innerHTML = `
-                    <div class="card-top">
-                        <div class="user-info"><strong>${item.name || 'User'}</strong><small>${item.email || ''}</small></div>
-                        <span class="badge ${badgeClass}">${status}</span>
+                    <div class="history-left">
+                        <strong>${item.method || 'eSewa'} Deposit</strong>
+                        <small>${item.date || 'N/A'}</small>
+                        <span class="tx-id">TX: ${item.transactionId || 'N/A'}</span>
                     </div>
-                    <div class="card-details">
-                        <div class="detail-item"><span>Amount</span><strong style="color:var(--primary);">Rs. ${item.amount}</strong></div>
-                        <div class="detail-item"><span>Method</span><strong>${item.method || 'eSewa'}</strong></div>
-                        <div class="detail-item"><span>TX ID</span><span class="tx-badge">${item.transactionId || 'N/A'}</span></div>
-                        <div class="detail-item"><span>Date</span><strong>${item.date || 'N/A'}</strong></div>
-                    </div>
-                    <div class="card-actions">
-                        ${isPending ? `
-                            <button class="btn btn-approve" onclick="approveDeposit('${key}', '${item.uid}', ${item.amount})">Approve</button>
-                            <button class="btn btn-reject" onclick="rejectDeposit('${key}')">Reject</button>
-                        ` : ''}
-                        <button class="btn btn-delete" onclick="deleteDeposit('${key}')"><i class="ri-delete-bin-line"></i> Delete</button>
+                    <div class="history-right">
+                        <span class="history-amount">Rs. ${item.amount}</span>
+                        <span class="badge ${badgeClass}"><i class="${statusIcon}"></i> ${item.status}</span>
                     </div>
                 `;
-                container.appendChild(card);
+                historyContainer.appendChild(card);
             });
         });
     }
-
-    // 2. Load Orders Function
-    function loadOrders() {
-        const refOrd = ref(db, 'orders');
-        onValue(refOrd, (snapshot) => {
-            const container = document.getElementById("orders-container");
-            container.innerHTML = "";
-            if (!snapshot.exists()) {
-                container.innerHTML = '<div class="no-data">No orders found.</div>';
-                return;
-            }
-            const data = snapshot.val();
-            Object.keys(data).reverse().forEach(key => {
-                const item = data[key];
-                let status = item.status || "Pending";
-                let badgeClass = (status === "Approved" || status === "Completed") ? "badge-approved" : (status === "Rejected" ? "badge-rejected" : "badge-processing");
-                let borderClass = (status === "Approved" || status === "Completed") ? "border-approved" : (status === "Rejected" ? "border-rejected" : "border-processing");
-                let isPending = (status === "Pending" || status === "Processing");
-
-                const card = document.createElement("div");
-                card.className = `card ${borderClass}`;
-                card.innerHTML = `
-                    <div class="card-top">
-                        <div class="user-info"><strong>${item.name || 'User'}</strong><small>${item.email || ''}</small></div>
-                        <span class="badge ${badgeClass}">${status}</span>
-                    </div>
-                    <div class="card-details">
-                        <div class="detail-item"><span>Package & Price</span><strong>${item.packageName || 'Package'} (Rs. ${item.price || 0})</strong></div>
-                        <div class="detail-item"><span>Game UID</span><span class="tx-badge">${item.gameUid || 'N/A'}</span></div>
-                        <div class="detail-item" style="grid-column: span 2;"><span>Date</span><strong>${item.date || 'N/A'}</strong></div>
-                    </div>
-                    <div class="card-actions">
-                        ${isPending ? `
-                            <button class="btn btn-approve" onclick="approveOrder('${key}')">Approve</button>
-                            <button class="btn btn-reject" onclick="rejectOrder('${key}')">Reject</button>
-                        ` : ''}
-                        <button class="btn btn-delete" onclick="deleteOrder('${key}')"><i class="ri-delete-bin-line"></i> Delete</button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        });
-    }
-
-    // Actions for Deposits
-    window.approveDeposit = async (id, uid, amount) => {
-        if (!confirm(`Approve Rs. ${amount} and add to user wallet?`)) return;
-        try {
-            await update(ref(db, `topup_requests/${id}`), { status: "Approved" });
-            await runTransaction(ref(db, `users/${uid}/balance`), (curr) => (curr || 0) + Number(amount));
-            alert("✅ Deposit Approved & Balance Added!");
-        } catch (err) { alert("Error: " + err.message); }
-    };
-
-    window.rejectDeposit = async (id) => {
-        if (!confirm("Reject this deposit request?")) return;
-        await update(ref(db, `topup_requests/${id}`), { status: "Rejected" });
-    };
-
-    window.deleteDeposit = async (id) => {
-        if (!confirm("Delete this deposit request?")) return;
-        await remove(ref(db, `topup_requests/${id}`));
-    };
-
-    // Actions for Orders
-    window.approveOrder = async (id) => {
-        if (!confirm("Approve this order?")) return;
-        await update(ref(db, `orders/${id}`), { status: "Approved" });
-    };
-
-    window.rejectOrder = async (id) => {
-        if (!confirm("Reject this order?")) return;
-        await update(ref(db, `orders/${id}`), { status: "Rejected" });
-    };
-
-    window.deleteOrder = async (id) => {
-        if (!confirm("Delete this order?")) return;
-        await remove(ref(db, `orders/${id}`));
-    };
 </script>
 
 </body>
