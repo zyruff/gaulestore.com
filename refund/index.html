@@ -76,11 +76,11 @@
 <div class="header">
     <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
     
-    <!-- Logo/Title मा क्लिक गर्दा Home Page (index.html) मा जानेछ -->
+    <!-- Logo मा क्लिक गर्दा Home Page (index.html) मा जाने -->
     <a href="index.html" class="store-title">GAULE <span style="color:#dc2626;">STORE</span></a>
     
     <div class="header-right">
-        <!-- Login नभएको बेला -->
+        <!-- Login नभएको बेला देखिने Icon -->
         <div id="login-container" onclick="googleLogin()">
             <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
@@ -128,7 +128,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
@@ -159,19 +159,25 @@
             document.getElementById("display-name").innerText = user.displayName;
             document.getElementById("display-email").innerText = user.email;
 
-            // Database बाट Wallet Balance Fetch गर्ने
             const userRef = ref(db, 'users/' + user.uid);
+
+            // पहिलोपटक लगइन गर्दा Database मा data (Name, Email, Balance, Role) create गर्ने
+            get(userRef).then((snapshot) => {
+                if (!snapshot.exists()) {
+                    set(userRef, {
+                        name: user.displayName,
+                        email: user.email,
+                        balance: 0,
+                        role: "user"
+                    });
+                }
+            });
+
+            // Realtime ब्यालेन्स Sync गर्ने
             onValue(userRef, (snapshot) => {
                 if (snapshot.exists()) {
                     const data = snapshot.val();
                     document.getElementById("header-user-balance").innerText = data.balance || 0;
-                } else {
-                    set(userRef, {
-                        name: user.displayName,
-                        email: user.email,
-                        balance: 0
-                    });
-                    document.getElementById("header-user-balance").innerText = 0;
                 }
             });
         }
@@ -179,7 +185,6 @@
 </script>
 </body>
 </html>
-
 
 
 
