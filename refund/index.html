@@ -1,5 +1,4 @@
-
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <link rel="canonical" href="https://roshantamang2.com.np/" />
@@ -66,7 +65,9 @@
         .change-name { font-size: 11px; color: #dc2626; text-decoration: none; display: block; margin-bottom: 15px; }
         .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; cursor: pointer; border-radius: 4px; width: 100%; }
         #nav-menu a { display: block; padding: 12px 0; color: black; text-decoration: none; border-bottom: 1px solid #eee; }
-        .store-title { font-size: 1.5rem; font-weight: bold; }
+        
+        /* Store Title/Logo Style */
+        .store-title { font-size: 1.5rem; font-weight: bold; color: black; text-decoration: none; }
         .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
     </style>
 </head>
@@ -74,7 +75,9 @@
 
 <div class="header">
     <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
-    <div class="store-title">GAULE <span style="color:#dc2626;">STORE</span></div>
+    
+    <!-- Logo/Title मा क्लिक गर्दा Home Page (index.html) मा जानेछ -->
+    <a href="index.html" class="store-title">GAULE <span style="color:#dc2626;">STORE</span></a>
     
     <div class="header-right">
         <!-- Login नभएको बेला -->
@@ -176,6 +179,7 @@
 </script>
 </body>
 </html>
+
 
 
 
