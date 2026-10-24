@@ -52,10 +52,46 @@
         .modal-overlay.active { display: flex; }
         .modal-overlay.active .modal-card { transform: scale(1); opacity: 1; }
 
-        /* Stylish Green Check Icon - Zoomed Out Circle Effect */
-        .icon-circle-outer { width: 84px; height: 84px; background: #e6f9f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; transition: transform 0.4s ease; }
-        .icon-circle-inner { width: 64px; height: 64px; background: #22c55e; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 6px 16px rgba(34, 197, 94, 0.35); }
-        .modal-overlay.active .icon-circle-outer { transform: scale(1); }
+        /* Stylish Green Check Icon - Blinking Glow Animation */
+        .icon-circle-outer { 
+            width: 84px; 
+            height: 84px; 
+            background: #dcfce7; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 0 auto 20px auto; 
+            animation: pulseGlow 1.8s infinite ease-in-out;
+        }
+        .icon-circle-inner { 
+            width: 62px; 
+            height: 62px; 
+            background: #22c55e; 
+            color: white; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 30px; 
+            box-shadow: 0 6px 16px rgba(34, 197, 94, 0.3); 
+        }
+
+        /* Pulse / Blink Animation Keyframes */
+        @keyframes pulseGlow {
+            0% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+                transform: scale(0.95);
+            }
+            50% {
+                box-shadow: 0 0 0 14px rgba(34, 197, 94, 0);
+                transform: scale(1.05);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+                transform: scale(0.95);
+            }
+        }
 
         .modal-title { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 8px; letter-spacing: -0.3px; }
         .modal-desc { font-size: 13.5px; color: #64748b; margin-bottom: 22px; line-height: 1.5; padding: 0 5px; }
@@ -67,7 +103,8 @@
         .receipt-label { color: #64748b; font-weight: 500; }
         .receipt-value { color: #0f172a; font-weight: 700; }
         
-        .status-badge-pending { color: #d97706; font-weight: 700; }
+        /* Processing Badge Style */
+        .status-badge-processing { background: #fef3c7; color: #d97706; padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; }
 
         .modal-btn { background: #1e293b; color: white; border: none; padding: 13px; width: 100%; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.1s; }
         .modal-btn:hover { background: #0f172a; }
@@ -128,7 +165,7 @@
     </form>
 </div>
 
-<!-- Updated English Order Success Modal with Soft Circle Icon -->
+<!-- Updated English Order Success Modal with Blinking Animation Icon -->
 <div class="modal-overlay" id="success-modal">
     <div class="modal-card">
         <div class="icon-circle-outer">
@@ -153,7 +190,7 @@
             </div>
             <div class="receipt-row">
                 <span class="receipt-label">Status:</span>
-                <span class="status-badge-pending">Pending Verification</span>
+                <span class="status-badge-processing">Processing</span>
             </div>
         </div>
 
@@ -195,7 +232,7 @@
 
     let currentUser = null;
 
-    // Login भएको युजरको Realtime Balance फेच गर्ने
+    // Login aina user Realtime Balance fetch cheyadam
     onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUser = user;
@@ -214,7 +251,7 @@
         }
     });
 
-    // Top-up Request Firebase मा पठाउने
+    // Top-up Request Firebase ki pampadam
     const form = document.getElementById("topup-form");
     const submitBtn = document.getElementById("submit-btn-text");
 
@@ -230,7 +267,7 @@
         const amount = document.getElementById("deposit-amount").value;
         const txId = document.getElementById("transaction-id").value;
 
-        // Nepal Timezone अनुसार स्पष्ट Date & Time स्ट्रिङ बनाउने
+        // Nepal Timezone prakaram clear Date & Time
         const now = new Date();
         const formattedDate = now.toLocaleString('en-US', { timeZone: 'Asia/Kathmandu' });
 
@@ -270,6 +307,7 @@
 
 </body>
 </html>
+
 
 
 
