@@ -1,1 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wallet | Gaule Store</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f8fafc; color: #1e293b; }
+        
+        /* Header Styling */
+        .header { display: flex; align-items: center; padding: 15px 25px; background: white; border-bottom: 1px solid #e2e8f0; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .store-title { font-size: 1.4rem; font-weight: 800; color: #0f172a; text-decoration: none; letter-spacing: -0.5px; }
+        .store-title span { color: #dc2626; }
+        
+        /* Main Container */
+        .container { max-width: 480px; margin: 30px auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
+        
+        /* Wallet Card */
+        .wallet-card { background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%); color: white; padding: 25px; border-radius: 12px; text-align: center; margin-bottom: 25px; box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.25); }
+        .wallet-amount { font-size: 34px; font-weight: 800; letter-spacing: -1px; }
+        
+        /* Section Title */
+        h3 { margin-top: 0; margin-bottom: 20px; color: #0f172a; font-size: 17px; font-weight: 700; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+        
+        /* Form Controls */
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #475569; }
+        input, select { width: 100%; padding: 12px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 14px; outline: none; background-color: #f8fafc; transition: all 0.2s ease; }
+        input:focus, select:focus { border-color: #dc2626; background-color: #fff; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1); }
+        
+        /* Quick Amount Buttons Styling */
+        .quick-amounts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+        .amt-btn { background: #f1f5f9; border: 1.5px solid #cbd5e1; color: #334155; padding: 8px 0; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .amt-btn:hover { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
+        .amt-btn.active { background: #dc2626; border-color: #dc2626; color: white; }
 
+        /* QR Section */
+        .qr-section { text-align: center; margin-bottom: 25px; background: #fff1f2; padding: 20px; border: 1.5px dashed #fecdd3; border-radius: 12px; }
+        .qr-section p { margin: 0; font-size: 13px; color: #475569; }
+        .qr-section img { width: 160px; height: 160px; object-fit: contain; margin-top: 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; padding: 5px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .id-badge { display: inline-block; background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 10px; }
+        
+        /* Submit Button */
+        .submit-btn { background: #dc2626; color: white; border: none; padding: 14px; width: 100%; font-size: 15px; font-weight: 700; cursor: pointer; border-radius: 8px; transition: background 0.2s, transform 0.1s; box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2); }
+        .submit-btn:hover { background: #b91c1c; }
+        .submit-btn:active { transform: scale(0.98); }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="../index.html" class="store-title">GAULE <span>STORE</span></a>
+</div>
+
+<div class="container">
+    <!-- Wallet Balance Card -->
+    <div class="wallet-card">
+        <div class="wallet-amount">Rs. <span id="my-wallet-balance">0</span></div>
+    </div>
+
+    <h3>Add Balance to Wallet</h3>
+    
+    <!-- Payment QR Section -->
+    <div class="qr-section">
+        <p>Scan QR via <b>eSewa / Khalti</b> to Pay</p>
+        <img src="../qr.png" alt="Payment QR Code" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=GAULE_STORE_PAYMENT'">
+        <div>
+            <span class="id-badge">ID: 9761081110 (Roshan Tamang)</span>
+        </div>
+    </div>
+
+    <!-- Top-up Request Form -->
+    <form id="topup-form">
+        <div class="form-group">
+            <label for="payment-method">Payment Method</label>
+            <select id="payment-method" required>
+                <option value="eSewa">eSewa</option>
+                <option value="Khalti">Khalti</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="deposit-amount">Amount Sent (Rs.)</label>
+            <!-- Quick Amount Selector Buttons -->
+            <div class="quick-amounts">
+                <button type="button" class="amt-btn" onclick="setAmount(100, event)">100</button>
+                <button type="button" class="amt-btn" onclick="setAmount(200, event)">200</button>
+                <button type="button" class="amt-btn" onclick="setAmount(500, event)">500</button>
+                <button type="button" class="amt-btn" onclick="setAmount(1000, event)">1000</button>
+            </div>
+            <input type="number" id="deposit-amount" placeholder="Or enter custom amount" required min="10">
+        </div>
+
+        <div class="form-group">
+            <label for="transaction-id">Transaction ID / Reference ID</label>
+            <input type="text" id="transaction-id" placeholder="Enter Transaction ID" required>
+        </div>
+
+        <button type="submit" class="submit-btn">Submit Request</button>
+    </form>
+</div>
+
+<script>
+    function setAmount(amount, event) {
+        document.getElementById('deposit-amount').value = amount;
+        let buttons = document.querySelectorAll('.amt-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+</script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+        authDomain: "gaule-top-up-center.firebaseapp.com",
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+        projectId: "gaule-top-up-center",
+        storageBucket: "gaule-top-up-center.firebasestorage.app",
+        messagingSenderId: "645605489690",
+        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    let currentUser = null;
+
+    // Login भएको युजरको Realtime Balance फेच गर्ने
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user;
+            const userRef = ref(db, 'users/' + user.uid);
+            onValue(userRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    document.getElementById("my-wallet-balance").innerText = data.balance || 0;
+                } else {
+                    document.getElementById("my-wallet-balance").innerText = 0;
+                }
+            });
+        } else {
+            alert("Please login first to access wallet!");
+            window.location.href = "../index.html";
+        }
+    });
+
+    // Top-up Request Firebase मा पठाउने
+    const form = document.getElementById("topup-form");
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        
+        if (!currentUser) return;
+
+        const method = document.getElementById("payment-method").value;
+        const amount = document.getElementById("deposit-amount").value;
+        const txId = document.getElementById("transaction-id").value;
+
+        const requestsRef = ref(db, 'topup_requests');
+        
+        push(requestsRef, {
+            uid: currentUser.uid,
+            name: currentUser.displayName,
+            email: currentUser.email,
+            method: method,
+            amount: Number(amount),
+            transactionId: txId,
+            status: "Pending",
+            timestamp: serverTimestamp()
+        }).then(() => {
+            alert("Top-up request sent successfully! Admin will verify your transaction and add balance soon.");
+            form.reset();
+            document.querySelectorAll('.amt-btn').forEach(btn => btn.classList.remove('active'));
+        }).catch((error) => {
+            alert("Error sending request: " + error.message);
+        });
+    });
+</script>
+
+</body>
+</html>
