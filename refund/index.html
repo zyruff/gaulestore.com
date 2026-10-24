@@ -96,11 +96,10 @@
         <!-- Profile Pic -->
         <img id="profile-pic" onclick="toggleProfile()">
         
-        <!-- Profile Dropdown -->
+        <!-- Profile Dropdown (My Wallet हटाइएको छ) -->
         <div id="profile-dropdown">
             <div id="display-name" class="user-name"></div>
             <div id="display-email" class="user-email"></div>
-            <a href="my-wallet/" style="display:block; margin-bottom: 10px; color:#dc2626; font-size:12px; font-weight:bold; text-decoration:none;">My Wallet</a>
             <a href="https://myaccount.google.com/personal-info" target="_blank" class="change-name">Change Name</a>
             <button class="logout-btn" onclick="logoutUser()">Logout</button>
         </div>
@@ -161,7 +160,7 @@
 
             const userRef = ref(db, 'users/' + user.uid);
 
-            // पहिलोपटक लगइन गर्दा Database मा data (Name, Email, Balance, Role) create गर्ने
+            // पहिलोपटक लगइन गर्दा Database मा Name, Email, Balance, Role अटोमेटिक सेभ गर्ने
             get(userRef).then((snapshot) => {
                 if (!snapshot.exists()) {
                     set(userRef, {
