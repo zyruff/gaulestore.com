@@ -56,6 +56,13 @@
         .close-modal { position: absolute; top: 15px; right: 15px; font-size: 20px; color: #718096; cursor: pointer; }
         .qr-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; color: #1a202c; }
         .qr-subtitle { font-size: 13px; color: #4a5568; margin-bottom: 12px; }
+        
+        /* Fixed Payment Method Grid Styling */
+        .pay-method-grid { display: flex; gap: 8px; margin-top: 6px; }
+        .pay-method-label { flex: 1; padding: 10px 8px; border: 1px solid #cbd5e0; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; background: #f7fafc; transition: all 0.2s; font-weight: 500; }
+        .pay-method-label input[type="radio"] { accent-color: #ffb300; }
+        .balance-amt { color: #ffb300; font-weight: 700; }
+
         .account-details-box { background: #fffdf5; border: 1px solid #ffb300; padding: 10px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; text-align: left; line-height: 1.5; }
         .qr-image-wrapper { background-color: #f7fafc; padding: 12px; border-radius: 12px; display: inline-block; margin-bottom: 15px; border: 1px solid #e2e8f0; }
         .qr-image-wrapper img { width: 180px; height: 180px; display: block; object-fit: contain; margin: 0 auto; }
@@ -200,12 +207,14 @@
             <!-- Payment Method Selector -->
             <div style="margin-bottom: 14px; text-align: left;">
                 <label class="txid-label">Payment Option <span style="color: #e53e3e;">*</span></label>
-                <div style="display: flex; gap: 10px; margin-top: 6px;">
-                    <label style="flex: 1; padding: 10px; border: 1px solid #cbd5e0; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px;">
-                        <input type="radio" name="payMethod" value="qr" checked onclick="togglePaymentMethod('qr')"> eSewa/Khalti QR
+                <div class="pay-method-grid">
+                    <label class="pay-method-label">
+                        <input type="radio" name="payMethod" value="qr" checked onclick="togglePaymentMethod('qr')"> 
+                        <span>eSewa/Khalti QR</span>
                     </label>
-                    <label style="flex: 1; padding: 10px; border: 1px solid #cbd5e0; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px;">
-                        <input type="radio" name="payMethod" value="wallet" onclick="togglePaymentMethod('wallet')"> Balance (<span id="user-wallet-bal" style="color: #ffb300; font-weight: bold;">Rs 0</span>)
+                    <label class="pay-method-label">
+                        <input type="radio" name="payMethod" value="wallet" onclick="togglePaymentMethod('wallet')"> 
+                        <span>Balance <span class="balance-amt" id="user-wallet-bal">Rs 0</span></span>
                     </label>
                 </div>
             </div>
@@ -405,7 +414,7 @@
             }
 
             if(!isFormValid) return;
-            fetchUserBalance(currentUser.uid); // Refresh balance before opening modal
+            fetchUserBalance(currentUser.uid); 
             openPaymentModal(uidValue);
         };
 
@@ -442,12 +451,10 @@
             document.getElementById('modal-item').innerText = selectedItemName;
             document.getElementById('modal-total').innerText = 'Rs ' + selectedItemPrice;
             
-            // Reset fields
             txidInput.value = ""; 
             txidInput.classList.remove('error-border');
             txidError.style.display = "none";
             
-            // Reset to default QR option
             document.querySelector('input[name="payMethod"][value="qr"]').checked = true;
             togglePaymentMethod('qr');
 
@@ -458,13 +465,11 @@
             document.getElementById('qrModal').classList.remove('show');
         };
 
-        // अर्डर पेमेन्ट बुझाउने मुख्य फङ्‍सन (QR र Wallet दुवैको लागि)
         window.submitPayment = async function() {
             let uidValue = gameUidInput.value.trim();
             let price = parseFloat(selectedItemPrice);
             const submitBtn = document.getElementById('submit-btn');
 
-            // 1. If Wallet Balance Selected
             if (selectedPaymentType === 'wallet') {
                 if (userCurrentBalance < price) {
                     alert("तपाईको ब्यालेन्स अपुग्दो छ (Insufficient Balance)! कृपया पहिले ब्यालेन्स लोड गर्नुहोला।");
@@ -500,7 +505,6 @@
                 try {
                     const orderRef = push(ref(db, 'orders'));
                     
-                    // Update user balance and push order simultaneously
                     await update(ref(db), {
                         [`users/${currentUser.uid}/balance`]: newBalance,
                         [`orders/${orderRef.key}`]: {
@@ -537,7 +541,6 @@
                 }
 
             } else {
-                // 2. If QR Payment Selected
                 let txidValue = txidInput.value.trim();
                 if (txidValue === "") {
                     txidInput.classList.add('error-border');
