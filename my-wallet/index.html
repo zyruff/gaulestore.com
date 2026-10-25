@@ -444,12 +444,12 @@
 
             // Reset Form & Button
             form.reset();
-            submitBtn.innerText = "Submit Request";
+            submitBtn.innerText = "Submit Deposit";
             submitBtn.disabled = false;
             document.querySelectorAll('.amt-btn').forEach(btn => btn.classList.remove('active'));
         }).catch((error) => {
             alert("Error sending request: " + error.message);
-            submitBtn.innerText = "Submit Request";
+            submitBtn.innerText = "Submit Deposit";
             submitBtn.disabled = false;
         });
     });
