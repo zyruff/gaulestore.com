@@ -183,8 +183,8 @@
 
 <div class="banner-container">
     <div class="badges-wrapper">
-        <div class="badge instant">1 min - 5 min Delivery</div>
-        <div class="badge official"><i class="fa-solid fa-circle-check"></i> Official Supply</div>
+        <div class="badge instant">Instant Delivery</div>
+        <div class="badge official"><i class="fa-solid fa-circle-check"></i>verified</div>
     </div>
     <div class="banner-flex">
         <img class="avatar-img" src="Unipin_Logo.png" alt="Unipin BD">
@@ -381,6 +381,14 @@
 
         <div class="success-receipt-info">
             <div class="receipt-row">
+                <span>Transaction ID:</span>
+                <span id="receipt-tx-id" style="font-weight: bold; color: #1a202c;">-</span>
+            </div>
+            <div class="receipt-row">
+                <span>Payment Method:</span>
+                <span style="font-weight: bold; color: #2563eb;">Wallet Paid</span>
+            </div>
+            <div class="receipt-row">
                 <span>Item:</span>
                 <span id="receipt-item">-</span>
             </div>
@@ -390,12 +398,15 @@
             </div>
             <div class="receipt-row">
                 <span>Status:</span>
-                <span style="color: #2ed573; font-weight: bold;">Completed</span>
+                <span style="color: #2ed573; font-weight: bold;">Complete</span>
             </div>
         </div>
         <button class="success-close-btn" onclick="closeSuccessModal()">Great, Thanks!</button>
     </div>
 </div>
+
+<br>
+<br>
 
 <div class="bottom-nav">
     <a href="../index.html" class="nav-item">
@@ -654,6 +665,9 @@
             const now = new Date();
             let newBalance = userCurrentBalance - price;
             const orderRef = push(ref(db, 'orders'));
+            
+            // Transaction ID जेनेरेट गर्ने (जस्तै GL-849204)
+            const transactionId = "GL-" + Math.floor(100000 + Math.random() * 900000);
 
             await update(ref(db), {
                 [`users/${currentUser.uid}/balance`]: newBalance,
@@ -668,7 +682,9 @@
                     amountDue: selectedItemPrice,
                     email: emailValue,
                     voucherCode: finalVoucherCode,
-                    status: "Completed"
+                    transactionId: transactionId,
+                    paymentMethod: "Wallet Paid",
+                    status: "Complete"
                 }
             });
 
@@ -677,6 +693,7 @@
             closePaymentModal();
 
             document.getElementById('delivered-voucher-pin').innerText = finalVoucherCode;
+            document.getElementById('receipt-tx-id').innerText = transactionId;
             document.getElementById('receipt-item').innerText = selectedItemName;
             document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
             document.getElementById('successModal').classList.add('show');
@@ -710,5 +727,3 @@
 
 </body>
 </html>
-
-Buy button lai Ali talala garna kun Chang garnu parxa
