@@ -354,7 +354,7 @@
         .product-name i { color: #0ea5e9; font-size: 13px; }
         
         .info-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #475569; font-weight: 500; word-break: break-all; }
-        .info-row i { width: 14px; color: #94a3b8; flex-shrink: 0; }
+        .info-row i { width: 14px; color: #94a3b8; flex-shrink: 0; text-align: center; }
         
         .price-tag { font-size: 15px; font-weight: 800; color: #059669; margin-top: 4px; }
 
@@ -627,7 +627,7 @@
                                 ${displayPlayerName && displayPlayerName !== "Unknown" ? `<div class="info-row"><i class="fa-solid fa-user-check"></i> Player: <b style="color: #0284c7;">${displayPlayerName}</b></div>` : ''}
                                 ${displayZoneId ? `<div class="info-row"><i class="fa-solid fa-server"></i> Zone ID: <b>${displayZoneId}</b></div>` : ''}
                                 
-                                ${voucherCode ? `<div class="info-row" onclick="copyToClipboard('${voucherCode}')" style="color:#047857; background:#ecfdf5; padding:6px 10px; border-radius:8px; margin-top:4px; border:1px dashed #34d399; cursor:pointer;" title="Click to copy code"><i class="fa-solid fa-key" style="cursor:pointer;"></i> <b style="letter-spacing:0.5px;">${voucherCode}</b> <i class="fa-regular fa-copy" style="margin-left:auto; color:#059669;"></i></div>` : ''}
+                                ${voucherCode ? `<div class="info-row" onclick="copyToClipboard('${voucherCode}')" style="color:#047857; background:#ecfdf5; padding:8px 10px; border-radius:8px; margin-top:4px; border:1px dashed #34d399; cursor:pointer;" title="Click to copy code"><i class="fa-solid fa-key" style="cursor:pointer; width:14px; text-align:center;"></i> <b style="letter-spacing:0.5px;">${voucherCode}</b> <i class="fa-regular fa-copy" style="margin-left:auto; color:#059669;"></i></div>` : ''}
                                 
                                 <div class="admin-action-box ${isAdmin ? 'visible' : ''}" style="margin-top: 6px; margin-bottom: 0px; border-top: none; padding-top: 0px;">
                                     ${transactionId ? `<div class="info-row" style="color:#059669;"><i class="fa-solid fa-receipt"></i> Txn ID: <b>${transactionId}</b></div>` : `<div class="info-row" style="color:#6b7280;"><i class="fa-solid fa-receipt"></i> Txn ID: <b>Not Provided</b></div>`}
@@ -700,7 +700,7 @@
 
         function deleteOrder(key) {
             if (confirm("Yo order database bata permanent delete garne ho?")) {
-                db.ref('orders/' + key).remove().catch_err(err => alert(err.message));
+                db.ref('orders/' + key).remove().catch(err => alert(err.message));
             }
         }
 
@@ -712,6 +712,7 @@
     </script>
 </body>
 </html>
+
 
 
 
