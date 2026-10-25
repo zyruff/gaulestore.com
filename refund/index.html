@@ -29,6 +29,10 @@
         .uid-input-group { display: flex; gap: 8px; }
         .uid-input { flex: 1; background-color: #f7fafc; border: 1px solid #cbd5e0; border-radius: 8px; padding: 12px 14px; color: #1a202c; font-size: 14px; outline: none; transition: all 0.2s; }
         .uid-input.error-border { border: 1px solid #e53e3e !important; background-color: #fff5f5 !important; }
+        /* Hide arrows for number input */
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
         .error-message { color: #e53e3e; font-size: 12px; margin-top: 8px; display: none; align-items: center; gap: 6px; font-weight: 500; }
         .instruction-text { font-size: 11px; color: #718096; display: flex; gap: 8px; line-height: 1.4; margin-top: 10px; }
         .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 4px; border-radius: 14px; border: 2px solid transparent; transition: all 0.2s ease; }
@@ -116,11 +120,11 @@
             <div class="input-label">User ID (uid)</div>
             
             <div class="uid-input-group">
-                <input type="text" id="game-uid" class="uid-input" placeholder="PLAYER ID (UID)" oninput="validateUIDLive()">
+                <input type="number" id="game-uid" class="uid-input" placeholder="PLAYER ID (UID)" inputmode="numeric" oninput="validateUIDLive()">
             </div>
             
             <div class="error-message" id="uid-error">
-                <i class="fa-solid fa-circle-exclamation"></i> <span>Invalid or Missing UID!</span>
+                <i class="fa-solid fa-circle-exclamation"><span>Invalid or Missing UID!</span></i>
             </div>
             
             <div class="instruction-text">
@@ -352,7 +356,6 @@
 
             if(!isFormValid) return;
             
-            // Fetch latest balance before opening modal
             fetchUserBalance(currentUser.uid).then(() => {
                 openPaymentModal(uidValue);
             });
@@ -435,7 +438,6 @@
             try {
                 const orderRef = push(ref(db, 'orders'));
                 
-                // Update user balance and push order simultaneously
                 await update(ref(db), {
                     [`users/${currentUser.uid}/balance`]: newBalance,
                     [`orders/${orderRef.key}`]: {
