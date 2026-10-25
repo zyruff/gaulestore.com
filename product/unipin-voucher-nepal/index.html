@@ -4,7 +4,6 @@
     <link rel="canonical" href="https://roshantamang2.com.np/" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Open Graph Tags -->
     <meta property="og:title" content="Gaule Store - Buy Unipin Voucher in Nepal" />
     <meta property="og:description" content="Buy Unipin Voucher in Nepal at the cheapest price with Gaule Store. Instant automated delivery." />
     <meta property="og:image" content="https://roshantamang2.com.np/product/unipin-voucher-nepal/Unipin_Logo.png" />
@@ -27,7 +26,6 @@
         #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
         .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
         
-        /* Header Wallet Button Style */
         .header-wallet {
             display: none;
             align-items: center;
@@ -99,7 +97,6 @@
         .action-btn { display: flex; justify-content: center; align-items: center; gap: 8px; border: none; cursor: pointer; font-weight: 700; color: #ffffff; background-color: #ffb300; width: 200px; height: 42px; font-size: 14px; border-radius: 25px; margin: 0 auto; }
         .action-btn.login-needed { background-color: #dc2626; }
 
-        /* Wallet Payment Modal */
         .qr-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 200; opacity: 0; pointer-events: none; transition: all 0.3s ease; padding: 20px; }
         .qr-modal.show { opacity: 1; pointer-events: auto; }
         .qr-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; max-width: 380px; width: 100%; text-align: center; position: relative; }
@@ -119,7 +116,6 @@
         .done-btn { background-color: #ffb300; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; }
         .done-btn:disabled { background-color: #cbd5e0; cursor: not-allowed; }
 
-        /* Custom Alert Modal */
         .alert-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 400; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out; }
         .alert-modal.show { opacity: 1; pointer-events: auto; }
         .alert-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
@@ -129,7 +125,6 @@
         .alert-msg { font-size: 13px; color: #4a5568; line-height: 1.5; margin-bottom: 20px; }
         .alert-btn { background-color: #e53e3e; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 600; border-radius: 10px; cursor: pointer; }
 
-        /* Success Modal with Voucher Pin Display */
         .success-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 300; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out; }
         .success-modal.show { opacity: 1; pointer-events: auto; }
         .success-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
@@ -153,7 +148,6 @@
     <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
     <div class="store-title">GAULE <span style="color:#dc2626;">STORE</span></div>
     <div class="header-right">
-        <!-- Header Wallet Button -->
         <a href="../my-wallet/" id="header-wallet-btn" class="header-wallet">
             <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
             <span>Rs. <span id="header-user-balance">0</span></span>
@@ -230,9 +224,9 @@
         <i class="fa-solid fa-circle-exclamation"></i> <span>Please select a pack to proceed!</span>
     </div>
 
-    <!-- ध्यान दिनुहोस्: data-stock-key लाई तपाईंको Firebase को unipin-voucher भित्रको नामसँग मिलाइएको छ -->
+    <!-- Firebase को नोड नेम सँग मिल्ने गरी data-stock-key हरू राखिएको छ -->
     <div class="cards-grid" id="diamonds-wrapper">
-        <div class="pack-card" data-stock-key="25_unipin" onclick="selectPack(this, '25 Unipin Code', '35')">
+        <div class="pack-card" data-stock-key="25-unipin" onclick="selectPack(this, '25 Unipin Code', '35')">
             <div class="text-content">
                 <div class="pack-title">25 💎 Unipin Code</div>
                 <div class="pack-price">Rs 35</div>
@@ -240,7 +234,7 @@
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card" data-stock-key="50_unipin" onclick="selectPack(this, '50 Unipin Code', '60')">
+        <div class="pack-card" data-stock-key="50-unipin" onclick="selectPack(this, '50 Unipin Code', '60')">
             <div class="text-content">
                 <div class="pack-title">50 💎 Unipin Code</div>
                 <div class="pack-price">Rs 60</div>
@@ -248,7 +242,7 @@
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card" data-stock-key="115_unipin" onclick="selectPack(this, '115 Unipin Code', '105')">
+        <div class="pack-card" data-stock-key="115-unipin" onclick="selectPack(this, '115 Unipin Code', '105')">
             <div class="text-content">
                 <div class="pack-title">115 💎 Unipin Code</div>
                 <div class="pack-price">Rs 105</div>
@@ -256,7 +250,7 @@
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card" data-stock-key="240_unipin" onclick="selectPack(this, '240 Unipin Code', '210')">
+        <div class="pack-card" data-stock-key="240-unipin" onclick="selectPack(this, '240 Unipin Code', '210')">
             <div class="text-content">
                 <div class="pack-title">240 💎 Unipin Code</div>
                 <div class="pack-price">Rs 210</div>
@@ -264,7 +258,7 @@
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card" data-stock-key="610_unipin" onclick="selectPack(this, '610 Unipin Code', '530')">
+        <div class="pack-card" data-stock-key="610-unipin" onclick="selectPack(this, '610 Unipin Code', '530')">
             <div class="text-content">
                 <div class="pack-title">610 💎 Unipin Code</div>
                 <div class="pack-price">Rs 530</div>
@@ -272,7 +266,7 @@
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card" data-stock-key="1240_unipin" onclick="selectPack(this, '1240 Unipin Code', '1050')">
+        <div class="pack-card" data-stock-key="1240-unipin" onclick="selectPack(this, '1240 Unipin Code', '1050')">
             <div class="text-content">
                 <div class="pack-title">1240 💎 Unipin Code</div>
                 <div class="pack-price">Rs 1050</div>
@@ -280,7 +274,7 @@
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card" data-stock-key="2530_unipin" onclick="selectPack(this, '2530 Unipin Code', '2300')">
+        <div class="pack-card" data-stock-key="2530-unipin" onclick="selectPack(this, '2530 Unipin Code', '2300')">
             <div class="text-content">
                 <div class="pack-title">2530 💎 Unipin Code</div>
                 <div class="pack-price">Rs 2300</div>
@@ -288,7 +282,7 @@
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card" data-stock-key="weekly_unipin" onclick="selectPack(this, 'Weekly Unipin Code', '220')">
+        <div class="pack-card" data-stock-key="weekly-voucher" onclick="selectPack(this, 'Weekly Unipin Code', '220')">
             <div class="text-content">
                 <div class="pack-title">Weekly Unipin Code</div>
                 <div class="pack-price">Rs 220</div>
@@ -296,7 +290,7 @@
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card" data-stock-key="monthly_unipin" onclick="selectPack(this, 'Monthly Unipin Code', '1050')">
+        <div class="pack-card" data-stock-key="monthly-voucher" onclick="selectPack(this, 'Monthly Unipin Code', '1050')">
             <div class="text-content">
                 <div class="pack-title">Monthly Unipin Code</div>
                 <div class="pack-price">Rs 1050</div>
@@ -304,7 +298,7 @@
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card" data-stock-key="2000_unipin" onclick="selectPack(this, '2000 Unipin Code', '2370')">
+        <div class="pack-card" data-stock-key="2000-unipin" onclick="selectPack(this, '2000 Unipin Code', '2370')">
             <div class="text-content">
                 <div class="pack-title">2000 Unipin Code<br>Load Wallet</div>
                 <div class="pack-price">Rs 2370</div>
@@ -331,7 +325,6 @@
     </div>
 </div>
 
-<!-- Wallet Checkout Modal -->
 <div class="qr-modal" id="qrModal">
     <div class="qr-card">
         <i class="fa-solid fa-xmark close-modal" onclick="closePaymentModal()"></i>
@@ -362,7 +355,6 @@
     </div>
 </div>
 
-<!-- Custom Warning/Alert Modal -->
 <div class="alert-modal" id="alertModal">
     <div class="alert-card">
         <div class="alert-icon-wrap">
@@ -374,7 +366,6 @@
     </div>
 </div>
 
-<!-- Success Modal with Auto-Delivered Voucher Code -->
 <div class="success-modal" id="successModal">
     <div class="success-card">
         <div class="success-checkmark">
@@ -383,7 +374,6 @@
         <div class="success-title">Order Successful!</div>
         <p class="success-msg">Your UniPin voucher code has been delivered automatically.</p>
         
-        <!-- Delivered Voucher Display Box -->
         <div class="voucher-code-box">
             <div class="voucher-label">Your Voucher PIN / Code</div>
             <div class="voucher-pin" id="delivered-voucher-pin">XXXX-XXXX-XXXX</div>
@@ -407,7 +397,6 @@
     </div>
 </div>
 
-<!-- Bottom Navigation Bar -->
 <div class="bottom-nav">
     <a href="../index.html" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -465,7 +454,6 @@
     window.googleLogin = () => signInWithPopup(auth, provider);
     window.logoutUser = () => signOut(auth).then(() => location.reload());
 
-    // 1. Firebase बाट unipin-voucher को स्टक Realtime मा चेक गर्ने र कार्ड अपडेट गर्ने
     const unipinVoucherRef = ref(db, 'unipin-voucher');
     onValue(unipinVoucherRef, (snapshot) => {
         const vouchersData = snapshot.val() || {};
@@ -474,7 +462,6 @@
             const stockKey = card.getAttribute('data-stock-key');
             const statusEl = card.querySelector('.stock-status');
             
-            // जस्तै monthly-voucher वा 25_unipin भित्र कतिवटा PIN हरू बाँकी छन् गन्ने
             const categoryVouchers = vouchersData[stockKey] ? vouchersData[stockKey] : {};
             const stockCount = Object.keys(categoryVouchers).length;
 
@@ -631,7 +618,6 @@
         document.getElementById('qrModal').classList.remove('show');
     };
 
-    // 2. ब्यालेन्सबाट पेमेन्ट गर्ने र Firebase स्टकबाट भौचर स्वतः झिकेर डेलिभरी गर्ने मुख्य फंक्सन
     window.submitPayment = async function() {
         let emailValue = gameUidInput.value.trim();
         let price = parseFloat(selectedItemPrice);
@@ -647,7 +633,6 @@
         submitBtn.innerText = "Processing Voucher...";
 
         try {
-            // क) स्टक फेरि एकपटक चेक गर्ने (Out of Stock सुरक्षा)
             const voucherRef = ref(db, `unipin-voucher/${selectedStockKey}`);
             const snapshot = await get(voucherRef);
 
@@ -661,17 +646,15 @@
 
             const vouchers = snapshot.val();
             const voucherKeys = Object.keys(vouchers);
-            const pinKeyToUse = voucherKeys[0]; // पहिलो उपलब्ध PIN Key
-            const pinCodeValue = vouchers[pinKeyToUse]; // वास्तविक कोड वा यदि key नै कोड हो भने
+            const pinKeyToUse = voucherKeys[0];
+            const pinCodeValue = vouchers[pinKeyToUse];
 
-            // यदि भ्यालु खाली छ भने key लाई नै भौचर कोड मानिनेछ
             const finalVoucherCode = (pinCodeValue && pinCodeValue !== "") ? pinCodeValue : pinKeyToUse;
 
             const now = new Date();
             let newBalance = userCurrentBalance - price;
             const orderRef = push(ref(db, 'orders'));
 
-            // ख) ब्यालेन्स घटाउने, अर्डर "Completed" सेभ गर्ने र डेलिभर भएको भौचर कोड राख्ने
             await update(ref(db), {
                 [`users/${currentUser.uid}/balance`]: newBalance,
                 [`orders/${orderRef.key}`]: {
@@ -689,12 +672,10 @@
                 }
             });
 
-            // ग) प्रयोग भइसकेको भौचरलाई Firebase को स्टकबाट तुरुन्तै हटाउने (Delete)
             await remove(ref(db, `unipin-voucher/${selectedStockKey}/${pinKeyToUse}`));
 
             closePaymentModal();
 
-            // घ) युजरलाई सफलताको मोडल र भौचर पिन देखाउने
             document.getElementById('delivered-voucher-pin').innerText = finalVoucherCode;
             document.getElementById('receipt-item').innerText = selectedItemName;
             document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
@@ -713,7 +694,6 @@
         location.reload();
     };
 
-    // Active bottom navbar highlighter
     document.addEventListener("DOMContentLoaded", function () {
         const currentPath = window.location.pathname;
         const navItems = document.querySelectorAll('.bottom-nav .nav-item');
