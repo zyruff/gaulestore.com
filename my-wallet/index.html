@@ -184,114 +184,104 @@
 
 
 
+<style>
+    * { box-sizing: border-box; }
+    
+    /* Main Container */
+    .container { max-width: 480px; margin: 30px auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
+    
+    /* Section Title */
+    h3 { margin-top: 0; margin-bottom: 20px; color: #0f172a; font-size: 17px; font-weight: 700; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+    
+    /* Form Controls */
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #475569; }
+    input, select { width: 100%; padding: 12px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 14px; outline: none; background-color: #f8fafc; transition: all 0.2s ease; }
+    input:focus, select:focus { border-color: #dc2626; background-color: #fff; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1); }
+    
+    /* Quick Amount Buttons Styling */
+    .quick-amounts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+    .amt-btn { background: #f1f5f9; border: 1.5px solid #cbd5e1; color: #334155; padding: 8px 0; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .amt-btn:hover { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
+    .amt-btn.active { background: #dc2626; border-color: #dc2626; color: white; }
 
-    <style>
-        * { box-sizing: border-box; }
-        
-        /* Main Container */
-        .container { max-width: 480px; margin: 30px auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
-        
-        /* Wallet Card */
-        .wallet-card { background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%); color: white; padding: 25px; border-radius: 12px; text-align: center; margin-bottom: 25px; box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.25); }
-        .wallet-amount { font-size: 34px; font-weight: 800; letter-spacing: -1px; }
-        
-        /* Section Title */
-        h3 { margin-top: 0; margin-bottom: 20px; color: #0f172a; font-size: 17px; font-weight: 700; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
-        
-        /* Form Controls */
-        .form-group { margin-bottom: 18px; }
-        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #475569; }
-        input, select { width: 100%; padding: 12px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 14px; outline: none; background-color: #f8fafc; transition: all 0.2s ease; }
-        input:focus, select:focus { border-color: #dc2626; background-color: #fff; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1); }
-        
-        /* Quick Amount Buttons Styling */
-        .quick-amounts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
-        .amt-btn { background: #f1f5f9; border: 1.5px solid #cbd5e1; color: #334155; padding: 8px 0; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-        .amt-btn:hover { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
-        .amt-btn.active { background: #dc2626; border-color: #dc2626; color: white; }
+    /* QR Section */
+    .qr-section { text-align: center; margin-bottom: 25px; background: #fff1f2; padding: 20px; border: 1.5px dashed #fecdd3; border-radius: 12px; }
+    .qr-section p { margin: 0; font-size: 13px; color: #475569; }
+    .qr-section img { width: 160px; height: 160px; object-fit: contain; margin-top: 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; padding: 5px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .id-badge { display: inline-block; background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 10px; }
+    
+    /* Submit Button */
+    .submit-btn { background: #dc2626; color: white; border: none; padding: 14px; width: 100%; font-size: 15px; font-weight: 700; cursor: pointer; border-radius: 8px; transition: background 0.2s, transform 0.1s; box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2); }
+    .submit-btn:hover { background: #b91c1c; }
+    .submit-btn:active { transform: scale(0.98); }
 
-        /* QR Section */
-        .qr-section { text-align: center; margin-bottom: 25px; background: #fff1f2; padding: 20px; border: 1.5px dashed #fecdd3; border-radius: 12px; }
-        .qr-section p { margin: 0; font-size: 13px; color: #475569; }
-        .qr-section img { width: 160px; height: 160px; object-fit: contain; margin-top: 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; padding: 5px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .id-badge { display: inline-block; background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 10px; }
-        
-        /* Submit Button */
-        .submit-btn { background: #dc2626; color: white; border: none; padding: 14px; width: 100%; font-size: 15px; font-weight: 700; cursor: pointer; border-radius: 8px; transition: background 0.2s, transform 0.1s; box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2); }
-        .submit-btn:hover { background: #b91c1c; }
-        .submit-btn:active { transform: scale(0.98); }
+    /* Modal Overlay */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+    .modal-card { background: white; border-radius: 24px; max-width: 380px; width: 100%; padding: 32px 24px 24px 24px; text-align: center; box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.2); transform: scale(0.85); opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .modal-overlay.active { display: flex; }
+    .modal-overlay.active .modal-card { transform: scale(1); opacity: 1; }
 
-        /* Modal Overlay */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
-        .modal-card { background: white; border-radius: 24px; max-width: 380px; width: 100%; padding: 32px 24px 24px 24px; text-align: center; box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.2); transform: scale(0.85); opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .modal-overlay.active { display: flex; }
-        .modal-overlay.active .modal-card { transform: scale(1); opacity: 1; }
+    /* Stylish Green Check Icon - Blinking Glow Animation */
+    .icon-circle-outer { 
+        width: 84px; 
+        height: 84px; 
+        background: #dcfce7; 
+        border-radius: 50%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        margin: 0 auto 20px auto; 
+        animation: pulseGlow 1.8s infinite ease-in-out;
+    }
+    .icon-circle-inner { 
+        width: 62px; 
+        height: 62px; 
+        background: #22c55e; 
+        color: white; 
+        border-radius: 50%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 30px; 
+        box-shadow: 0 6px 16px rgba(34, 197, 94, 0.3); 
+    }
 
-        /* Stylish Green Check Icon - Blinking Glow Animation */
-        .icon-circle-outer { 
-            width: 84px; 
-            height: 84px; 
-            background: #dcfce7; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            margin: 0 auto 20px auto; 
-            animation: pulseGlow 1.8s infinite ease-in-out;
+    /* Pulse / Blink Animation Keyframes */
+    @keyframes pulseGlow {
+        0% {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+            transform: scale(0.95);
         }
-        .icon-circle-inner { 
-            width: 62px; 
-            height: 62px; 
-            background: #22c55e; 
-            color: white; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 30px; 
-            box-shadow: 0 6px 16px rgba(34, 197, 94, 0.3); 
+        50% {
+            box-shadow: 0 0 0 14px rgba(34, 197, 94, 0);
+            transform: scale(1.05);
         }
-
-        /* Pulse / Blink Animation Keyframes */
-        @keyframes pulseGlow {
-            0% {
-                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
-                transform: scale(0.95);
-            }
-            50% {
-                box-shadow: 0 0 0 14px rgba(34, 197, 94, 0);
-                transform: scale(1.05);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
-                transform: scale(0.95);
-            }
+        100% {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+            transform: scale(0.95);
         }
+    }
 
-        .modal-title { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 8px; letter-spacing: -0.3px; }
-        .modal-desc { font-size: 13.5px; color: #64748b; margin-bottom: 22px; line-height: 1.5; padding: 0 5px; }
-        
-        /* Order Receipt Box */
-        .receipt-box { background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 14px; padding: 14px 16px; margin-bottom: 22px; text-align: left; }
-        .receipt-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 9px; align-items: center; }
-        .receipt-row:last-child { margin-bottom: 0; }
-        .receipt-label { color: #64748b; font-weight: 500; }
-        .receipt-value { color: #0f172a; font-weight: 700; }
-        
-        /* Processing Badge Style */
-        .status-badge-processing { background: #fef3c7; color: #d97706; padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; }
+    .modal-title { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 8px; letter-spacing: -0.3px; }
+    .modal-desc { font-size: 13.5px; color: #64748b; margin-bottom: 22px; line-height: 1.5; padding: 0 5px; }
+    
+    /* Order Receipt Box */
+    .receipt-box { background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 14px; padding: 14px 16px; margin-bottom: 22px; text-align: left; }
+    .receipt-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 9px; align-items: center; }
+    .receipt-row:last-child { margin-bottom: 0; }
+    .receipt-label { color: #64748b; font-weight: 500; }
+    .receipt-value { color: #0f172a; font-weight: 700; }
+    
+    /* Processing Badge Style */
+    .status-badge-processing { background: #fef3c7; color: #d97706; padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; }
 
-        .modal-btn { background: #1e293b; color: white; border: none; padding: 13px; width: 100%; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.1s; }
-        .modal-btn:hover { background: #0f172a; }
-        .modal-btn:active { transform: scale(0.98); }
-    </style>
+    .modal-btn { background: #1e293b; color: white; border: none; padding: 13px; width: 100%; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+    .modal-btn:hover { background: #0f172a; }
+    .modal-btn:active { transform: scale(0.98); }
+</style>
 
 <div class="container">
-    <!-- Wallet Balance Card -->
-    <div class="wallet-card">
-        <div class="wallet-amount">Rs. <span id="my-wallet-balance">0</span></div>
-    </div>
-
     <h3>Add Balance to Wallet</h3>
     
     <!-- Payment QR Section -->
@@ -330,7 +320,7 @@
             <input type="text" id="transaction-id" placeholder="Enter Transaction ID" required>
         </div>
 
-        <button type="submit" class="submit-btn" id="submit-btn-text">Submit Request</button>
+        <button type="submit" class="submit-btn" id="submit-btn-text">Submit Deposit</button>
     </form>
 </div>
 
@@ -383,7 +373,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
@@ -401,19 +391,10 @@
 
     let currentUser = null;
 
-    // Login user Realtime Balance fetch
+    // Check user authentication state
     onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUser = user;
-            const userRef = ref(db, 'users/' + user.uid);
-            onValue(userRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    document.getElementById("my-wallet-balance").innerText = data.balance || 0;
-                } else {
-                    document.getElementById("my-wallet-balance").innerText = 0;
-                }
-            });
         } else {
             alert("Please login first to access wallet!");
             window.location.href = "../index.html";
@@ -473,6 +454,7 @@
         });
     });
 </script>
+
 
 
 
@@ -794,4 +776,3 @@
 
 </body>
 </html>
-
