@@ -16,7 +16,7 @@ app.post('/api/process-topup', async (req, res) => {
     console.log("--> INCOMING REQUEST RECEIVED FROM FRONTEND:", req.body);
     
     const { orderid, playerid, code, url } = req.body;
-    const apiKey = process.env.API_SECRET; // Render को Environment Variable बाट तान्छ
+    const apiKey = process.env.API_SECRET; 
 
     if (!apiKey) {
         console.error("API Error: API_SECRET is missing in Render Environment variables!");
@@ -24,7 +24,6 @@ app.post('/api/process-topup', async (req, res) => {
     }
 
     try {
-        // AndroidArtist API मा पठाउने (Cloudflare Bypass गर्न बलियो Headers थसिएको छ)
         const apiResponse = await axios.post('https://androidartist.com/api/process-topup', {
             api: apiKey,
             orderid: orderid,
@@ -67,11 +66,19 @@ app.post('/api/webhook', (req, res) => {
         console.log(`ℹ️ Order Status Update [${orderid}]:`, status, message);
     }
 
-    // सर्भरले वेबहुक सक्सेसफुली पायो भनेर 200 OK फर्काउने
     return res.status(200).json({ status: "success", message: "Webhook received successfully" });
 });
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+
+    // Render को बाहिरी IP (Outbound IP) पत्ता लगाउने कोड (यहाँ राख्दा पोर्ट टाइमआउट हुँदैन)
+    axios.get('https://api.ipify.org?format=json')
+        .then(response => {
+            console.log("🔥 MY RENDER OUTBOUND IP IS:", response.data.ip);
+        })
+        .catch(error => {
+            console.log("IP Fetch Error:", error.message);
+        });
 });
