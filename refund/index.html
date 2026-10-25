@@ -412,6 +412,7 @@
             submitBtn.disabled = true;
             submitBtn.innerText = "Processing...";
 
+            // 🔥 Render लाई जगाउन Warm-up Ping
             fetch('https://gaule-store.onrender.com/').catch(e => console.log("Waking Render..."));
 
             const now = new Date();
@@ -438,6 +439,7 @@
             try {
                 const orderRef = push(ref(db, 'orders'));
                 
+                // 1. Firebase मा User को Balance घटाउने ra Order "Pending" राखेर सेभ गर्ने
                 await update(ref(db), {
                     [`users/${currentUser.uid}/balance`]: newBalance,
                     [`orders/${orderRef.key}`]: {
@@ -461,10 +463,9 @@
                 document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
                 document.getElementById('successModal').classList.add('show');
 
+                // 2. यदि Membership हो भने, बिना कुनै ढिलाइ (Timeout बिना) तुरुन्तै Render API मा पठाउने
                 if (isMembership) {
-                    setTimeout(() => {
-                        processAutoTopUpApi(uidValue, membershipType, orderRef);
-                    }, 5000);
+                    processAutoTopUpApi(uidValue, membershipType, orderRef);
                 }
 
             } catch (error) {
@@ -474,6 +475,7 @@
             }
         };
 
+        // 🚀 Render Backend मा अर्डर पठाउने फङ्‍सन
         async function processAutoTopUpApi(playerId, membershipType, orderRef) {
             try {
                 const voucherRef = ref(db, `auto-top-up/${membershipType}`);
@@ -489,11 +491,14 @@
                 const voucherCode = vouchers[selectedKey];
                 if (!voucherCode) return;
 
+                const orderIdStr = "GAULE_" + Date.now();
+                console.log("Sending Request to Render Backend...");
+
                 const response = await fetch('https://gaule-store.onrender.com/api/process-topup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        orderid: "GAULE_" + Date.now(),
+                        orderid: orderIdStr,
                         playerid: playerId,
                         code: voucherCode,
                         url: "https://gaule-store.onrender.com/api/webhook"
@@ -503,6 +508,7 @@
                 const responseText = await response.text();
                 let result = JSON.parse(responseText);
 
+                // AndroidArtist Doc अनुसार status success वा 200 आएमा भौचर हटाउने र Completed बनाउने
                 if (result.status === 'success' || result.status === 200 || result.success) {
                     await remove(ref(db, `auto-top-up/${membershipType}/${selectedKey}`));
                     await set(ref(db, `orders/${orderRef.key}/status`), "Completed");
