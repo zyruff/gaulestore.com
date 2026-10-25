@@ -381,10 +381,6 @@
 
         <div class="success-receipt-info">
             <div class="receipt-row">
-                <span>Transaction ID:</span>
-                <span id="receipt-tx-id" style="font-weight: bold; color: #1a202c;">-</span>
-            </div>
-            <div class="receipt-row">
                 <span>Payment Method:</span>
                 <span style="font-weight: bold; color: #2563eb;">Wallet Paid</span>
             </div>
@@ -666,8 +662,8 @@
             let newBalance = userCurrentBalance - price;
             const orderRef = push(ref(db, 'orders'));
             
-            // Transaction ID जेनेरेट गर्ने (जस्तै GL-849204)
-            const transactionId = "GL-" + Math.floor(100000 + Math.random() * 900000);
+            // Transaction ID field ma "Wallet Paid" save thashe
+            const transactionId = "Wallet Paid";
 
             await update(ref(db), {
                 [`users/${currentUser.uid}/balance`]: newBalance,
@@ -693,7 +689,6 @@
             closePaymentModal();
 
             document.getElementById('delivered-voucher-pin').innerText = finalVoucherCode;
-            document.getElementById('receipt-tx-id').innerText = transactionId;
             document.getElementById('receipt-item').innerText = selectedItemName;
             document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
             document.getElementById('successModal').classList.add('show');
