@@ -400,6 +400,26 @@
             transition: 0.2s;
         }
         .login-prompt-btn:hover { background: #f8fafc; border-color: #94a3b8; }
+
+        /* Toast Notification */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #0f172a;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            z-index: 1000;
+            transition: 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
     </style>
 </head>
 <body>
@@ -439,6 +459,9 @@
             <div class="no-data"><i class="fa-solid fa-spinner fa-spin"></i> Loading orders...</div>
         </div>
     </div>
+
+    <!-- Toast Notification Popup -->
+    <div id="toast">Code copied to clipboard!</div>
 
     <script>
         const firebaseConfig = {
@@ -492,6 +515,23 @@
                 hour: '2-digit',
                 minute: '2-digit'
             });
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("Code copied: " + text);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
         }
 
         function renderOrders() {
@@ -587,7 +627,7 @@
                                 ${displayPlayerName && displayPlayerName !== "Unknown" ? `<div class="info-row"><i class="fa-solid fa-user-check"></i> Player: <b style="color: #0284c7;">${displayPlayerName}</b></div>` : ''}
                                 ${displayZoneId ? `<div class="info-row"><i class="fa-solid fa-server"></i> Zone ID: <b>${displayZoneId}</b></div>` : ''}
                                 
-                                ${voucherCode ? `<div class="info-row" style="color:#047857; background:#ecfdf5; padding:6px 10px; border-radius:8px; margin-top:4px; border:1px dashed #34d399;"><i class="fa-solid fa-key"></i> Your code: <b>${voucherCode}</b></div>` : ''}
+                                ${voucherCode ? `<div class="info-row" onclick="copyToClipboard('${voucherCode}')" style="color:#047857; background:#ecfdf5; padding:6px 10px; border-radius:8px; margin-top:4px; border:1px dashed #34d399; cursor:pointer;" title="Click to copy code"><i class="fa-solid fa-key" style="cursor:pointer;"></i> <b style="letter-spacing:0.5px;">${voucherCode}</b> <i class="fa-regular fa-copy" style="margin-left:auto; color:#059669;"></i></div>` : ''}
                                 
                                 <div class="admin-action-box ${isAdmin ? 'visible' : ''}" style="margin-top: 6px; margin-bottom: 0px; border-top: none; padding-top: 0px;">
                                     ${transactionId ? `<div class="info-row" style="color:#059669;"><i class="fa-solid fa-receipt"></i> Txn ID: <b>${transactionId}</b></div>` : `<div class="info-row" style="color:#6b7280;"><i class="fa-solid fa-receipt"></i> Txn ID: <b>Not Provided</b></div>`}
@@ -660,7 +700,7 @@
 
         function deleteOrder(key) {
             if (confirm("Yo order database bata permanent delete garne ho?")) {
-                db.ref('orders/' + key).remove().catch(err => alert(err.message));
+                db.ref('orders/' + key).remove().catch_err(err => alert(err.message));
             }
         }
 
@@ -672,6 +712,7 @@
     </script>
 </body>
 </html>
+
 
 
 
