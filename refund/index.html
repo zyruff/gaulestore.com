@@ -29,7 +29,6 @@
         .uid-input-group { display: flex; gap: 8px; }
         .uid-input { flex: 1; background-color: #f7fafc; border: 1px solid #cbd5e0; border-radius: 8px; padding: 12px 14px; color: #1a202c; font-size: 14px; outline: none; transition: all 0.2s; }
         .uid-input.error-border { border: 1px solid #e53e3e !important; background-color: #fff5f5 !important; }
-        /* Hide arrows for number input */
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
 
@@ -73,6 +72,18 @@
         .done-btn { background-color: #ffb300; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; }
         .done-btn:disabled { background-color: #cbd5e0; cursor: not-allowed; }
         
+        /* Custom Professional Warning/Error Modal */
+        .alert-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 400; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out; }
+        .alert-modal.show { opacity: 1; pointer-events: auto; }
+        .alert-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(30px); transition: all 0.3s ease-in-out; }
+        .alert-modal.show .alert-card { transform: translateY(0); }
+        .alert-icon-wrap { width: 72px; height: 72px; background: rgba(229, 62, 62, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; }
+        .alert-icon-wrap i { color: #e53e3e; font-size: 32px; }
+        .alert-title { font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 8px; }
+        .alert-msg { font-size: 13px; color: #4a5568; line-height: 1.5; margin-bottom: 20px; }
+        .alert-btn { background-color: #e53e3e; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 600; border-radius: 10px; cursor: pointer; transition: background 0.2s; }
+        .alert-btn:hover { background-color: #c53030; }
+
         .success-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 300; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out; }
         .success-modal.show { opacity: 1; pointer-events: auto; }
         .success-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(30px); transition: all 0.3s ease-in-out; }
@@ -106,7 +117,7 @@
         </div>
     </div>
 
-    <!-- ट्याबहरू -->
+    <!-- Tabs -->
     <div class="tabs-container">
         <div class="tab" onclick="switchTab('membership', this)">Membership</div>
     </div>
@@ -128,7 +139,7 @@
             
             <div class="instruction-text">
                 <i class="fa-solid fa-circle-info"></i>
-                <span>Open Free fire, Click on Profile icon, you will get your UID.</span>
+                <span>Open Free Fire, click on your profile icon to find your UID.</span>
             </div>
         </div>
         
@@ -155,8 +166,8 @@
                 <div class="pack-price">Rs1020</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
-        </div> <!-- ✅ सच्याइएको: cards-grid यहाँ बन्द गरियो -->
-    </div> <!-- ✅ सच्याइएको: section-box यहाँ बन्द गरियो -->
+        </div>
+    </div>
             
     <div class="bottom-drawer">
         <div class="drawer-inner">
@@ -182,7 +193,6 @@
             <div class="qr-title">Confirm Checkout</div>
             <div class="qr-subtitle">Pay securely using your account balance</div>
             
-            <!-- Wallet Balance Display Box -->
             <div class="wallet-info-box">
                 <div class="wallet-info-title">Available Wallet Balance</div>
                 <div class="wallet-info-balance" id="modal-wallet-bal">Rs 0</div>
@@ -207,6 +217,19 @@
         </div>
     </div>
 
+    <!-- Custom Professional Alert Modal (Replaces browser alert) -->
+    <div class="alert-modal" id="alertModal">
+        <div class="alert-card">
+            <div class="alert-icon-wrap">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+            <div class="alert-title">Insufficient Balance</div>
+            <p class="alert-msg" id="alert-msg-text">Your wallet balance is insufficient for this transaction. Please top up your wallet first.</p>
+            <button class="alert-btn" onclick="closeAlertModal()">Got It</button>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
     <div class="success-modal" id="successModal">
         <div class="success-card">
             <div class="success-checkmark">
@@ -249,6 +272,15 @@
             } else {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
+        }
+
+        function showCustomAlert(message) {
+            document.getElementById('alert-msg-text').innerText = message;
+            document.getElementById('alertModal').classList.add('show');
+        }
+
+        function closeAlertModal() {
+            document.getElementById('alertModal').classList.remove('show');
         }
     </script>
 
@@ -317,7 +349,7 @@
                 signInWithPopup(auth, provider).then((result) => {
                     console.log("Logged in!");
                 }).catch((error) => {
-                    alert("लगइन असफल भयो: " + error.message);
+                    showCustomAlert("Authentication failed: " + error.message);
                 });
                 return;
             }
@@ -390,7 +422,8 @@
             let price = parseFloat(selectedItemPrice);
 
             if (userCurrentBalance < price) {
-                alert("तपाईको ब्यालेन्स अपुग्दो छ (Insufficient Balance)! कृपया पहिले ब्यालेन्स लोड गर्नुहोला।");
+                closePaymentModal();
+                showCustomAlert("Insufficient wallet balance! Please top up your account balance before proceeding.");
                 return;
             }
 
@@ -398,7 +431,7 @@
             submitBtn.disabled = true;
             submitBtn.innerText = "Processing...";
 
-            // 🔥 Render लाई जगाउन Warm-up Ping
+            // Warm-up ping to Render backend
             fetch('https://gaule-store.onrender.com/').catch(e => console.log("Waking Render..."));
 
             const now = new Date();
@@ -412,7 +445,8 @@
                     const voucherRef = ref(db, `auto-top-up/${membershipType}`);
                     const snapshot = await get(voucherRef);
                     if (!snapshot.exists() || !snapshot.val() || Object.keys(snapshot.val()).length === 0) {
-                        alert("Out of Stock! यो मेम्बरसिपको भौचर स्टकमा उपलब्ध छैन।");
+                        closePaymentModal();
+                        showCustomAlert("Out of Stock! Selected membership vouchers are currently unavailable.");
                         submitBtn.disabled = false;
                         submitBtn.innerText = "Pay from Balance";
                         return;
@@ -425,7 +459,6 @@
             try {
                 const orderRef = push(ref(db, 'orders'));
                 
-                // 1. Firebase मा User को Balance घटाउने ra Order "Pending" राखेर सेभ गर्ने
                 await update(ref(db), {
                     [`users/${currentUser.uid}/balance`]: newBalance,
                     [`orders/${orderRef.key}`]: {
@@ -449,19 +482,17 @@
                 document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
                 document.getElementById('successModal').classList.add('show');
 
-                // 2. यदि Membership हो भने, बिना कुनै ढिलाइ (Timeout बिना) तुरुन्तै Render API मा पठाउने
                 if (isMembership) {
                     processAutoTopUpApi(uidValue, membershipType, orderRef);
                 }
 
             } catch (error) {
-                alert("भुक्तानी असफल भयो: " + error.message);
+                showCustomAlert("Transaction failed: " + error.message);
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Pay from Balance";
             }
         };
 
-        // 🚀 Render Backend मा अर्डर पठाउने फङ्‍सन
         async function processAutoTopUpApi(playerId, membershipType, orderRef) {
             try {
                 const voucherRef = ref(db, `auto-top-up/${membershipType}`);
@@ -494,7 +525,6 @@
                 const responseText = await response.text();
                 let result = JSON.parse(responseText);
 
-                // AndroidArtist Doc अनुसार status success वा 200 आएमा भौचर हटाउने र Completed बनाउने
                 if (result.status === 'success' || result.status === 200 || result.success) {
                     await remove(ref(db, `auto-top-up/${membershipType}/${selectedKey}`));
                     await set(ref(db, `orders/${orderRef.key}/status`), "Completed");
@@ -512,6 +542,7 @@
     </script>
 </body>
 </html>
+
 
 
 
