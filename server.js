@@ -1,7 +1,21 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const admin = require('firebase-admin');
 
+// Firebase Admin SDK सेटअप
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert({
+            projectId: "gaule-top-up-center",
+            clientEmail: "firebase-adminsdk-xxx@gaule-top-up-center.iam.gserviceaccount.com", // आफ्नो Firebase email राख्नुहोला
+            privateKey: (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, '\n')
+        }),
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
+    });
+}
+
+const db = admin.database();
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -52,28 +66,57 @@ app.post('/api/process-topup', async (req, res) => {
     }
 });
 
-// EXTERNAL API बाट आउने Webhook रिसिभ गर्ने Route
-app.post('/api/webhook', (req, res) => {
+// EXTERNAL API बाट आउने Webhook रिसिभ गर्ने Route (फेल हुँदा Failed बनाउने)
+app.post('/api/webhook', async (req, res) => {
     console.log("--> INCOMING WEBHOOK RECEIVED FROM API:", req.body);
     
     const { orderid, status, message, processing_time, content } = req.body;
 
-    if (status === "error") {
-        console.error(`❌ Order Failed [${orderid}]:`, content);
-    } else if (status === "success" || status === 200) {
-        console.log(`✅ Order Successfully Completed [${orderid}]:`, content);
-    } else {
-        console.log(`ℹ️ Order Status Update [${orderid}]:`, status, message);
+    try {
+        // Firebase मा orderid सँग मिल्ने अर्डर खोज्ने
+        const ordersRef = db.ref('orders');
+        const snapshot = await ordersRef.orderByChild('orderid').equalTo(orderid).once('value');
+
+        let targetOrderKey = null;
+        snapshot.forEach((childSnapshot) => {
+            targetOrderKey = childSnapshot.key;
+        });
+
+        if (status === "error" || status === "failed") {
+            console.error(`❌ Order Failed [${orderid}]:`, content || message);
+            
+            // यदि अर्डर फेला पर्यो भने Status लाई Failed बनाउने
+            if (targetOrderKey) {
+                await db.ref(`orders/${targetOrderKey}`).update({
+                    status: "Failed",
+                    errorReason: content || message || "Top-up failed"
+                });
+                console.log(`⚠️ Order ${orderid} status updated to Failed in Firebase.`);
+            }
+        } else if (status === "success" || status === 200) {
+            console.log(`✅ Order Successfully Completed [${orderid}]:`, content);
+
+            if (targetOrderKey) {
+                await db.ref(`orders/${targetOrderKey}`).update({
+                    status: "Completed"
+                });
+                console.log(`🎉 Order ${orderid} status updated to Completed in Firebase.`);
+            }
+        } else {
+            console.log(`ℹ️ Order Status Update [${orderid}]:`, status, message);
+        }
+    } catch (err) {
+        console.error("Webhook Database Error:", err);
     }
 
-    return res.status(200).json({ status: "success", message: "Webhook received successfully" });
+    return res.status(200).json({ status: "success", message: "Webhook processed successfully" });
 });
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 
-    // Render को बाहिरी IP (Outbound IP) पत्ता लगाउने कोड (यहाँ राख्दा पोर्ट टाइमआउट हुँदैन)
+    // Render को बाहिरी IP (Outbound IP) पत्ता लगाउने कोड
     axios.get('https://api.ipify.org?format=json')
         .then(response => {
             console.log("🔥 MY RENDER OUTBOUND IP IS:", response.data.ip);
