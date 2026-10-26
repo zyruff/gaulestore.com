@@ -642,9 +642,10 @@
                                     <button class="adm-btn btn-complete" onclick="completeOrder('${key}')"><i class="fa-solid fa-check"></i> Complete</button>
                                     <button class="adm-btn btn-reject" onclick="updateStatus('${key}', 'rejected')"><i class="fa-solid fa-xmark"></i> Reject</button>
                                 </div>
+                                ${voucherCode ? `
                                 <div class="admin-btn-row">
                                     <a href="https://shop.garena.my" target="_blank" class="adm-btn btn-topup"><i class="fa-solid fa-external-link-alt"></i> Top Up</a>
-                                </div>
+                                </div>` : ''}
                                 <button class="adm-btn btn-delete" onclick="deleteOrder('${key}')"><i class="fa-solid fa-trash"></i> Delete Order</button>
                             </div>
                         </div>
@@ -714,6 +715,7 @@
     </script>
 </body>
 </html>
+
 
 
 
