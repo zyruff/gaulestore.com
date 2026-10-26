@@ -5,17 +5,22 @@ const admin = require('firebase-admin');
 
 // Firebase Admin SDK सेटअप
 if (!admin.apps.length) {
-    admin.initializeApp({
-        credential: admin.credential.cert({
-            projectId: "gaule-top-up-center",
-            clientEmail: "firebase-adminsdk-xxx@gaule-top-up-center.iam.gserviceaccount.com", // आफ्नो Firebase email राख्नुहोला
-            privateKey: (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, '\n')
-        }),
-        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
-    });
+    try {
+        admin.initializeApp({
+            credential: admin.credential.cert({
+                projectId: "gaule-top-up-center",
+                clientEmail: process.env.FIREBASE_CLIENT_EMAIL || "gaule-top-up-center@appspot.gserviceaccount.com",
+                privateKey: (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, '\n')
+            }),
+            databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
+        });
+        console.log("Firebase Admin Initialized Successfully!");
+    } catch (err) {
+        console.error("Firebase Admin Initialization Error:", err.message);
+    }
 }
 
-const db = admin.database();
+const db = admin.apps.length ? admin.database() : null;
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -66,45 +71,49 @@ app.post('/api/process-topup', async (req, res) => {
     }
 });
 
-// EXTERNAL API बाट आउने Webhook रिसिभ गर्ने Route (Firebase-admin मार्फत Status अपडेट हुने)
+// EXTERNAL API बाट आउने Webhook रिसिभ गर्ने Route
 app.post('/api/webhook', async (req, res) => {
     console.log("--> INCOMING WEBHOOK RECEIVED FROM API:", req.body);
     
     const { orderid, status, message, processing_time, content } = req.body;
 
-    try {
-        const ordersRef = db.ref('orders');
-        const snapshot = await ordersRef.orderByChild('orderid').equalTo(orderid).once('value');
+    if (db) {
+        try {
+            const ordersRef = db.ref('orders');
+            const snapshot = await ordersRef.orderByChild('orderid').equalTo(orderid).once('value');
 
-        let targetOrderKey = null;
-        snapshot.forEach((childSnapshot) => {
-            targetOrderKey = childSnapshot.key;
-        });
+            let targetOrderKey = null;
+            snapshot.forEach((childSnapshot) => {
+                targetOrderKey = childSnapshot.key;
+            });
 
-        if (status === "error" || status === "failed") {
-            console.error(`❌ Order Failed [${orderid}]:`, content || message);
-            
-            if (targetOrderKey) {
-                await db.ref(`orders/${targetOrderKey}`).update({
-                    status: "Failed",
-                    errorReason: content || message || "Top-up failed"
-                });
-                console.log(`⚠️ Order ${orderid} status updated to Failed in Firebase.`);
+            if (status === "error" || status === "failed") {
+                console.error(`❌ Order Failed [${orderid}]:`, content || message);
+                
+                if (targetOrderKey) {
+                    await db.ref(`orders/${targetOrderKey}`).update({
+                        status: "Failed",
+                        errorReason: content || message || "Top-up failed"
+                    });
+                    console.log(`⚠️ Order ${orderid} status updated to Failed in Firebase.`);
+                }
+            } else if (status === "success" || status === 200) {
+                console.log(`✅ Order Successfully Completed [${orderid}]:`, content);
+
+                if (targetOrderKey) {
+                    await db.ref(`orders/${targetOrderKey}`).update({
+                        status: "Completed"
+                    });
+                    console.log(`🎉 Order ${orderid} status updated to Completed in Firebase.`);
+                }
+            } else {
+                console.log(`ℹ️ Order Status Update [${orderid}]:`, status, message);
             }
-        } else if (status === "success" || status === 200) {
-            console.log(`✅ Order Successfully Completed [${orderid}]:`, content);
-
-            if (targetOrderKey) {
-                await db.ref(`orders/${targetOrderKey}`).update({
-                    status: "Completed"
-                });
-                console.log(`🎉 Order ${orderid} status updated to Completed in Firebase.`);
-            }
-        } else {
-            console.log(`ℹ️ Order Status Update [${orderid}]:`, status, message);
+        } catch (err) {
+            console.error("Webhook Database Error:", err.message);
         }
-    } catch (err) {
-        console.error("Webhook Database Error:", err);
+    } else {
+        console.log("Webhook received, but Firebase Database is not connected.");
     }
 
     return res.status(200).json({ status: "success", message: "Webhook processed successfully" });
