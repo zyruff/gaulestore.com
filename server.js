@@ -1,28 +1,41 @@
-const apiResponse = await axios.post('https://androidartist.com/api/process-topup', {
-    api: apiKey,
-    orderid: orderid,
-    playerid: playerid,
-    code: code,
-    url: url
-}, {
-    headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-        'Accept': 'application/json, text/plain, */*',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Content-Type': 'application/json',
-        'Origin': 'https://androidartist.com',
-        'Referer': 'https://androidartist.com/'
-    },
-    validateStatus: function (status) {
-        return status < 500; // 500 भन्दा कमको status हरूलाई मात्र error नमानोस्
+// फ्रन्टएन्डबाट अर्डर रिसिभ गरेर AndroidArtist मा पठाउने API Route
+app.post('/api/process-topup', async (req, res) => {
+    console.log("--> INCOMING REQUEST RECEIVED FROM FRONTEND:", req.body);
+    
+    const { orderid, playerid, code, url } = req.body;
+    const apiKey = process.env.API_SECRET; 
+
+    if (!apiKey) {
+        console.error("API Error: API_SECRET is missing in Render Environment variables!");
+        return res.status(500).json({ status: "error", message: "Server API Secret missing" });
+    }
+
+    try {
+        // await यहाँ async function भित्र राखिएको छ, त्यसैले अब Error आउँदैन
+        const apiResponse = await axios.post('https://androidartist.com/api/process-topup', {
+            api: apiKey,
+            orderid: orderid,
+            playerid: playerid,
+            code: code,
+            url: url
+        }, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'application/json, text/plain, */*',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Content-Type': 'application/json',
+                'Referer': 'https://androidartist.com/'
+            }
+        });
+
+        console.log("AndroidArtist API Response:", apiResponse.data);
+        return res.status(200).json(apiResponse.data);
+
+    } catch (error) {
+        console.error("API Error:", error.response ? error.response.data : error.message);
+        return res.status(500).json({ 
+            status: "error", 
+            message: error.response ? error.response.data : error.message 
+        });
     }
 });
-
-// यदि HTML आयो भने रोक्नको लागि चेक राख्ने
-if (typeof apiResponse.data === 'string' && apiResponse.data.includes('Just a moment')) {
-    console.error("Cloudflare challenge intercepted the request!");
-    return res.status(403).json({ 
-        status: "error", 
-        message: "Target server security (Cloudflare) blocked the automated request." 
-    });
-}
