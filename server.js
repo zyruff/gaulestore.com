@@ -1,41 +1,37 @@
-// फ्रन्टएन्डबाट अर्डर रिसिभ गरेर AndroidArtist मा पठाउने API Route
-app.post('/api/process-topup', async (req, res) => {
-    console.log("--> INCOMING REQUEST RECEIVED FROM FRONTEND:", req.body);
-    
-    const { orderid, playerid, code, url } = req.body;
-    const apiKey = process.env.API_SECRET; 
+const express = require('express');
+const cors = require('cors');
+const axios = require('axios');
+const admin = require('firebase-admin');
 
-    if (!apiKey) {
-        console.error("API Error: API_SECRET is missing in Render Environment variables!");
-        return res.status(500).json({ status: "error", message: "Server API Secret missing" });
-    }
+// पहिले app डिफाइन गर्नुपर्छ
+const app = express();
+app.use(express.json());
+app.use(cors());
 
+// Firebase Admin SDK सेटअप
+if (!admin.apps.length) {
     try {
-        // await यहाँ async function भित्र राखिएको छ, त्यसैले अब Error आउँदैन
-        const apiResponse = await axios.post('https://androidartist.com/api/process-topup', {
-            api: apiKey,
-            orderid: orderid,
-            playerid: playerid,
-            code: code,
-            url: url
-        }, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': 'application/json, text/plain, */*',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Content-Type': 'application/json',
-                'Referer': 'https://androidartist.com/'
-            }
+        admin.initializeApp({
+            credential: admin.credential.cert({
+                projectId: "gaule-top-up-center",
+                clientEmail: process.env.FIREBASE_CLIENT_EMAIL || "gaule-top-up-center@appspot.gserviceaccount.com",
+                privateKey: (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, '\n')
+            }),
+            databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
         });
-
-        console.log("AndroidArtist API Response:", apiResponse.data);
-        return res.status(200).json(apiResponse.data);
-
-    } catch (error) {
-        console.error("API Error:", error.response ? error.response.data : error.message);
-        return res.status(500).json({ 
-            status: "error", 
-            message: error.response ? error.response.data : error.message 
-        });
+        console.log("Firebase Admin Initialized Successfully!");
+    } catch (err) {
+        console.error("Firebase Admin Initialization Error:", err.message);
     }
+}
+
+const db = admin.apps.length ? admin.database() : null;
+
+// अब यहाँ तल app.get वा app.post हरू लेख्नुहोस्:
+app.get('/', (req, res) => {
+    res.send('Gaule Store Backend is running successfully!');
+});
+
+app.post('/api/process-topup', async (req, res) => {
+    // ... तपाईंको कोड यहाँ राख्नुहोस् ...
 });
