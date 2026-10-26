@@ -1,188 +1,3 @@
-<html lang="en">
-<head>
-    <link rel="canonical" href="https://roshantamang2.com.np/" />
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaule Store | Fast & Secure Gaming Top Up in Nepal</title>
-    <meta property="og:image" content="https://roshantamang2.com.np/owner.png">
-    <link rel="icon" href="owner.png" type="image/png">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="description" content="Gaule Store provides fast and secure gaming top-up services in Nepal.">
-    <meta property="og:site_name" content="Gaule Store">
-    <meta property="og:title" content="Gaule Store - Trusted Gaming Top Up Nepal">
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Gaule Store",
-      "alternateName": "GAULE STORE",
-      "url": "https://roshantamang2.com.np"
-    }
-    </script>
-     
-    <style>
-        body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; }
-        .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #dc2626; justify-content: space-between; }
-        .menu-icon { font-size: 28px; cursor: pointer; }
-        #nav-menu { display: none; position: absolute; top: 0; left: 0; background: #fff; border: 1px solid #ccc; padding: 20px; width: 250px; height: 100%; z-index: 1000; box-shadow: 2px 2px 10px #ccc; }
-        .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .close-btn { font-size: 30px; cursor: pointer; color: #dc2626; }
-        .search-box { display: flex; gap: 5px; margin-bottom: 20px; }
-        #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
-        
-        /* Header Wallet Button Style */
-        .header-wallet {
-            display: none; /* Login भएपछि JS ले flex बनाउँछ */
-            align-items: center;
-            gap: 5px;
-            background-color: #fef2f2;
-            border: 1px solid #fca5a5;
-            color: #dc2626;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: bold;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .header-wallet:hover {
-            background-color: #fee2e2;
-        }
-        .header-wallet svg {
-            width: 16px;
-            height: 16px;
-            fill: #dc2626;
-        }
-
-        #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; }
-        #profile-dropdown { display: none; position: absolute; top: 50px; right: 0; background: white; border: 1px solid #ccc; padding: 15px; width: 200px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); border-radius: 8px; text-align: center; z-index: 1000; }
-        .user-name { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
-        .user-email { font-size: 12px; color: #666; margin-bottom: 10px; }
-        .change-name { font-size: 11px; color: #dc2626; text-decoration: none; display: block; margin-bottom: 15px; }
-        .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; cursor: pointer; border-radius: 4px; width: 100%; }
-        #nav-menu a { display: block; padding: 12px 0; color: black; text-decoration: none; border-bottom: 1px solid #eee; }
-        
-        /* Store Title Logo Link */
-        .store-title { font-size: 1.5rem; font-weight: bold; color: black; text-decoration: none; }
-        .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
-    </style>
-</head>
-<body>
-
-<div class="header">
-    <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
-    
-    <!-- Logo मा क्लिक गर्दा index.html (Home) खुल्ने बनाइएको छ -->
-    <a href="index.html" class="store-title">GAULE <span style="color:#dc2626;">STORE</span></a>
-    
-    <div class="header-right">
-        <div id="login-container" onclick="googleLogin()">
-            <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-        </div>
-
-        <!-- Login भएपछि profile को बायाँपट्टी देखिने Wallet Button -->
-        <a href="my-wallet/" id="header-wallet-btn" class="header-wallet">
-            <svg viewBox="0 0 24 24">
-                <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
-            </svg>
-            <span>Rs. <span id="header-user-balance">0</span></span>
-        </a>
-
-        <img id="profile-pic" onclick="toggleProfile()">
-        <div id="profile-dropdown">
-            <div id="display-name" class="user-name"></div>
-            <div id="display-email" class="user-email"></div>
-            <a href="https://myaccount.google.com/personal-info" target="_blank" class="change-name">Change Name</a>
-            <button class="logout-btn" onclick="logoutUser()">Logout</button>
-        </div>
-    </div>
-</div>
-
-<div id="nav-menu">
-    <div class="menu-header">
-        <span style="font-weight:bold;">Menu</span>
-        <span class="close-btn" onclick="toggleMenu()">&times;</span>
-    </div>
-    <div class="search-box">
-        <input type="text" id="gameSearch" placeholder="Search games..." onkeyup="filterGames()">
-        <button onclick="filterGames()">Search</button>
-    </div>
-    <div id="search-results" style="margin-bottom: 15px; max-height: 200px; overflow-y: auto;"></div>
-    <a href="index.html">Home</a>
-    <a href="shop/">Shop</a>
-    <a href="my-wallet/">My Wallet</a>
-    <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
-</div>
-
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-        authDomain: "gaule-top-up-center.firebaseapp.com",
-        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-        projectId: "gaule-top-up-center",
-        storageBucket: "gaule-top-up-center.firebasestorage.app",
-        messagingSenderId: "645605489690",
-        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    const provider = new GoogleAuthProvider();
-
-    window.toggleMenu = () => { const m = document.getElementById("nav-menu"); m.style.display = (m.style.display === "block") ? "none" : "block"; };
-    window.toggleProfile = () => { const d = document.getElementById("profile-dropdown"); d.style.display = (d.style.display === "block") ? "none" : "block"; };
-    window.googleLogin = () => signInWithPopup(auth, provider);
-    window.logoutUser = () => signOut(auth).then(() => location.reload());
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.getElementById("login-container").style.display = "none";
-            document.getElementById("header-wallet-btn").style.display = "flex";
-            document.getElementById("profile-pic").style.display = "block";
-            document.getElementById("profile-pic").src = user.photoURL;
-            document.getElementById("display-name").innerText = user.displayName;
-            document.getElementById("display-email").innerText = user.email;
-
-            const userRef = ref(db, 'users/' + user.uid);
-
-            // पहिलोपटक लगइन गर्दा Database मा Data create गर्ने
-            get(userRef).then((snapshot) => {
-                if (!snapshot.exists()) {
-                    set(userRef, {
-                        name: user.displayName,
-                        email: user.email,
-                        balance: 0,
-                        role: "user"
-                    });
-                }
-            });
-
-            // Realtime ब्यालेन्स Sync गर्ने
-            onValue(userRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    document.getElementById("header-user-balance").innerText = data.balance || 0;
-                }
-            });
-        }
-    });
-</script>
-</body>
-</html>
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -257,7 +72,6 @@
         .done-btn { background-color: #ffb300; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; }
         .done-btn:disabled { background-color: #cbd5e0; cursor: not-allowed; }
         
-        /* Custom Professional Warning/Error Modal */
         .alert-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 400; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out; }
         .alert-modal.show { opacity: 1; pointer-events: auto; }
         .alert-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(30px); transition: all 0.3s ease-in-out; }
@@ -402,7 +216,7 @@
         </div>
     </div>
 
-    <!-- Custom Professional Alert Modal (Replaces browser alert) -->
+    <!-- Custom Professional Alert Modal -->
     <div class="alert-modal" id="alertModal">
         <div class="alert-card">
             <div class="alert-icon-wrap">
@@ -616,7 +430,6 @@
             submitBtn.disabled = true;
             submitBtn.innerText = "Processing...";
 
-            // Warm-up ping to Render backend
             fetch('https://gaule-store.onrender.com/').catch(e => console.log("Waking Render..."));
 
             const now = new Date();
@@ -683,15 +496,24 @@
                 const voucherRef = ref(db, `auto-top-up/${membershipType}`);
                 const snapshot = await get(voucherRef);
 
-                if (!snapshot.exists()) return;
+                if (!snapshot.exists()) {
+                    await update(ref(db, `orders/${orderRef.key}`), { status: "Failed", errorReason: "Out of Stock" });
+                    return;
+                }
 
                 const vouchers = snapshot.val();
                 const voucherKeys = Object.keys(vouchers);
-                if (voucherKeys.length === 0) return;
+                if (voucherKeys.length === 0) {
+                    await update(ref(db, `orders/${orderRef.key}`), { status: "Failed", errorReason: "No vouchers available" });
+                    return;
+                }
 
                 const selectedKey = voucherKeys[0];
                 const voucherCode = vouchers[selectedKey];
-                if (!voucherCode) return;
+                if (!voucherCode) {
+                    await update(ref(db, `orders/${orderRef.key}`), { status: "Failed", errorReason: "Invalid voucher" });
+                    return;
+                }
 
                 const orderIdStr = "GAULE_" + Date.now();
                 console.log("Sending Request to Render Backend...");
@@ -714,9 +536,24 @@
                     await remove(ref(db, `auto-top-up/${membershipType}/${selectedKey}`));
                     await set(ref(db, `orders/${orderRef.key}/status`), "Completed");
                     console.log("Top Up Completed & Voucher Deleted Successfully!");
+                } else {
+                    await update(ref(db, `orders/${orderRef.key}`), {
+                        status: "Failed",
+                        errorReason: result.message || "API returned failure"
+                    });
+                    console.log("Order status updated to Failed due to API error.");
                 }
             } catch (err) {
                 console.error("Auto Top Up Process Error:", err);
+                try {
+                    await update(ref(db, `orders/${orderRef.key}`), {
+                        status: "Failed",
+                        errorReason: err.message || "Network or server connection error"
+                    });
+                    console.log("Order status updated to Failed due to exception.");
+                } catch (dbErr) {
+                    console.error("Failed to update status in Firebase:", dbErr);
+                }
             }
         }
 
@@ -727,103 +564,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-<br>
-<br>
-
-
-<div class="bottom-nav">
-    <a href="../../index.html" class="nav-item">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-        <span>Home</span>
-    </a>
-    <a href="../../index.html" class="nav-item">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-        <span>Shop</span>
-    </a>
-    <a href="../../order" class="nav-item">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-        <span>Order</span>
-    </a>
-    <a href="../../account" class="nav-item">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-        <span>Account</span>
-    </a>
-</div>
-
-<style>
-    .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: #ffffff;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        height: 62px;
-        border-top: 1px solid #eaeaea;
-        padding: 0 5px;
-        z-index: 1000;
-        box-sizing: border-box;
-    }
-
-    .bottom-nav .nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        color: #888;
-        font-size: 11px;
-        font-weight: 500;
-        flex: 1;
-        height: 100%;
-        transition: all 0.2s ease-in-out;
-        background: transparent;
-        border: none;
-        box-sizing: border-box;
-    }
-
-    .bottom-nav .nav-item svg {
-        width: 18px;
-        height: 18px;
-        margin-bottom: 3px;
-        stroke: currentColor;
-        fill: none;
-    }
-
-    /* Active huda yellow color hatauna yaha changes garieko xa */
-    .bottom-nav .nav-item.active {
-        color: #333333; /* Active huda kasto color rakhne, yaha dark gray haleko xa */
-    }
-</style>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const currentPath = window.location.pathname;
-        const navItems = document.querySelectorAll('.bottom-nav .nav-item');
-
-        navItems.forEach(item => {
-            const href = item.getAttribute('href');
-            const cleanHref = href.replace(/\.\./g, '').replace(/\/+/g, '/');
-            
-            if (cleanHref !== "/" && currentPath.includes(cleanHref)) {
-                navItems.forEach(nav => nav.classList.remove('active'));
-                item.classList.add('active');
-            } else if (cleanHref === "/" && (currentPath === "/" || currentPath.endsWith("index.html"))) {
-                navItems.forEach(nav => nav.classList.remove('active'));
-                item.classList.add('active');
-            }
-        });
-    });
-</script>
