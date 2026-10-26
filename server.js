@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
     res.send('Gaule Store Backend is running successfully!');
 });
 
-// फ्रन्टएन्डबाट अर्डर रिसिभ गर्ने API Route
+// फ्रन्टएन्डबाट अर्डर रिसिभ गरेर AndroidArtist मा पठाउने API Route
 app.post('/api/process-topup', async (req, res) => {
     console.log("--> INCOMING REQUEST RECEIVED FROM FRONTEND:", req.body);
     
@@ -66,14 +66,13 @@ app.post('/api/process-topup', async (req, res) => {
     }
 });
 
-// EXTERNAL API बाट आउने Webhook रिसिभ गर्ने Route (फेल हुँदा Failed बनाउने)
+// EXTERNAL API बाट आउने Webhook रिसिभ गर्ने Route (Firebase-admin मार्फत Status अपडेट हुने)
 app.post('/api/webhook', async (req, res) => {
     console.log("--> INCOMING WEBHOOK RECEIVED FROM API:", req.body);
     
     const { orderid, status, message, processing_time, content } = req.body;
 
     try {
-        // Firebase मा orderid सँग मिल्ने अर्डर खोज्ने
         const ordersRef = db.ref('orders');
         const snapshot = await ordersRef.orderByChild('orderid').equalTo(orderid).once('value');
 
@@ -85,7 +84,6 @@ app.post('/api/webhook', async (req, res) => {
         if (status === "error" || status === "failed") {
             console.error(`❌ Order Failed [${orderid}]:`, content || message);
             
-            // यदि अर्डर फेला पर्यो भने Status लाई Failed बनाउने
             if (targetOrderKey) {
                 await db.ref(`orders/${targetOrderKey}`).update({
                     status: "Failed",
@@ -116,7 +114,6 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 
-    // Render को बाहिरी IP (Outbound IP) पत्ता लगाउने कोड
     axios.get('https://api.ipify.org?format=json')
         .then(response => {
             console.log("🔥 MY RENDER OUTBOUND IP IS:", response.data.ip);
