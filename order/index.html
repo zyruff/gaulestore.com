@@ -455,7 +455,7 @@
         <div class="filter-tabs" id="filterTabs">
             <button class="filter-btn active" onclick="filterOrders('all', this)">All</button>
             <button class="filter-btn" onclick="filterOrders('pending', this)">Pending</button>
-            <button class="filter-btn" onclick="filterOrders('complete', this)">Completed</button>
+            <button class="filter-btn" onclick="filterOrders('completed', this)">Completed</button>
             <button class="filter-btn" onclick="filterOrders('rejected', this)">Rejected</button>
         </div>
 
@@ -634,10 +634,15 @@
                                 
                                 ${voucherCode ? `<div class="info-row" onclick="copyToClipboard('${voucherCode}')" style="background:transparent; padding:4px 0; margin-top:4px; margin-left:0; cursor:pointer; width:100%; display:flex; align-items:center;" title="Click to copy code"><i class="fa-solid fa-key" style="cursor:pointer; width:14px; text-align:center; margin-right:6px; color:#94a3b8;"></i> <b style="letter-spacing:0.5px; flex-grow:1; color:#047857; background:#ecfdf5; padding:6px 10px; border-radius:8px; border:1px dashed #34d399; display:inline-block;">${voucherCode}</b> <i class="fa-regular fa-copy" style="color:#059669; margin-left:8px;"></i></div>` : ''}
                                 
-                                <!-- Price Tag (Rs.) moved right after voucher code -->
+                                <!-- Transaction ID placed right below voucher code -->
+                                <div class="admin-action-box visible" style="margin-top: 4px; margin-bottom: 0px; border-top: none; padding-top: 0px; display: flex !important;">
+                                    ${transactionId ? `<div class="info-row" style="color:#059669;"><i class="fa-solid fa-receipt"></i> Txn ID: <b>${transactionId}</b></div>` : `<div class="info-row" style="color:#6b7280;"><i class="fa-solid fa-receipt"></i> Txn ID: <b>Not Provided</b></div>`}
+                                </div>
+
+                                <!-- Price Tag (Rs.) placed below Transaction ID -->
                                 <div class="price-tag">Rs. ${orderAmount}</div>
 
-                                <!-- Customer Redeem Now button placed below price tag -->
+                                <!-- Customer Redeem Now button -->
                                 ${voucherCode ? `
                                     <div style="margin-top: 4px;">
                                         <a href="https://shop.garena.my" target="_blank" style="background: #e0f2fe; color: #0284c7; width: 100%; max-width: 160px; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
@@ -645,10 +650,6 @@
                                         </a>
                                     </div>
                                 ` : ''}
-                                
-                                <div class="admin-action-box ${isAdmin ? 'visible' : ''}" style="margin-top: 6px; margin-bottom: 0px; border-top: none; padding-top: 0px;">
-                                    ${transactionId ? `<div class="info-row" style="color:#059669;"><i class="fa-solid fa-receipt"></i> Txn ID: <b>${transactionId}</b></div>` : `<div class="info-row" style="color:#6b7280;"><i class="fa-solid fa-receipt"></i> Txn ID: <b>Not Provided</b></div>`}
-                                </div>
                             </div>
                             <div class="admin-action-box ${isAdmin ? 'visible' : ''}">
                                 <div class="admin-btn-row">
@@ -728,6 +729,7 @@
     </script>
 </body>
 </html>
+
 
 
 
