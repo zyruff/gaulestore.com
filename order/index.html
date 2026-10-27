@@ -633,10 +633,10 @@
                                 
                                 ${voucherCode ? `<div class="info-row" onclick="copyToClipboard('${voucherCode}')" style="background:transparent; padding:4px 0; margin-top:4px; margin-left:0; cursor:pointer; width:100%; display:flex; align-items:center;" title="Click to copy code"><i class="fa-solid fa-key" style="cursor:pointer; width:14px; text-align:center; margin-right:6px; color:#94a3b8;"></i> <b style="letter-spacing:0.5px; flex-grow:1; color:#047857; background:#ecfdf5; padding:6px 10px; border-radius:8px; border:1px dashed #34d399; display:inline-block;">${voucherCode}</b> <i class="fa-regular fa-copy" style="color:#059669; margin-left:8px;"></i></div>` : ''}
                                 
-                                <!-- Customer lai voucher code vaye Redeem Now button (Compact size) -->
+                                <!-- Customer lai voucher code vaye Redeem Now button (Compact and matched with box width) -->
                                 ${voucherCode ? `
                                     <div style="margin-top: 4px;">
-                                        <a href="https://shop.garena.my" target="_blank" style="background: #e0f2fe; color: #0284c7; width: 100%; padding: 6px 0; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                                        <a href="https://shop.garena.my" target="_blank" style="background: #e0f2fe; color: #0284c7; width: 100%; max-width: 160px; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
                                             <i class="fa-solid fa-external-link-alt"></i> Redeem Now
                                         </a>
                                     </div>
@@ -726,6 +726,7 @@
     </script>
 </body>
 </html>
+
 
 
 
