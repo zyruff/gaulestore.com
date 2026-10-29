@@ -831,7 +831,7 @@
           <div id="uidError" class="error-text">Please enter a valid Gmail address (e.g. user@gmail.com).</div>
         </div>
 
-        <!-- MAIN ACTION BUTTON (Dynamic: Login to Buy / BUY NOW with SVG) -->
+        <!-- MAIN ACTION BUTTON -->
         <button class="btn-buy-now login-btn" id="mainActionBtn" onclick="handleMainAction()">
           <svg class="btn-svg" viewBox="0 0 24 24">
             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
@@ -1039,6 +1039,7 @@
     let selectedQrImage = "";
     
     let currentUserUid = null;
+    let currentUserName = "Guest";
     let currentUserBalance = 0;
     let isUserLoggedIn = false;
 
@@ -1050,8 +1051,8 @@
       if (user) {
         isUserLoggedIn = true;
         currentUserUid = user.uid;
+        currentUserName = user.displayName || "User";
         
-        // Logged in: Change button style to orange/gradient and show "BUY NOW" with cart/bag SVG
         mainBtn.classList.remove('login-btn');
         btnText.innerText = "BUY NOW";
         mainBtn.querySelector('svg').innerHTML = `
@@ -1060,7 +1061,6 @@
           <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
         `;
         
-        // Fetch user balance from database users/{uid}/balance
         db.ref(`users/${currentUserUid}/balance`).on('value', (snapshot) => {
           if (snapshot.exists()) {
             currentUserBalance = Number(snapshot.val());
@@ -1075,9 +1075,9 @@
       } else {
         isUserLoggedIn = false;
         currentUserUid = null;
+        currentUserName = "Guest";
         currentUserBalance = 0;
         
-        // Not logged in: Change button style to red and show "LOGIN TO BUY" with login SVG
         mainBtn.classList.add('login-btn');
         btnText.innerText = "LOGIN TO BUY";
         mainBtn.querySelector('svg').innerHTML = `
@@ -1091,10 +1091,8 @@
       }
     });
 
-    // Handle Main Action Button Click (Login to Buy or Open Payment Modal)
     function handleMainAction() {
       if (!isUserLoggedIn) {
-        // Trigger Google Login Popup
         const provider = new firebase.auth.GoogleAuthProvider();
         auth.signInWithPopup(provider).then((result) => {
           const user = result.user;
@@ -1114,7 +1112,6 @@
           alert("Login Failed: " + error.message);
         });
       } else {
-        // Open Payment Modal
         openPaymentModal();
       }
     }
@@ -1240,8 +1237,10 @@
       const formattedDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
       const formattedTime = now.toTimeString().split(' ')[0];
 
+      // Order Data containing Google login user name
       const orderData = {
         orderId: randomOrderCode,
+        name: currentUserName, // Google Login user's display name
         email: emailInput,
         authEmail: emailInput,
         voucherCode: "",
