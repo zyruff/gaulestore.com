@@ -160,6 +160,9 @@
       cursor: pointer;
       font-weight: 600;
       user-select: none;
+      display: inline;
+      margin-left: 4px;
+      white-space: nowrap;
     }
 
     /* Package Section */
@@ -800,9 +803,7 @@
 
       <!-- Description Section -->
       <p class="description">
-        Recharge Smile One Coins globally with instant delivery. Pay easily via eSewa, Khalti, Wallet or Bank Transfer...
-        <span class="full-text" id="fullDescription"> Get your coins transferred directly to your Email ID within 1-5 minutes with 100% guarantee & 24/7 support. No VPN required.</span>
-        <span class="read-more-btn" onclick="toggleReadMore()" id="readMoreBtn">Read more ∨</span>
+        Recharge Smile One Coins globally with instant delivery. Pay easily via eSewa, Khalti, Wallet or Bank Transfer.<span class="full-text" id="fullDescription"> Get your coins transferred directly to your Email ID within 1-5 minutes with 100% guarantee & 24/7 support. No VPN required.</span> <span class="read-more-btn" onclick="toggleReadMore()" id="readMoreBtn">Read more ∨</span>
       </p>
     </div>
 
@@ -1237,10 +1238,9 @@
       const formattedDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
       const formattedTime = now.toTimeString().split(' ')[0];
 
-      // Order Data containing Google login user name
       const orderData = {
         orderId: randomOrderCode,
-        name: currentUserName, // Google Login user's display name
+        name: currentUserName,
         email: emailInput,
         authEmail: emailInput,
         voucherCode: "",
