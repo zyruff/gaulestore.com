@@ -76,7 +76,7 @@
     <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
     
     <!-- Logo मा क्लिक गर्दा index.html (Home) खुल्ने बनाइएको छ -->
-    <a href="index.html" class="store-title">GAULE <span style="color:#dc2626;">STORE</span></a>
+    <a href="../../index.html" class="store-title">GAULE <span style="color:#dc2626;">STORE</span></a>
     
     <div class="header-right">
         <div id="login-container" onclick="googleLogin()">
@@ -111,13 +111,13 @@
         <button onclick="filterGames()">Search</button>
     </div>
     <div id="search-results" style="margin-bottom: 15px; max-height: 200px; overflow-y: auto;"></div>
-    <a href="index.html">Home</a>
-    <a href="shop/">Shop</a>
-    <a href="my-wallet/">My Wallet</a>
+    <a href="../../index.html">Home</a>
+    <a href="../../shop/">Shop</a>
+    <a href="../../my-wallet/">My Wallet</a>
     <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
 </div>
 
-<div id="content-area" style="padding: 20px;"></div>
+<div id="content-area" style="padding: 0px;"></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -184,1249 +184,1385 @@
 
 
 
-<!-- Green Theme Instant Delivery Banner (Moved Up) -->
-<div style="text-align: center; padding: 15px; margin-top: -65px;">
-<div style="position: relative; margin-top: -0px; margin-left: -250px; display: inline-block;">
-</div>
-
-
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
+<html lang="ne">
 <head>
-  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Firebase JS SDK (v9 Compatibility Mode) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
   <style>
-    /* YouTube ko 16:9 aspect ratio milayeko */
-    .swiper { 
-      width: 100%; 
-      max-width: 800px; 
-      aspect-ratio: 16 / 7; 
-      margin: auto;
-      border-radius: 10px;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-user-select: none;
+      user-select: none;
     }
-    .swiper-slide img { 
-      width: 100%; 
-      height: 100%; 
-      object-fit: cover; 
+
+    input {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    body {
+      background-color: #f8fafc;
+      color: #1e293b;
+      min-height: 100vh;
+      width: 100%;
+      padding-bottom: 40px;
+    }
+
+    .container {
+      width: 100% !important;
+      max-width: 100% !important;
+      background: #ffffff;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Product Section */
+    .product-section {
+      padding: 24px 30px;
+      width: 100%;
+    }
+
+    .product-header {
+      display: flex;
+      gap: 18px;
+      margin-bottom: 16px;
+    }
+
+    .app-icon {
+      width: 84px;
+      height: 84px;
+      border-radius: 18px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      flex-shrink: 0;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid #f1f5f9;
+    }
+
+    .app-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .product-details {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .product-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-top: 6px;
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+
+    .badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #fff7ed;
+      color: #ea580c;
+      border: 1px solid #ffedd5;
+    }
+
+    .badge.global {
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #dbeafe;
+    }
+
+    .badge-svg {
+      width: 14px;
+      height: 14px;
+      stroke-width: 2.2;
+      stroke: currentColor;
+      fill: none;
+    }
+
+    .rating-row {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rating-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      background: #fefce8;
+      border: 1px solid #fef08a;
+      font-size: 12px;
+      font-weight: 600;
+      color: #ca8a04;
+    }
+
+    .description {
+      font-size: 14px;
+      color: #64748b;
+      line-height: 1.5;
+      margin-top: 12px;
+    }
+
+    .full-text {
+      display: none;
+    }
+
+    .read-more-btn {
+      color: #f97316;
+      cursor: pointer;
+      font-weight: 600;
+      user-select: none;
+      display: inline;
+      margin-left: 4px;
+      white-space: nowrap;
+    }
+
+    /* Package Section */
+    .section-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #94a3b8;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin: 20px 30px 12px 30px;
+    }
+
+    .package-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding: 0 30px;
+      width: 100%;
+    }
+
+    .package-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      min-height: 56px;
+    }
+
+    .package-card:hover, .package-card.selected {
+      border-color: #f97316;
+      background: #fffaf5;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+    }
+
+    .coin-amount-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .coin-amount {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .brl-text {
+      font-size: 11px;
+      color: #334155;
+      font-weight: 600;
+      margin-top: 1px;
+    }
+
+    .price-container {
+      margin-left: 8px;
+      text-align: right;
+    }
+
+    .price-npr {
+      font-size: 13px;
+      font-weight: 800;
+      color: #ea580c;
+      white-space: nowrap;
+    }
+
+    /* Order Information Section */
+    .order-info-card {
+      margin: 24px 30px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+      width: calc(100% - 60px);
+    }
+
+    .order-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #475569;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .account-details-box {
+      border: 1px solid #fed7aa;
+      background: #fffaf5;
+      border-radius: 12px;
+      padding: 16px;
+      width: 100%;
+    }
+
+    .account-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .account-icon {
+      width: 36px;
+      height: 36px;
+      background: #ffedd5;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ea580c;
+      font-size: 18px;
+    }
+
+    .account-text h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .account-text p {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      width: 100%;
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .required-tag {
+      font-size: 10px;
+      background: #ffedd5;
+      color: #ea580c;
+      padding: 2px 7px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+      background: #ffffff;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: #f97316;
+    }
+
+    .btn-buy-now {
+      width: 100%;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.3s ease;
+    }
+
+    .btn-buy-now.login-btn {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    .btn-buy-now:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .btn-svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .error-text {
+      color: #dc2626;
+      font-size: 11px;
+      margin-top: 4px;
+      display: none;
+    }
+
+    /* Tabs Section */
+    .tabs-section {
+      padding: 0 30px;
+      margin-top: 24px;
+      margin-bottom: 24px;
+      width: 100%;
+    }
+
+    .tab-header {
+      display: flex;
+      gap: 20px;
+      border-bottom: 2px solid #f1f5f9;
+      margin-bottom: 14px;
+    }
+
+    .tab-item {
+      padding-bottom: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .tab-item.active {
+      color: #f97316;
+    }
+
+    .tab-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: #f97316;
+      border-radius: 3px 3px 0 0;
+    }
+
+    .tab-rating {
+      font-size: 11px;
+      background: #fefce8;
+      color: #ca8a04;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid #fef08a;
+      margin-left: 4px;
+    }
+
+    .tab-content {
+      font-size: 14px;
+      color: #475569;
+      line-height: 1.6;
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 440px;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .modal-close {
+      background: #f1f5f9;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 16px;
+      color: #64748b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .summary-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 5px;
+      color: #64748b;
+    }
+
+    .summary-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .summary-val {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .pay-methods-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .pay-method-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 4px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #ffffff;
+    }
+
+    .pay-method-item:hover, .pay-method-item.selected {
+      border-color: #f97316;
+      background: #fffaf5;
+      box-shadow: 0 2px 6px rgba(249, 115, 22, 0.15);
+    }
+
+    .pay-icon {
+      font-size: 18px;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 24px;
+    }
+
+    .pay-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .pay-name {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 2px;
+      display: block;
+    }
+
+    .modal-qr-box {
+      background: #ffffff;
+      border: 1px dashed #f97316;
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .qr-image {
+      width: 130px;
+      height: 130px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      padding: 4px;
+      margin: 8px auto;
+      object-fit: contain;
+    }
+
+    .qr-acc-no {
+      font-size: 13px;
+      font-weight: 800;
+      color: #ea580c;
+      background: #fff7ed;
+      padding: 2px 8px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-top: 2px;
+    }
+
+    .wallet-box {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .wallet-balance-title {
+      font-size: 11.5px;
+      color: #ea580c;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .wallet-balance-amt {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .wallet-info-text {
+      font-size: 11.5px;
+      color: #64748b;
+    }
+
+    .success-icon {
+      width: 50px;
+      height: 50px;
+      background: #dcfce7;
+      color: #16a34a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin: 0 auto 12px auto;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      background: #fef3c7;
+      color: #d97706;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* Mobile Optimization */
+    @media (max-width: 600px) {
+      .product-section {
+        padding: 16px;
+      }
+      .product-header {
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .app-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 14px;
+      }
+      .product-title {
+        font-size: 15px;
+      }
+      .badge {
+        padding: 3px 8px;
+        font-size: 10.5px;
+      }
+      .rating-badge {
+        font-size: 10.5px;
+        padding: 2px 8px;
+      }
+      .description {
+        font-size: 12.5px;
+        margin-top: 10px;
+      }
+      .section-title {
+        font-size: 11.5px;
+        margin: 16px 16px 10px 16px;
+      }
+      .package-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding: 0 16px;
+      }
+      .package-card {
+        padding: 10px 10px;
+        min-height: 48px;
+        border-radius: 10px;
+      }
+      .coin-amount {
+        font-size: 11.5px;
+      }
+      .brl-text {
+        font-size: 10px;
+      }
+      .price-npr {
+        font-size: 11.5px;
+      }
+      .order-info-card {
+        margin: 20px 16px;
+        padding: 16px;
+        width: calc(100% - 32px);
+        border-radius: 14px;
+      }
+      .order-title {
+        font-size: 12px;
+        margin-bottom: 12px;
+      }
+      .account-details-box {
+        padding: 12px;
+      }
+      .account-header {
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .account-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 15px;
+      }
+      .account-text h4 {
+        font-size: 13px;
+      }
+      .account-text p {
+        font-size: 10.5px;
+      }
+      .form-group {
+        margin-bottom: 12px;
+      }
+      .form-label {
+        font-size: 12px;
+        margin-bottom: 6px;
+      }
+      .form-input {
+        padding: 11px 14px;
+        font-size: 13px;
+        border-radius: 8px;
+      }
+      .btn-buy-now {
+        padding: 12px;
+        font-size: 14px;
+        border-radius: 8px;
+      }
+      .tabs-section {
+        padding: 0 16px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+      .tab-item {
+        font-size: 13.5px;
+        padding-bottom: 8px;
+      }
+      .tab-content {
+        font-size: 13px;
+      }
+      .pay-methods-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
   </style>
 </head>
 <body>
 
-  <div class="swiper">
-    <div class="swiper-wrapper">
-      <div class="swiper-slide"><img src="image1.png" alt="Gaule Store"></div>
-      <div class="swiper-slide"><img src="image2.png" alt="Upcoming Events"></div>
-      <div class="swiper-slide"><img src="image3.png" alt="Trusted Service"></div>
-    </div>
-    
-    <!-- Navigation arrows hataidiyo -->
-    <!-- Pagination matra rakheko -->
-    <div class="swiper-pagination"></div>
-  </div>
-     
-  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-  <script>
-    const swiper = new Swiper('.swiper', {
-      loop: true,
-      autoplay: { delay: 3000, disableOnInteraction: false },
-      // Navigation section hatayeko
-      pagination: { el: '.swiper-pagination', clickable: true },
-    });
-  </script>
-</body>
-</html>
-
-
-<!-- Style (CSS) -->
-<style>
-    .gs-header-container {
-        text-align: center;
-        width: 92%;
-        max-width: 600px;
-        margin: 20px auto;
-        font-family: Arial, sans-serif;
-    }
-
-    .gs-title-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-    }
-
-    .gs-title-wrapper::before,
-    .gs-title-wrapper::after {
-        content: "";
-        flex: 1;
-        border-bottom: 2px solid #cbd5e1;
-        margin: 0 10px;
-    }
-
-    .gs-main-title {
-        font-size: 1.15rem;
-        font-weight: 800;
-        color: #1e293b;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        margin: 0;
-        white-space: nowrap;
-    }
-
-    .gs-sub-title {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.75rem;
-        color: #475569;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        margin-top: 8px;
-        margin-left: -15px; /* Yo value le subtitle lai left tira sarna milxa */
-        font-weight: 600;
-    }
-
-    .gs-sub-title svg {
-        width: 14px;
-        height: 14px;
-        margin-right: 5px;
-        position: relative;
-        top: -1px;
-    }
-</style>
-
-
-   <!-- Content (HTML) -->
-<div class="gs-header-container">
-    <div class="gs-title-wrapper">
-        <h1 class="gs-main-title">GAMING TOPUP & GIFT CARD</h1>
-    </div>
-    <div class="gs-sub-title">
-        <!-- Secure Icon -->
-        <svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            <polyline points="9 12 11 14 15 10"/>
-        </svg>
-        100% TRUSTED & FAST SERVICE NEPAL
-    </div>
-</div>
-
-<style>
-.gs-header-container {
-    background: transparent;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    font-family: sans-serif;
-}
-
-.gs-title-wrapper {
-    display: flex;
-    align-items: center;
-}
-
-.gs-main-title {
-    margin: 0;
-    font-weight: 800;
-    
-    /* Side glow hataera solid black with a sharp clean gold light pass */
-    color: #000000;
-    background: linear-gradient(90deg, #000000 0%, #000000 42%, #f59e0b 50%, #fef08a 52%, #000000 58%, #000000 100%);
-    background-size: 300% auto;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: goldShimmer 7s linear infinite;
-}
-
-@keyframes goldShimmer {
-    0% { background-position: 100% center; }
-    100% { background-position: -200% center; }
-}
-
-.gs-sub-title {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #334155;
-    font-weight: 600;
-}
-
-.gs-sub-title svg {
-    width: 14px;
-    height: 14px;
-}
-</style>
-
-
-
-    </p>
-<div style="height: 1px; width: 1
-200px; background-color: #d1d5db; margin: 15px auto;"></div>
-<style>
-    /* मोबाइलको लागि - आइकनहरू पङ्क्तिमा (Row) */
-    .service-container {
-        display: flex;
-        justify-content: space-between;
-        padding: 20px 10px;
-        flex-wrap: wrap; /* स्क्रिन सानो हुँदा तल सर्छ */
-    }
-
-    /* डेस्कटपको लागि - अलि फराकिलो बनाउने */
-    @media (min-width: 600px) {
-        .service-container {
-            justify-content: center;
-            gap: 50px; /* डेस्कटपमा बिचमा धेरै ग्याप राख्ने */
-        }
-    }
-</style>
-         
-
-
-<style>
-    /* डेस्कटपमा अलि धेरै ग्याप राख्न ७०० को सट्टा ६००px */
-    @media (min-width: 600px) {
-        .service-container {
-            max-width: 600px !important;
-        }
-    }
-</style>
-
-
-<style>
-    @media (min-width: 600px) {
-        .service-container {
-            max-width: 700px !important;
-        }
-    }
-</style>
-
-
-<style>
-    /* डेस्कटपमा अलि बढी ग्यापको लागि ७३०px */
-    @media (min-width: 600px) {
-        .service-container {
-            max-width: 730px !important;
-        }
-    }
-</style>
-
-<div class="service-container" style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:500px; margin:0 auto; padding:20px 0;">
-
-<!-- Free Fire App Icon -->
-<div style="text-align:center; width:80px; font-family: sans-serif;">
-    <a href="https://roshantamang2.com.np/product/free-fire-top-up-nepal" style="display:block; width:80px; height:80px; text-decoration:none;">
-        <img src="product/free-fire-top-up-nepal/free_fire.png" alt="Free Fire" style="width:80px; height:80px; border-radius:20px; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:block; transition: transform 0.2s ease;">
-    </a>
-    <div style="font-weight:700; font-size:11px; color:#333; margin-top:6px; letter-spacing: 0.5px; pointer-events:none;">FREE FIRE</div>
-</div>
-
-
-
-
-
-
-<!-- UniPin App Icon with Correct Card & Badge Alignment -->
-<div style="text-align: center; width: 80px; font-family: sans-serif; position: relative; display: inline-block;">
-    
-    <!-- Image Link Container -->
-    <a href="https://roshantamang2.com.np/product/unipin-voucher-nepal" style="display: block; width: 80px; height: 80px; text-decoration: none; position: relative; border-radius: 20px; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); overflow: hidden; background: #fff;">
-        
-        <!-- Logo Image -->
-        <img src="product/unipin-voucher-nepal/Unipin_Logo.png" alt="UniPin BD" style="width: 80px; height: 80px; display: block; object-fit: cover;">
-        
-        <!-- Blue Badge Overlapping Inside Top of the Image -->
-        <div style="position: absolute; top: 0; left: 0; background-color: #2563EB; color: #fff; font-size: 7.5px; font-weight: 700; padding: 2px 8px; border-top-left-radius: 20px; border-bottom-right-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; z-index: 10; pointer-events: none;">
-            Auto Delivery
+  <div class="container">
+    <!-- Product Info Section -->
+    <div class="product-section">
+      <div class="product-header">
+        <div class="app-icon">
+          <img src="smile_one.png" alt="Smile One">
         </div>
-    </a>
-    
-    <!-- Title -->
-    <div style="font-weight: 700; font-size: 11px; color: #333; margin-top: 6px; letter-spacing: 0.5px; pointer-events: none;">UNIPIN BD</div>
-</div>
-
-
-
-
-
-<!-- PUBG App Icon -->
-<div style="text-align:center; width:80px; font-family: sans-serif;">
-    <a href="https://roshantamang2.com.np/product/pubg-uc-top-up-nepal" style="display:block; width:80px; height:80px; text-decoration:none;">
-        <img src="product/pubg-uc-top-up-nepal/pubg.png" alt="PUBG" style="width:80px; height:80px; border-radius:20px; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:block; transition: transform 0.2s ease;">
-    </a>
-    <div style="font-weight:700; font-size:11px; color:#333; margin-top:6px; letter-spacing: 0.5px; pointer-events:none;">PUBG</div>
-</div>
-
-
-
-</div>
-
-
-
-
-<div class="service-container" style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:500px; margin:0 auto; padding:20px 0;">
-
-<!-- FF Airdrop App Icon -->
-<div style="text-align:center; width:80px; font-family: sans-serif;">
-    <a href="https://roshantamang2.com.np/product/special-airdrop-nepal" style="display:block; width:80px; height:80px; text-decoration:none;">
-        <img src="product/special-airdrop-nepal/airdrop.png" alt="Special Airdrop" style="width:80px; height:80px; border-radius:20px; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:block; transition: transform 0.2s ease;">
-    </a>
-    <div style="font-weight:700; font-size:11px; color:#333; margin-top:6px; letter-spacing: 0.5px; pointer-events:none;">FF AIRDROP</div>
-</div>
-
-
-<!-- Less Is More App Icon -->
-<div style="text-align:center; width:80px; font-family: sans-serif;">
-    <a href="https://roshantamang2.com.np/product/less-is-more-nepal" style="display:block; width:80px; height:80px; text-decoration:none;">
-        <img src="product/less-is-more-nepal/less_is_more.png" alt="Less Is More" style="width:80px; height:80px; border-radius:20px; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:block; transition: transform 0.2s ease;">
-    </a>
-    <div style="font-weight:700; font-size:11px; color:#333; margin-top:6px; letter-spacing: 0.5px; pointer-events:none;">LESS IS MORE</div>
-</div>
-
-
-<!-- Level Up Pass App Icon -->
-<div style="text-align:center; width:80px; font-family: sans-serif;">
-    <a href="https://roshantamang2.com.np/product/level-up-pass-top-up-nepal" style="display:block; width:80px; height:80px; text-decoration:none;">
-        <img src="product/level-up-pass-top-up-nepal/levelup.png" alt="Level Up Pass" style="width:80px; height:80px; border-radius:20px; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:block; transition: transform 0.2s ease;">
-    </a>
-    <div style="font-weight:700; font-size:11px; color:#333; margin-top:6px; letter-spacing: 0.5px; pointer-events:none;">LEVEL UP PASS</div>
-</div>
-
-
-
-</div>
-
-
-
-<div class="service-container" style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:500px; margin:0 auto; padding:20px 0;">
-
-<!-- Mobile Legend App Icon -->
-<div style="text-align:center; width:80px; font-family: sans-serif;">
-    <a href="https://roshantamang2.com.np/product/mobile-legend-top-up-nepal" style="display:block; width:80px; height:80px; text-decoration:none;">
-        <img src="product/mobile-legend-top-up-nepal/mbl.png" alt="Mobile Legend" style="width:80px; height:80px; border-radius:20px; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:block; transition: transform 0.2s ease;">
-    </a>
-    <div style="font-weight:700; font-size:11px; color:#333; margin-top:6px; letter-spacing: 0.5px; pointer-events:none;">MBL LEGEND</div>
-</div>
-
-
-<!-- Roblox App Icon -->
-<div style="text-align:center; width:80px; font-family: sans-serif;">
-    <a href="https://roshantamang2.com.np/product/roblox-top-up-nepal" style="display:block; width:80px; height:80px; text-decoration:none;">
-        <img src="product/roblox-top-up-nepal/roblox.png" alt="Roblox" style="width:80px; height:80px; border-radius:20px; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:block; transition: transform 0.2s ease;">
-    </a>
-    <div style="font-weight:700; font-size:11px; color:#333; margin-top:6px; letter-spacing: 0.5px; pointer-events:none;">ROBLOX</div>
-</div>
-
-
-<!-- Efootball App Icon -->
-<div style="text-align:center; width:80px; font-family: sans-serif;">
-    <a href="https://roshantamang2.com.np/product/efootball-top-up-nepal" style="display:block; width:80px; height:80px; text-decoration:none;">
-        <img src="product/efootball-top-up-nepal/efootbal.png" alt="Efootball" style="width:80px; height:80px; border-radius:20px; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:block; transition: transform 0.2s ease;">
-    </a>
-    <div style="font-weight:700; font-size:11px; color:#333; margin-top:6px; letter-spacing: 0.5px; pointer-events:none;">EFOOTBALL</div>
-</div>
-
-
-</div>
-
-<div class="service-container" style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:500px; margin:0 auto; padding:20px 0;">
-
-<!-- FF Glory App Icon -->
-<div style="text-align:center; width:80px; font-family: sans-serif;">
-    <a href="https://roshantamang2.com.np/product/free-fire-glory-bot-nepal" style="display:block; width:80px; height:80px; text-decoration:none;">
-        <img src="product/free-fire-glory-bot-nepal/ffglory.png" alt="Glory Bot" style="width:80px; height:80px; border-radius:20px; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:block; transition: transform 0.2s ease;">
-    </a>
-    <div style="font-weight:700; font-size:11px; color:#333; margin-top:6px; letter-spacing: 0.5px; pointer-events:none;">GLORY BOT</div>
-</div>
-
-
-<!-- Delta Force App Icon -->
-<div style="text-align:center; width:80px; font-family: sans-serif;">
-    <a href="https://roshantamang2.com.np/product/delta-force-top-up-nepal" style="display:block; width:80px; height:80px; text-decoration:none;">
-        <img src="product/delta-force-top-up-nepal/deltaforce.png" alt="Delta Force" style="width:80px; height:80px; border-radius:20px; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:block; transition: transform 0.2s ease;">
-    </a>
-    <div style="font-weight:700; font-size:11px; color:#333; margin-top:6px; letter-spacing: 0.5px; pointer-events:none;">DELTA FORCE</div>
-</div>
-
-
-<!-- FF Like App Icon -->
-<div style="text-align:center; width:80px; font-family: sans-serif;">
-    <a href="https://roshantamang2.com.np/product/free-fire-like-nepal" style="display:block; width:80px; height:80px; text-decoration:none;">
-        <img src="product/free-fire-like-nepal/fflike.png" alt="FF Like" style="width:80px; height:80px; border-radius:20px; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:block; transition: transform 0.2s ease;">
-    </a>
-    <div style="font-weight:700; font-size:11px; color:#333; margin-top:6px; letter-spacing: 0.5px; pointer-events:none;">FF LIKE</div>
-</div>
-
-
-</div>
-
-
-<div class="service-container" style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:500px; margin:0 auto; padding:20px 0;">
-
-<!-- Smile One App Icon -->
-<div style="text-align:center; width:80px; font-family: sans-serif;">
-    <a href="https://roshantamang2.com.np/product/smile-one-buy-nepal" style="display:block; width:80px; height:80px; text-decoration:none;">
-        <img src="product/smile-one-buy-nepal/smile_one.png" alt="Smile One" style="width:80px; height:80px; border-radius:20px; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:block; transition: transform 0.2s ease;">
-    </a>
-    <div style="font-weight:700; font-size:11px; color:#333; margin-top:6px; letter-spacing: 0.5px; pointer-events:none;">SMILE ONE BRL</div>
-</div>
-
-
-<!-- Garena Shell App Icon -->
-<div style="text-align:center; width:80px; font-family: sans-serif;">
-    <a href="https://roshantamang2.com.np/product/garena-shell-buy-nepal" style="display:block; width:80px; height:80px; text-decoration:none;">
-        <img src="product/garena-shell-buy-nepal/garena_shell.png" alt="Garena Shell" style="width:80px; height:80px; border-radius:20px; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:block; transition: transform 0.2s ease;">
-    </a>
-    <div style="font-weight:700; font-size:11px; color:#333; margin-top:6px; letter-spacing: 0.5px; pointer-events:none;">GARENA SHELL</div>
-</div>
-
-
-<!-- Pubg Voucher App Icon -->
-<div style="text-align:center; width:80px; font-family: sans-serif;">
-    <a href="https://roshantamang2.com.np/product/pubg-voucher-buy-nepal" style="display:block; width:80px; height:80px; text-decoration:none;">
-        <img src="product/pubg-voucher-buy-nepal/pubg_v.png" alt="Pubg Voucher" style="width:80px; height:80px; border-radius:20px; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:block; transition: transform 0.2s ease;">
-    </a>
-    <div style="font-weight:700; font-size:11px; color:#333; margin-top:6px; letter-spacing: 0.5px; pointer-events:none;">PUBG VOUCHER</div>
-</div>
-
-
-</div>
-
-      
-
-
-<style>
-    .contact-container {
-        display: flex;
-        flex-direction: column;
-        gap: 8px; /* लाइनहरू बीचको दुरी */
-    }
-
-    .contact-link {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: black;
-        font-family: sans-serif;
-        font-size: 14px;
-        text-decoration: none;
-    }
-    
-    .svg-icon {
-        width: 18px;
-        height: 18px;
-        fill: black;
-    }
-
-    .rotate-right { transform: rotate(45deg); }
-</style>
-
-
-
-
-
-
-   <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaule Store - Live Order Status</title>
-    <style>
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-        }
-        body { 
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            padding: 0; 
-            background: transparent !important; /* Background purai transparent ra fix */
-        }
-        
-        .main-wrapper {
-            width: 100%;
-            max-width: 1200px; 
-            margin: 0 auto;
-            background: transparent !important;
-        }
-
-        .table-container { 
-            width: 100%; 
-            background: transparent !important; /* Container ko background pani hataeko */
-            padding: 0; 
-            border-radius: 0; 
-            box-shadow: none !important; 
-            border: none !important;
-            overflow-x: auto; 
-        }
-        
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            font-size: 11px; 
-            background: transparent !important;
-        }
-        
-        th, td { 
-            padding: 10px 8px; 
-            white-space: nowrap; 
-            text-align: left;
-            background: transparent !important;
-        }
-
-        th { 
-            background: #333 !important; /* Header matra dark, aru kunai extra line chhaina */
-            color: white; 
-            font-size: 11px;
-            border: none !important;
-        }
-        
-        td { 
-            border-bottom: 1px solid #eee; /* Table rows ko normal separator line matra */
-        }
-        
-        h3 { 
-            text-align: center; 
-            color: #333; 
-            font-size: 16px; 
-            padding: 10px 8px;
-            background: transparent !important;
-            border: none !important;
-        }
-
-        /* Desktop view ko lagi */
-        @media (min-width: 768px) {
-            body { padding: 10px; }
-            table { font-size: 14px; }
-            th, td { padding: 12px 12px; }
-            h3 { 
-                text-align: center; 
-            }
-        }
-    </style>
-</head>
-<body>
-
-<div class="main-wrapper">
-    <h3>Latest Order</h3>
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Product</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="orderTableBody">
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-        authDomain: "gaule-top-up-center.firebaseapp.com",
-        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-        projectId: "gaule-top-up-center",
-        storageBucket: "gaule-top-up-center.firebasestorage.app",
-        messagingSenderId: "645605489690",
-        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-    };
-
-    function getTimeAgo(timestamp) {
-        if (!timestamp) return "";
-        const now = new Date().getTime();
-        const seconds = Math.floor((now - timestamp) / 1000);
-
-        if (seconds < 60) return "Just now";
-        
-        let interval = Math.floor(seconds / 31536000);
-        if (interval >= 1) return interval + " year" + (interval > 1 ? "s" : "") + " ago";
-        
-        interval = Math.floor(seconds / 2592000);
-        if (interval >= 1) return interval + " month" + (interval > 1 ? "s" : "") + " ago";
-        
-        interval = Math.floor(seconds / 86400);
-        if (interval >= 1) return interval + " day" + (interval > 1 ? "s" : "") + " ago";
-        
-        interval = Math.floor(seconds / 3600);
-        if (interval >= 1) return interval + " hour" + (interval > 1 ? "s" : "") + " ago";
-        
-        interval = Math.floor(seconds / 60);
-        return interval + " minute" + (interval > 1 ? "s" : "") + " ago";
-    }
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    
-    onValue(ref(db, 'orders'), (snapshot) => {
-        const data = snapshot.val();
-        const tbody = document.getElementById('orderTableBody');
-        tbody.innerHTML = '';
-        
-        if (!data) return;
-
-        const ordersArray = Object.keys(data).map(key => data[key]);
-        const recentOrders = ordersArray.reverse().slice(0, 10);
-        
-        recentOrders.forEach(o => {
-            let statusColor = '#999';
-            if (o.status.toLowerCase() === 'pending') statusColor = '#FFC107';
-            else if (o.status.toLowerCase() === 'rejected') statusColor = '#F44336';
-            else if (o.status.toLowerCase() === 'complete') statusColor = '#4CAF50';
-            else if (o.status.toLowerCase() === 'refunded') statusColor = '#9E9E9E';
-            
-            tbody.innerHTML += `
-                <tr>
-                    <td>${o.name}</td>
-                    <td>${o.product}</td>
-                    <td>${getTimeAgo(o.timestamp)}</td>
-                    <td style="color: ${statusColor}; font-weight: bold;">${o.status.toUpperCase()}</td>
-                </tr>
-            `;
-        });
-    });
-</script>
-</body>
-</html>
-  
-
-                    
-
-    
-
-
-
-<br>
-
-
-  
-
-<style>
-    /* डिजाइन मात्र परिवर्तन गरिएको छ */
-    #review-container { 
-        background: #fff; 
-        padding: 25px; 
-        border-radius: 20px; 
-        box-shadow: 0 10px 25px rgba(0,0,0,0.06); 
-        margin-top: 20px; 
-        border: 1px solid #f5f5f5;
-    }
-    
-    #review-container h2 { text-align: center; color: #1a1a1a; margin-bottom: 20px; }
-
-    .btn-write { 
-        background: #000 !important; 
-        color: #fff !important; 
-        padding: 14px !important; 
-        width: 100%; 
-        border: none !important; 
-        border-radius: 12px !important; 
-        cursor: pointer; 
-        font-weight: 600; 
-        transition: 0.3s;
-    }
-    .btn-write:hover { background: #333 !important; }
-
-    /* स्टार सेलेक्सन र एनिमेशन */
-    .stars { display: flex; flex-direction: row-reverse; justify-content: center; gap: 8px; margin: 15px 0; }
-    .stars input { display: none; }
-    .stars label { font-size: 38px; color: #ddd; cursor: pointer; transition: 0.2s; }
-    .stars input:checked ~ label, .stars label:hover, .stars label:hover ~ label { color: #f4b400; transform: scale(1.1); }
-
-    #review-text { 
-        width: 100%; 
-        height: 70px; 
-        padding: 12px; 
-        border: 2px solid #eee; 
-        border-radius: 12px; 
-        box-sizing: border-box; 
-        transition: 0.3s;
-    }
-    #review-text:focus { border-color: #000; outline: none; }
-
-    #submit-review-btn { 
-        width: 100%; 
-        padding: 14px; 
-        margin-top: 15px; 
-        background: #dc2626; 
-        color: white; 
-        border: none; 
-        border-radius: 12px; 
-        cursor: pointer; 
-        font-weight: bold; 
-    }
-
-    /* रातो भएर हल्लिने (Shake) एनिमेशन */
-    @keyframes shake { 0%,100% {transform:translateX(0)} 25% {transform:translateX(-5px)} 75% {transform:translateX(5px)} }
-    .shake-error { animation: shake 0.4s ease-in-out; border: 2px solid red !important; }
-
-    /* सक्सेस पप-अप */
-    .success-animation { color: #166534; font-weight: bold; text-align: center; padding: 25px; background: #f0fdf4; border-radius: 15px; margin-top: 10px; border: 2px dashed #22c55e; }
-</style>
-
-<div class="container" id="review-container">
-    <h2>CUSTOMER REVIEWS</h2>
-    
-    <button class="btn-write" id="write-review-btn">
-        Write a Review
-    </button>
-     
-
-     
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Live Rating</title>
-
-<style>
-body{
-    margin:0;
-    font-family:Arial,sans-serif;
-}
-
-.rating-box{
-    display:inline-block;
-    text-align:center;
-}
-
-.star-wrap{
-    position:relative;
-    display:inline-block;
-    font-size:32px;
-    line-height:1;
-}
-
-.star-bg{
-    color:#e0e0e0;
-}
-
-.star-fill{
-    position:absolute;
-    top:0;
-    left:0;
-    color:#FFC107;
-    overflow:hidden;
-    white-space:nowrap;
-    width:0%;
-    transition:width .5s ease;
-}
-
-#ratingText{
-    margin-top:8px;
-    font-size:22px;
-    font-weight:bold;
-    color:#222;
-}
-
-#ratingText span{
-    font-size:15px;
-    color:#666;
-    font-weight:500;
-}
-</style>
-</head>
-<body>
-
-<div class="rating-box">
-    <div class="star-wrap">
-        <div class="star-bg">★★★★★</div>
-        <div class="star-fill" id="fill">★★★★★</div>
-    </div>
-
-    <div id="ratingText"></div>
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-  authDomain: "gaule-top-up-center.firebaseapp.com",
-  databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-  projectId: "gaule-top-up-center",
-  storageBucket: "gaule-top-up-center.firebasestorage.app",
-  messagingSenderId: "645605489690",
-  appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-const fill = document.getElementById("fill");
-const ratingText = document.getElementById("ratingText");
-
-onValue(ref(db,"reviews"),(snapshot)=>{
-
-    if(!snapshot.exists()){
-        ratingText.innerHTML = "<span>No Reviews</span>";
-        fill.style.width = "0%";
-        return;
-    }
-
-    let total = 0;
-    let sum = 0;
-
-    snapshot.forEach(child=>{
-        const review = child.val();
-        sum += Number(review.stars || 0);
-        total++;
-    });
-
-    const avg = total ? (sum / total) : 0;
-
-    fill.style.width = ((avg / 5) * 100) + "%";
-
-    ratingText.innerHTML = `
-        ${avg.toFixed(1)}
-        <span>(${total} Reviews)</span>
-    `;
-});
-</script>
-
-</body>
-</html>
-     
-     
-    <div id="review-form" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
-        <div class="stars" id="star-group">
-            <input type="radio" id="s5" name="rating" value="5"><label for="s5">★</label>
-            <input type="radio" id="s4" name="rating" value="4"><label for="s4">★</label>
-            <input type="radio" id="s3" name="rating" value="3"><label for="s3">★</label>
-            <input type="radio" id="s2" name="rating" value="2"><label for="s2">★</label>
-            <input type="radio" id="s1" name="rating" value="1"><label for="s1">★</label>
+        <div class="product-details">
+          <h1 class="product-title">Smile One Brazil</h1>
+          <div class="badges">
+            <span class="badge">1 - 5 Minutes Delivery</span>
+            <span class="badge global">
+              <svg class="badge-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+              Brazil / Nepal
+            </span>
+          </div>
+          <div class="rating-row">
+            <span class="rating-badge">★ 4.9</span>
+            <span style="font-size: 12px; color: #64748b;">350+ Orders</span>
+          </div>
         </div>
-        <textarea id="review-text" placeholder="Share your experience..."></textarea>
-        <button id="submit-review-btn">Submit Review</button>
+      </div>
+
+      <!-- Description Section -->
+      <p class="description">
+        Recharge Smile One Coins globally with instant delivery. Pay easily via eSewa, Khalti, Wallet or Bank Transfer<span class="full-text" id="fullDescription">. Get your coins transferred directly to your Email ID within 1-5 minutes with 100% guarantee & 24/7 support. No VPN required.</span> <span class="read-more-btn" onclick="toggleReadMore()" id="readMoreBtn">Read more ∨</span>
+      </p>
     </div>
-</div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    <!-- Package Title & Grid -->
+    <div class="section-title">SELECT A PACKAGE (NPR)</div>
+    <div class="package-grid" id="packagesGrid"></div>
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-        authDomain: "gaule-top-up-center.firebaseapp.com",
-        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-        projectId: "gaule-top-up-center",
-        storageBucket: "gaule-top-up-center.firebasestorage.app",
-        messagingSenderId: "645605489690",
-        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-    };
+    <!-- Order Information Section -->
+    <div class="order-info-card">
+      <div class="order-title">📋 ORDER INFORMATION</div>
+      <div class="account-details-box">
+        <div class="account-header">
+          <div class="account-icon">💳</div>
+          <div class="account-text">
+            <h4>Enter your account details</h4>
+            <p>We deliver directly to this Email ID</p>
+          </div>
+        </div>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    const provider = new GoogleAuthProvider();
+        <!-- Email ID Input Field -->
+        <div class="form-group">
+          <label class="form-label">
+            Email ID <span class="required-tag">Required</span>
+          </label>
+          <input type="text" id="userEmailInput" class="form-input" placeholder="Enter your Email ID (e.g. user@gmail.com)" />
+          <div id="uidError" class="error-text">Please enter a valid Gmail address (e.g. user@gmail.com).</div>
+        </div>
 
-    document.getElementById("write-review-btn").addEventListener("click", async () => {
-        if (!auth.currentUser) {
-            try { await signInWithPopup(auth, provider); } 
-            catch (e) { alert("Login failed!"); return; }
-        }
-        document.getElementById("review-form").style.display = "block";
-        document.getElementById("write-review-btn").style.display = "none";
-    });
-
-    document.getElementById("submit-review-btn").addEventListener("click", () => {
-        const user = auth.currentUser;
-        const rating = document.querySelector('input[name="rating"]:checked');
-        const text = document.getElementById("review-text");
-
-        let isError = false;
-
-        if (!rating) {
-            document.getElementById("star-group").classList.add("shake-error");
-            isError = true;
-        } else {
-            document.getElementById("star-group").classList.remove("shake-error");
-        }
-
-        if (!text.value.trim()) {
-            text.classList.add("shake-error");
-            isError = true;
-        } else {
-            text.classList.remove("shake-error");
-        }
-
-        if (isError) return;
-
-        const btn = document.getElementById("submit-review-btn");
-        btn.innerText = "Submitting...";
-        btn.disabled = true;
-
-        push(ref(db, 'reviews/'), {
-            userId: user.uid,
-            name: user.displayName,
-            photo: user.photoURL,
-            email: user.email,
-            stars: rating.value,
-            comment: text.value,
-            timestamp: new Date().toLocaleString(),
-            orderCompleted: false,
-            reply: ""
-        }).then(() => {
-            document.getElementById("review-container").innerHTML = `<div class="success-animation">Thank You For Review✨</div>`;
-        });
-    });
-</script>
-
-
-<div id="reviews-container" style="width: 100%; font-family: 'Poppins', sans-serif;">
-    <div id="reviews" style="display: flex; flex-direction: column; gap: 12px; width: 100%;"></div>
-
-    <div style="text-align:center; margin-top: 15px;">
-        <button id="moreBtn" style="background: #ffffff; color: #111; padding: 10px 24px; font-size: 13px; font-weight: 600; border-radius: 30px; border: 1px solid #e5e7eb; box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; display: none;">
-            More Reviews
+        <!-- MAIN ACTION BUTTON -->
+        <button class="btn-buy-now login-btn" id="mainActionBtn" onclick="handleMainAction()">
+          <svg class="btn-svg" viewBox="0 0 24 24">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+            <polyline points="10 17 15 12 10 7"></polyline>
+            <line x1="15" y1="12" x2="3" y2="12"></line>
+          </svg>
+          <span id="mainBtnText">LOGIN TO BUY</span>
         </button>
+      </div>
     </div>
-</div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    <!-- Tab Description Section -->
+    <div class="tabs-section">
+      <div class="tab-header">
+        <div class="tab-item active">Description</div>
+        <div class="tab-item">Reviews <span class="tab-rating">★ 4.9 • 350+</span></div>
+      </div>
+      <div class="tab-content">
+        <h3 style="font-size: 14.5px; font-weight: 700; color: #0f172a; margin-bottom: 5px;">Smile One Coins Recharge – Brazil Top-Up</h3>
+        <p>Boost your experience instantly with fast & secure top-ups. Direct credit via Wallet, eSewa, Khalti & Bank Transfer.</p>
+      </div>
+    </div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-  authDomain: "gaule-top-up-center.firebaseapp.com",
-  databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-  projectId: "gaule-top-up-center",
-  storageBucket: "gaule-top-up-center.firebasestorage.app",
-  messagingSenderId: "645605489690",
-  appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-};
+  </div>
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const auth = getAuth(app);
+  <!-- PAYMENT & SCAN QR MODAL -->
+  <div class="modal-overlay" id="paymentModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">Payment Method Selection</div>
+        <button class="modal-close" onclick="closeModal('paymentModal')">&times;</button>
+      </div>
 
-let isAdmin = false;
-let showAll = false;
-let allReviews = [];
-
-window.sendReply = (reviewId) => {
-    const replyText = prompt("रिप्लाई लेख्नुहोस्:");
-    if (replyText !== null && replyText.trim() !== "") {
-        update(ref(db, 'reviews/' + reviewId), { reply: replyText.trim() });
-    }
-};
-
-window.deleteReview = (reviewId) => {
-    if (confirm("के you यो review मेटाउन चाहनुहुन्छ?")) {
-        remove(ref(db, 'reviews/' + reviewId));
-    }
-};
-
-function timeAgo(timestamp) {
-    if (!timestamp) return "";
-    
-    let timeMs;
-    if (typeof timestamp === 'number') {
-        timeMs = timestamp < 10000000000 ? timestamp * 1000 : timestamp;
-    } else if (typeof timestamp === 'string') {
-        const match = timestamp.match(/(\d{2})\/(\d{2})\/(\d{4}),?\s*(\d{2}):(\d{2}):(\d{2})/);
-        if (match) {
-            const day = parseInt(match[1], 10);
-            const month = parseInt(match[2], 10) - 1;
-            const year = parseInt(match[3], 10);
-            const hour = parseInt(match[4], 10);
-            const minute = parseInt(match[5], 10);
-            const second = parseInt(match[6], 10);
-            timeMs = new Date(year, month, day, hour, minute, second).getTime();
-        } else {
-            const parsed = Date.parse(timestamp);
-            timeMs = isNaN(parsed) ? Date.now() : parsed;
-        }
-    } else {
-        timeMs = Date.now();
-    }
-
-    if (isNaN(timeMs)) return "";
-
-    const seconds = Math.floor((Date.now() - timeMs) / 1000);
-    if (seconds < 15) return "Just now";
-    
-    let interval = seconds / 31536000;
-    if (interval > 1) return Math.floor(interval) + (Math.floor(interval) === 1 ? " year ago" : " years ago");
-    
-    interval = seconds / 2592000;
-    if (interval > 1) return Math.floor(interval) + (Math.floor(interval) === 1 ? " month ago" : " months ago");
-    
-    interval = seconds / 86400;
-    if (interval > 1) {
-        const days = Math.floor(interval);
-        return days === 1 ? "1 day ago" : days + " days ago";
-    }
-    
-    interval = seconds / 3600;
-    if (interval > 1) {
-        const hours = Math.floor(interval);
-        return hours === 1 ? "1 hour ago" : hours + " hours ago";
-    }
-    
-    interval = seconds / 60;
-    if (interval > 1) {
-        const minutes = Math.floor(interval);
-        return minutes === 1 ? "1 minute ago" : minutes + " minutes ago";
-    }
-    
-    return seconds + " seconds ago";
-}
-
-function isUserAlreadyVerified(userId, email) {
-    if (email === "gaulestore.np@gmail.com") return true;
-    return allReviews.some(r => r.userId === userId && r.orderCompleted === true);
-}
-
-onAuthStateChanged(auth, (user) => {
-    isAdmin = user?.email === "gaulestore.np@gmail.com";
-    renderReviews();
-});
-
-function renderReviews() {
-    const reviewsDiv = document.getElementById("reviews");
-    const moreBtn = document.getElementById("moreBtn");
-    reviewsDiv.innerHTML = "";
-    const reviewsToShow = showAll ? allReviews : allReviews.slice(0, 3);
-    
-    const blueBadge = `<svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:#065fd4; margin-left:4px; flex-shrink: 0;"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zM9.8 17.3l-4.2-4.2 1.4-1.4 2.8 2.8 7.3-7.3 1.4 1.4-8.7 8.7z"></path></svg>`;
-    const blackBadge = `<svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:#111111; margin-left:4px; flex-shrink: 0;"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zM9.8 17.3l-4.2-4.2 1.4-1.4 2.8 2.8 7.3-7.3 1.4 1.4-8.7 8.7z"></path></svg>`;
-
-    reviewsToShow.forEach(review => {
-        const photo = review.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.name || "U")}&background=e2e8f0&color=1e293b`;
-        const isOwner = review.email === "gaulestore.np@gmail.com";
-        const alreadyVerified = isUserAlreadyVerified(review.userId, review.email);
-        const starCount = Number(review.stars || 5);
-        const starsDisplay = `<span style="color:#f59e0b; font-size:12px; letter-spacing: 2px;">${"★".repeat(starCount)}</span>`;
-        const timeDisplay = timeAgo(review.timestamp);
-        
-        const replySection = review.reply ? `
-        <div style="margin-top: 10px; padding: 10px 14px; background: #f8fafc; border-radius: 10px; font-size: 13px; width: 100%; box-sizing: border-box;">
-            <div style="display:flex; align-items:center; gap:6px; margin-bottom: 4px;">
-                <img src="owner.png" style="width:20px; height:20px; border-radius:50%; object-fit:cover;">
-                <span style="font-weight:600; font-size:11px; color:#065fd4; display:flex; align-items:center;">
-                    <span style="color:#111111;">GAULE</span><span style="color:#ef4444; margin-left:3px;">STORE</span> ${blueBadge}
-                </span>
-            </div>
-            <div style="color: #334155; line-height: 1.4;">${review.reply}</div>
-        </div>` : "";
-
-        // Premium Admin Panel UI
-        const adminPanel = isAdmin ? `
-        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed #e2e8f0;">
-            <button onclick="sendReply('${review.id}')" style="display: flex; align-items: center; gap: 5px; padding: 6px 14px; font-size: 11px; font-weight: 600; cursor: pointer; background: linear-gradient(135deg, #0ea5e9, #0284c7); color: #fff; border: none; border-radius: 8px; box-shadow: 0 2px 6px rgba(14, 165, 233, 0.25); transition: opacity 0.2s;">
-                <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: #ffffff;"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
-                ${review.reply ? 'Edit Reply' : 'Reply'}
-            </button>
-            <button onclick="deleteReview('${review.id}')" style="display: flex; align-items: center; gap: 5px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; border: none; border-radius: 8px; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25); transition: opacity 0.2s;">
-                <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: #ffffff;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                Delete
-            </button>
-        </div>` : "";
-
-        reviewsDiv.innerHTML += `
-        <div style="background: #ffffff; border: 1px solid #f1f5f9; padding: 16px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); width: 100%; box-sizing: border-box;">
-            <div style="display:flex; align-items:flex-start; justify-content: space-between; gap: 10px;">
-                <div style="display:flex; align-items:center; gap: 10px;">
-                    <img src="${photo}" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0;">
-                    <div>
-                        <div style="font-size: 14px; font-weight: 600; color: #0f172a; display: flex; align-items: center;">
-                            ${review.name || "User"} ${alreadyVerified ? (isOwner ? blueBadge : blackBadge) : ""}
-                        </div>
-                        <div style="margin-top: 2px;">${starsDisplay}</div>
-                    </div>
-                </div>
-                <div style="font-size: 11px; color: #94a3b8; white-space: nowrap; margin-top: 2px;">
-                    ${timeDisplay}
-                </div>
-            </div>
-            <div style="margin-top: 10px; font-size: 13px; color: #475569; line-height: 1.5; word-break: break-word;">
-                ${review.comment || ""}
-            </div>
-            ${replySection}
-            ${adminPanel}
+      <!-- Order Summary -->
+      <div class="summary-box">
+        <div class="summary-row">
+          <span>Target Email ID:</span>
+          <span class="summary-val" id="summaryId">-</span>
         </div>
-        `;
-    });
+        <div class="summary-row">
+          <span>Selected Package:</span>
+          <span class="summary-val" id="summaryCoins">-</span>
+        </div>
+        <div class="summary-row">
+          <span>Total Amount:</span>
+          <span class="summary-val" style="color: #ea580c;" id="summaryPrice">-</span>
+        </div>
+      </div>
 
-    moreBtn.style.display = allReviews.length > 3 ? "inline-block" : "none";
-    moreBtn.innerText = showAll ? "Less Reviews" : "More Reviews";
-}
+      <!-- Payment Method Selection -->
+      <div class="form-label" style="margin-bottom: 6px; font-size: 13px;">Select Payment Method <span class="required-tag">Required</span></div>
+      <div class="pay-methods-grid">
+        <!-- Wallet (SVG) -->
+        <div class="pay-method-item selected" onclick="selectPayMethod(this, 'Wallet', 'wallet', '')">
+          <span class="pay-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
+              <path d="M4 6v12a2 2 0 0 0 2 2h14v-4"></path>
+              <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path>
+            </svg>
+          </span>
+          <span class="pay-name">Wallet</span>
+        </div>
 
-document.getElementById("moreBtn").onclick = () => { showAll = !showAll; renderReviews(); };
+        <!-- eSewa (Pure SVG Logo) -->
+        <div class="pay-method-item" onclick="selectPayMethod(this, 'eSewa', '9800000000', 'esewa.png')">
+          <span class="pay-icon">
+            <svg viewBox="0 0 24 24" fill="#42C154">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M7 12l3 3 7-7" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="pay-name">eSewa</span>
+        </div>
 
-onValue(ref(db, "reviews"), (snapshot) => {
-    allReviews = [];
-    snapshot.forEach(child => { 
-        let data = child.val();
-        data.id = child.key;
-        allReviews.push(data); 
-    });
-    allReviews.reverse();
-    renderReviews();
-});
-</script>
+        <!-- Khalti (Pure SVG Logo) -->
+        <div class="pay-method-item" onclick="selectPayMethod(this, 'Khalti', '9761081110', 'khalti.png')">
+          <span class="pay-icon">
+            <svg viewBox="0 0 24 24" fill="#5C2D91">
+              <rect x="2" y="4" width="20" height="16" rx="3" />
+              <path d="M7 8h10M7 12h7M7 16h4" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="pay-name">Khalti</span>
+        </div>
 
+        <!-- Bank Transfer (SVG) -->
+        <div class="pay-method-item" onclick="selectPayMethod(this, 'Bank Transfer', '09810017577496', 'bank.png')">
+          <span class="pay-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"></path>
+            </svg>
+          </span>
+          <span class="pay-name">Bank</span>
+        </div>
+      </div>
 
+      <!-- Dynamic Payment View -->
+      <div id="walletPayContainer" class="wallet-box">
+        <div class="wallet-balance-title">Wallet Balance</div>
+        <div class="wallet-balance-amt">Rs <span id="userWalletBalance">0</span>.00</div>
+        <div class="wallet-info-text" id="walletStatusText">Checking login & balance...</div>
+      </div>
 
+      <div id="qrPayContainer" class="modal-qr-box" style="display: none;">
+        <div style="font-size: 13px; font-weight: 700; color: #0f172a;" id="qrTitle">Scan QR Code</div>
+        <img id="modalQrImage" class="qr-image" src="" alt="Payment QR Code">
+        <div style="font-size: 12px; color: #64748b;">
+          Pay Amount: <strong id="qrPayAmount" style="color: #ea580c;">Rs 20</strong><br>
+          Account Number / ID:<br>
+          <span class="qr-acc-no" id="modalAccNo">9761081110</span><br>
+          Name: <strong>Roshan Tamang</strong>
+        </div>
+      </div>
 
+      <!-- Transaction ID Input -->
+      <div class="form-group" id="txGroup" style="margin-bottom: 12px; display: none;">
+        <label class="form-label" style="font-size: 13px;">
+          Transaction / Reference ID <span class="required-tag">Required</span>
+        </label>
+        <input type="text" id="txIdInput" class="form-input" style="padding: 12px 14px;" placeholder="TxID rakhnuhos (e.g. 05829104)" />
+        <div id="txError" class="error-text">Please enter the Transaction ID.</div>
+      </div>
 
-     <br>
+      <button class="btn-buy-now" id="confirmPayBtn" style="padding: 13px;" onclick="submitPayment()">CONFIRM PAYMENT</button>
+    </div>
+  </div>
 
+  <!-- SUCCESS CONFIRMATION MODAL -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal-card" style="text-align: center;">
+      <div class="success-icon">✓</div>
+      <h2 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Order Submitted!</h2>
+      <p style="font-size: 13px; color: #64748b; line-height: 1.4; margin-bottom: 16px;">
+        Tapai ko order submit bhayo! Coins 1-5 minutes bhitra transfer hunechha.
+      </p>
 
+      <div class="summary-box" style="text-align: left; margin-bottom: 16px;">
+        <div class="summary-row">
+          <span>Order ID:</span>
+          <span class="summary-val" id="successOrderId">#GL-94821</span>
+        </div>
+        <div class="summary-row">
+          <span>Email ID:</span>
+          <span class="summary-val" id="successIdText" style="color: #ea580c;">-</span>
+        </div>
+        <div class="summary-row">
+          <span>Coins:</span>
+          <span class="summary-val" id="successCoins">300 Coin (30 BRL)</span>
+        </div>
+        <div class="summary-row">
+          <span>Paid Via:</span>
+          <span class="summary-val" id="successMethod">Wallet</span>
+        </div>
+        <div class="summary-row" id="successTxRow">
+          <span>TxID / Ref:</span>
+          <span class="summary-val" id="successTxId">WAL-PAY</span>
+        </div>
+        <div class="summary-row">
+          <span>Total Price:</span>
+          <span class="summary-val" style="color: #ea580c;" id="successPrice">Rs 20</span>
+        </div>
+        <div class="summary-row" style="margin-top: 6px; border-top: 1px dashed #e2e8f0; padding-top: 6px;">
+          <span>Status:</span>
+          <span class="status-badge">Pending</span>
+        </div>
+      </div>
 
+      <button class="btn-buy-now" style="padding: 13px;" onclick="closeModal('successModal')">BACK TO HOME</button>
+    </div>
+  </div>
 
+  <!-- CUSTOM ALERT / ERROR MODAL -->
+  <div class="modal-overlay" id="customAlertModal">
+    <div class="modal-card" style="text-align: center; max-width: 360px;">
+      <div id="alertIconBox" style="width: 48px; height: 48px; background: #fee2e2; color: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px auto;">✕</div>
+      <h2 id="alertTitle" style="font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Login Failed</h2>
+      <p id="alertMessage" style="font-size: 13px; color: #64748b; line-height: 1.4; margin-bottom: 18px;">
+        The popup has been closed by the user.
+      </p>
+      <button class="btn-buy-now" style="padding: 12px; background: linear-gradient(135deg, #f97316, #ea580c);" onclick="closeModal('customAlertModal')">back</button>
+    </div>
+  </div>
 
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+      authDomain: "gaule-top-up-center.firebaseapp.com",
+      databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+      projectId: "gaule-top-up-center",
+      storageBucket: "gaule-top-up-center.firebasestorage.app",
+      messagingSenderId: "645605489690",
+      appId: "1:645605489690:web:0b0f2898d295be03c1e5a3",
+      measurementId: "G-M7BY3PQM3H"
+    };
 
-
-<h3 style="text-align: center; font-family: sans-serif; color: black;">Contact Us</h3>
-
-<div style="display: flex; justify-content: center; gap: 20px; align-items: center; padding: 10px;">
-    <!-- Facebook (#1877F2) -->
-    <a href="https://www.facebook.com/gauletopupcenter" target="_blank" style="color: #1877F2; display: flex;">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
-    </a>
-
-    <!-- YouTube (#FF0000) -->
-    <a href="https://www.youtube.com/@GAULE_STORE" target="_blank" style="color: #FF0000; display: flex;">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-    </a>
-
-    <!-- TikTok (#000000) -->
-    <a href="https://www.tiktok.com/@gaule_gaming_official" target="_blank" style="color: #000000; display: flex;">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.68h-3.13v12.4a2.67 2.67 0 1 1-2.67-2.67c.21 0 .41.02.61.07V8.64a5.8 5.8 0 0 0-.61-.03A5.8 5.8 0 1 0 15.82 14V8.72a7.93 7.93 0 0 0 4.64 1.48V6.69h-.87z"/></svg>
-    </a>
-
-    <!-- WhatsApp (#25D366) -->
-    <a href="https://chat.whatsapp.com/GqvRSSHyEvG1u1w1OqPmVa" target="_blank" style="color: #25D366; display: flex;">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-    </a>
-
-    <!-- Email (#D44638) -->
-    <a href="mailto:gaulestore.np@gmail.com" target="_blank" style="color: #D44638; display: flex;">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-    </a>
-</div>
-
-
-
-         
-         
-  <hr style="border:0; border-top:1px solid #ddd; margin:15px 0 0px;">
-
-<footer class="footer">
-    <p class="copyright">
-        &copy; 2026 Gaule Store. All rights reserved.
-    </p>
-
-    <div class="footer-links">
-        <a href="faq/">FAQ</a> <span class="pipe">|</span> 
-        <a href="about/">About</a> <span class="pipe">|</span> 
-        <a href="refund/">Refund Policy</a> <span class="pipe">|</span>
-        <br class="mobile-break">
-        <a href="terms/">Terms and Conditions</a> <span class="pipe">|</span>
-        <br class="mobile-break">
-        <a href="privacy/">Privacy Policy</a>
-        <p align="center" style="color: #666666;">
-  Developed by <a href="https://yourwebsite.com" target="_blank" style="color: #000000; font-weight: bold; text-decoration: none;">Gaule Bro</a>
-</p>
-
- </div>
-</footer>
-
-<style>
-.footer {
-    text-align: center;
-    padding: 15px 20px;
-    font-family: Arial, sans-serif;
-}
-
-.copyright {
-    color: #777;
-    font-size: 14px;
-    margin-bottom: 15px;
-}
-
-.footer-links {
-    font-size: 14px;
-    line-height: 2.2; 
-}
-
-.footer-links a {
-    color: #777;
-    text-decoration: none;
-}
-
-.footer-links a:hover {
-    color: #000;
-}
-
-.footer-links .pipe {
-    color: #ccc;
-    margin: 0 8px;
-}
-
-/* 💻 PC (Desktop) को लागि SPECIFIC DESIGN */
-@media (min-width: 768px) {
-    .footer-links {
-        line-height: 1.5; /* PC मा टम्म मिलेको ग्याप */
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
     }
+    const db = firebase.database();
+    const auth = firebase.auth();
+
+    const packagesData = [
+      { coins: "300 Coin", brl: "30 BRL", npr: "Rs 20", priceVal: 20 },
+      { coins: "600 Coin", brl: "60 BRL", npr: "Rs 140", priceVal: 140 },
+      { coins: "5000 Coin", brl: "500 BRL", npr: "Rs 510", priceVal: "510" },
+      { coins: "50000 Coin", brl: "5000 BRL", npr: "Rs 1,400", priceVal: 1400 },      
+      { coins: "1000 Coin", brl: "100 BRL", npr: "Rs 420", priceVal: 420 },
+      { coins: "10000 Coin", brl: "1000 BRL", npr: "Rs 870", priceVal: 870 }
+    ];
+
+    let selectedPackage = packagesData[0];
+    let selectedPaymentMethod = "Wallet";
+    let selectedPaymentAccount = "wallet";
+    let selectedQrImage = "";
     
-    /* PC मा मोबाइलको लाइन ब्रेक (<br>) लाई गायब बनाइदिने */
-    .mobile-break {
-        display: none;
+    let currentUserUid = null;
+    let currentUserName = "Guest";
+    let currentUserBalance = 0;
+    let isUserLoggedIn = false;
+
+    // Listen to Firebase Auth state
+    auth.onAuthStateChanged((user) => {
+      const mainBtn = document.getElementById('mainActionBtn');
+      const btnText = document.getElementById('mainBtnText');
+      
+      if (user) {
+        isUserLoggedIn = true;
+        currentUserUid = user.uid;
+        currentUserName = user.displayName || "User";
+        
+        mainBtn.classList.remove('login-btn');
+        btnText.innerText = "BUY NOW";
+        mainBtn.querySelector('svg').innerHTML = `
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        `;
+        
+        db.ref(`users/${currentUserUid}/balance`).on('value', (snapshot) => {
+          if (snapshot.exists()) {
+            currentUserBalance = Number(snapshot.val());
+            document.getElementById('userWalletBalance').innerText = currentUserBalance.toLocaleString();
+            document.getElementById('walletStatusText').innerText = "Amount will be automatically deducted from your store wallet.";
+          } else {
+            currentUserBalance = 0;
+            document.getElementById('userWalletBalance').innerText = "0";
+            document.getElementById('walletStatusText').innerText = "Wallet balance not found.";
+          }
+        });
+      } else {
+        isUserLoggedIn = false;
+        currentUserUid = null;
+        currentUserName = "Guest";
+        currentUserBalance = 0;
+        
+        mainBtn.classList.add('login-btn');
+        btnText.innerText = "LOGIN TO BUY";
+        mainBtn.querySelector('svg').innerHTML = `
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+          <polyline points="10 17 15 12 10 7"></polyline>
+          <line x1="15" y1="12" x2="3" y2="12"></line>
+        `;
+
+        document.getElementById('userWalletBalance').innerText = "0";
+        document.getElementById('walletStatusText').innerText = "Please log in with Google to use wallet balance.";
+      }
+    });
+
+    function handleMainAction() {
+      if (!isUserLoggedIn) {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider).then((result) => {
+          const user = result.user;
+          const userRef = db.ref(`users/${user.uid}`);
+          userRef.once('value').then((snapshot) => {
+            if (!snapshot.exists()) {
+              userRef.set({
+                email: user.email,
+                name: user.displayName || "User",
+                balance: 0
+              });
+            }
+          });
+          showCustomAlert("Success", "Login Successful!", "success");
+        }).catch((error) => {
+          console.error("Google Login Error:", error);
+          
+          let errorMsg = "Login garna sakiyena. Kripaya pheri prayas garnuhos.";
+          if (error.code === 'auth/popup-closed-by-user') {
+            errorMsg = "Login popup bandh garieko cha. Kripaya login complete garnuhos.";
+          } else if (error.code === 'auth/network-request-failed') {
+            errorMsg = "Please TyAgain";
+          } else {
+            errorMsg = error.message;
+          }
+          
+          showCustomAlert("Login Failed", errorMsg, "error");
+        });
+      } else {
+        openPaymentModal();
+      }
     }
-}
-</style>
 
+    function showCustomAlert(title, message, type = "error") {
+      document.getElementById('alertTitle').innerText = title;
+      document.getElementById('alertMessage').innerText = message;
+      
+      const iconBox = document.getElementById('alertIconBox');
+      if (type === "success") {
+        iconBox.style.background = "#dcfce7";
+        iconBox.style.color = "#16a34a";
+        iconBox.innerHTML = "✓";
+      } else {
+        iconBox.style.background = "#fee2e2";
+        iconBox.style.color = "#dc2626";
+        iconBox.innerHTML = "✕";
+      }
+      
+      document.getElementById('customAlertModal').classList.add('active');
+    }
 
+    function toggleReadMore() {
+      const fullText = document.getElementById('fullDescription');
+      const btn = document.getElementById('readMoreBtn');
 
+      if (fullText.style.display === 'inline') {
+        fullText.style.display = 'none';
+        btn.innerText = 'Read more ∨';
+      } else {
+        fullText.style.display = 'inline';
+        btn.innerText = 'Show less ∧';
+      }
+    }
+
+    function renderPackages() {
+      const grid = document.getElementById('packagesGrid');
+      grid.innerHTML = packagesData.map((pkg, index) => `
+        <div class="package-card ${index === 0 ? 'selected' : ''}" onclick="selectPackage(this, ${index})">
+          <div class="coin-amount-wrapper">
+            <div class="coin-amount">${pkg.coins}</div>
+            <div class="brl-text">(${pkg.brl})</div>
+          </div>
+          <div class="price-container">
+            <div class="price-npr">${pkg.npr}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function selectPackage(element, index) {
+      document.querySelectorAll('.package-card').forEach(c => c.classList.remove('selected'));
+      element.classList.add('selected');
+      selectedPackage = packagesData[index];
+    }
+
+    function openPaymentModal() {
+      const emailInput = document.getElementById('userEmailInput').value.trim().toLowerCase();
+      const uidError = document.getElementById('uidError');
+
+      if (!emailInput || !emailInput.endsWith('@gmail.com')) {
+        uidError.innerText = "Please enter a valid Gmail address (e.g. user@gmail.com).";
+        uidError.style.display = 'block';
+        return;
+      }
+      uidError.style.display = 'none';
+
+      document.getElementById('summaryId').innerText = emailInput;
+      document.getElementById('summaryCoins').innerText = selectedPackage.coins + " (" + selectedPackage.brl + ")";
+      document.getElementById('summaryPrice').innerText = selectedPackage.npr;
+
+      updateModalPaymentView();
+      document.getElementById('paymentModal').classList.add('active');
+    }
+
+    function selectPayMethod(element, name, account, qrUrl) {
+      document.querySelectorAll('.pay-method-item').forEach(m => m.classList.remove('selected'));
+      element.classList.add('selected');
+      selectedPaymentMethod = name;
+      selectedPaymentAccount = account;
+      selectedQrImage = qrUrl;
+      updateModalPaymentView();
+    }
+
+    function updateModalPaymentView() {
+      const walletBox = document.getElementById('walletPayContainer');
+      const qrBox = document.getElementById('qrPayContainer');
+      const txGroup = document.getElementById('txGroup');
+
+      if (selectedPaymentAccount === 'wallet') {
+        walletBox.style.display = 'block';
+        qrBox.style.display = 'none';
+        txGroup.style.display = 'none';
+      } else {
+        walletBox.style.display = 'none';
+        qrBox.style.display = 'block';
+        txGroup.style.display = 'block';
+
+        document.getElementById('qrTitle').innerText = `Scan ${selectedPaymentMethod} QR Code`;
+        document.getElementById('modalAccNo').innerText = selectedPaymentAccount;
+        document.getElementById('qrPayAmount').innerText = selectedPackage.npr;
+        
+        document.getElementById('modalQrImage').src = selectedQrImage;
+      }
+    }
+
+    function submitPayment() {
+      const emailInput = document.getElementById('userEmailInput').value.trim();
+      let txId = "";
+      const packagePrice = Number(selectedPackage.priceVal);
+
+      if (selectedPaymentAccount === 'wallet') {
+        if (!currentUserUid) {
+          showCustomAlert("Error", "Kripaya pahile Google Login garnuhos!", "error");
+          return;
+        }
+        if (currentUserBalance < packagePrice) {
+          showCustomAlert("Insufficient Balance", "Tapai ko wallet ma balance pugena! Kripaya balance top-up garnuhos.", "error");
+          return;
+        }
+        txId = "Wallet Paid";
+      } else {
+        txId = document.getElementById('txIdInput').value.trim();
+        const txError = document.getElementById('txError');
+
+        if (!txId) {
+          txError.style.display = 'block';
+          return;
+        }
+        txError.style.display = 'none';
+      }
+
+      const btn = document.getElementById('confirmPayBtn');
+      btn.innerText = "PROCESSING...";
+      btn.disabled = true;
+
+      const randomOrderNum = Math.floor(10000 + Math.random() * 90000);
+      const randomOrderCode = `#GL-${randomOrderNum}`;
+
+      const now = new Date();
+      const formattedDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+      const formattedTime = now.toTimeString().split(' ')[0];
+
+      const orderData = {
+        orderId: randomOrderCode,
+        name: currentUserName,
+        email: emailInput,
+        authEmail: emailInput,
+        voucherCode: "",
+        product: `Smile One - ${selectedPackage.coins} (${selectedPackage.brl})`,
+        amountDue: packagePrice,
+        paymentMethod: selectedPaymentAccount === 'wallet' ? 'Wallet Paid' : selectedPaymentMethod,
+        transactionId: txId,
+        userId: currentUserUid || "Guest",
+        status: "Pending",
+        date: formattedDate,
+        time: formattedTime,
+        timestamp: Date.now()
+      };
+
+      const finalizeOrder = () => {
+        db.ref("orders").push(orderData).then(() => {
+          btn.innerText = "CONFIRM PAYMENT";
+          btn.disabled = false;
+
+          document.getElementById('successIdText').innerText = emailInput;
+          document.getElementById('successOrderId').innerText = randomOrderCode;
+          document.getElementById('successCoins').innerText = selectedPackage.coins + " (" + selectedPackage.brl + ")";
+          document.getElementById('successPrice').innerText = selectedPackage.npr;
+          document.getElementById('successMethod').innerText = selectedPaymentMethod;
+          document.getElementById('successTxId').innerText = txId;
+
+          closeModal('paymentModal');
+          document.getElementById('successModal').classList.add('active');
+
+          document.getElementById('txIdInput').value = '';
+        }).catch((error) => {
+          console.error("Firebase save error:", error);
+          showCustomAlert("Error", "Order Submit Huna Sakena! Kripaya punah prayas garnuhos.", "error");
+          btn.innerText = "CONFIRM PAYMENT";
+          btn.disabled = false;
+        });
+      };
+
+      if (selectedPaymentAccount === 'wallet') {
+        const newBalance = currentUserBalance - packagePrice;
+        db.ref(`users/${currentUserUid}`).update({ balance: newBalance }).then(() => {
+          finalizeOrder();
+        }).catch((err) => {
+          console.error("Wallet deduction error:", err);
+          showCustomAlert("Error", "Wallet balance deduct garna sakiyena.", "error");
+          btn.innerText = "CONFIRM PAYMENT";
+          btn.disabled = false;
+        });
+      } else {
+        finalizeOrder();
+      }
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    window.onload = function() {
+      renderPackages();
+    };
+  </script>
+</html>
 
 
 
 
 
 <br>
-<br>
-<br>
+
 <div class="bottom-nav">
-    <a href="index.html" class="nav-item">
+    <a href="../../index.html" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
         <span>Home</span>
     </a>
-    <a href="index.html" class="nav-item">
+    <a href="../../shop.html" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
         <span>Shop</span>
     </a>
-    <a href="order/" class="nav-item">
+    <a href="my-wallet" class="nav-item">
+        <!-- New Center Wallet Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
+            <path d="M4 6v12a2 2 0 0 0 2 2h14v-4"></path>
+            <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path>
+        </svg>
+        <span>Wallet</span>
+    </a>
+    <a href="../../order/" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         <span>Order</span>
     </a>
-    <a href="account/" class="nav-item">
+    <a href="../../account/" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         <span>Account</span>
     </a>
-
-
 </div>
-
-
-
 
 <style>
     .bottom-nav {
@@ -1470,7 +1606,7 @@ onValue(ref(db, "reviews"), (snapshot) => {
         fill: none;
     }
 
-    /* Active huda yellow hatauna ra dark color (mathi jastai) banauna */
+    /* Active nav item style */
     .bottom-nav .nav-item.active {
         color: #333333; 
     }
@@ -1483,279 +1619,15 @@ onValue(ref(db, "reviews"), (snapshot) => {
 
         navItems.forEach(item => {
             const href = item.getAttribute('href');
-            // Remove trailing slashes for clean matching
             const cleanHref = href.replace(/\.\./g, '').replace(/\/+/g, '/');
             
             if (cleanHref !== "/" && currentPath.includes(cleanHref)) {
                 navItems.forEach(nav => nav.classList.remove('active'));
                 item.classList.add('active');
             } else if (cleanHref === "/" && (currentPath === "/" || currentPath.endsWith("index.html"))) {
-                // Home page ko lagi condition
                 navItems.forEach(nav => nav.classList.remove('active'));
                 item.classList.add('active');
             }
         });
     });
 </script>
-
-
-
-
-
-
-<!-- === START: Modern Floating Chat Widget (Clickable "Need Help?" Label) === -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<style>
-    .chat-widget-container {
-        position: fixed;
-        bottom: 90px;
-        right: 20px;
-        z-index: 9999;
-        font-family: sans-serif;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    /* Side Need Help Label - Clickable with pointer */
-    .chat-help-label {
-        background: #ffffff;
-        color: #374151;
-        font-size: 13px;
-        font-weight: 600;
-        padding: 6px 12px;
-        border-radius: 20px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e5e7eb;
-        white-space: nowrap;
-        cursor: pointer;
-        transition: background 0.2s, color 0.2s;
-        animation: fadeInUp 0.3s ease;
-    }
-
-    .chat-help-label:hover {
-        background: #4f46e5;
-        color: #ffffff;
-    }
-
-    /* Main Floating Button - Border pulse animation */
-    .modern-chat-btn {
-        background: #ffffff;
-        color: #4f46e5;
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        text-decoration: none;
-        border: 2px solid #4f46e5;
-        cursor: pointer;
-        transition: background 0.3s, color 0.3s;
-        position: relative;
-        z-index: 2;
-        animation: borderPulse 1.8s infinite cubic-bezier(0.4, 0, 0.6, 1);
-    }
-
-    @keyframes borderPulse {
-        0% {
-            box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.6);
-        }
-        70% {
-            box-shadow: 0 0 0 12px rgba(79, 70, 229, 0);
-        }
-        100% {
-            box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
-        }
-    }
-
-    /* Notification Badge */
-    .modern-chat-btn .badge {
-        display: none; 
-        position: absolute;
-        top: 0px;
-        right: 0px;
-        background: #ef4444;
-        color: white;
-        font-size: 9px;
-        font-weight: bold;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        align-items: center;
-        justify-content: center;
-        border: 2px solid #ffffff;
-    }
-
-    .modern-chat-btn.has-notification .badge {
-        display: flex;
-    }
-
-    .modern-chat-btn:hover {
-        background: #4f46e5;
-        color: #ffffff;
-        animation: none;
-        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
-    }
-
-    /* Popup Options Menu Box */
-    .chat-popup-menu {
-        position: absolute;
-        bottom: 60px;
-        right: 0;
-        display: none;
-        flex-direction: column;
-        gap: 10px;
-        border: none;
-        animation: fadeInUp 0.3s ease;
-        z-index: 1;
-        padding-bottom: 10px;
-    }
-
-    .chat-popup-menu.active {
-        display: flex;
-    }
-
-    /* Option Item with Circle Icon and Name */
-    .chat-option-row {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 10px;
-        text-decoration: none;
-        opacity: 0;
-        transform: translateY(20px);
-        transition: all 0.3s ease;
-    }
-
-    .chat-popup-menu.active .chat-option-row {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    /* Circular Icon Style */
-    .chat-circle-icon {
-        background: #ffffff;
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
-        font-size: 18px;
-        border: 2px solid #e5e7eb;
-    }
-
-    /* Name Label Style inside popup */
-    .chat-name-label {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(5px);
-        color: #374151;
-        font-size: 13px;
-        font-weight: 600;
-        padding: 5px 12px;
-        border-radius: 20px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        white-space: nowrap;
-    }
-
-    /* Brand Colors */
-    .chat-option-row.whatsapp .chat-circle-icon { color: #25D366; border-color: #25D366; }
-    .chat-option-row.whatsapp:hover .chat-circle-icon { background: #25D366; color: #ffffff; }
-
-    .chat-option-row.messenger .chat-circle-icon { color: #0084FF; border-color: #0084FF; }
-    .chat-option-row.messenger:hover .chat-circle-icon { background: #0084FF; color: #ffffff; }
-
-    .chat-option-row.livechat .chat-circle-icon { color: #4f46e5; border-color: #4f46e5; }
-    .chat-option-row.livechat:hover .chat-circle-icon { background: #4f46e5; color: #ffffff; }
-
-    @keyframes fadeInUp {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-</style>
-
-<div class="chat-widget-container" id="chatWidgetContainer">
-    <!-- Popup Options Menu -->
-    <div class="chat-popup-menu" id="chatPopupMenu">
-        <!-- WhatsApp (9761081110) -->
-        <a href="https://wa.me/9779761081110?text=Hello%20Gaule%20Store,%20I%20need%20help!" target="_blank" class="chat-option-row whatsapp">
-            <span class="chat-name-label">WhatsApp</span>
-            <div class="chat-circle-icon"><i class="fa-brands fa-whatsapp"></i></div>
-        </a>
-
-        <!-- Messenger (gauletopupcenter) -->
-        <a href="https://m.me/gauletopupcenter" target="_blank" class="chat-option-row messenger">
-            <span class="chat-name-label">Messenger</span>
-            <div class="chat-circle-icon"><i class="fa-brands fa-facebook-messenger"></i></div>
-        </a>
-        
-        <!-- Live Chat -->
-        <a href="https://roshantamang2.com.np/support/live-chat" class="chat-option-row livechat">
-            <span class="chat-name-label">Live Chat</span>
-            <div class="chat-circle-icon"><i class="fa-solid fa-headset"></i></div>
-        </a>
-    </div>
-
-    <!-- Side Label (Now Clickable) -->
-    <div class="chat-help-label" id="chatHelpLabel">Need Help?</div>
-
-    <!-- Main Button -->
-    <div class="modern-chat-btn" id="chatButton" title="Chat Options">
-        <i class="fa-solid fa-headset" id="mainIcon"></i>
-        <span class="badge">1</span>
-    </div>
-</div>
-
-<script>
-    const hasNewMessage = true;
-    const chatWidget = document.getElementById('chatWidgetContainer');
-    const chatBtn = document.getElementById('chatButton');
-    const chatHelpLabel = document.getElementById('chatHelpLabel');
-    const chatMenu = document.getElementById('chatPopupMenu');
-    const mainIcon = document.getElementById('mainIcon');
-    const isClicked = localStorage.getItem('chatClicked');
-
-    if (hasNewMessage && !isClicked) {
-        chatBtn.classList.add('has-notification');
-    }
-
-    function closeChatMenu() {
-        chatMenu.classList.remove('active');
-        mainIcon.classList.remove('fa-xmark');
-        mainIcon.classList.add('fa-headset');
-    }
-
-    // Common toggle function for both button and label
-    function toggleChatMenu(e) {
-        e.stopPropagation();
-        
-        localStorage.setItem('chatClicked', 'true');
-        chatBtn.classList.remove('has-notification');
-
-        if (chatMenu.classList.contains('active')) {
-            closeChatMenu();
-        } else {
-            chatMenu.classList.add('active');
-            mainIcon.classList.remove('fa-headset');
-            mainIcon.classList.add('fa-xmark');
-        }
-    }
-
-    chatBtn.addEventListener('click', toggleChatMenu);
-    chatHelpLabel.addEventListener('click', toggleChatMenu);
-
-    window.addEventListener('click', function(e) {
-        if (!chatWidget.contains(e.target)) {
-            closeChatMenu();
-        }
-    });
-
-    chatMenu.addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
-</script>
-<!-- === END: Modern Floating Chat Widget === -->
