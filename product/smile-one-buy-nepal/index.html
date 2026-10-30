@@ -1137,7 +1137,7 @@
           </div>
           <div class="rating-row">
             <span class="rating-badge" id="headerRatingDisplay">★ 4.9</span>
-            <span style="font-size: 12px; color: #64748b;" id="headerTotalOrders">96+ Orders</span>
+            <span style="font-size: 12px; color: #64748b;" id="headerTotalOrders">97+ Orders</span>
           </div>
         </div>
       </div>
@@ -1189,7 +1189,7 @@
     <div class="tabs-section">
       <div class="tab-header">
         <div class="tab-item active" onclick="switchTab(0)">Description</div>
-        <div class="tab-item" onclick="switchTab(1)">Reviews <span class="tab-rating" id="tabRatingBadge">★ 4.9 • 96+</span></div>
+        <div class="tab-item" onclick="switchTab(1)">Reviews <span class="tab-rating" id="tabRatingBadge">★ 4.9 • 97+</span></div>
       </div>
 
       <!-- Tab 1: Description -->
@@ -1804,7 +1804,7 @@
 
       // Update ratings average
       let avgRating = (totalRatingSum / reviews.length).toFixed(1);
-      let totalCount = reviews.length + 96; // including default reviews count
+      let totalCount = reviews.length + 97; // including default reviews count
       
       document.getElementById('headerRatingDisplay').innerText = `★ ${avgRating}`;
       document.getElementById('headerTotalOrders').innerText = `${totalCount}+ Orders`;
