@@ -1413,6 +1413,15 @@ onValue(ref(db, "reviews"), (snapshot) => {
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
         <span>Shop</span>
     </a>
+    <a href="my-wallet" class="nav-item">
+        <!-- New Center Wallet Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
+            <path d="M4 6v12a2 2 0 0 0 2 2h14v-4"></path>
+            <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path>
+        </svg>
+        <span>Wallet</span>
+    </a>
     <a href="order/" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         <span>Order</span>
@@ -1421,12 +1430,7 @@ onValue(ref(db, "reviews"), (snapshot) => {
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         <span>Account</span>
     </a>
-
-
 </div>
-
-
-
 
 <style>
     .bottom-nav {
@@ -1470,7 +1474,7 @@ onValue(ref(db, "reviews"), (snapshot) => {
         fill: none;
     }
 
-    /* Active huda yellow hatauna ra dark color (mathi jastai) banauna */
+    /* Active nav item style */
     .bottom-nav .nav-item.active {
         color: #333333; 
     }
@@ -1483,14 +1487,12 @@ onValue(ref(db, "reviews"), (snapshot) => {
 
         navItems.forEach(item => {
             const href = item.getAttribute('href');
-            // Remove trailing slashes for clean matching
             const cleanHref = href.replace(/\.\./g, '').replace(/\/+/g, '/');
             
             if (cleanHref !== "/" && currentPath.includes(cleanHref)) {
                 navItems.forEach(nav => nav.classList.remove('active'));
                 item.classList.add('active');
             } else if (cleanHref === "/" && (currentPath === "/" || currentPath.endsWith("index.html"))) {
-                // Home page ko lagi condition
                 navItems.forEach(nav => nav.classList.remove('active'));
                 item.classList.add('active');
             }
