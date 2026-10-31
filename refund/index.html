@@ -1,1305 +1,181 @@
-<html lang="ne">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Firebase JS SDK (v9 Compatibility Mode) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      -webkit-user-select: none;
-      user-select: none;
-    }
-
-    input {
-      -webkit-user-select: text;
-      user-select: text;
-    }
-
-    body {
-      background-color: #f8fafc;
-      color: #1e293b;
-      min-height: 100vh;
-      width: 100%;
-      padding-bottom: 40px;
-    }
-
-    .container {
-      width: 100% !important;
-      max-width: 100% !important;
-      background: #ffffff;
-      min-height: 100vh;
-      position: relative;
-    }
-
-    /* Product Section */
-    .product-section {
-      padding: 24px 30px;
-      width: 100%;
-    }
-
-    .product-header {
-      display: flex;
-      gap: 18px;
-      margin-bottom: 16px;
-    }
-
-    .app-icon {
-      width: 84px;
-      height: 84px;
-      border-radius: 18px;
-      background: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      flex-shrink: 0;
-      overflow: hidden;
-      position: relative;
-      border: 1px solid #f1f5f9;
-    }
-
-    .app-icon img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-
-    .product-details {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .product-title {
-      font-size: 20px;
-      font-weight: 800;
-      color: #0f172a;
-      margin-top: 6px;
-      margin-bottom: 6px;
-      line-height: 1.2;
-    }
-
-    .badges {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      background: #fff7ed;
-      color: #ea580c;
-      border: 1px solid #ffedd5;
-    }
-
-    .badge.global {
-      background: #eff6ff;
-      color: #2563eb;
-      border: 1px solid #dbeafe;
-    }
-
-    .badge-svg {
-      width: 14px;
-      height: 14px;
-      stroke-width: 2.2;
-      stroke: currentColor;
-      fill: none;
-    }
-
-    .rating-row {
-      margin-top: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .rating-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 10px;
-      border-radius: 12px;
-      background: #fefce8;
-      border: 1px solid #fef08a;
-      font-size: 12px;
-      font-weight: 600;
-      color: #ca8a04;
-    }
-
-    .description {
-      font-size: 14px;
-      color: #64748b;
-      line-height: 1.5;
-      margin-top: 12px;
-    }
-
-    .full-text {
-      display: none;
-    }
-
-    .read-more-btn {
-      color: #f97316;
-      cursor: pointer;
-      font-weight: 600;
-      user-select: none;
-      display: inline;
-      margin-left: 4px;
-      white-space: nowrap;
-    }
-
-    /* Package Section */
-    .section-title {
-      font-size: 13px;
-      font-weight: 800;
-      color: #94a3b8;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin: 20px 30px 12px 30px;
-    }
-
-    .package-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      padding: 0 30px;
-      width: 100%;
-    }
-
-    .package-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-      min-height: 56px;
-    }
-
-    .package-card:hover, .package-card.selected {
-      border-color: #f97316;
-      background: #fffaf5;
-      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
-    }
-
-    .coin-amount-wrapper {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .coin-amount {
-      font-size: 13px;
-      font-weight: 700;
-      color: #0f172a;
-    }
-
-    .brl-text {
-      font-size: 11px;
-      color: #334155;
-      font-weight: 600;
-      margin-top: 1px;
-    }
-
-    .price-container {
-      margin-left: 8px;
-      text-align: right;
-    }
-
-    .price-npr {
-      font-size: 13px;
-      font-weight: 800;
-      color: #ea580c;
-      white-space: nowrap;
-    }
-
-    /* Order Information Section */
-    .order-info-card {
-      margin: 24px 30px;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
-      width: calc(100% - 60px);
-    }
-
-    .order-title {
-      font-size: 14px;
-      font-weight: 800;
-      color: #475569;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .account-details-box {
-      border: 1px solid #fed7aa;
-      background: #fffaf5;
-      border-radius: 12px;
-      padding: 16px;
-      width: 100%;
-    }
-
-    .account-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .account-icon {
-      width: 36px;
-      height: 36px;
-      background: #ffedd5;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ea580c;
-      font-size: 18px;
-    }
-
-    .account-text h4 {
-      font-size: 15px;
-      font-weight: 700;
-      color: #0f172a;
-    }
-
-    .account-text p {
-      font-size: 12px;
-      color: #64748b;
-    }
-
-    .form-group {
-      margin-bottom: 16px;
-      width: 100%;
-    }
-
-    .form-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      color: #0f172a;
-      margin-bottom: 8px;
-    }
-
-    .required-tag {
-      font-size: 10px;
-      background: #ffedd5;
-      color: #ea580c;
-      padding: 2px 7px;
-      border-radius: 8px;
-      font-weight: 600;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 14px 16px;
-      border: 1px solid #cbd5e1;
-      border-radius: 10px;
-      font-size: 15px;
-      outline: none;
-      background: #ffffff;
-      transition: border-color 0.2s;
-    }
-
-    .form-input:focus {
-      border-color: #f97316;
-    }
-
-    .btn-buy-now {
-      width: 100%;
-      background: linear-gradient(135deg, #f97316, #ea580c);
-      color: white;
-      border: none;
-      padding: 15px;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: background 0.3s ease;
-    }
-
-    .btn-buy-now.login-btn {
-      background: linear-gradient(135deg, #dc2626, #b91c1c);
-      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
-    }
-
-    .btn-buy-now:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
-    .btn-svg {
-      width: 18px;
-      height: 18px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2.2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .error-text {
-      color: #dc2626;
-      font-size: 11px;
-      margin-top: 4px;
-      display: none;
-    }
-
-    /* Tabs Section */
-    .tabs-section {
-      padding: 0 30px;
-      margin-top: 24px;
-      margin-bottom: 24px;
-      width: 100%;
-    }
-
-    .tab-header {
-      display: flex;
-      gap: 20px;
-      border-bottom: 2px solid #f1f5f9;
-      margin-bottom: 14px;
-    }
-
-    .tab-item {
-      padding-bottom: 10px;
-      font-size: 15px;
-      font-weight: 700;
-      color: #64748b;
-      cursor: pointer;
-      position: relative;
-    }
-
-    .tab-item.active {
-      color: #f97316;
-    }
-
-    .tab-item.active::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 0;
-      width: 100%;
-      height: 3px;
-      background: #f97316;
-      border-radius: 3px 3px 0 0;
-    }
-
-    .tab-rating {
-      font-size: 11px;
-      background: #fefce8;
-      color: #ca8a04;
-      padding: 2px 6px;
-      border-radius: 8px;
-      border: 1px solid #fef08a;
-      margin-left: 4px;
-    }
-
-    .tab-content {
-      font-size: 14px;
-      color: #475569;
-      line-height: 1.6;
-    }
-
-    /* Modal Overlay */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(4px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-      padding: 16px;
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .modal-card {
-      background: #ffffff;
-      width: 100%;
-      max-width: 440px;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-      transform: translateY(20px);
-      transition: all 0.3s ease;
-      max-height: 92vh;
-      overflow-y: auto;
-    }
-
-    .modal-overlay.active .modal-card {
-      transform: translateY(0);
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #f1f5f9;
-      padding-bottom: 10px;
-      margin-bottom: 14px;
-    }
-
-    .modal-title {
-      font-size: 16px;
-      font-weight: 800;
-      color: #0f172a;
-    }
-
-    .modal-close {
-      background: #f1f5f9;
-      border: none;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      font-size: 16px;
-      color: #64748b;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .summary-box {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 14px;
-    }
-
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      margin-bottom: 5px;
-      color: #64748b;
-    }
-
-    .summary-row:last-child {
-      margin-bottom: 0;
-    }
-
-    .summary-val {
-      font-weight: 700;
-      color: #0f172a;
-    }
-
-    .pay-methods-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-
-    .pay-method-item {
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 10px 4px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: #ffffff;
-    }
-
-    .pay-method-item:hover, .pay-method-item.selected {
-      border-color: #f97316;
-      background: #fffaf5;
-      box-shadow: 0 2px 6px rgba(249, 115, 22, 0.15);
-    }
-
-    .pay-icon {
-      font-size: 18px;
-      margin-bottom: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 24px;
-    }
-
-    .pay-icon svg {
-      width: 22px;
-      height: 22px;
-    }
-
-    .pay-name {
-      font-size: 10.5px;
-      font-weight: 700;
-      color: #1e293b;
-      margin-top: 2px;
-      display: block;
-    }
-
-    .modal-qr-box {
-      background: #ffffff;
-      border: 1px dashed #f97316;
-      border-radius: 12px;
-      padding: 14px;
-      text-align: center;
-      margin-bottom: 14px;
-    }
-
-    .qr-image {
-      width: 130px;
-      height: 130px;
-      border-radius: 6px;
-      border: 1px solid #e2e8f0;
-      padding: 4px;
-      margin: 8px auto;
-      object-fit: contain;
-    }
-
-    .qr-acc-no {
-      font-size: 13px;
-      font-weight: 800;
-      color: #ea580c;
-      background: #fff7ed;
-      padding: 2px 8px;
-      border-radius: 6px;
-      display: inline-block;
-      margin-top: 2px;
-    }
-
-    .wallet-box {
-      background: #fff7ed;
-      border: 1px solid #fed7aa;
-      border-radius: 12px;
-      padding: 14px;
-      text-align: center;
-      margin-bottom: 14px;
-    }
-
-    .wallet-balance-title {
-      font-size: 11.5px;
-      color: #ea580c;
-      font-weight: 700;
-      text-transform: uppercase;
-      margin-bottom: 2px;
-    }
-
-    .wallet-balance-amt {
-      font-size: 18px;
-      font-weight: 800;
-      color: #0f172a;
-      margin-bottom: 6px;
-    }
-
-    .wallet-info-text {
-      font-size: 11.5px;
-      color: #64748b;
-    }
-
-    .success-icon {
-      width: 50px;
-      height: 50px;
-      background: #dcfce7;
-      color: #16a34a;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      margin: 0 auto 12px auto;
-    }
-
-    .status-badge {
-      display: inline-block;
-      padding: 2px 8px;
-      background: #fef3c7;
-      color: #d97706;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    /* Mobile Optimization */
-    @media (max-width: 600px) {
-      .product-section {
-        padding: 16px;
-      }
-      .product-header {
-        gap: 12px;
-        margin-bottom: 12px;
-      }
-      .app-icon {
-        width: 70px;
-        height: 70px;
-        border-radius: 14px;
-      }
-      .product-title {
-        font-size: 15px;
-      }
-      .badge {
-        padding: 3px 8px;
-        font-size: 10.5px;
-      }
-      .rating-badge {
-        font-size: 10.5px;
-        padding: 2px 8px;
-      }
-      .description {
-        font-size: 12.5px;
-        margin-top: 10px;
-      }
-      .section-title {
-        font-size: 11.5px;
-        margin: 16px 16px 10px 16px;
-      }
-      .package-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-        padding: 0 16px;
-      }
-      .package-card {
-        padding: 10px 10px;
-        min-height: 48px;
-        border-radius: 10px;
-      }
-      .coin-amount {
-        font-size: 11.5px;
-      }
-      .brl-text {
-        font-size: 10px;
-      }
-      .price-npr {
-        font-size: 11.5px;
-      }
-      .order-info-card {
-        margin: 20px 16px;
-        padding: 16px;
-        width: calc(100% - 32px);
-        border-radius: 14px;
-      }
-      .order-title {
-        font-size: 12px;
-        margin-bottom: 12px;
-      }
-      .account-details-box {
-        padding: 12px;
-      }
-      .account-header {
-        gap: 10px;
-        margin-bottom: 12px;
-      }
-      .account-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 15px;
-      }
-      .account-text h4 {
-        font-size: 13px;
-      }
-      .account-text p {
-        font-size: 10.5px;
-      }
-      .form-group {
-        margin-bottom: 12px;
-      }
-      .form-label {
-        font-size: 12px;
-        margin-bottom: 6px;
-      }
-      .form-input {
-        padding: 11px 14px;
-        font-size: 13px;
-        border-radius: 8px;
-      }
-      .btn-buy-now {
-        padding: 12px;
-        font-size: 14px;
-        border-radius: 8px;
-      }
-      .tabs-section {
-        padding: 0 16px;
-        margin-top: 20px;
-        margin-bottom: 20px;
-      }
-      .tab-item {
-        font-size: 13.5px;
-        padding-bottom: 8px;
-      }
-      .tab-content {
-        font-size: 13px;
-      }
-      .pay-methods-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-  </style>
+    <link rel="canonical" href="https://roshantamang2.com.np/" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaule Store | Fast & Secure Gaming Top Up in Nepal</title>
+    <meta property="og:image" content="https://roshantamang2.com.np/owner.png">
+    <link rel="icon" href="owner.png" type="image/png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="description" content="Gaule Store provides fast and secure gaming top-up services in Nepal.">
+    <meta property="og:site_name" content="Gaule Store">
+    <meta property="og:title" content="Gaule Store - Trusted Gaming Top Up Nepal">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Gaule Store",
+      "alternateName": "GAULE STORE",
+      "url": "https://roshantamang2.com.np"
+    }
+    </script>
+     
+    <style>
+        body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; }
+        .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #dc2626; justify-content: space-between; }
+        .menu-icon { font-size: 28px; cursor: pointer; }
+        #nav-menu { display: none; position: absolute; top: 0; left: 0; background: #fff; border: 1px solid #ccc; padding: 20px; width: 250px; height: 100%; z-index: 1000; box-shadow: 2px 2px 10px #ccc; }
+        .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-btn { font-size: 30px; cursor: pointer; color: #dc2626; }
+        .search-box { display: flex; gap: 5px; margin-bottom: 20px; }
+        #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
+        
+        /* Header Wallet Button Style */
+        .header-wallet {
+            display: none; /* Login भएपछि JS ले flex बनाउँछ */
+            align-items: center;
+            gap: 5px;
+            background-color: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #dc2626;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .header-wallet:hover {
+            background-color: #fee2e2;
+        }
+        .header-wallet svg {
+            width: 16px;
+            height: 16px;
+            fill: #dc2626;
+        }
+
+        #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; }
+        #profile-dropdown { display: none; position: absolute; top: 50px; right: 0; background: white; border: 1px solid #ccc; padding: 15px; width: 200px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); border-radius: 8px; text-align: center; z-index: 1000; }
+        .user-name { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+        .user-email { font-size: 12px; color: #666; margin-bottom: 10px; }
+        .change-name { font-size: 11px; color: #dc2626; text-decoration: none; display: block; margin-bottom: 15px; }
+        .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; cursor: pointer; border-radius: 4px; width: 100%; }
+        #nav-menu a { display: block; padding: 12px 0; color: black; text-decoration: none; border-bottom: 1px solid #eee; }
+        
+        /* Store Title Logo Link */
+        .store-title { font-size: 1.5rem; font-weight: bold; color: black; text-decoration: none; }
+        .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
+    </style>
 </head>
 <body>
 
-  <div class="container">
-    <!-- Product Info Section -->
-    <div class="product-section">
-      <div class="product-header">
-        <div class="app-icon">
-          <img src="smile_one.png" alt="Smile One">
-        </div>
-        <div class="product-details">
-          <h1 class="product-title">Smile One Brazil</h1>
-          <div class="badges">
-            <span class="badge">1 - 5 Minutes Delivery</span>
-            <span class="badge global">
-              <svg class="badge-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="2" y1="12" x2="22" y2="12"></line>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-              </svg>
-              Brazil / Nepal
-            </span>
-          </div>
-          <div class="rating-row">
-            <span class="rating-badge">★ 4.9</span>
-            <span style="font-size: 12px; color: #64748b;">350+ Orders</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Description Section -->
-      <p class="description">
-        Recharge Smile One Coins globally with instant delivery. Pay easily via eSewa, Khalti, Wallet or Bank Transfer<span class="full-text" id="fullDescription">. Get your coins transferred directly to your Email ID within 1-5 minutes with 100% guarantee & 24/7 support. No VPN required.</span> <span class="read-more-btn" onclick="toggleReadMore()" id="readMoreBtn">Read more ∨</span>
-      </p>
-    </div>
-
-    <!-- Package Title & Grid -->
-    <div class="section-title">SELECT A PACKAGE (NPR)</div>
-    <div class="package-grid" id="packagesGrid"></div>
-
-    <!-- Order Information Section -->
-    <div class="order-info-card">
-      <div class="order-title">📋 ORDER INFORMATION</div>
-      <div class="account-details-box">
-        <div class="account-header">
-          <div class="account-icon">💳</div>
-          <div class="account-text">
-            <h4>Enter your account details</h4>
-            <p>We deliver directly to this Email ID</p>
-          </div>
-        </div>
-
-        <!-- Email ID Input Field -->
-        <div class="form-group">
-          <label class="form-label">
-            Email ID <span class="required-tag">Required</span>
-          </label>
-          <input type="text" id="userEmailInput" class="form-input" placeholder="Enter your Email ID (e.g. user@gmail.com)" />
-          <div id="uidError" class="error-text">Please enter a valid Gmail address (e.g. user@gmail.com).</div>
-        </div>
-
-        <!-- MAIN ACTION BUTTON -->
-        <button class="btn-buy-now login-btn" id="mainActionBtn" onclick="handleMainAction()">
-          <svg class="btn-svg" viewBox="0 0 24 24">
-            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-            <polyline points="10 17 15 12 10 7"></polyline>
-            <line x1="15" y1="12" x2="3" y2="12"></line>
-          </svg>
-          <span id="mainBtnText">LOGIN TO BUY</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Tab Description Section -->
-    <div class="tabs-section">
-      <div class="tab-header">
-        <div class="tab-item active">Description</div>
-        <div class="tab-item">Reviews <span class="tab-rating">★ 4.9 • 350+</span></div>
-      </div>
-      <div class="tab-content">
-        <h3 style="font-size: 14.5px; font-weight: 700; color: #0f172a; margin-bottom: 5px;">Smile One Coins Recharge – Brazil Top-Up</h3>
-        <p>Boost your experience instantly with fast & secure top-ups. Direct credit via Wallet, eSewa, Khalti & Bank Transfer.</p>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- PAYMENT & SCAN QR MODAL -->
-  <div class="modal-overlay" id="paymentModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div class="modal-title">Payment Method Selection</div>
-        <button class="modal-close" onclick="closeModal('paymentModal')">&times;</button>
-      </div>
-
-      <!-- Order Summary -->
-      <div class="summary-box">
-        <div class="summary-row">
-          <span>Target Email ID:</span>
-          <span class="summary-val" id="summaryId">-</span>
-        </div>
-        <div class="summary-row">
-          <span>Selected Package:</span>
-          <span class="summary-val" id="summaryCoins">-</span>
-        </div>
-        <div class="summary-row">
-          <span>Total Amount:</span>
-          <span class="summary-val" style="color: #ea580c;" id="summaryPrice">-</span>
-        </div>
-      </div>
-
-      <!-- Payment Method Selection -->
-      <div class="form-label" style="margin-bottom: 6px; font-size: 13px;">Select Payment Method <span class="required-tag">Required</span></div>
-      <div class="pay-methods-grid">
-        <!-- Wallet (SVG) -->
-        <div class="pay-method-item selected" onclick="selectPayMethod(this, 'Wallet', 'wallet', '')">
-          <span class="pay-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
-              <path d="M4 6v12a2 2 0 0 0 2 2h14v-4"></path>
-              <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path>
-            </svg>
-          </span>
-          <span class="pay-name">Wallet</span>
-        </div>
-
-        <!-- eSewa (Pure SVG Logo) -->
-        <div class="pay-method-item" onclick="selectPayMethod(this, 'eSewa', '9800000000', 'esewa.png')">
-          <span class="pay-icon">
-            <svg viewBox="0 0 24 24" fill="#42C154">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M7 12l3 3 7-7" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
-          <span class="pay-name">eSewa</span>
-        </div>
-
-        <!-- Khalti (Pure SVG Logo) -->
-        <div class="pay-method-item" onclick="selectPayMethod(this, 'Khalti', '9811111111', 'khalti.png')">
-          <span class="pay-icon">
-            <svg viewBox="0 0 24 24" fill="#5C2D91">
-              <rect x="2" y="4" width="20" height="16" rx="3" />
-              <path d="M7 8h10M7 12h7M7 16h4" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </span>
-          <span class="pay-name">Khalti</span>
-        </div>
-
-        <!-- Bank Transfer (SVG) -->
-        <div class="pay-method-item" onclick="selectPayMethod(this, 'Bank Transfer', '01920491823901', 'bank.png')">
-          <span class="pay-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"></path>
-            </svg>
-          </span>
-          <span class="pay-name">Bank</span>
-        </div>
-      </div>
-
-      <!-- Dynamic Payment View -->
-      <div id="walletPayContainer" class="wallet-box">
-        <div class="wallet-balance-title">Wallet Balance</div>
-        <div class="wallet-balance-amt">Rs <span id="userWalletBalance">0</span>.00</div>
-        <div class="wallet-info-text" id="walletStatusText">Checking login & balance...</div>
-      </div>
-
-      <div id="qrPayContainer" class="modal-qr-box" style="display: none;">
-        <div style="font-size: 13px; font-weight: 700; color: #0f172a;" id="qrTitle">Scan QR Code</div>
-        <img id="modalQrImage" class="qr-image" src="" alt="Payment QR Code">
-        <div style="font-size: 12px; color: #64748b;">
-          Pay Amount: <strong id="qrPayAmount" style="color: #ea580c;">Rs 20</strong><br>
-          Account Number / ID:<br>
-          <span class="qr-acc-no" id="modalAccNo">9800000000</span><br>
-          Name: <strong>Gaule Store Topup</strong>
-        </div>
-      </div>
-
-      <!-- Transaction ID Input -->
-      <div class="form-group" id="txGroup" style="margin-bottom: 12px; display: none;">
-        <label class="form-label" style="font-size: 13px;">
-          Transaction / Reference ID <span class="required-tag">Required</span>
-        </label>
-        <input type="text" id="txIdInput" class="form-input" style="padding: 12px 14px;" placeholder="TxID rakhnuhos (e.g. 05829104)" />
-        <div id="txError" class="error-text">Please enter the Transaction ID.</div>
-      </div>
-
-      <button class="btn-buy-now" id="confirmPayBtn" style="padding: 13px;" onclick="submitPayment()">CONFIRM PAYMENT</button>
-    </div>
-  </div>
-
-  <!-- SUCCESS CONFIRMATION MODAL -->
-  <div class="modal-overlay" id="successModal">
-    <div class="modal-card" style="text-align: center;">
-      <div class="success-icon">✓</div>
-      <h2 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Order Submitted!</h2>
-      <p style="font-size: 13px; color: #64748b; line-height: 1.4; margin-bottom: 16px;">
-        Tapai ko order submit bhayo! Coins 1-5 minutes bhitra transfer hunechha.
-      </p>
-
-      <div class="summary-box" style="text-align: left; margin-bottom: 16px;">
-        <div class="summary-row">
-          <span>Order ID:</span>
-          <span class="summary-val" id="successOrderId">#GL-94821</span>
-        </div>
-        <div class="summary-row">
-          <span>Email ID:</span>
-          <span class="summary-val" id="successIdText" style="color: #ea580c;">-</span>
-        </div>
-        <div class="summary-row">
-          <span>Coins:</span>
-          <span class="summary-val" id="successCoins">300 Coin (30 BRL)</span>
-        </div>
-        <div class="summary-row">
-          <span>Paid Via:</span>
-          <span class="summary-val" id="successMethod">Wallet</span>
-        </div>
-        <div class="summary-row" id="successTxRow">
-          <span>TxID / Ref:</span>
-          <span class="summary-val" id="successTxId">WAL-PAY</span>
-        </div>
-        <div class="summary-row">
-          <span>Total Price:</span>
-          <span class="summary-val" style="color: #ea580c;" id="successPrice">Rs 20</span>
-        </div>
-        <div class="summary-row" style="margin-top: 6px; border-top: 1px dashed #e2e8f0; padding-top: 6px;">
-          <span>Status:</span>
-          <span class="status-badge">Pending</span>
-        </div>
-      </div>
-
-      <button class="btn-buy-now" style="padding: 13px;" onclick="closeModal('successModal')">BACK TO HOME</button>
-    </div>
-  </div>
-
-  <script>
-    // Firebase Configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-      authDomain: "gaule-top-up-center.firebaseapp.com",
-      databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-      projectId: "gaule-top-up-center",
-      storageBucket: "gaule-top-up-center.firebasestorage.app",
-      messagingSenderId: "645605489690",
-      appId: "1:645605489690:web:0b0f2898d295be03c1e5a3",
-      measurementId: "G-M7BY3PQM3H"
-    };
-
-    // Initialize Firebase
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.database();
-    const auth = firebase.auth();
-
-    const packagesData = [
-      { coins: "300 Coin", brl: "30 BRL", npr: "Rs 20", priceVal: 20 },
-      { coins: "600 Coin", brl: "60 BRL", npr: "Rs 140", priceVal: 140 },
-      { coins: "5000 Coin", brl: "500 BRL", npr: "Rs 510", priceVal: "510" },
-      { coins: "50000 Coin", brl: "5000 BRL", npr: "Rs 1,400", priceVal: 1400 },      
-      { coins: "1000 Coin", brl: "100 BRL", npr: "Rs 420", priceVal: 420 },
-      { coins: "10000 Coin", brl: "1000 BRL", npr: "Rs 870", priceVal: 870 }
-    ];
-
-    let selectedPackage = packagesData[0];
-    let selectedPaymentMethod = "Wallet";
-    let selectedPaymentAccount = "wallet";
-    let selectedQrImage = "";
+<div class="header">
+    <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
     
-    let currentUserUid = null;
-    let currentUserName = "Guest";
-    let currentUserBalance = 0;
-    let isUserLoggedIn = false;
-
-    // Listen to Firebase Auth state
-    auth.onAuthStateChanged((user) => {
-      const mainBtn = document.getElementById('mainActionBtn');
-      const btnText = document.getElementById('mainBtnText');
-      
-      if (user) {
-        isUserLoggedIn = true;
-        currentUserUid = user.uid;
-        currentUserName = user.displayName || "User";
-        
-        mainBtn.classList.remove('login-btn');
-        btnText.innerText = "BUY NOW";
-        mainBtn.querySelector('svg').innerHTML = `
-          <circle cx="9" cy="21" r="1"></circle>
-          <circle cx="20" cy="21" r="1"></circle>
-          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-        `;
-        
-        db.ref(`users/${currentUserUid}/balance`).on('value', (snapshot) => {
-          if (snapshot.exists()) {
-            currentUserBalance = Number(snapshot.val());
-            document.getElementById('userWalletBalance').innerText = currentUserBalance.toLocaleString();
-            document.getElementById('walletStatusText').innerText = "Amount will be automatically deducted from your store wallet.";
-          } else {
-            currentUserBalance = 0;
-            document.getElementById('userWalletBalance').innerText = "0";
-            document.getElementById('walletStatusText').innerText = "Wallet balance not found.";
-          }
-        });
-      } else {
-        isUserLoggedIn = false;
-        currentUserUid = null;
-        currentUserName = "Guest";
-        currentUserBalance = 0;
-        
-        mainBtn.classList.add('login-btn');
-        btnText.innerText = "LOGIN TO BUY";
-        mainBtn.querySelector('svg').innerHTML = `
-          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-          <polyline points="10 17 15 12 10 7"></polyline>
-          <line x1="15" y1="12" x2="3" y2="12"></line>
-        `;
-
-        document.getElementById('userWalletBalance').innerText = "0";
-        document.getElementById('walletStatusText').innerText = "Please log in with Google to use wallet balance.";
-      }
-    });
-
-    function handleMainAction() {
-      if (!isUserLoggedIn) {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider).then((result) => {
-          const user = result.user;
-          const userRef = db.ref(`users/${user.uid}`);
-          userRef.once('value').then((snapshot) => {
-            if (!snapshot.exists()) {
-              userRef.set({
-                email: user.email,
-                name: user.displayName || "User",
-                balance: 0
-              });
-            }
-          });
-          alert("Login Successful!");
-        }).catch((error) => {
-          console.error("Google Login Error:", error);
-          alert("Login Failed: " + error.message);
-        });
-      } else {
-        openPaymentModal();
-      }
-    }
-
-    function toggleReadMore() {
-      const fullText = document.getElementById('fullDescription');
-      const btn = document.getElementById('readMoreBtn');
-
-      if (fullText.style.display === 'inline') {
-        fullText.style.display = 'none';
-        btn.innerText = 'Read more ∨';
-      } else {
-        fullText.style.display = 'inline';
-        btn.innerText = 'Show less ∧';
-      }
-    }
-
-    function renderPackages() {
-      const grid = document.getElementById('packagesGrid');
-      grid.innerHTML = packagesData.map((pkg, index) => `
-        <div class="package-card ${index === 0 ? 'selected' : ''}" onclick="selectPackage(this, ${index})">
-          <div class="coin-amount-wrapper">
-            <div class="coin-amount">${pkg.coins}</div>
-            <div class="brl-text">(${pkg.brl})</div>
-          </div>
-          <div class="price-container">
-            <div class="price-npr">${pkg.npr}</div>
-          </div>
+    <!-- Logo मा क्लिक गर्दा index.html (Home) खुल्ने बनाइएको छ -->
+    <a href="index.html" class="store-title">GAULE <span style="color:#dc2626;">STORE</span></a>
+    
+    <div class="header-right">
+        <div id="login-container" onclick="googleLogin()">
+            <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
-      `).join('');
-    }
 
-    function selectPackage(element, index) {
-      document.querySelectorAll('.package-card').forEach(c => c.classList.remove('selected'));
-      element.classList.add('selected');
-      selectedPackage = packagesData[index];
-    }
+        <!-- Login भएपछि profile को बायाँपट्टी देखिने Wallet Button -->
+        <a href="my-wallet/" id="header-wallet-btn" class="header-wallet">
+            <svg viewBox="0 0 24 24">
+                <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+            </svg>
+            <span>Rs. <span id="header-user-balance">0</span></span>
+        </a>
 
-    function openPaymentModal() {
-      const emailInput = document.getElementById('userEmailInput').value.trim().toLowerCase();
-      const uidError = document.getElementById('uidError');
+        <img id="profile-pic" onclick="toggleProfile()">
+        <div id="profile-dropdown">
+            <div id="display-name" class="user-name"></div>
+            <div id="display-email" class="user-email"></div>
+            <a href="https://myaccount.google.com/personal-info" target="_blank" class="change-name">Change Name</a>
+            <button class="logout-btn" onclick="logoutUser()">Logout</button>
+        </div>
+    </div>
+</div>
 
-      if (!emailInput || !emailInput.endsWith('@gmail.com')) {
-        uidError.innerText = "Please enter a valid Gmail address (e.g. user@gmail.com).";
-        uidError.style.display = 'block';
-        return;
-      }
-      uidError.style.display = 'none';
+<div id="nav-menu">
+    <div class="menu-header">
+        <span style="font-weight:bold;">Menu</span>
+        <span class="close-btn" onclick="toggleMenu()">&times;</span>
+    </div>
+    <div class="search-box">
+        <input type="text" id="gameSearch" placeholder="Search games..." onkeyup="filterGames()">
+        <button onclick="filterGames()">Search</button>
+    </div>
+    <div id="search-results" style="margin-bottom: 15px; max-height: 200px; overflow-y: auto;"></div>
+    <a href="index.html">Home</a>
+    <a href="shop/">Shop</a>
+    <a href="my-wallet/">My Wallet</a>
+    <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
+</div>
 
-      document.getElementById('summaryId').innerText = emailInput;
-      document.getElementById('summaryCoins').innerText = selectedPackage.coins + " (" + selectedPackage.brl + ")";
-      document.getElementById('summaryPrice').innerText = selectedPackage.npr;
+<div id="content-area" style="padding: 20px;"></div>
 
-      updateModalPaymentView();
-      document.getElementById('paymentModal').classList.add('active');
-    }
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    function selectPayMethod(element, name, account, qrUrl) {
-      document.querySelectorAll('.pay-method-item').forEach(m => m.classList.remove('selected'));
-      element.classList.add('selected');
-      selectedPaymentMethod = name;
-      selectedPaymentAccount = account;
-      selectedQrImage = qrUrl;
-      updateModalPaymentView();
-    }
-
-    function updateModalPaymentView() {
-      const walletBox = document.getElementById('walletPayContainer');
-      const qrBox = document.getElementById('qrPayContainer');
-      const txGroup = document.getElementById('txGroup');
-
-      if (selectedPaymentAccount === 'wallet') {
-        walletBox.style.display = 'block';
-        qrBox.style.display = 'none';
-        txGroup.style.display = 'none';
-      } else {
-        walletBox.style.display = 'none';
-        qrBox.style.display = 'block';
-        txGroup.style.display = 'block';
-
-        document.getElementById('qrTitle').innerText = `Scan ${selectedPaymentMethod} QR Code`;
-        document.getElementById('modalAccNo').innerText = selectedPaymentAccount;
-        document.getElementById('qrPayAmount').innerText = selectedPackage.npr;
-        
-        document.getElementById('modalQrImage').src = selectedQrImage;
-      }
-    }
-
-    function submitPayment() {
-      const emailInput = document.getElementById('userEmailInput').value.trim();
-      let txId = "";
-      const packagePrice = Number(selectedPackage.priceVal);
-
-      if (selectedPaymentAccount === 'wallet') {
-        if (!currentUserUid) {
-          alert("Kripaya pahile Google Login garnuhos!");
-          return;
-        }
-        if (currentUserBalance < packagePrice) {
-          alert("Tapai ko wallet ma balance pugena! Kripaya balance top-up garnuhos.");
-          return;
-        }
-        txId = "Wallet Paid";
-      } else {
-        txId = document.getElementById('txIdInput').value.trim();
-        const txError = document.getElementById('txError');
-
-        if (!txId) {
-          txError.style.display = 'block';
-          return;
-        }
-        txError.style.display = 'none';
-      }
-
-      const btn = document.getElementById('confirmPayBtn');
-      btn.innerText = "PROCESSING...";
-      btn.disabled = true;
-
-      const randomOrderNum = Math.floor(10000 + Math.random() * 90000);
-      const randomOrderCode = `#GL-${randomOrderNum}`;
-
-      const now = new Date();
-      const formattedDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
-      const formattedTime = now.toTimeString().split(' ')[0];
-
-      const orderData = {
-        orderId: randomOrderCode,
-        name: currentUserName,
-        email: emailInput,
-        authEmail: emailInput,
-        voucherCode: "",
-        product: `Smile One - ${selectedPackage.coins} (${selectedPackage.brl})`,
-        amountDue: packagePrice,
-        paymentMethod: selectedPaymentAccount === 'wallet' ? 'Wallet Paid' : selectedPaymentMethod,
-        transactionId: txId,
-        userId: currentUserUid || "Guest",
-        status: "Pending",
-        date: formattedDate,
-        time: formattedTime,
-        timestamp: Date.now()
-      };
-
-      const finalizeOrder = () => {
-        db.ref("orders").push(orderData).then(() => {
-          btn.innerText = "CONFIRM PAYMENT";
-          btn.disabled = false;
-
-          document.getElementById('successIdText').innerText = emailInput;
-          document.getElementById('successOrderId').innerText = randomOrderCode;
-          document.getElementById('successCoins').innerText = selectedPackage.coins + " (" + selectedPackage.brl + ")";
-          document.getElementById('successPrice').innerText = selectedPackage.npr;
-          document.getElementById('successMethod').innerText = selectedPaymentMethod;
-          document.getElementById('successTxId').innerText = txId;
-
-          closeModal('paymentModal');
-          document.getElementById('successModal').classList.add('active');
-
-          document.getElementById('txIdInput').value = '';
-        }).catch((error) => {
-          console.error("Firebase save error:", error);
-          alert("Order Submit Huna Sakena! Kripaya punah prayas garnuhos.");
-          btn.innerText = "CONFIRM PAYMENT";
-          btn.disabled = false;
-        });
-      };
-
-      if (selectedPaymentAccount === 'wallet') {
-        const newBalance = currentUserBalance - packagePrice;
-        db.ref(`users/${currentUserUid}`).update({ balance: newBalance }).then(() => {
-          finalizeOrder();
-        }).catch((err) => {
-          console.error("Wallet deduction error:", err);
-          alert("Wallet balance deduct garna sakiyena.");
-          btn.innerText = "CONFIRM PAYMENT";
-          btn.disabled = false;
-        });
-      } else {
-        finalizeOrder();
-      }
-    }
-
-    function closeModal(modalId) {
-      document.getElementById(modalId).classList.remove('active');
-    }
-
-    window.onload = function() {
-      renderPackages();
+    const firebaseConfig = {
+        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
+        authDomain: "roshantamang2.com.np",
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
+        projectId: "gaule-top-up-center",
+        storageBucket: "gaule-top-up-center.firebasestorage.app",
+        messagingSenderId: "645605489690",
+        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
     };
-  </script>
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const provider = new GoogleAuthProvider();
+
+    window.toggleMenu = () => { const m = document.getElementById("nav-menu"); m.style.display = (m.style.display === "block") ? "none" : "block"; };
+    window.toggleProfile = () => { const d = document.getElementById("profile-dropdown"); d.style.display = (d.style.display === "block") ? "none" : "block"; };
+    window.googleLogin = () => signInWithPopup(auth, provider);
+    window.logoutUser = () => signOut(auth).then(() => location.reload());
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById("login-container").style.display = "none";
+            document.getElementById("header-wallet-btn").style.display = "flex";
+            document.getElementById("profile-pic").style.display = "block";
+            document.getElementById("profile-pic").src = user.photoURL;
+            document.getElementById("display-name").innerText = user.displayName;
+            document.getElementById("display-email").innerText = user.email;
+
+            const userRef = ref(db, 'users/' + user.uid);
+
+            // पहिलोपटक लगइन गर्दा Database मा Data create गर्ने
+            get(userRef).then((snapshot) => {
+                if (!snapshot.exists()) {
+                    set(userRef, {
+                        name: user.displayName,
+                        email: user.email,
+                        balance: 0,
+                        role: "user"
+                    });
+                }
+            });
+
+            // Realtime ब्यालेन्स Sync गर्ने
+            onValue(userRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    document.getElementById("header-user-balance").innerText = data.balance || 0;
+                }
+            });
+        }
+    });
+</script>
+</body>
 </html>
