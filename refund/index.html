@@ -77,16 +77,6 @@
     .error-message { color: #e53e3e; font-size: 12px; margin-bottom: 10px; display: none; align-items: center; gap: 6px; font-weight: 500; }
     .instruction-text { font-size: 11px; color: #718096; display: flex; gap: 8px; line-height: 1.4; }
 
-    /* Payment Option Select Styles */
-    .payment-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
-    .pay-option-card { display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #cbd5e0; border-radius: 10px; background: #fff; cursor: pointer; transition: all 0.2s ease; }
-    .pay-option-card.selected { border: 2px solid #ffb300 !important; background-color: #fffdf5; }
-    .pay-option-card.disabled-option { background-color: #f7fafc; opacity: 0.6; cursor: not-allowed; border-color: #e2e8f0; }
-    .pay-option-icon { width: 28px; height: 28px; object-fit: contain; }
-    .pay-option-info { display: flex; flex-direction: column; }
-    .pay-option-title { font-size: 13px; font-weight: 700; color: #1a202c; }
-    .pay-option-desc { font-size: 10px; color: #718096; }
-
     .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 0; }
     .cards-grid.error-border { border: 2px solid #e53e3e !important; background-color: #fff5f5; padding: 8px; border-radius: 10px; }
     .pack-card { display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background: #fff; cursor: pointer; position: relative; transition: all 0.2s ease; }
@@ -135,7 +125,16 @@
     .wallet-info-title { font-size: 12px; font-weight: 600; color: #718096; text-transform: uppercase; margin-bottom: 4px; }
     .wallet-info-balance { font-size: 22px; font-weight: 700; color: #ffb300; }
 
-    .payment-summary-box { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; text-align: left; margin-top: 10px; margin-bottom: 16px; }
+    /* Modal Checkout Payment Method Selection Style */
+    .modal-payment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .modal-pay-option { display: flex; align-items: center; gap: 8px; padding: 10px; border: 1px solid #cbd5e0; border-radius: 8px; background: #fff; cursor: pointer; text-align: left; }
+    .modal-pay-option.selected { border: 2px solid #ffb300 !important; background-color: #fffdf5; }
+    .modal-pay-option.disabled-option { background-color: #f7fafc; opacity: 0.6; cursor: not-allowed; border-color: #e2e8f0; }
+    .modal-pay-icon { width: 22px; height: 22px; object-fit: contain; }
+    .modal-pay-title { font-size: 12px; font-weight: 700; color: #1a202c; }
+    .modal-pay-desc { font-size: 9px; color: #718096; }
+
+    .payment-summary-box { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; text-align: left; margin-bottom: 16px; }
     .pay-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
     .pay-row span:first-child { color: #4a5568; }
     .pay-row span:last-child { color: #1a202c; font-weight: 500; }
@@ -234,34 +233,11 @@
         <div class="input-label">Your Email</div>
         <input type="text" id="game-uid" class="uid-input" placeholder="Enter Your Email" oninput="validateUIDLive()">
         <div class="error-message" id="uid-error">
-            <i class="fa-solid fa-circle-exclamation"><span>Email ID is required to make a purchase!</span>
+            <i class="fa-solid fa-circle-exclamation"></i> <span>Email ID is required to make a purchase!</span>
         </div>
         <div class="instruction-text">
             <i class="fa-solid fa-circle-info"></i>
             <span>Please enter your real email ID.</span>
-        </div>
-    </div>
-</div>
-
-<!-- Select Payment Method Section (eSewa Disabled & Wallet Selected) -->
-<div class="section-box">
-    <div class="section-header-flex">
-        <div class="box-title">Payment Method <span style="color: #e53e3e;">*</span></div>
-    </div>
-    <div class="payment-options-grid">
-        <div class="pay-option-card selected" onclick="selectPaymentMethod('wallet')">
-            <img src="https://img.icons8.com/color/48/wallet--v1.png" alt="Wallet" class="pay-option-icon">
-            <div class="pay-option-info">
-                <div class="pay-option-title">Wallet Balance</div>
-                <div class="pay-option-desc">Instant Automated</div>
-            </div>
-        </div>
-        <div class="pay-option-card disabled-option" title="Currently Disabled. Use Wallet Balance.">
-            <img src="https://esewa.com.np/common/images/esewa_logo.png" alt="eSewa" class="pay-option-icon" onerror="this.src='https://img.icons8.com/color/48/e-wallet.png'">
-            <div class="pay-option-info">
-                <div class="pay-option-title" style="color: #718096;">eSewa</div>
-                <div class="pay-option-desc">Coming Soon / Disabled</div>
-            </div>
         </div>
     </div>
 </div>
@@ -417,7 +393,6 @@
     <div class="payment-badges">
         <span class="payment-badge">Wallet Balance</span>
         <span class="payment-badge" style="opacity: 0.5;">eSewa (Disabled)</span>
-        <span class="payment-badge" style="opacity: 0.5;">Khalti (Disabled)</span>
     </div>
 </div>
 
@@ -476,6 +451,24 @@
         <div class="wallet-info-box">
             <div class="wallet-info-title">Available Wallet Balance</div>
             <div class="wallet-info-balance" id="modal-wallet-bal">Rs 0</div>
+        </div>
+
+        <!-- Payment Method Options Inside Modal (eSewa Disabled) -->
+        <div class="modal-payment-grid">
+            <div class="modal-pay-option selected">
+                <img src="https://img.icons8.com/color/48/wallet--v1.png" alt="Wallet" class="modal-pay-icon">
+                <div>
+                    <div class="modal-pay-title">Wallet Balance</div>
+                    <div class="modal-pay-desc">Instant Pay</div>
+                </div>
+            </div>
+            <div class="modal-pay-option disabled-option" onclick="showDisabledNotice()">
+                <img src="https://img.icons8.com/color/48/e-wallet.png" alt="eSewa" class="modal-pay-icon">
+                <div>
+                    <div class="modal-pay-title" style="color:#718096;">eSewa</div>
+                    <div class="modal-pay-desc">Disabled</div>
+                </div>
+            </div>
         </div>
 
         <div class="payment-summary-box">
@@ -574,10 +567,8 @@
     window.googleLogin = () => signInWithPopup(auth, provider);
     window.logoutUser = () => signOut(auth).then(() => location.reload());
 
-    window.selectPaymentMethod = function(method) {
-        if (method !== 'wallet') {
-            showCustomAlert("Notice", "eSewa payment is currently disabled. Please use Wallet Balance.");
-        }
+    window.showDisabledNotice = function() {
+        showCustomAlert("Notice", "eSewa payment method is currently disabled. Please use Wallet Balance.");
     };
 
     const unipinVoucherRef = ref(db, 'unipin-voucher');
