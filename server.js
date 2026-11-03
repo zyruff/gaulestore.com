@@ -1,4 +1,4 @@
-// server.js (Pura & Final Code)
+// server.js (Pura & Final Code - Small letter status)
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
@@ -152,7 +152,7 @@ app.get('/api/otp', async (req, res) => {
   }
 });
 
-// 5. Webhook Listener (Updates Firebase order status automatically)
+// 5. Webhook Listener (Updates Firebase order status to small letters: complete / failed)
 app.post('/api/webhook', async (req, res) => {
   const payload = req.body;
   console.log('--- Webhook Received ---', payload);
@@ -168,18 +168,20 @@ app.post('/api/webhook', async (req, res) => {
       if (snapshot.exists()) {
         snapshot.forEach((childSnapshot) => {
           const orderKey = childSnapshot.key;
-          let newStatus = "Pending";
+          let newStatus = "pending";
           
-          if (orderStatus.toLowerCase() === 'success' || orderStatus.toLowerCase() === 'completed') {
-            newStatus = "Completed";
-          } else if (orderStatus.toLowerCase() === 'failed') {
-            newStatus = "Failed";
+          const statusLower = String(orderStatus).toLowerCase();
+          if (statusLower === 'success' || statusLower === 'completed' || statusLower === 'complete') {
+            newStatus = "complete";
+          } else if (statusLower === 'failed' || statusLower === 'fail') {
+            newStatus = "failed";
           }
 
           db.ref(`orders/${orderKey}`).update({
             status: newStatus,
             updatedAt: Date.now()
           });
+          console.log(`Order ${orderKey} updated to: ${newStatus}`);
         });
       }
     }
