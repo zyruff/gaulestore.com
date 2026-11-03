@@ -339,7 +339,7 @@
             try {
                 const userOrderId = 'GAULE-' + Date.now();
                 
-                // Fixed: Endpoint `/api/order/create` ma change gareko chha
+                // Directly hitting Render Backend URL
                 const response = await fetch('https://gaule-store.onrender.com/api/order/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -378,7 +378,9 @@
                     document.getElementById('receipt-status').innerText = "Pending / Processing";
                     document.getElementById('successModal').classList.add('show');
                 } else {
-                    alert("TopUp Failed: " + (result.message || JSON.stringify(result)));
+                    let errMessage = result.message || result.error || JSON.stringify(result);
+                    if (typeof errMessage === 'object') errMessage = JSON.stringify(errMessage);
+                    alert("TopUp Failed: " + errMessage);
                 }
             } catch (err) {
                 alert("Server Connection Error: " + err.message);
