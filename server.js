@@ -7,19 +7,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Private key lai safe tarikale parse garne function
-const getFormattedPrivateKey = () => {
-  const key = process.env.FIREBASE_PRIVATE_KEY;
-  if (!key) return undefined;
-  
-  // Format standard multiline text wa \n string duitai handeling
-  return key.replace(/\\n/g, '\n');
-};
-
-// Firebase Admin Initialize
+// Firebase Admin Initialize (Base64 wa normal string handle garne safe method)
 const projectId = process.env.FIREBASE_PROJECT_ID || "gaule-top-up-center";
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-const privateKey = getFormattedPrivateKey();
+
+let privateKey = process.env.FIREBASE_PRIVATE_KEY || "";
+// Yedi base64 format ma cha vane decode garne, haina vane newline milaune
+if (!privateKey.includes("BEGIN PRIVATE KEY")) {
+  try {
+    privateKey = Buffer.from(privateKey, 'base64').toString('utf8');
+  } catch (e) {
+    // fallback
+  }
+} else {
+  privateKey = privateKey.replace(/\\n/g, '\n');
+}
 
 admin.initializeApp({
   credential: admin.credential.cert({
@@ -54,7 +56,6 @@ async function getAndRemoveVoucher(dbKey) {
     const firstKey = voucherKeys[0];
     const voucherCode = vouchers[firstKey];
 
-    // Use bhayeko voucher lai Firebase database bata automatic remove garne
     await db.ref(`auto-top-up/${dbKey}/${firstKey}`).remove();
 
     return voucherCode;
