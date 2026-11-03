@@ -53,7 +53,6 @@
         .store-title { font-size: 1.5rem; font-weight: bold; }
         .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
 
-        /* Smile One Style Header Banner */
         .banner-container { padding: 16px; background: #ffffff; border-bottom: 1px solid #e2e8f0; margin-bottom: 10px; }
         .banner-flex { display: flex; gap: 14px; align-items: flex-start; }
         .avatar-img { width: 75px; height: 75px; border-radius: 16px; border: 1px solid #e2e8f0; object-fit: cover; flex-shrink: 0; }
@@ -156,7 +155,6 @@
     <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
 </div>
 
-<!-- Smile One Style Header Banner -->
 <div class="banner-container">
     <div class="banner-flex">
         <img class="avatar-img" src="Free_Fire.png" alt="Free Fire">
@@ -266,7 +264,6 @@
         </div>
     </div>
 
-    <!-- Order Summary & Instant TopUp Button -->
     <div class="bottom-drawer">
         <div class="drawer-inner">
             <div class="row-detail">
@@ -354,6 +351,7 @@
     let selectedItemPrice = "";
     let selectedDbKey = "";
     let activeOrderFirebaseKey = null;
+    let balanceListener = null;
 
     const mainActionBtn = document.getElementById('main-action-btn');
     const gameUidInput = document.getElementById('game-uid');
@@ -392,6 +390,13 @@
             document.getElementById('display-name').innerText = user.displayName || 'User';
             document.getElementById('display-email').innerText = user.email || '';
             document.getElementById('header-wallet-btn').style.display = 'flex';
+
+            // Listen to real-time wallet balance from /users/{uid}/balance
+            const userBalanceRef = ref(db, `users/${user.uid}/balance`);
+            balanceListener = onValue(userBalanceRef, (snapshot) => {
+                const balance = snapshot.val();
+                document.getElementById('header-user-balance').innerText = balance !== null ? balance : 0;
+            });
         } else {
             currentUser = null;
             mainActionBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login to TopUp`;
@@ -401,6 +406,7 @@
             document.getElementById('profile-pic').style.display = 'none';
             document.getElementById('profile-dropdown').style.display = 'none';
             document.getElementById('header-wallet-btn').style.display = 'none';
+            document.getElementById('header-user-balance').innerText = '0';
         }
     });
 
