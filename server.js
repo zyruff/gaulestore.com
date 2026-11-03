@@ -7,11 +7,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Firebase Admin Initialize (Environment Variables बाट)
+// Firebase Admin Initialize
 const projectId = process.env.FIREBASE_PROJECT_ID || "gaule-top-up-center";
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 
-// Render environment variable को private key को newline हरू parse गर्ने
 let privateKey = process.env.FIREBASE_PRIVATE_KEY || "";
 if (privateKey) {
   privateKey = privateKey.replace(/\\n/g, '\n');
@@ -31,7 +30,6 @@ const db = admin.database();
 const BASE_URL = 'https://tzapi.tzsmm.com';
 const API_KEY = process.env.API_SECRET || process.env.API_KEY;
 
-// Database बाट voucher stock check गरेर remove गर्ने function
 async function getAndRemoveVoucher(dbKey) {
     const voucherRef = db.ref(`auto-top-up/${dbKey}`);
     const snapshot = await voucherRef.once('value');
@@ -50,27 +48,25 @@ async function getAndRemoveVoucher(dbKey) {
     const firstKey = voucherKeys[0];
     const voucherCode = vouchers[firstKey];
 
-    // Use भएको voucher लाई Firebase database बाट स्वचालित हटाउने
     await db.ref(`auto-top-up/${dbKey}/${firstKey}`).remove();
-
     return voucherCode;
 }
 
-// TopUp API Endpoint
+// TopUp API Endpoint with Debug Log
 app.post('/api/topup', async (req, res) => {
+    console.log('==> /api/topup ROUTE HIT! Request body:', req.body);
+    
     const { playerId, packageId, dbKey, userOrderId } = req.body;
 
     try {
-        if (!dbKey) {
-            return res.status(400).json({ status: 'error', message: 'Package DB Key is missing!' });
+        if (!dbKey || !playerId || !packageId) {
+            return res.status(400).json({ status: 'error', message: 'Missing required parameters!' });
         }
 
-        // 1. Firebase database बाट stock को voucher code निकाल्ने
         const voucherCode = await getAndRemoveVoucher(dbKey);
 
-        // 2. UniPin API मा automated order create request पठाउने
         const response = await axios.post(`${BASE_URL}/api/v1/user/order/create`, {
-            playerid: playerId,
+            playerid: String(playerId),
             package: parseInt(packageId),
             code: voucherCode,
             orderid: userOrderId,
@@ -79,8 +75,10 @@ app.post('/api/topup', async (req, res) => {
             headers: { 'X-API-KEY': API_KEY }
         });
 
+        console.log('UniPin API Response:', response.data);
         res.json(response.data);
     } catch (error) {
+        console.error('TopUp Error:', error.response?.data || error.message);
         res.status(500).json({ 
             status: 'error', 
             message: error.response?.data?.message || error.message 
@@ -88,17 +86,14 @@ app.post('/api/topup', async (req, res) => {
     }
 });
 
-// Webhook Endpoint (Log formatted output & update Firebase order status)
+// Webhook Endpoint
 app.post('/api/webhook', async (req, res) => {
-    console.log('==> Detected service running on port 10000');
-    console.log('==> Docs on specifying a port: https://render.com/docs/web-services#port-binding');
     console.log('Webhook Received from UniPin:', req.body);
     
     try {
         const { orderid, api_order_id, status, message } = req.body;
 
         if (orderid) {
-            // Firebase orders database मा orderid खोजेर status update गर्ने
             const ordersRef = db.ref('orders');
             const snapshot = await ordersRef.orderByChild('apiOrderId').equalTo(orderid).once('value');
             
