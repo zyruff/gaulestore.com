@@ -2,7 +2,19 @@
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
+const admin = require('firebase-admin');
 
+// Initialize Firebase Admin (Realtime Database status update ko lagi)
+try {
+  admin.initializeApp({
+    credential: admin.credential.applicationDefault(),
+    databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
+  });
+} catch (e) {
+  // Already initialized fallback
+}
+
+const db = admin.database();
 const app = express();
 
 // Enable CORS for frontend accessibility
@@ -130,11 +142,43 @@ app.get('/api/otp', async (req, res) => {
   }
 });
 
-// 5. Webhook Listener
-app.post('/api/webhook', (req, res) => {
+// 5. Webhook Listener (Updated to update Firebase Order Status automatically)
+app.post('/api/webhook', async (req, res) => {
   const payload = req.body;
   console.log('--- Webhook Received ---', payload);
-  res.status(200).json({ status: 'success', message: 'Received' });
+
+  try {
+    const apiOrderId = payload.api_order_id || payload.order_id || payload.orderid;
+    const orderStatus = payload.status;
+
+    if (apiOrderId && orderStatus) {
+      const ordersRef = db.ref('orders');
+      const snapshot = await ordersRef.orderByChild('apiOrderId').equalTo(String(apiOrderId)).once('value');
+
+      if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+          const orderKey = childSnapshot.key;
+          let newStatus = "Pending";
+          
+          if (orderStatus.toLowerCase() === 'success' || orderStatus.toLowerCase() === 'completed') {
+            newStatus = "Completed";
+          } else if (orderStatus.toLowerCase() === 'failed') {
+            newStatus = "Failed";
+          }
+
+          db.ref(`orders/${orderKey}`).update({
+            status: newStatus,
+            updatedAt: Date.now()
+          });
+        });
+      }
+    }
+
+    res.status(200).json({ status: 'success', message: 'Webhook processed and status updated' });
+  } catch (err) {
+    console.error("Webhook Database Error:", err);
+    res.status(500).json({ status: 'error', message: err.message });
+  }
 });
 
 const PORT = process.env.PORT || 3000;
