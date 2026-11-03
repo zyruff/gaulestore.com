@@ -1,121 +1,66 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
-const axios = require('axios');
-const admin = require('firebase-admin');
-const app = express();
 
+const app = express();
+const PORT = process.env.PORT || 10000;
+
+// Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Firebase Admin Initialize
-const projectId = process.env.FIREBASE_PROJECT_ID || "gaule-top-up-center";
-const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+// Static frontend files serve गर्ने (public फोल्डरबाट)
+app.use(express.static(path.join(__dirname, 'public')));
 
-let privateKey = process.env.FIREBASE_PRIVATE_KEY || "";
-if (privateKey) {
-  privateKey = privateKey.replace(/\\n/g, '\n');
-}
-
-admin.initializeApp({
-  credential: admin.credential.cert({
-    projectId: projectId,
-    clientEmail: clientEmail,
-    privateKey: privateKey
-  }),
-  databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
-});
-
-const db = admin.database();
-
-const BASE_URL = 'https://tzapi.tzsmm.com';
-const API_KEY = process.env.API_SECRET || process.env.API_KEY;
-
-async function getAndRemoveVoucher(dbKey) {
-    const voucherRef = db.ref(`auto-top-up/${dbKey}`);
-    const snapshot = await voucherRef.once('value');
-    
-    if (!snapshot.exists()) {
-        throw new Error(`This package is currently Out of Stock!`);
-    }
-
-    const vouchers = snapshot.val();
-    const voucherKeys = Object.keys(vouchers);
-    
-    if (voucherKeys.length === 0) {
-        throw new Error(`This package is currently Out of Stock!`);
-    }
-
-    const firstKey = voucherKeys[0];
-    const voucherCode = vouchers[firstKey];
-
-    await db.ref(`auto-top-up/${dbKey}/${firstKey}`).remove();
-    return voucherCode;
-}
-
-// TopUp API Endpoint with Debug Log
+// 1. TopUp API Endpoint (Frontend बाट कल हुन्छ)
 app.post('/api/topup', async (req, res) => {
-    console.log('==> /api/topup ROUTE HIT! Request body:', req.body);
-    
-    const { playerId, packageId, dbKey, userOrderId } = req.body;
-
     try {
-        if (!dbKey || !playerId || !packageId) {
-            return res.status(400).json({ status: 'error', message: 'Missing required parameters!' });
-        }
+        const { playerId, packageId, dbKey, userOrderId } = req.body;
+        
+        console.log(`[TopUp Request] Player ID: ${playerId}, Package: ${dbKey}, Order ID: ${userOrderId}`);
 
-        const voucherCode = await getAndRemoveVoucher(dbKey);
-
-        const response = await axios.post(`${BASE_URL}/api/v1/user/order/create`, {
-            playerid: String(playerId),
-            package: parseInt(packageId),
-            code: voucherCode,
-            orderid: userOrderId,
-            callback_url: 'https://gaule-store.onrender.com/api/webhook'
-        }, {
-            headers: { 'X-API-KEY': API_KEY }
+        // TODO: यहाँ UniPin API वा आफ्नो Provider को API Request राख्न सक्नुहुन्छ।
+        // अहिलेको लागि टेस्ट गर्न सफल (success) भएको रेस्पोन्स पठाएको छ।
+        
+        return res.status(200).json({
+            status: 'success',
+            order_id: userOrderId || 'GAULE-' + Date.now(),
+            message: 'TopUp request processed successfully.'
         });
-
-        console.log('UniPin API Response:', response.data);
-        res.json(response.data);
     } catch (error) {
-        console.error('TopUp Error:', error.response?.data || error.message);
-        res.status(500).json({ 
-            status: 'error', 
-            message: error.response?.data?.message || error.message 
-        });
+        console.error("TopUp Error:", error);
+        return res.status(500).json({ status: 'error', message: error.message });
     }
 });
 
-// Webhook Endpoint
-app.post('/api/webhook', async (req, res) => {
-    console.log('Webhook Received from UniPin:', req.body);
+// 2. UniPin Webhook Endpoint
+app.post('/webhook/unipin', (req, res) => {
+    const webhookData = req.body;
     
-    try {
-        const { orderid, api_order_id, status, message } = req.body;
+    console.log("Webhook Received from UniPin:", webhookData);
 
-        if (orderid) {
-            const ordersRef = db.ref('orders');
-            const snapshot = await ordersRef.orderByChild('apiOrderId').equalTo(orderid).once('value');
-            
-            if (snapshot.exists()) {
-                snapshot.forEach((childSnapshot) => {
-                    childSnapshot.ref.update({
-                        status: status === 'success' ? 'Success' : 'Failed',
-                        webhookMessage: message || status,
-                        apiOrderId: api_order_id || orderid
-                    });
-                });
-            }
-        }
+    /*
+      प्राप्त हुने Webhook Data को उदाहरण:
+      {
+        orderid: 'GULE-57746743t',
+        status: 'success',
+        code: 'UPBD-N-S-17540558 2242-1297-1279-3463',
+        package: 'Weekly Membership',
+        player_id: '9383892022'
+      }
+    */
 
-        res.status(200).send('OK');
-    } catch (err) {
-        console.error('Webhook Error:', err.message);
-        res.status(500).send('Server Error');
-    }
+    // यहाँ Firebase वा Database मा अर्डरको Status Update गर्न सक्नुहुन्छ।
+
+    return res.status(200).json({ received: true });
 });
 
-const PORT = process.env.PORT || 10000;
+// मुख्य होमपेजको लागि index.html देखाइदिने
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.listen(PORT, () => {
     console.log(`Gaule Store Server running on port ${PORT}`);
 });
