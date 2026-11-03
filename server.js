@@ -7,19 +7,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Firebase Admin Initialize (Base64 wa normal string handle garne safe method)
+// Firebase Admin Initialize (Base64 wa normal string handle garne foolproof method)
 const projectId = process.env.FIREBASE_PROJECT_ID || "gaule-top-up-center";
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 
 let privateKey = process.env.FIREBASE_PRIVATE_KEY || "";
-// Yedi base64 format ma cha vane decode garne, haina vane newline milaune
-if (!privateKey.includes("BEGIN PRIVATE KEY")) {
-  try {
+try {
+  // Yedi key base64 format ma cha vane decode garne, haina vane normal replace garne
+  if (!privateKey.includes("BEGIN PRIVATE KEY")) {
     privateKey = Buffer.from(privateKey, 'base64').toString('utf8');
-  } catch (e) {
-    // fallback
+  } else {
+    privateKey = privateKey.replace(/\\n/g, '\n');
   }
-} else {
+} catch (e) {
   privateKey = privateKey.replace(/\\n/g, '\n');
 }
 
