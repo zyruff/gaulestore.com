@@ -1,14 +1,19 @@
 const express = require('express');
+const cors = require('cors');
 const axios = require('axios');
 const admin = require('firebase-admin');
 const app = express();
 
+app.use(cors()); // CORS allow garne frontend ko lagi
 app.use(express.json());
 
-// 1. Firebase Admin Initialize 
-// (Render ma 'firebase-service-account.json' file upload garnu parne huncha)
+// Firebase Admin Initialize (Environment Variables bata)
 admin.initializeApp({
-  credential: admin.cert(require('./firebase-service-account.json')),
+  credential: admin.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined
+  }),
   databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
 });
 
@@ -17,7 +22,7 @@ const db = admin.database();
 const BASE_URL = 'https://tzapi.tzsmm.com';
 const API_KEY = process.env.API_SECRET || process.env.API_KEY;
 
-// Outbound IP check garne function (Server start huda IP print garnako lagi)
+// Outbound IP check garne function
 async function checkOutboundIP() {
     try {
         const response = await axios.get('https://api.ipify.org?format=json');
@@ -27,7 +32,7 @@ async function checkOutboundIP() {
     }
 }
 
-// 2. Database bata stock check garera voucher code lene ra remove garne function
+// Database bata voucher stock check garera remove garne function
 async function getAndRemoveVoucher(dbKey) {
     const voucherRef = db.ref(`auto-top-up/${dbKey}`);
     const snapshot = await voucherRef.once('value');
@@ -46,13 +51,13 @@ async function getAndRemoveVoucher(dbKey) {
     const firstKey = voucherKeys[0];
     const voucherCode = vouchers[firstKey];
 
-    // Use bhayeko voucher lai Firebase database bata automatic remove (delete) garne
+    // Use bhayeko voucher lai Firebase database bata automatic remove garne
     await db.ref(`auto-top-up/${dbKey}/${firstKey}`).remove();
 
     return voucherCode;
 }
 
-// 3. TopUp API Endpoint (Frontend bata call hune)
+// TopUp API Endpoint
 app.post('/api/topup', async (req, res) => {
     const { playerId, packageId, dbKey, userOrderId } = req.body;
 
@@ -61,15 +66,15 @@ app.post('/api/topup', async (req, res) => {
             return res.status(400).json({ status: 'error', message: 'Package DB Key is missing!' });
         }
 
-        // Firebase bata stock check garera voucher PIN nikalne
+        // 1. Firebase database bata stock ko voucher code nikalne
         const voucherCode = await getAndRemoveVoucher(dbKey);
 
-        // UniPin API ma automated order create request pathaune
+        // 2. UniPin API ma automated order create request pathaune
         const response = await axios.post(`${BASE_URL}/api/v1/user/order/create`, {
             playerid: playerId,
             package: parseInt(packageId),
-            code: voucherCode,          // Firebase bata taneko real voucher PIN
-            orderid: userOrderId,       // Website ko unique tracking/order ID
+            code: voucherCode,
+            orderid: userOrderId,
             callback_url: 'https://gaule-store.onrender.com/api/webhook'
         }, {
             headers: { 'X-API-KEY': API_KEY }
@@ -84,17 +89,10 @@ app.post('/api/topup', async (req, res) => {
     }
 });
 
-// 4. Webhook Endpoint (UniPin bata terminal status updates aaudha)
+// Webhook Endpoint
 app.post('/api/webhook', (req, res) => {
     const webhookData = req.body;
     console.log('Webhook Received from UniPin:', webhookData);
-    
-    if (webhookData.status === 'success') {
-        console.log(`Order ${webhookData.orderid} top-up successful!`);
-    } else {
-        console.log(`Order ${webhookData.orderid} failed!`);
-    }
-
     res.status(200).send('OK');
 });
 
