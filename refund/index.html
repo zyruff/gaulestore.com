@@ -77,14 +77,14 @@
         .error-message { color: #e53e3e; font-size: 12px; margin-top: 8px; display: none; align-items: center; gap: 6px; font-weight: 500; }
         .instruction-text { font-size: 11px; color: #718096; display: flex; gap: 8px; line-height: 1.4; margin-top: 10px; }
         
-        /* Payment Method Options Grid */
+        /* Payment Method Options Grid with Halka Black Touch */
         .payment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 5px; }
-        .payment-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s; }
-        .payment-card.selected { border: 2px solid #ffb300; background-color: #fffdf5; }
-        .payment-card.disabled { opacity: 0.5; background-color: #edf2f7; cursor: not-allowed; border: 1px dashed #cbd5e0; }
+        .payment-card { background-color: #fafbfc; border: 1px solid #cbd5e0; border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s; }
+        .payment-card.selected { border: 2px solid #1a202c; background-color: #f1f3f5; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .payment-card.disabled { opacity: 0.55; background-color: #edf2f7; cursor: not-allowed; border: 1px dashed #a0aec0; }
         .payment-info { display: flex; flex-direction: column; }
         .payment-name { font-size: 13px; font-weight: 700; color: #1a202c; }
-        .payment-sub { font-size: 11px; font-weight: 500; color: #718096; margin-top: 1px; }
+        .payment-sub { font-size: 11px; font-weight: 500; color: #4a5568; margin-top: 1px; }
         .esewa-logo { width: 32px; height: 32px; object-fit: contain; border-radius: 50%; flex-shrink: 0; }
 
         .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 4px; border-radius: 14px; border: 2px solid transparent; transition: all 0.2s ease; }
@@ -281,7 +281,7 @@
         </div>
         <div class="payment-grid">
             <div class="payment-card selected" onclick="selectPayment('wallet')">
-                <i class="fa-solid fa-wallet" style="font-size: 20px; color: #dc2626;"></i>
+                <i class="fa-solid fa-wallet" style="font-size: 20px; color: #1a202c;"></i>
                 <div class="payment-info">
                     <div class="payment-name">Wallet Balance</div>
                     <div class="payment-sub">Wallet Pay</div>
@@ -369,7 +369,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, push, set, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, push, set, onValue, get, remove, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
@@ -393,6 +393,7 @@
     let selectedDbKey = "";
     let activeOrderFirebaseKey = null;
     let balanceListener = null;
+    let currentWalletBalance = 0;
 
     const mainActionBtn = document.getElementById('main-action-btn');
     const gameUidInput = document.getElementById('game-uid');
@@ -435,10 +436,12 @@
             const userBalanceRef = ref(db, `users/${user.uid}/balance`);
             balanceListener = onValue(userBalanceRef, (snapshot) => {
                 const balance = snapshot.val();
-                document.getElementById('header-user-balance').innerText = balance !== null ? balance : 0;
+                currentWalletBalance = balance !== null ? Number(balance) : 0;
+                document.getElementById('header-user-balance').innerText = currentWalletBalance;
             });
         } else {
             currentUser = null;
+            currentWalletBalance = 0;
             mainActionBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login to Buy`;
             mainActionBtn.classList.add('login-needed');
             
@@ -490,6 +493,13 @@
 
         if(!isFormValid) return;
 
+        // Check if user has enough wallet balance
+        const itemPriceNum = parseFloat(selectedItemPrice);
+        if (currentWalletBalance < itemPriceNum) {
+            alert("Insufficient wallet balance! Please add funds to your wallet to complete this purchase.");
+            return;
+        }
+
         mainActionBtn.disabled = true;
         mainActionBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Fetching Code...`;
 
@@ -526,7 +536,13 @@
             const result = await response.json();
 
             if (response.ok && (result.status === 'success' || result.order_id)) {
+                // Remove stock item and deduct wallet balance
                 await remove(ref(db, `auto-top-up/${selectedDbKey}/${codeEntryKey}`));
+
+                const newBalance = currentWalletBalance - itemPriceNum;
+                await update(ref(db, `users/${currentUser.uid}`), {
+                    balance: newBalance
+                });
 
                 const apiOrderId = result.order_id || userOrderId;
                 const now = new Date();
