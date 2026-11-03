@@ -7,10 +7,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Firebase Admin Initialize (Environment Variables bata)
+// Private key lai safe tarikale parse garne function
+const getFormattedPrivateKey = () => {
+  const key = process.env.FIREBASE_PRIVATE_KEY;
+  if (!key) return undefined;
+  
+  // Format standard multiline text wa \n string duitai handeling
+  return key.replace(/\\n/g, '\n');
+};
+
+// Firebase Admin Initialize
 const projectId = process.env.FIREBASE_PROJECT_ID || "gaule-top-up-center";
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-const privateKey = process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined;
+const privateKey = getFormattedPrivateKey();
 
 admin.initializeApp({
   credential: admin.credential.cert({
@@ -60,10 +69,8 @@ app.post('/api/topup', async (req, res) => {
             return res.status(400).json({ status: 'error', message: 'Package DB Key is missing!' });
         }
 
-        // 1. Firebase database bata stock ko voucher code nikalne
         const voucherCode = await getAndRemoveVoucher(dbKey);
 
-        // 2. UniPin API ma automated order create request pathaune
         const response = await axios.post(`${BASE_URL}/api/v1/user/order/create`, {
             playerid: playerId,
             package: parseInt(packageId),
