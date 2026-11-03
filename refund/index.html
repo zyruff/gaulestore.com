@@ -167,8 +167,7 @@
                 Membership <span style="color:#e53e3e;">*</span>
             </div>
 
-            <!-- Weekly Membership ID सही 161 राखिएको छ -->
-            <div class="pack-card" data-dbkey="Weekly Membership" onclick="selectPack(this, 'Weekly Membership', '161', '200', 'Weekly Membership')">
+            <div class="pack-card" data-dbkey="Weekly Membership" onclick="selectPack(this, 'Weekly Membership', '16', '200', 'Weekly Membership')">
                 <div class="pack-title">Weekly Membership</div>
                 <div class="pack-price">Rs200</div>
                 <i class="fa-solid fa-gem diamond-icon"></i>
@@ -340,14 +339,15 @@
             try {
                 const userOrderId = 'GAULE-' + Date.now();
                 
-                const response = await fetch('https://gaule-store.onrender.com/api/topup', {
+                // Fixed: Endpoint `/api/order/create` ma change gareko chha
+                const response = await fetch('https://gaule-store.onrender.com/api/order/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        playerId: uidValue,
-                        packageId: parseInt(selectedPackageId),
-                        dbKey: selectedDbKey,
-                        userOrderId: userOrderId
+                        playerid: uidValue,
+                        package: parseInt(selectedPackageId),
+                        orderid: userOrderId,
+                        callback_url: 'https://gaule-store.onrender.com/api/webhook'
                     })
                 });
 
