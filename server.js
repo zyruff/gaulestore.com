@@ -3,7 +3,7 @@ const path = require('path');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
-// Firebase Admin Initialization (Database URL मात्र प्रयोग गरिएको)
+// Firebase Admin Initialization (metadata एरर नआउने गरी databaseURL मात्र राखेर मिलाइएको)
 admin.initializeApp({
     databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
 });
