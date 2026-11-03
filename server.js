@@ -7,9 +7,9 @@ const app = express();
 app.use(cors()); // CORS allow garne frontend ko lagi
 app.use(express.json());
 
-// Firebase Admin Initialize (Environment Variables bata)
+// Firebase Admin Initialize (Environment Variables bata - Sahi tarika)
 admin.initializeApp({
-  credential: admin.cert({
+  credential: admin.credential.cert({
     projectId: process.env.FIREBASE_PROJECT_ID,
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
     privateKey: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined
