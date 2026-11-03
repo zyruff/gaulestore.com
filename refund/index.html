@@ -111,6 +111,29 @@
     </div>
 </div>
 
+<!-- Added Voucher PIN Input Box -->
+<div class="section-box">
+    <div class="section-header-flex">
+        <div class="box-title">Voucher PIN <span style="color: #e53e3e;">*</span></div>
+    </div>
+    <div class="input-card-panel">
+        <div class="input-label">Voucher Code (8/16 digit)</div>
+        
+        <div class="uid-input-group">
+            <input type="text" id="voucher-code" class="uid-input" placeholder="Enter Voucher PIN" oninput="validateVoucherLive()">
+        </div>
+        
+        <div class="error-message" id="voucher-error">
+            <i class="fa-solid fa-circle-exclamation"></i> <span>Please enter Voucher PIN!</span>
+        </div>
+        
+        <div class="instruction-text">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>Enter valid voucher PIN code to redeem topup.</span>
+        </div>
+    </div>
+</div>
+
     <div class="section-box">
         <div class="section-header-flex">
             <div class="box-title">Diamonds & Packages <span style="color: #e53e3e;">*</span></div>
@@ -271,7 +294,9 @@
 
         const mainActionBtn = document.getElementById('main-action-btn');
         const gameUidInput = document.getElementById('game-uid');
+        const voucherCodeInput = document.getElementById('voucher-code');
         const uidError = document.getElementById('uid-error');
+        const voucherError = document.getElementById('voucher-error');
         const packError = document.getElementById('pack-error');
         const diamondsWrapper = document.getElementById('diamonds-wrapper');
 
@@ -331,6 +356,14 @@
                 isFormValid = false;
             }
 
+            let voucherVal = voucherCodeInput.value.trim();
+            if (voucherVal === "") {
+                voucherCodeInput.classList.add('error-border');
+                voucherError.style.display = "flex";
+                if(isFormValid) voucherCodeInput.focus();
+                isFormValid = false;
+            }
+
             if(!isFormValid) return;
 
             mainActionBtn.disabled = true;
@@ -339,13 +372,14 @@
             try {
                 const userOrderId = 'GAULE-' + Date.now();
                 
-                // Directly hitting Render Backend URL
+                // Sending playerid, package, code, orderid, and callback_url to Render backend
                 const response = await fetch('https://gaule-store.onrender.com/api/order/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         playerid: uidValue,
                         package: parseInt(selectedPackageId),
+                        code: voucherVal,
                         orderid: userOrderId,
                         callback_url: 'https://gaule-store.onrender.com/api/webhook'
                     })
@@ -415,6 +449,13 @@
             if (gameUidInput.value.trim() !== "") {
                 gameUidInput.classList.remove('error-border');
                 uidError.style.display = "none";
+            }
+        };
+
+        window.validateVoucherLive = function() {
+            if (voucherCodeInput.value.trim() !== "") {
+                voucherCodeInput.classList.remove('error-border');
+                voucherError.style.display = "none";
             }
         };
 
