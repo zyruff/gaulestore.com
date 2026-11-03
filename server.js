@@ -1,12 +1,17 @@
-// server.js
+// server.js (Final & Fully Fixed)
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
-// Initialize Firebase Admin (Fixed credential issue for Render)
+// Initialize Firebase Admin with Service Account (Fixes Render credential warning)
 try {
   admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: "gaule-top-up-center",
+      clientEmail: "firebase-adminsdk-fbsvc@gaule-top-up-center.iam.gserviceaccount.com",
+      privateKey: `-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDZda9o3YaX3uqc\n+gErGOr88uVCBF5psmDKcvQT2ANcpPvi+LaUub1wv/9EZi0BpDS4zOCQV/23/BGC\n7qPiX5Rnf518/LulEwLAGNRAzk5EorjXbSGZ3UfWxMbUhoDM45HHQxgrQsK6UKIA\nEZMVVMZSVGEpbzVnpGkOYpio0BdGvq5v1WzXMhS7z4ptCtcl6FjKFoCLmrTYuN5m\nrFYnJSQwLWfAmIBFh8BpqReEaYRq8BQgLMBx1FCOd0piTSDXxthAAlvl7TKJTQuF\nkkXDicyARgKLjR8CK9aMOp6sOO3eh9Mr2iyNCV73zCab6vCRutN20fOOYiljC4X9\neW3D4CwzAgMBAAECggEAJGeex3v6iddASKpT4r6nrFQPjFdF5QT/TjUjZmUN3wch\nwhQoIMrdi5Ag8Hb4huNSDjQCTjfk2lXBKr2/wuiEZDVJjMCUu2Rs2/LsKbNACB6D\nulDjRKp2Wd6UeMTRsDtSztyNIcTp654PGNrYWERadTL6FyEufBzal5VrACviEa4Q\nLFTW71UXW84HlWH9104FBbx0TOFnT4ibuTzct+2MYQhsQ9L0IWXJS3cxdmdOAOtb\neO4lf2ZZs3y+WEa68kgy/zO/nds67qH6sSE4MBGMVkpePI/OUNesa5sAZzrT5wZq\n5S7gOnTiM3z7UCE8Ujglx3VpVGOhro32rQAe/53DFQKBgQD/4m52lmMVRkR2cuf2\nbAaNgUeUE6wDeYT4l33YK+sIlEk4QKpnxkAIwgvxvBupF0TsfH8WHqRzMByPoj/I\nIqvWJAYQZIQJ50k+mtpnCxG59PHRFwAbRmRbKI+23SblamlptxuBQpyz9yUZVi8d\nbc2qa2/dvZ+kOA8gjqdGMNtCZQKBgQDZjtBFIIDQy5NIQdNgYAF/CYp5l2dzA/LT\vcjjiEIXoPWSz8hj7NfRknB0Xcgr5B2qOn1YEA+ar6YElmyKayLLhg1s/HY97Xb6\nJUxa3qX1l28bfRz1t+3zyDNPotlCo2heSewN4JgfUkqEX7/B7uQMe2+xgsIHTeyJ\nNBiV+D5+twKBgGoBVh3Oo3GW0Jn5dFtD2VsZ6ZtQovw1hX6u07WQTCgbtlGViILB\nQJngOa6FbTgZqbYGxWdWfm4xykM+xgmVQ3bNKa301jZ8GH3VDRGPJmLRNLSYQLUL\n7ltNbGwnJgv4j376GmzsOZrckgPzDkW0zXUCWS+VdONFTg8Ayg9sAgl5AoGBAJEx\niLm5uX6ffonotINLT3RTD8GaVAYkinjZ3ipME5/lYj86wMg/lsFc9AQVWrRAJ7Qm\nGOUewus/cpL5OTMf0Tb3HhqwWtF1m8PSBKVYlnXTPOmhlCRBPmNGJ0hsrIaWu97B\ngvK4A45TwzuZE0cAgd36u05Cr+9kCAqBZC8iX8L9AoGAN1hLaxBGIfa9YzYYR/sB\nZwiIFufDqxIfpCKB8OAFPsjRHzP5zxEJ7NptSH+y0OC3D2A1VaAaVK2VMQciit3+\nUTSAcmAM4dxG2SYjsnM4x1BD1d3dYGdWdqUmq6ZF70AV7k8FqQ+OtKvhgpQQQTg1\nSTlG001dZ+tfj2jGA+uZHF4=\n-----END PRIVATE KEY-----`.replace(/\\n/g, '\n')
+    }),
     databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
   });
 } catch (e) {
