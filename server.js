@@ -3,10 +3,25 @@ const path = require('path');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
-// Firebase Admin Initialization (metadata एरर नआउने गरी databaseURL मात्र राखेर मिलाइएको)
-admin.initializeApp({
-    databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
-});
+// सुरक्षित रूपमा Environment Variable बाट Service Account लोड गर्ने
+let serviceAccount;
+try {
+    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+} catch (error) {
+    console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT from environment variables:", error);
+}
+
+// Firebase Admin Initialization
+if (serviceAccount) {
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
+    });
+} else {
+    admin.initializeApp({
+        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
+    });
+}
 
 const db = admin.database();
 const app = express();
@@ -14,17 +29,17 @@ const PORT = process.env.PORT || 10000;
 
 // TZ API Configuration
 const TZ_API_BASE = "https://tzapi.tzsmm.com";
-const TZ_API_KEY = process.env.TZ_API_KEY || "YOUR_TZ_API_KEY_HERE"; // Render Environment Variable मा आफ्नो API Key राख्नुहोला
+const TZ_API_KEY = process.env.TZ_API_KEY;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static files (index.html, free_fire.png आदि) मुख्य (Root) फोल्डरबाटै serve गर्ने
+// Static files serve गर्ने
 app.use(express.static(path.join(__dirname)));
 
-// 1. TopUp API Endpoint (Frontend बाट कल हुन्छ)
+// 1. TopUp API Endpoint
 app.post('/api/topup', async (req, res) => {
     try {
         const { playerId, packageId, dbKey, userOrderId } = req.body;
@@ -44,7 +59,6 @@ app.post('/api/topup', async (req, res) => {
             return res.status(400).json({ status: 'error', message: 'Selected package is currently Out of Stock!' });
         }
 
-        // स्टकबाट पहिलो उपलब्ध भौचरको Key र Code लिने
         const voucherEntries = Object.entries(stockData);
         const [voucherKey, voucherObj] = voucherEntries[0];
         
@@ -75,7 +89,7 @@ app.post('/api/topup', async (req, res) => {
         const tzResult = await tzResponse.json();
 
         if (tzResponse.ok && tzResult.status === 'success') {
-            // Step C: अर्डर सफल भएपछि प्रयोग भइसकेको भौचरलाई Firebase स्टकबाट हटाउने (Delete)
+            // Step C: अर्डर सफल भएपछि प्रयोग भइसकेको भौचरलाई Firebase स्टकबाट हटाउने
             await db.ref(`auto-top-up/${dbKey}/${voucherKey}`).remove();
 
             return res.status(200).json({
@@ -102,7 +116,6 @@ app.post('/webhook/tzapi', (req, res) => {
     
     console.log("Webhook Received from TZ API:", webhookData);
 
-    // Firebase Database मा अर्डरको Status Update गर्ने
     if (webhookData && webhookData.api_order_id) {
         db.ref('orders').orderByChild('apiOrderId').equalTo(webhookData.api_order_id).once('value', (snapshot) => {
             if (snapshot.exists()) {
