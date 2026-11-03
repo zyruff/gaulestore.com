@@ -1,9 +1,22 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const admin = require('firebase-admin');
 
+// Firebase Admin Initialization
+// (Note: Render मा deploy गर्दा Environment Variable वा Firebase Service Account प्रयोग गर्न सक्नुहुन्छ)
+admin.initializeApp({
+    credential: admin.credential.applicationDefault(), // वा आफ्नो serviceAccount.json प्रयोग गर्न सक्नुहुन्छ
+    databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
+});
+
+const db = admin.database();
 const app = express();
 const PORT = process.env.PORT || 10000;
+
+// TZ API Configuration
+const TZ_API_BASE = "https://tzapi.tzsmm.com";
+const TZ_API_KEY = process.env.TZ_API_KEY || "YOUR_TZ_API_KEY_HERE"; // Render Environment Variables मा आफ्नो API Key राख्नुहोला
 
 // Middleware
 app.use(cors());
@@ -18,40 +31,106 @@ app.post('/api/topup', async (req, res) => {
     try {
         const { playerId, packageId, dbKey, userOrderId } = req.body;
         
+        if (!playerId || !packageId || !dbKey) {
+            return res.status(400).json({ status: 'error', message: 'Missing required fields (playerId, packageId, dbKey)' });
+        }
+
         console.log(`[TopUp Request] Player ID: ${playerId}, Package: ${dbKey}, Order ID: ${userOrderId}`);
 
-        // TODO: यहाँ UniPin API वा आफ्नो Provider को API Request राख्न सक्नुहुन्छ।
-        // अहिलेको लागि टेस्ट गर्न सफल (success) भएको रेस्पोन्स पठाएको छ।
+        // Step A: Firebase stock (`auto-top-up/{dbKey}`) बाट एउटा available voucher code फेला पार्ने
+        const stockRef = db.ref(`auto-top-up/${dbKey}`);
+        const snapshot = await stockRef.once('value');
+        const stockData = snapshot.val();
+
+        if (!stockData || Object.keys(stockData).length ===0) {
+            return res.status(400).json({ status: 'error', message: 'Selected package is currently Out of Stock!' });
+        }
+
+        // स्टकबाट पहिलो उपलब्ध भौचरको Key र Code लिने
+        const voucherEntries = Object.entries(stockData);
+        const [voucherKey, voucherObj] = voucherEntries[0];
         
-        return res.status(200).json({
-            status: 'success',
-            order_id: userOrderId || 'GAULE-' + Date.now(),
-            message: 'TopUp request processed successfully.'
+        // भौचरको कोड कुन field मा छ (जस्तै: code वा pin) त्यस अनुसार मिलाउनुहोला
+        const voucherCode = typeof voucherObj === 'string' ? voucherObj : (voucherObj.code || voucherObj.pin);
+
+        if (!voucherCode) {
+            return res.status(400).json({ status: 'error', message: 'Invalid voucher format in stock.' });
+        }
+
+        // Step B: TZ API मा Order Create गर्न Request पठाउने
+        const callbackUrl = `https://${req.get('host')}/webhook/tzapi`;
+
+        const tzResponse = await fetch(`${TZ_API_BASE}/api/v1/user/order/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-KEY': TZ_API_KEY
+            },
+            body: JSON.stringify({
+                playerid: playerId,
+                package: parseInt(packageId),
+                code: voucherCode,
+                orderid: userOrderId,
+                callback_url: callbackUrl
+            })
         });
+
+        const tzResult = await tzResponse.json();
+
+        if (tzResponse.ok && tzResult.status === 'success') {
+            // Step C: अर्डर सफल भएपछि प्रयोग भइसकेको भौचरलाई Firebase स्टकबाट हटाउने (Delete)
+            await db.ref(`auto-top-up/${dbKey}/${voucherKey}`).remove();
+
+            return res.status(200).json({
+                status: 'success',
+                order_id: tzResult.order_id || userOrderId,
+                message: tzResult.message || 'TopUp order created successfully.'
+            });
+        } else {
+            return res.status(400).json({
+                status: 'error',
+                message: tzResult.message || 'TZ API rejected the topup request.'
+            });
+        }
+
     } catch (error) {
-        console.error("TopUp Error:", error);
+        console.error("TopUp Server Error:", error);
         return res.status(500).json({ status: 'error', message: error.message });
     }
 });
 
-// 2. UniPin Webhook Endpoint
-app.post('/webhook/unipin', (req, res) => {
+// 2. TZ API Webhook (Callback) Endpoint
+app.post('/webhook/tzapi', (req, res) => {
     const webhookData = req.body;
     
-    console.log("Webhook Received from UniPin:", webhookData);
+    console.log("Webhook Received from TZ API:", webhookData);
 
     /*
       प्राप्त हुने Webhook Data को उदाहरण:
       {
-        orderid: 'GULE-57746743t',
-        status: 'success',
-        code: 'UPBD-N-S-17540558 2242-1297-1279-3463',
-        package: 'Weekly Membership',
-        player_id: '9383892022'
+        "status": "success",
+        "api_order_id": "TZUP-ABCD12345678",
+        "orderid": "TRACK-001",
+        "player_id": "12345678",
+        "package": "UniPin 50 Diamonds",
+        "message": "Top-up success!"
       }
     */
 
-    // यहाँ Firebase वा Database मा अर्डरको Status Update गर्न सक्नुहुन्छ।
+    // यहाँ Firebase Database मा अर्डरको Status Update गर्न सक्नुहुन्छ (जस्तै: Pending बाट Success मा लैजाने)
+    if (webhookData && webhookData.orderid) {
+        // यदि तपाईंले अर्डरहरू 'orders' node मा सेभ गर्नुभएको छ भने:
+        db.ref('orders').orderByChild('apiOrderId').equalTo(webhookData.api_order_id).once('value', (snapshot) => {
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    childSnapshot.ref.update({
+                        status: webhookData.status === 'success' ? 'Completed' : 'Failed',
+                        webhookMessage: webhookData.message
+                    });
+                });
+            }
+        });
+    }
 
     return res.status(200).json({ received: true });
 });
