@@ -1,14 +1,17 @@
 {
   "name": "gaule-store-backend",
   "version": "1.0.0",
+  "description": "Gaule Store UniPin Auto TopUp Backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "axios": "^1.6.0",
-    "cors": "^2.8.5",
-    "firebase-admin": "^12.0.0"
+    "axios": "^1.6.8",
+    "express": "^4.19.2",
+    "firebase-admin": "^12.1.0"
+  },
+  "engines": {
+    "node": ">=18.x"
   }
 }
