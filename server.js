@@ -4,10 +4,9 @@ const axios = require('axios');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
-// Initialize Firebase Admin (Realtime Database status update ko lagi)
+// Initialize Firebase Admin (Fixed credential issue for Render)
 try {
   admin.initializeApp({
-    credential: admin.credential.applicationDefault(),
     databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
   });
 } catch (e) {
