@@ -1,131 +1,161 @@
+// server.js
 const express = require('express');
-const path = require('path');
-const cors = require('cors');
-const admin = require('firebase-admin');
+const axios = require('axios');
 
-// Render को Secret File (serviceAccountKey.json) बाट सिधै लोड गर्ने
-const serviceAccount = require('./serviceAccountKey.json');
-
-// Firebase Admin Initialization
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
-});
-
-const db = admin.database();
 const app = express();
-const PORT = process.env.PORT || 10000;
-
-// TZ API Configuration
-const TZ_API_BASE = "https://tzapi.tzsmm.com";
-const TZ_API_KEY = process.env.TZ_API_KEY;
-
-// Middleware
-app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Static files serve गर्ने
-app.use(express.static(path.join(__dirname)));
+// Configuration
+const BASE_URL = process.env.BASE_URL || 'https://tzapi.tzsmm.com/api/v1/user';
+const API_KEY = process.env.API_KEY || 'YOUR_SECRET_KEY';
 
-// 1. TopUp API Endpoint
-app.post('/api/topup', async (req, res) => {
-    try {
-        const { playerId, packageId, dbKey, userOrderId } = req.body;
-        
-        if (!playerId || !packageId || !dbKey) {
-            return res.status(400).json({ status: 'error', message: 'Missing required fields (playerId, packageId, dbKey)' });
-        }
+// Common Headers for API Request
+const getAuthHeaders = () => ({
+  'X-API-KEY': API_KEY,
+  'Content-Type': 'application/json',
+});
 
-        console.log(`[TopUp Request] Player ID: ${playerId}, Package: ${dbKey} (ID: ${packageId}), Order ID: ${userOrderId}`);
-
-        // Step A: Firebase stock (`auto-top-up/{dbKey}`) बाट available voucher code फेला पार्ने
-        const stockRef = db.ref(`auto-top-up/${dbKey}`);
-        const snapshot = await stockRef.once('value');
-        const stockData = snapshot.val();
-
-        if (!stockData || Object.keys(stockData).length === 0) {
-            return res.status(400).json({ status: 'error', message: 'Selected package is currently Out of Stock!' });
-        }
-
-        const voucherEntries = Object.entries(stockData);
-        const [voucherKey, voucherObj] = voucherEntries[0];
-        
-        const voucherCode = typeof voucherObj === 'string' ? voucherObj : (voucherObj.code || voucherObj.pin);
-
-        if (!voucherCode) {
-            return res.status(400).json({ status: 'error', message: 'Invalid voucher format in stock.' });
-        }
-
-        // Step B: TZ API मा Order Create गर्न Request पठाउने
-        const callbackUrl = `https://${req.get('host')}/webhook/tzapi`;
-
-        const tzResponse = await fetch(`${TZ_API_BASE}/api/v1/user/order/create`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-API-KEY': TZ_API_KEY
-            },
-            body: JSON.stringify({
-                playerid: playerId,
-                package: parseInt(packageId),
-                code: voucherCode,
-                orderid: userOrderId,
-                callback_url: callbackUrl
-            })
-        });
-
-        const tzResult = await tzResponse.json();
-
-        if (tzResponse.ok && tzResult.status === 'success') {
-            // Step C: अर्डर सफल भएपछि प्रयोग भइसकेको भौचरलाई Firebase स्टकबाट हटाउने
-            await db.ref(`auto-top-up/${dbKey}/${voucherKey}`).remove();
-
-            return res.status(200).json({
-                status: 'success',
-                order_id: tzResult.order_id || userOrderId,
-                message: tzResult.message || 'TopUp order created successfully.'
-            });
-        } else {
-            return res.status(400).json({
-                status: 'error',
-                message: tzResult.message || 'TZ API rejected the topup request.'
-            });
-        }
-
-    } catch (error) {
-        console.error("TopUp Server Error:", error);
-        return res.status(500).json({ status: 'error', message: error.message });
+// Root Route (So that visiting https://gaule-store.onrender.com doesn't show Cannot GET /)
+app.get('/', (req, res) => {
+  res.json({
+    status: 'success',
+    message: 'Gaule Store API Gateway is running live!',
+    endpoints: {
+      packages: '/api/packages',
+      create_order: '/api/order/create (POST)',
+      check_status: '/api/order/status?order_id=OR_user_order_id',
+      generate_otp: '/api/otp?key=YOUR_BASE32_KEY',
+      webhook: '/api/webhook (POST)'
     }
+  });
 });
 
-// 2. TZ API Webhook (Callback) Endpoint
-app.post('/webhook/tzapi', (req, res) => {
-    const webhookData = req.body;
-    
-    console.log("Webhook Received from TZ API:", webhookData);
-
-    if (webhookData && webhookData.api_order_id) {
-        db.ref('orders').orderByChild('apiOrderId').equalTo(webhookData.api_order_id).once('value', (snapshot) => {
-            if (snapshot.exists()) {
-                snapshot.forEach((childSnapshot) => {
-                    childSnapshot.ref.update({
-                        status: webhookData.status === 'success' ? 'Completed' : 'Failed',
-                        webhookMessage: webhookData.message || ''
-                    });
-                });
-            }
-        });
-    }
-
-    return res.status(200).json({ received: true });
+/**
+ * 1. GET Active Packages
+ * GET /api/packages
+ */
+app.get('/api/packages', async (req, res) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/packages`, {
+      headers: getAuthHeaders(),
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({
+      status: 'error',
+      message: error.response?.data || error.message,
+    });
+  }
 });
 
-// मुख्य होमपेजको लागि index.html देखाइदिने
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+/**
+ * 2. Create TopUp Order
+ * POST /api/order/create
+ * Body JSON: { "playerid": "12345678", "package": 25, "code": "VOUCHERPIN", "orderid": "TRACK-001", "callback_url": "https://gaule-store.onrender.com/api/webhook" }
+ */
+app.post('/api/order/create', async (req, res) => {
+  const { playerid, package: pkgId, code, orderid, callback_url } = req.body;
+
+  if (!playerid || !pkgId || !code) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'playerid, package, and code are required fields.',
+    });
+  }
+
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/order/create`,
+      {
+        playerid,
+        package: pkgId,
+        code,
+        orderid,
+        callback_url,
+      },
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+    res.json(response.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({
+      status: 'error',
+      message: error.response?.data || error.message,
+    });
+  }
 });
 
+/**
+ * 3. Check Order Status
+ * GET /api/order/status?order_id=TZUP-ABCD12345678 OR ?user_order_id=TRACK-001
+ */
+app.get('/api/order/status', async (req, res) => {
+  const { order_id, user_order_id } = req.query;
+
+  if (!order_id && !user_order_id) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'Please provide either order_id or user_order_id as query parameters.',
+    });
+  }
+
+  try {
+    const response = await axios.get(`${BASE_URL}/order/status`, {
+      headers: getAuthHeaders(),
+      params: { order_id, user_order_id },
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({
+      status: 'error',
+      message: error.response?.data || error.message,
+    });
+  }
+});
+
+/**
+ * 4. Generate TOTP Code
+ * GET /api/otp?key=YOUR_BASE32_SECRET
+ */
+app.get('/api/otp', async (req, res) => {
+  const { key } = req.query;
+
+  if (!key) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'Base32 secret key is required as ?key=... parameter.',
+    });
+  }
+
+  try {
+    const response = await axios.get(`${BASE_URL}/otp`, {
+      headers: getAuthHeaders(),
+      params: { key },
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({
+      error: error.response?.data || error.message,
+    });
+  }
+});
+
+/**
+ * 5. Webhook Listener (Callback Endpoint)
+ * POST /api/webhook
+ */
+app.post('/api/webhook', (req, res) => {
+  const payload = req.body;
+  console.log('--- Webhook Notification Received ---');
+  console.log(JSON.stringify(payload, null, 2));
+
+  // Yaha timile order success/failed huda database update garne logic rakhna sakxau
+  res.status(200).json({ status: 'success', message: 'Webhook received successfully' });
+});
+
+// Start Server bound to Render's dynamic PORT
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Gaule Store Server running on port ${PORT}`);
+  console.log(`Gaule Store server is running on port ${PORT}`);
 });
