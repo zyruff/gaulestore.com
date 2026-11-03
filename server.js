@@ -3,10 +3,8 @@ const path = require('path');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
-// Firebase Admin Initialization
-// (Note: Render मा deploy गर्दा Environment Variable वा Firebase Service Account प्रयोग गर्न सक्नुहुन्छ)
+// Firebase Admin Initialization (Database URL मात्र प्रयोग गरिएको)
 admin.initializeApp({
-    credential: admin.credential.applicationDefault(), // वा आफ्नो serviceAccount.json प्रयोग गर्न सक्नुहुन्छ
     databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
 });
 
@@ -16,15 +14,15 @@ const PORT = process.env.PORT || 10000;
 
 // TZ API Configuration
 const TZ_API_BASE = "https://tzapi.tzsmm.com";
-const TZ_API_KEY = process.env.TZ_API_KEY || "YOUR_TZ_API_KEY_HERE"; // Render Environment Variables मा आफ्नो API Key राख्नुहोला
+const TZ_API_KEY = process.env.TZ_API_KEY || "YOUR_TZ_API_KEY_HERE"; // Render Environment Variable मा आफ्नो API Key राख्नुहोला
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static frontend files serve गर्ने (public फोल्डरबाट)
-app.use(express.static(path.join(__dirname, 'public')));
+// Static files (index.html, free_fire.png आदि) मुख्य (Root) फोल्डरबाटै serve गर्ने
+app.use(express.static(path.join(__dirname)));
 
 // 1. TopUp API Endpoint (Frontend बाट कल हुन्छ)
 app.post('/api/topup', async (req, res) => {
@@ -35,14 +33,14 @@ app.post('/api/topup', async (req, res) => {
             return res.status(400).json({ status: 'error', message: 'Missing required fields (playerId, packageId, dbKey)' });
         }
 
-        console.log(`[TopUp Request] Player ID: ${playerId}, Package: ${dbKey}, Order ID: ${userOrderId}`);
+        console.log(`[TopUp Request] Player ID: ${playerId}, Package: ${dbKey} (ID: ${packageId}), Order ID: ${userOrderId}`);
 
-        // Step A: Firebase stock (`auto-top-up/{dbKey}`) बाट एउटा available voucher code फेला पार्ने
+        // Step A: Firebase stock (`auto-top-up/{dbKey}`) बाट available voucher code फेला पार्ने
         const stockRef = db.ref(`auto-top-up/${dbKey}`);
         const snapshot = await stockRef.once('value');
         const stockData = snapshot.val();
 
-        if (!stockData || Object.keys(stockData).length ===0) {
+        if (!stockData || Object.keys(stockData).length === 0) {
             return res.status(400).json({ status: 'error', message: 'Selected package is currently Out of Stock!' });
         }
 
@@ -50,7 +48,6 @@ app.post('/api/topup', async (req, res) => {
         const voucherEntries = Object.entries(stockData);
         const [voucherKey, voucherObj] = voucherEntries[0];
         
-        // भौचरको कोड कुन field मा छ (जस्तै: code वा pin) त्यस अनुसार मिलाउनुहोला
         const voucherCode = typeof voucherObj === 'string' ? voucherObj : (voucherObj.code || voucherObj.pin);
 
         if (!voucherCode) {
@@ -105,27 +102,14 @@ app.post('/webhook/tzapi', (req, res) => {
     
     console.log("Webhook Received from TZ API:", webhookData);
 
-    /*
-      प्राप्त हुने Webhook Data को उदाहरण:
-      {
-        "status": "success",
-        "api_order_id": "TZUP-ABCD12345678",
-        "orderid": "TRACK-001",
-        "player_id": "12345678",
-        "package": "UniPin 50 Diamonds",
-        "message": "Top-up success!"
-      }
-    */
-
-    // यहाँ Firebase Database मा अर्डरको Status Update गर्न सक्नुहुन्छ (जस्तै: Pending बाट Success मा लैजाने)
-    if (webhookData && webhookData.orderid) {
-        // यदि तपाईंले अर्डरहरू 'orders' node मा सेभ गर्नुभएको छ भने:
+    // Firebase Database मा अर्डरको Status Update गर्ने
+    if (webhookData && webhookData.api_order_id) {
         db.ref('orders').orderByChild('apiOrderId').equalTo(webhookData.api_order_id).once('value', (snapshot) => {
             if (snapshot.exists()) {
                 snapshot.forEach((childSnapshot) => {
                     childSnapshot.ref.update({
                         status: webhookData.status === 'success' ? 'Completed' : 'Failed',
-                        webhookMessage: webhookData.message
+                        webhookMessage: webhookData.message || ''
                     });
                 });
             }
@@ -137,7 +121,7 @@ app.post('/webhook/tzapi', (req, res) => {
 
 // मुख्य होमपेजको लागि index.html देखाइदिने
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.listen(PORT, () => {
