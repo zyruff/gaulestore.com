@@ -3,25 +3,14 @@ const path = require('path');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
-// सुरक्षित रूपमा Environment Variable बाट Service Account लोड गर्ने
-let serviceAccount;
-try {
-    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-} catch (error) {
-    console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT from environment variables:", error);
-}
+// Render को Secret File (serviceAccountKey.json) बाट सिधै लोड गर्ने
+const serviceAccount = require('./serviceAccountKey.json');
 
 // Firebase Admin Initialization
-if (serviceAccount) {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
-    });
-} else {
-    admin.initializeApp({
-        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
-    });
-}
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
+});
 
 const db = admin.database();
 const app = express();
