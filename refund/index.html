@@ -9,7 +9,7 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { background-color: #f7fafc; color: #2d3748; padding-bottom: 160px; }
+        body { background-color: #f7fafc; color: #2d3748; padding-bottom: 60px; }
         .banner-container { padding: 16px; background: linear-gradient(180deg, #ffffff 0%, #f7fafc 100%); border-bottom: 1px solid #e2e8f0; }
         .badges-wrapper { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
         .badge { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
@@ -44,13 +44,14 @@
         .pack-price { font-size: 15px; font-weight: 700; color: #ffb300; }
         .diamond-icon { position: absolute; bottom: 14px; right: 14px; color: #3182ce; font-size: 20px; }
         
-        .bottom-drawer { position: fixed; bottom: 55px; left: 2px; right: 2px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); z-index: 100; }
+        /* Bottom drawer layout updated to static section box below memberships */
+        .bottom-drawer { margin-top: 20px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         .drawer-inner { max-width: 600px; margin: 0 auto; }
         .row-detail { display: flex; justify-content: space-between; font-size: 13px; color: #4a5568; margin-bottom: 8px; }
         .row-detail .val-white { color: #1a202c; font-weight: 500; }
         .total-row { margin-top: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
         .total-price { font-size: 20px; font-weight: 700; color: #ffb300; }
-        .action-btn { display: flex; justify-content: center; align-items: center; gap: 8px; border: none; cursor: pointer; font-weight: 700; color: #ffffff; background-color: #ffb300; transition: background 0.2s; width: 200px; height: 42px; font-size: 14px; border-radius: 25px; margin: 0 auto; }
+        .action-btn { display: flex; justify-content: center; align-items: center; gap: 8px; border: none; cursor: pointer; font-weight: 700; color: #ffffff; background-color: #ffb300; transition: background 0.2s; width: 100%; height: 48px; font-size: 15px; border-radius: 25px; margin: 0 auto; }
         .action-btn.login-needed { background-color: #dc2626; }
         
         .success-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 300; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out; }
@@ -179,22 +180,23 @@
                 <i class="fa-solid fa-gem diamond-icon"></i>
             </div>
         </div>
-    </div>
 
-    <div class="bottom-drawer">
-        <div class="drawer-inner">
-            <div class="row-detail">
-                <span>Item</span>
-                <span class="val-white" id="summary-item">-</span>
+        <!-- Order Summary & Instant TopUp Button moved right below Memberships -->
+        <div class="bottom-drawer">
+            <div class="drawer-inner">
+                <div class="row-detail">
+                    <span>Item</span>
+                    <span class="val-white" id="summary-item">-</span>
+                </div>
+                <div class="total-row">
+                    <span class="total-label">Total</span>
+                    <span class="total-price" id="summary-total">Rs 0.00</span>
+                </div>
+                
+                <button id="main-action-btn" class="action-btn">
+                    <i class="fa-solid fa-basket-shopping"></i> Instant TopUp
+                </button>
             </div>
-            <div class="total-row">
-                <span class="total-label">Total</span>
-                <span class="total-price" id="summary-total">Rs 0.00</span>
-            </div>
-            
-            <button id="main-action-btn" class="action-btn">
-                <i class="fa-solid fa-basket-shopping"></i> Instant TopUp
-            </button>
         </div>
     </div>
 
@@ -392,7 +394,6 @@
                         status: "Pending"
                     });
 
-                    // Realtime listener to automatically update status on modal for Success or Failed
                     onValue(ref(db, `orders/${activeOrderFirebaseKey}`), (orderSnap) => {
                         const orderVal = orderSnap.val();
                         if (orderVal && orderVal.status) {
@@ -401,17 +402,17 @@
                             
                             if (rawStatus === 'completed' || rawStatus === 'success') {
                                 statusEl.innerText = "Complete";
-                                statusEl.style.color = "#2ed573"; // Green color
+                                statusEl.style.color = "#2ed573";
                                 document.getElementById('success-title-text').innerText = "TopUp Complete!";
                                 document.getElementById('success-msg-text').innerText = "Your diamonds have been delivered successfully.";
                             } else if (rawStatus === 'failed') {
                                 statusEl.innerText = "Failed";
-                                statusEl.style.color = "#e53e3e"; // Red color
+                                statusEl.style.color = "#e53e3e";
                                 document.getElementById('success-title-text').innerText = "TopUp Failed";
                                 document.getElementById('success-msg-text').innerText = "Sorry, your top-up order has failed.";
                             } else {
                                 statusEl.innerText = "Pending / Processing";
-                                statusEl.style.color = "#f6ad55"; // Orange color
+                                statusEl.style.color = "#f6ad55";
                             }
                         }
                     });
