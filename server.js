@@ -7,19 +7,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Firebase Admin Initialize (Base64 wa normal string handle garne foolproof method)
+// Firebase Admin Initialize (Environment Variables bata)
 const projectId = process.env.FIREBASE_PROJECT_ID || "gaule-top-up-center";
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 
+// Render environment variable ko private key ko newline haru safe tarikale parse garne
 let privateKey = process.env.FIREBASE_PRIVATE_KEY || "";
-try {
-  // Yedi key base64 format ma cha vane decode garne, haina vane normal replace garne
-  if (!privateKey.includes("BEGIN PRIVATE KEY")) {
-    privateKey = Buffer.from(privateKey, 'base64').toString('utf8');
-  } else {
-    privateKey = privateKey.replace(/\\n/g, '\n');
-  }
-} catch (e) {
+if (privateKey) {
   privateKey = privateKey.replace(/\\n/g, '\n');
 }
 
@@ -56,6 +50,7 @@ async function getAndRemoveVoucher(dbKey) {
     const firstKey = voucherKeys[0];
     const voucherCode = vouchers[firstKey];
 
+    // Use bhayeko voucher lai Firebase database bata automatic remove garne
     await db.ref(`auto-top-up/${dbKey}/${firstKey}`).remove();
 
     return voucherCode;
@@ -70,8 +65,10 @@ app.post('/api/topup', async (req, res) => {
             return res.status(400).json({ status: 'error', message: 'Package DB Key is missing!' });
         }
 
+        // 1. Firebase database bata stock ko voucher code nikalne
         const voucherCode = await getAndRemoveVoucher(dbKey);
 
+        // 2. UniPin API ma automated order create request pathaune
         const response = await axios.post(`${BASE_URL}/api/v1/user/order/create`, {
             playerid: playerId,
             package: parseInt(packageId),
