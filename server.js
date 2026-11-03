@@ -4,15 +4,19 @@ const axios = require('axios');
 const admin = require('firebase-admin');
 const app = express();
 
-app.use(cors()); // CORS allow garne frontend ko lagi
+app.use(cors());
 app.use(express.json());
 
-// Firebase Admin Initialize (Environment Variables bata - Sahi tarika)
+// Firebase Admin Initialize (Environment Variables bata)
+const projectId = process.env.FIREBASE_PROJECT_ID || "gaule-top-up-center";
+const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+const privateKey = process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined;
+
 admin.initializeApp({
   credential: admin.credential.cert({
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined
+    projectId: projectId,
+    clientEmail: clientEmail,
+    privateKey: privateKey
   }),
   databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
 });
@@ -21,16 +25,6 @@ const db = admin.database();
 
 const BASE_URL = 'https://tzapi.tzsmm.com';
 const API_KEY = process.env.API_SECRET || process.env.API_KEY;
-
-// Outbound IP check garne function
-async function checkOutboundIP() {
-    try {
-        const response = await axios.get('https://api.ipify.org?format=json');
-        console.log(`Server Outbound IP Address: ${response.data.ip}`);
-    } catch (error) {
-        console.error('Could not fetch outbound IP:', error.message);
-    }
-}
 
 // Database bata voucher stock check garera remove garne function
 async function getAndRemoveVoucher(dbKey) {
@@ -91,13 +85,11 @@ app.post('/api/topup', async (req, res) => {
 
 // Webhook Endpoint
 app.post('/api/webhook', (req, res) => {
-    const webhookData = req.body;
-    console.log('Webhook Received from UniPin:', webhookData);
+    console.log('Webhook Received from UniPin:', req.body);
     res.status(200).send('OK');
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, async () => {
+app.listen(PORT, () => {
     console.log(`Gaule Store Server running on port ${PORT}`);
-    await checkOutboundIP();
 });
