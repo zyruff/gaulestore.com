@@ -79,11 +79,13 @@
         
         /* Payment Method Options Grid */
         .payment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 5px; }
-        .payment-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; }
+        .payment-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s; }
         .payment-card.selected { border: 2px solid #ffb300; background-color: #fffdf5; }
         .payment-card.disabled { opacity: 0.5; background-color: #edf2f7; cursor: not-allowed; border: 1px dashed #cbd5e0; }
-        .payment-card img { width: 24px; height: 24px; object-fit: contain; }
-        .payment-name { font-size: 13px; font-weight: 600; color: #1a202c; }
+        .payment-info { display: flex; flex-direction: column; }
+        .payment-name { font-size: 13px; font-weight: 700; color: #1a202c; }
+        .payment-sub { font-size: 11px; font-weight: 500; color: #718096; margin-top: 1px; }
+        .esewa-logo { width: 32px; height: 32px; background-color: #60b246; color: white; font-weight: 900; font-size: 17px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-family: sans-serif; flex-shrink: 0; }
 
         .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 4px; border-radius: 14px; border: 2px solid transparent; transition: all 0.2s ease; }
         .cards-grid.error-border { border: 2px solid #e53e3e !important; background-color: #fff5f5; padding: 8px; }
@@ -203,23 +205,6 @@
     </div>
 </div>
 
-<!-- Payment Method Section -->
-<div class="section-box">
-    <div class="section-header-flex">
-        <div class="box-title">Payment Method <span style="color: #e53e3e;">*</span></div>
-    </div>
-    <div class="payment-grid">
-        <div class="payment-card selected" onclick="selectPayment('wallet')">
-            <i class="fa-solid fa-wallet" style="font-size: 20px; color: #dc2626;"></i>
-            <div class="payment-name">Wallet Balance</div>
-        </div>
-        <div class="payment-card disabled" title="eSewa payment is currently disabled">
-            <i class="fa-solid fa-shield-halved" style="font-size: 20px; color: #60b246;"></i>
-            <div class="payment-name">eSewa (Disabled)</div>
-        </div>
-    </div>
-</div>
-
 <div class="section-box">
     <div class="section-header-flex">
         <div class="box-title">Diamonds & Packages <span style="color: #e53e3e;">*</span></div>
@@ -286,6 +271,29 @@
             <div class="pack-title">Monthly Membership</div>
             <div class="pack-price">Rs1000</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
+        </div>
+    </div>
+
+    <!-- Payment Method Section -->
+    <div style="margin-top: 20px;">
+        <div class="section-header-flex" style="margin-bottom: 10px;">
+            <div class="box-title">Payment Method <span style="color: #e53e3e;">*</span></div>
+        </div>
+        <div class="payment-grid">
+            <div class="payment-card selected" onclick="selectPayment('wallet')">
+                <i class="fa-solid fa-wallet" style="font-size: 20px; color: #dc2626;"></i>
+                <div class="payment-info">
+                    <div class="payment-name">Wallet Balance</div>
+                    <div class="payment-sub">Wallet Pay</div>
+                </div>
+            </div>
+            <div class="payment-card disabled" title="eSewa payment is currently disabled">
+                <div class="esewa-logo">e</div>
+                <div class="payment-info">
+                    <div class="payment-name">eSewa <span style="font-size: 10px; color: #e53e3e; font-weight: normal;">(Disabled)</span></div>
+                    <div class="payment-sub">Direct Payment</div>
+                </div>
+            </div>
         </div>
     </div>
 
