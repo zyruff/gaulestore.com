@@ -85,7 +85,7 @@
         .payment-info { display: flex; flex-direction: column; }
         .payment-name { font-size: 13px; font-weight: 700; color: #1a202c; }
         .payment-sub { font-size: 11px; font-weight: 500; color: #718096; margin-top: 1px; }
-        .esewa-logo { width: 32px; height: 32px; background-color: #60b246; color: white; font-weight: 900; font-size: 17px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-family: sans-serif; flex-shrink: 0; }
+        .esewa-logo { width: 32px; height: 32px; object-fit: contain; border-radius: 50%; flex-shrink: 0; }
 
         .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 4px; border-radius: 14px; border: 2px solid transparent; transition: all 0.2s ease; }
         .cards-grid.error-border { border: 2px solid #e53e3e !important; background-color: #fff5f5; padding: 8px; }
@@ -288,7 +288,7 @@
                 </div>
             </div>
             <div class="payment-card disabled" title="eSewa payment is currently disabled">
-                <div class="esewa-logo">e</div>
+                <img src="https://esewa.com.np/common/images/esewa_logo.png" alt="eSewa" class="esewa-logo">
                 <div class="payment-info">
                     <div class="payment-name">eSewa <span style="font-size: 10px; color: #e53e3e; font-weight: normal;">(Disabled)</span></div>
                     <div class="payment-sub">Direct Payment</div>
