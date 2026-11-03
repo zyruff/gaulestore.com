@@ -7,11 +7,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Firebase Admin Initialize (Environment Variables bata)
+// Firebase Admin Initialize (Environment Variables बाट)
 const projectId = process.env.FIREBASE_PROJECT_ID || "gaule-top-up-center";
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 
-// Render environment variable ko private key ko newline haru safe tarikale parse garne
+// Render environment variable को private key को newline हरू parse गर्ने
 let privateKey = process.env.FIREBASE_PRIVATE_KEY || "";
 if (privateKey) {
   privateKey = privateKey.replace(/\\n/g, '\n');
@@ -31,7 +31,7 @@ const db = admin.database();
 const BASE_URL = 'https://tzapi.tzsmm.com';
 const API_KEY = process.env.API_SECRET || process.env.API_KEY;
 
-// Database bata voucher stock check garera remove garne function
+// Database बाट voucher stock check गरेर remove गर्ने function
 async function getAndRemoveVoucher(dbKey) {
     const voucherRef = db.ref(`auto-top-up/${dbKey}`);
     const snapshot = await voucherRef.once('value');
@@ -50,7 +50,7 @@ async function getAndRemoveVoucher(dbKey) {
     const firstKey = voucherKeys[0];
     const voucherCode = vouchers[firstKey];
 
-    // Use bhayeko voucher lai Firebase database bata automatic remove garne
+    // Use भएको voucher लाई Firebase database बाट स्वचालित हटाउने
     await db.ref(`auto-top-up/${dbKey}/${firstKey}`).remove();
 
     return voucherCode;
@@ -65,10 +65,10 @@ app.post('/api/topup', async (req, res) => {
             return res.status(400).json({ status: 'error', message: 'Package DB Key is missing!' });
         }
 
-        // 1. Firebase database bata stock ko voucher code nikalne
+        // 1. Firebase database बाट stock को voucher code निकाल्ने
         const voucherCode = await getAndRemoveVoucher(dbKey);
 
-        // 2. UniPin API ma automated order create request pathaune
+        // 2. UniPin API मा automated order create request पठाउने
         const response = await axios.post(`${BASE_URL}/api/v1/user/order/create`, {
             playerid: playerId,
             package: parseInt(packageId),
@@ -88,13 +88,39 @@ app.post('/api/topup', async (req, res) => {
     }
 });
 
-// Webhook Endpoint
-app.post('/api/webhook', (req, res) => {
+// Webhook Endpoint (Log formatted output & update Firebase order status)
+app.post('/api/webhook', async (req, res) => {
+    console.log('==> Detected service running on port 10000');
+    console.log('==> Docs on specifying a port: https://render.com/docs/web-services#port-binding');
     console.log('Webhook Received from UniPin:', req.body);
-    res.status(200).send('OK');
+    
+    try {
+        const { orderid, api_order_id, status, message } = req.body;
+
+        if (orderid) {
+            // Firebase orders database मा orderid खोजेर status update गर्ने
+            const ordersRef = db.ref('orders');
+            const snapshot = await ordersRef.orderByChild('apiOrderId').equalTo(orderid).once('value');
+            
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    childSnapshot.ref.update({
+                        status: status === 'success' ? 'Success' : 'Failed',
+                        webhookMessage: message || status,
+                        apiOrderId: api_order_id || orderid
+                    });
+                });
+            }
+        }
+
+        res.status(200).send('OK');
+    } catch (err) {
+        console.error('Webhook Error:', err.message);
+        res.status(500).send('Server Error');
+    }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
     console.log(`Gaule Store Server running on port ${PORT}`);
 });
