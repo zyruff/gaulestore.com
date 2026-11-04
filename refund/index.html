@@ -347,6 +347,18 @@
     </div>
 </div>
 
+<!-- Insufficient Balance Modal -->
+<div class="success-modal" id="insufficientModal">
+    <div class="success-card">
+        <div class="success-checkmark" style="background: #fef2f2; border: 1px solid #fca5a5;">
+            <i class="fa-solid fa-wallet" style="color: #dc2626; font-size: 28px;"></i>
+        </div>
+        <div class="success-title">Insufficient Balance</div>
+        <p class="success-msg">Your wallet balance is insufficient! Please top up your account balance before proceeding.</p>
+        <button class="success-close-btn" style="background-color: #dc2626;" onclick="closeInsufficientModal()">Got It</button>
+    </div>
+</div>
+
 <script>
     function toggleMenu() {
         const menu = document.getElementById('nav-menu');
@@ -363,6 +375,10 @@
             alert("eSewa payment method is currently disabled.");
             return;
         }
+    }
+
+    function closeInsufficientModal() {
+        document.getElementById('insufficientModal').classList.remove('show');
     }
 </script>
 
@@ -496,7 +512,7 @@
         // Check if user has enough wallet balance
         const itemPriceNum = parseFloat(selectedItemPrice);
         if (currentWalletBalance < itemPriceNum) {
-            alert("Insufficient wallet balance! Please add funds to your wallet to complete this purchase.");
+            document.getElementById('insufficientModal').classList.add('show');
             return;
         }
 
