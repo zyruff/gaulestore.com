@@ -32,7 +32,7 @@ app.use(cors());
 app.use(express.json());
 
 // Configurations
-const BASE_URL = process.env.BASE_URL || 'https://androidartist.com/api/v1/user';
+const BASE_URL = process.env.BASE_URL || 'https://androidartist.com/api/process-topup';
 const API_KEY = process.env.API_KEY || 'YOUR_SECRET_KEY';
 
 const getAuthHeaders = () => ({
