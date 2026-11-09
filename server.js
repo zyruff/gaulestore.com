@@ -1,328 +1,73 @@
-// server.js (Pura & Final Code - Small letter status + Unbound, Wishlist & IP Checker added)
 const express = require('express');
-const axios = require('axios');
-const cors = require('cors');
+const bodyParser = require('body-parser');
 const admin = require('firebase-admin');
 
-// Initialize Firebase Admin securely using Environment Variable
-try {
-  if (process.env.FIREBASE_PRIVATE_KEY) {
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: "rg-digital-store",
-        clientEmail: "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40rg-digital-store.iam.gserviceaccount.com",
-        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-      }),
-      databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com"
-    });
-  } else {
-    admin.initializeApp({
-      databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com"
-    });
-  }
-} catch (e) {
-  // Already initialized fallback
-}
+// Firebase Admin SDK सेटअप (अपनी serviceAccountKey.json फाइल यहाँ कनेक्ट करें)
+const serviceAccount = require('./serviceAccountKey.json');
 
-const db = admin.database();
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com" // अपनी Realtime DB URL डालें
+});
+
+const db = admin.firestore();
 const app = express();
 
-// Enable CORS for frontend accessibility
-app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// Configurations
-const BASE_URL = process.env.BASE_URL || 'https://androidartist.com/api/process-topup';
-const API_KEY = process.env.API_KEY || 'YOUR_SECRET_KEY';
+// 1. Webhook Endpoint - जहाँ androidartist.com से स्टेटस रिस्पांस आएगा
+app.post('/api/auto-topup/webhook', async (req, res) => {
+    try {
+        const callbackData = req.body;
+        console.log("Webhook Received:", callbackData);
 
-const getAuthHeaders = () => ({
-  'X-API-KEY': API_KEY,
-  'Content-Type': 'application/json',
-});
+        const orderId = callbackData.orderid; // आर्डर आईडी जो आपने भेजा था
+        const status = callbackData.status;   // 'success', 'error', 'partial' आदि
+        const message = callbackData.message || callbackData.content;
 
-// Root Route
-app.get('/', (req, res) => {
-  res.json({
-    status: 'success',
-    message: 'Gaule Store API Service is active',
-    endpoints: [
-      '/api/packages',
-      '/api/order/create',
-      '/api/order/status',
-      '/api/orders/unbound',
-      '/api/otp',
-      '/api/webhook',
-      '/api/wishlist/add',
-      '/api/wishlist/:userId',
-      '/api/wishlist/:userId/:itemId',
-      '/api/get-my-ip'
-    ]
-  });
-});
+        if (!orderId) {
+            return res.status(400).json({ status: "error", message: "Order ID missing in webhook" });
+        }
 
-// 1. GET Active Packages
-app.get('/api/packages', async (req, res) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/packages`, { headers: getAuthHeaders() });
-    res.json(response.data);
-  } catch (error) {
-    res.status(error.response?.status || 500).json({
-      status: 'error',
-      message: error.response?.data || error.message,
-    });
-  }
-});
+        // Firestore में ऑर्डर स्टेटस अपडेट करें
+        const orderRef = db.collection('orders').doc(orderId);
+        const orderDoc = await orderRef.get();
 
-// 2. Create TopUp Order
-app.post('/api/order/create', async (req, res) => {
-  const { playerid, package: pkgId, code, orderid, callback_url } = req.body;
+        if (!orderDoc.exists) {
+            console.log(`Order ID ${orderId} not found in database.`);
+            return res.status(404).json({ status: "error", message: "Order not found" });
+        }
 
-  if (!playerid || !pkgId) {
-    return res.status(400).json({
-      status: 'failed',
-      message: 'playerid and package are required fields.',
-    });
-  }
+        // स्टेटस के आधार पर डेटाबेस अपडेट करें
+        let newStatus = 'processing';
+        if (status === 'success') {
+            newStatus = 'success';
+        } else if (status === 'error' || status === 'failed') {
+            newStatus = 'rejected'; // या cancel
+        } else if (status === 'partial') {
+            newStatus = 'partial';
+        }
 
-  try {
-    const payload = {
-      playerid: String(playerid),
-      package: Number(pkgId),
-      orderid: orderid || `GAULE-${Date.now()}`,
-      callback_url: callback_url || 'https://gaule-store.onrender.com/api/webhook'
-    };
-
-    if (code) payload.code = code;
-
-    const response = await axios.post(`${BASE_URL}/order/create`, payload, {
-      headers: getAuthHeaders(),
-    });
-
-    res.json(response.data);
-  } catch (error) {
-    res.status(error.response?.status || 500).json({
-      status: 'error',
-      message: error.response?.data || error.message,
-    });
-  }
-});
-
-// 3. Check Order Status
-app.get('/api/order/status', async (req, res) => {
-  const { order_id, user_order_id } = req.query;
-
-  if (!order_id && !user_order_id) {
-    return res.status(400).json({
-      status: 'failed',
-      message: 'Please provide either order_id or user_order_id.',
-    });
-  }
-
-  try {
-    const response = await axios.get(`${BASE_URL}/order/status`, {
-      headers: getAuthHeaders(),
-      params: { order_id, user_order_id },
-    });
-    res.json(response.data);
-  } catch (error) {
-    res.status(error.response?.status || 500).json({
-      status: 'error',
-      message: error.response?.data || error.message,
-    });
-  }
-});
-
-// 4. Unbound API Route (Added)
-app.get('/api/orders/unbound', async (req, res) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/orders`, {
-      headers: getAuthHeaders(),
-      params: req.query
-    });
-    
-    res.json({
-      status: 'success',
-      source: 'unbound_api',
-      data: response.data
-    });
-  } catch (error) {
-    res.status(error.response?.status || 500).json({
-      status: 'error',
-      message: error.response?.data || error.message,
-    });
-  }
-});
-
-// 5. Generate TOTP Code
-app.get('/api/otp', async (req, res) => {
-  const { key } = req.query;
-
-  if (!key) {
-    return res.status(400).json({
-      status: 'failed',
-      message: 'Base32 secret key is required.',
-    });
-  }
-
-  try {
-    const response = await axios.get(`${BASE_URL}/otp`, {
-      headers: getAuthHeaders(),
-      params: { key },
-    });
-    res.json(response.data);
-  } catch (error) {
-    res.status(error.response?.status || 500).json({
-      status: 'error',
-      message: error.response?.data || error.message,
-    });
-  }
-});
-
-// 6. Webhook Listener (Updates Firebase order status to small letters: complete / failed)
-app.post('/api/webhook', async (req, res) => {
-  const payload = req.body;
-  console.log('--- Webhook Received ---', payload);
-
-  try {
-    const apiOrderId = payload.api_order_id || payload.order_id || payload.orderid;
-    const orderStatus = payload.status;
-
-    if (apiOrderId && orderStatus) {
-      const ordersRef = db.ref('orders');
-      const snapshot = await ordersRef.orderByChild('apiOrderId').equalTo(String(apiOrderId)).once('value');
-
-      if (snapshot.exists()) {
-        snapshot.forEach((childSnapshot) => {
-          const orderKey = childSnapshot.key;
-          let newStatus = "pending";
-          
-          const statusLower = String(orderStatus).toLowerCase();
-          if (statusLower === 'success' || statusLower === 'completed' || statusLower === 'complete') {
-            newStatus = "complete";
-          } else if (statusLower === 'failed' || statusLower === 'fail') {
-            newStatus = "failed";
-          }
-
-          db.ref(`orders/${orderKey}`).update({
+        await orderRef.update({
             status: newStatus,
-            updatedAt: Date.now()
-          });
-          console.log(`Order ${orderKey} updated to: ${newStatus}`);
+            webhookResponse: callbackData,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
         });
-      }
+
+        console.log(`Order ${orderId} status updated to: ${newStatus}`);
+
+        // सफलता का रिस्पांस वापस भेजें
+        return res.status(200).json({ status: "success", message: "Webhook processed successfully" });
+
+    } catch (error) {
+        console.error("Webhook Error:", error);
+        return res.status(500).json({ status: "error", message: error.message });
     }
-
-    res.status(200).json({ status: 'success', message: 'Webhook processed and status updated' });
-  } catch (err) {
-    console.error("Webhook Database Error:", err);
-    res.status(500).json({ status: 'error', message: err.message });
-  }
 });
 
-// 7. Add item to Wishlist (Added)
-app.post('/api/wishlist/add', async (req, res) => {
-  const { userId, packageId, packageName, price } = req.body;
-
-  if (!userId || !packageId) {
-    return res.status(400).json({
-      status: 'failed',
-      message: 'userId and packageId are required fields.',
-    });
-  }
-
-  try {
-    const wishlistItem = {
-      packageId: String(packageId),
-      packageName: packageName || 'Unknown Package',
-      price: price || 0,
-      createdAt: Date.now()
-    };
-
-    const wishlistRef = db.ref(`wishlists/${userId}`);
-    const newRef = wishlistRef.push();
-    await newRef.set(wishlistItem);
-
-    res.json({
-      status: 'success',
-      message: 'Package added to wishlist successfully',
-      wishlistId: newRef.key
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      message: error.message,
-    });
-  }
-});
-
-// 8. Get User's Wishlist (Added)
-app.get('/api/wishlist/:userId', async (req, res) => {
-  const { userId } = req.params;
-
-  try {
-    const wishlistRef = db.ref(`wishlists/${userId}`);
-    const snapshot = await wishlistRef.once('value');
-
-    if (!snapshot.exists()) {
-      return res.json({
-        status: 'success',
-        data: []
-      });
-    }
-
-    const wishlistItems = [];
-    snapshot.forEach((childSnapshot) => {
-      wishlistItems.push({
-        id: childSnapshot.key,
-        ...childSnapshot.val()
-      });
-    });
-
-    res.json({
-      status: 'success',
-      data: wishlistItems
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      message: error.message,
-    });
-  }
-});
-
-// 9. Remove item from Wishlist (Added)
-app.delete('/api/wishlist/:userId/:itemId', async (req, res) => {
-  const { userId, itemId } = req.params;
-
-  try {
-    await db.ref(`wishlists/${userId}/${itemId}`).remove();
-    res.json({
-      status: 'success',
-      message: 'Item removed from wishlist successfully'
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      message: error.message,
-    });
-  }
-});
-
-// 10. Check Render Outbound IP Address (Added for TZ API IP Whitelist)
-app.get('/api/get-my-ip', async (req, res) => {
-  try {
-    const response = await axios.get('https://api.ipify.org?format=json');
-    res.json({
-      status: 'success',
-      render_outbound_ip: response.data.ip,
-      message: 'Yo IP lai TZ API ko IP Whitelist ma halnu hos.'
-    });
-  } catch (error) {
-    res.status(500).json({ status: 'error', message: error.message });
-  }
-});
-
+// सर्वर स्टार्ट पोर्ट
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    console.log(`Auto TopUp Webhook Server running on port ${PORT}`);
 });
