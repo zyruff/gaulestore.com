@@ -1,26 +1,15 @@
 {
-  "name": "rg-digital-store-api",
+  "name": "rg-digital-store",
   "version": "1.0.0",
-  "description": "UniPin TopUp API Integration Gateway for Gaule Store",
+  "description": "Auto Topup Server",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js"
+    "start": "node server.js"
   },
-  "keywords": [
-    "unipin",
-    "topup",
-    "express",
-    "node",
-    "render"
-  ],
-  "author": "Gaule Store",
-  "license": "ISC",
   "dependencies": {
-    "axios": "^1.7.9",
     "cors": "^2.8.5",
-    "express": "^4.21.2",
-    "firebase-admin": "^12.0.0"
+    "express": "^4.18.2",
+    "firebase-admin": "^11.11.0"
   },
   "engines": {
     "node": ">=18.0.0"
