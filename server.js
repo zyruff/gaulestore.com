@@ -9,7 +9,7 @@ try {
   if (process.env.FIREBASE_PRIVATE_KEY) {
     admin.initializeApp({
       credential: admin.credential.cert({
-        projectId: "gaule-top-up-center",
+        projectId: "rg-digital-store",
         clientEmail: "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40rg-digital-store.iam.gserviceaccount.com",
         privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
       }),
