@@ -1,5 +1,5 @@
 {
-  "name": "gaule-store-api",
+  "name": "rg-digital-store-api",
   "version": "1.0.0",
   "description": "UniPin TopUp API Integration Gateway for Gaule Store",
   "main": "server.js",
