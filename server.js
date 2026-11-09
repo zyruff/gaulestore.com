@@ -10,14 +10,14 @@ try {
     admin.initializeApp({
       credential: admin.credential.cert({
         projectId: "gaule-top-up-center",
-        clientEmail: "firebase-adminsdk-fbsvc@gaule-top-up-center.iam.gserviceaccount.com",
+        clientEmail: "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40rg-digital-store.iam.gserviceaccount.com",
         privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
       }),
-      databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
+      databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com"
     });
   } else {
     admin.initializeApp({
-      databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
+      databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com"
     });
   }
 } catch (e) {
