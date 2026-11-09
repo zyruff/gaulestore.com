@@ -1,4 +1,4 @@
-// server.js (Pura & Final Code - Small letter status)
+// server.js (Pura & Final Code - Small letter status + Unbound, Wishlist & IP Checker added)
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
@@ -49,8 +49,13 @@ app.get('/', (req, res) => {
       '/api/packages',
       '/api/order/create',
       '/api/order/status',
+      '/api/orders/unbound',
       '/api/otp',
-      '/api/webhook'
+      '/api/webhook',
+      '/api/wishlist/add',
+      '/api/wishlist/:userId',
+      '/api/wishlist/:userId/:itemId',
+      '/api/get-my-ip'
     ]
   });
 });
@@ -127,7 +132,28 @@ app.get('/api/order/status', async (req, res) => {
   }
 });
 
-// 4. Generate TOTP Code
+// 4. Unbound API Route (Added)
+app.get('/api/orders/unbound', async (req, res) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/orders`, {
+      headers: getAuthHeaders(),
+      params: req.query
+    });
+    
+    res.json({
+      status: 'success',
+      source: 'unbound_api',
+      data: response.data
+    });
+  } catch (error) {
+    res.status(error.response?.status || 500).json({
+      status: 'error',
+      message: error.response?.data || error.message,
+    });
+  }
+});
+
+// 5. Generate TOTP Code
 app.get('/api/otp', async (req, res) => {
   const { key } = req.query;
 
@@ -152,7 +178,7 @@ app.get('/api/otp', async (req, res) => {
   }
 });
 
-// 5. Webhook Listener (Updates Firebase order status to small letters: complete / failed)
+// 6. Webhook Listener (Updates Firebase order status to small letters: complete / failed)
 app.post('/api/webhook', async (req, res) => {
   const payload = req.body;
   console.log('--- Webhook Received ---', payload);
@@ -190,6 +216,109 @@ app.post('/api/webhook', async (req, res) => {
   } catch (err) {
     console.error("Webhook Database Error:", err);
     res.status(500).json({ status: 'error', message: err.message });
+  }
+});
+
+// 7. Add item to Wishlist (Added)
+app.post('/api/wishlist/add', async (req, res) => {
+  const { userId, packageId, packageName, price } = req.body;
+
+  if (!userId || !packageId) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'userId and packageId are required fields.',
+    });
+  }
+
+  try {
+    const wishlistItem = {
+      packageId: String(packageId),
+      packageName: packageName || 'Unknown Package',
+      price: price || 0,
+      createdAt: Date.now()
+    };
+
+    const wishlistRef = db.ref(`wishlists/${userId}`);
+    const newRef = wishlistRef.push();
+    await newRef.set(wishlistItem);
+
+    res.json({
+      status: 'success',
+      message: 'Package added to wishlist successfully',
+      wishlistId: newRef.key
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: error.message,
+    });
+  }
+});
+
+// 8. Get User's Wishlist (Added)
+app.get('/api/wishlist/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const wishlistRef = db.ref(`wishlists/${userId}`);
+    const snapshot = await wishlistRef.once('value');
+
+    if (!snapshot.exists()) {
+      return res.json({
+        status: 'success',
+        data: []
+      });
+    }
+
+    const wishlistItems = [];
+    snapshot.forEach((childSnapshot) => {
+      wishlistItems.push({
+        id: childSnapshot.key,
+        ...childSnapshot.val()
+      });
+    });
+
+    res.json({
+      status: 'success',
+      data: wishlistItems
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: error.message,
+    });
+  }
+});
+
+// 9. Remove item from Wishlist (Added)
+app.delete('/api/wishlist/:userId/:itemId', async (req, res) => {
+  const { userId, itemId } = req.params;
+
+  try {
+    await db.ref(`wishlists/${userId}/${itemId}`).remove();
+    res.json({
+      status: 'success',
+      message: 'Item removed from wishlist successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: error.message,
+    });
+  }
+});
+
+// 10. Check Render Outbound IP Address (Added for TZ API IP Whitelist)
+app.get('/api/get-my-ip', async (req, res) => {
+  try {
+    const response = await axios.get('https://api.ipify.org?format=json');
+    res.json({
+      status: 'success',
+      render_outbound_ip: response.data.ip,
+      message: 'Yo IP lai TZ API ko IP Whitelist ma halnu hos.'
+    });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
   }
 });
 
