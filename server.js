@@ -1,185 +1,200 @@
+// server.js (Pura & Final Code - Small letter status)
 const express = require('express');
-const path = require('path');
+const axios = require('axios');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
-// 1. Firebase Admin Initialization
-let serviceAccount;
-if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    try {
-        serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-        // Private key भित्रको newline (\n) मिलाउने
-        if (serviceAccount.private_key) {
-            serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
-        }
-    } catch (e) {
-        console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT JSON:", e);
-    }
-} else {
-    serviceAccount = require('./serviceAccountKey.json');
+// Initialize Firebase Admin securely using Environment Variable
+try {
+  if (process.env.FIREBASE_PRIVATE_KEY) {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: "gaule-top-up-center",
+        clientEmail: "firebase-adminsdk-fbsvc@gaule-top-up-center.iam.gserviceaccount.com",
+        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      }),
+      databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
+    });
+  } else {
+    admin.initializeApp({
+      databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com"
+    });
+  }
+} catch (e) {
+  // Already initialized fallback
 }
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com" // Realtime Database URL
-});
-
 const db = admin.database();
-const firestore = admin.firestore(); // Firestore
 const app = express();
 
-// Render proxy को लागि
-app.set('trust proxy', 1);
-
-const PORT = process.env.PORT || 10000;
-
-// AndroidArtist API Configuration
-const AA_API_BASE = "https://androidartist.com";
-const AA_API_KEY = process.env.AA_API_KEY || "YOUR_ANDROID_ARTIST_API_KEY";
-
-// Middleware - CORS र JSON Parsing खुल्ला गरिएको
-app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// Enable CORS for frontend accessibility
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Static files serve गर्ने (Frontend को लागि)
-app.use(express.static(path.join(__dirname)));
+// Configurations
+const BASE_URL = process.env.BASE_URL || 'https://androidartist.com/api/process-topup';
+const API_KEY = process.env.API_KEY || 'YOUR_SECRET_KEY';
 
-// Root Test Route (सर्वर अन छ कि छैन चेक गर्न)
+const getAuthHeaders = () => ({
+  'X-API-KEY': API_KEY,
+  'Content-Type': 'application/json',
+});
+
+// Root Route
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+  res.json({
+    status: 'success',
+    message: 'Gaule Store API Service is active',
+    endpoints: [
+      '/api/packages',
+      '/api/order/create',
+      '/api/order/status',
+      '/api/otp',
+      '/api/webhook'
+    ]
+  });
 });
 
-// 1. TopUp Endpoint (Frontend बाट कल हुन्छ)
-app.post('/api/topup', async (req, res) => {
-    try {
-        const { playerId, dbKey, userOrderId } = req.body;
-        
-        console.log(`[Incoming Request] Player ID: ${playerId}, Package Key: ${dbKey}, Order ID: ${userOrderId}`);
+// 1. GET Active Packages
+app.get('/api/packages', async (req, res) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/packages`, { headers: getAuthHeaders() });
+    res.json(response.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({
+      status: 'error',
+      message: error.response?.data || error.message,
+    });
+  }
+});
 
-        if (!playerId || !dbKey || !userOrderId) {
-            return res.status(400).json({ 
-                status: 'error', 
-                message: 'Missing required fields (playerId, dbKey, userOrderId)' 
-            });
-        }
+// 2. Create TopUp Order
+app.post('/api/order/create', async (req, res) => {
+  const { playerid, package: pkgId, code, orderid, callback_url } = req.body;
 
-        // Step A: Firebase stock बाट available voucher code झिक्ने
-        const stockRef = db.ref(`auto-top-up/${dbKey}`);
-        const snapshot = await stockRef.once('value');
-        const stockData = snapshot.val();
+  if (!playerid || !pkgId) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'playerid and package are required fields.',
+    });
+  }
 
-        if (!stockData || Object.keys(stockData).length === 0) {
-            console.log(`[Stock Error] Package ${dbKey} is Out of Stock!`);
-            return res.status(400).json({ 
-                status: 'error', 
-                message: 'Selected package is currently Out of Stock!' 
-            });
-        }
+  try {
+    const payload = {
+      playerid: String(playerid),
+      package: Number(pkgId),
+      orderid: orderid || `GAULE-${Date.now()}`,
+      callback_url: callback_url || 'https://gaule-store.onrender.com/api/webhook'
+    };
 
-        const voucherEntries = Object.entries(stockData);
-        const [voucherKey, voucherObj] = voucherEntries[0];
-        const voucherCode = typeof voucherObj === 'string' ? voucherObj : (voucherObj.code || voucherObj.pin);
+    if (code) payload.code = code;
 
-        if (!voucherCode) {
-            return res.status(400).json({ status: 'error', message: 'Invalid voucher format in stock.' });
-        }
+    const response = await axios.post(`${BASE_URL}/order/create`, payload, {
+      headers: getAuthHeaders(),
+    });
 
-        // Webhook URL जहाँ AndroidArtist ले रिजल्ट पठाउँछ
-        const callbackUrl = `https://${req.get('host')}/webhook/androidartist`;
+    res.json(response.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({
+      status: 'error',
+      message: error.response?.data || error.message,
+    });
+  }
+});
 
-        console.log(`[Sending to AA API] Player ID: ${playerId}, Code: ${voucherCode}, Callback: ${callbackUrl}`);
+// 3. Check Order Status
+app.get('/api/order/status', async (req, res) => {
+  const { order_id, user_order_id } = req.query;
 
-        // Step B: AndroidArtist API मा Request पठाउने
-        const aaResponse = await fetch(`${AA_API_BASE}/api/process-topup`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                api: AA_API_KEY,
-                orderid: userOrderId,
-                playerid: playerId,
-                code: voucherCode,
-                url: callbackUrl
-            })
+  if (!order_id && !user_order_id) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'Please provide either order_id or user_order_id.',
+    });
+  }
+
+  try {
+    const response = await axios.get(`${BASE_URL}/order/status`, {
+      headers: getAuthHeaders(),
+      params: { order_id, user_order_id },
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({
+      status: 'error',
+      message: error.response?.data || error.message,
+    });
+  }
+});
+
+// 4. Generate TOTP Code
+app.get('/api/otp', async (req, res) => {
+  const { key } = req.query;
+
+  if (!key) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'Base32 secret key is required.',
+    });
+  }
+
+  try {
+    const response = await axios.get(`${BASE_URL}/otp`, {
+      headers: getAuthHeaders(),
+      params: { key },
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({
+      status: 'error',
+      message: error.response?.data || error.message,
+    });
+  }
+});
+
+// 5. Webhook Listener (Updates Firebase order status to small letters: complete / failed)
+app.post('/api/webhook', async (req, res) => {
+  const payload = req.body;
+  console.log('--- Webhook Received ---', payload);
+
+  try {
+    const apiOrderId = payload.api_order_id || payload.order_id || payload.orderid;
+    const orderStatus = payload.status;
+
+    if (apiOrderId && orderStatus) {
+      const ordersRef = db.ref('orders');
+      const snapshot = await ordersRef.orderByChild('apiOrderId').equalTo(String(apiOrderId)).once('value');
+
+      if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+          const orderKey = childSnapshot.key;
+          let newStatus = "pending";
+          
+          const statusLower = String(orderStatus).toLowerCase();
+          if (statusLower === 'success' || statusLower === 'completed' || statusLower === 'complete') {
+            newStatus = "complete";
+          } else if (statusLower === 'failed' || statusLower === 'fail') {
+            newStatus = "failed";
+          }
+
+          db.ref(`orders/${orderKey}`).update({
+            status: newStatus,
+            updatedAt: Date.now()
+          });
+          console.log(`Order ${orderKey} updated to: ${newStatus}`);
         });
-
-        const aaResult = await aaResponse.json();
-        console.log("AndroidArtist API Response:", aaResult);
-
-        // API को रेस्पोन्स चेक गर्ने
-        if (aaResponse.ok && (aaResult.status === 'success' || aaResult.main_order_id)) {
-            // Step C: भौचर प्रयोग भइसकेपछि Firebase stock बाट हटाउने
-            await db.ref(`auto-top-up/${dbKey}/${voucherKey}`).remove();
-            console.log(`[Stock Cleaned] Voucher removed from stock: ${voucherKey}`);
-
-            return res.status(200).json({
-                status: 'success',
-                order_id: userOrderId,
-                message: aaResult.message || 'TopUp order processed successfully.'
-            });
-        } else {
-            return res.status(400).json({
-                status: 'error',
-                message: aaResult.content || aaResult.message || 'AndroidArtist API rejected the topup request.'
-            });
-        }
-
-    } catch (error) {
-        console.error("TopUp Server Error:", error);
-        return res.status(500).json({ status: 'error', message: error.message });
-    }
-});
-
-// 2. AndroidArtist Webhook / Callback Endpoint
-app.post('/webhook/androidartist', async (req, res) => {
-    const webhookData = req.body;
-    console.log("Webhook Received from AndroidArtist:", webhookData);
-
-    const orderId = webhookData.orderid;
-    const orderStatus = webhookData.status; // success, error, partial आदि
-
-    if (orderId) {
-        try {
-            // Firestore मा अर्डरको Status Update गर्ने
-            const orderRef = firestore.collection('orders').doc(orderId);
-            const orderDoc = await orderRef.get();
-
-            if (orderDoc.exists) {
-                let mappedStatus = 'processing';
-                if (orderStatus === 'success') {
-                    mappedStatus = 'success';
-                } else if (orderStatus === 'error' || orderStatus === 'failed') {
-                    mappedStatus = 'rejected';
-                } else if (orderStatus === 'partial') {
-                    mappedStatus, mappedStatus = 'partial';
-                }
-
-                await orderRef.update({
-                    status: mappedStatus,
-                    webhookMessage: webhookData.message || webhookData.content || '',
-                    updatedAt: admin.firestore.FieldValue.serverTimestamp()
-                });
-                console.log(`Order ${orderId} successfully updated to status: ${mappedStatus}`);
-            }
-        } catch (err) {
-            console.error("Webhook DB Update Error:", err);
-        }
+      }
     }
 
-    return res.status(200).json({ received: true });
+    res.status(200).json({ status: 'success', message: 'Webhook processed and status updated' });
+  } catch (err) {
+    console.error("Webhook Database Error:", err);
+    res.status(500).json({ status: 'error', message: err.message });
+  }
 });
 
-// सबै Routes को लागि index.html serve गर्ने
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`AndroidArtist AutoTopUp Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
+Yesto xa
