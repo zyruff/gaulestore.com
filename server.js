@@ -37,24 +37,36 @@ const PORT = process.env.PORT || 10000;
 const AA_API_BASE = "https://androidartist.com";
 const AA_API_KEY = process.env.AA_API_KEY || "YOUR_ANDROID_ARTIST_API_KEY";
 
-// Middleware
-app.use(cors());
+// Middleware - CORS र JSON Parsing खुल्ला गरिएको
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static files serve गर्ने
+// Static files serve गर्ने (Frontend को लागि)
 app.use(express.static(path.join(__dirname)));
+
+// Root Test Route (सर्वर अन छ कि छैन चेक गर्न)
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // 1. TopUp Endpoint (Frontend बाट कल हुन्छ)
 app.post('/api/topup', async (req, res) => {
     try {
         const { playerId, dbKey, userOrderId } = req.body;
         
-        if (!playerId || !dbKey || !userOrderId) {
-            return res.status(400).json({ status: 'error', message: 'Missing required fields (playerId, dbKey, userOrderId)' });
-        }
+        console.log(`[Incoming Request] Player ID: ${playerId}, Package Key: ${dbKey}, Order ID: ${userOrderId}`);
 
-        console.log(`[AA TopUp Request] Player ID: ${playerId}, Package Key: ${dbKey}, Order ID: ${userOrderId}`);
+        if (!playerId || !dbKey || !userOrderId) {
+            return res.status(400).json({ 
+                status: 'error', 
+                message: 'Missing required fields (playerId, dbKey, userOrderId)' 
+            });
+        }
 
         // Step A: Firebase stock बाट available voucher code झिक्ने
         const stockRef = db.ref(`auto-top-up/${dbKey}`);
@@ -62,7 +74,11 @@ app.post('/api/topup', async (req, res) => {
         const stockData = snapshot.val();
 
         if (!stockData || Object.keys(stockData).length === 0) {
-            return res.status(400).json({ status: 'error', message: 'Selected package is currently Out of Stock!' });
+            console.log(`[Stock Error] Package ${dbKey} is Out of Stock!`);
+            return res.status(400).json({ 
+                status: 'error', 
+                message: 'Selected package is currently Out of Stock!' 
+            });
         }
 
         const voucherEntries = Object.entries(stockData);
@@ -100,6 +116,7 @@ app.post('/api/topup', async (req, res) => {
         if (aaResponse.ok && (aaResult.status === 'success' || aaResult.main_order_id)) {
             // Step C: भौचर प्रयोग भइसकेपछि Firebase stock बाट हटाउने
             await db.ref(`auto-top-up/${dbKey}/${voucherKey}`).remove();
+            console.log(`[Stock Cleaned] Voucher removed from stock: ${voucherKey}`);
 
             return res.status(200).json({
                 status: 'success',
@@ -140,7 +157,7 @@ app.post('/webhook/androidartist', async (req, res) => {
                 } else if (orderStatus === 'error' || orderStatus === 'failed') {
                     mappedStatus = 'rejected';
                 } else if (orderStatus === 'partial') {
-                    mappedStatus = 'partial';
+                    mappedStatus, mappedStatus = 'partial';
                 }
 
                 await orderRef.update({
