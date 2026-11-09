@@ -3,40 +3,46 @@ const path = require('path');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
-// 1. Firebase Admin Initialization (Render Environment Variable वा Local File बाट)
+// 1. Firebase Admin Initialization
 let serviceAccount;
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    // Render को Environment Variable बाट JSON लोड गर्ने
-    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    try {
+        serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+        // Private key भित्रको newline (\n) मिलाउने
+        if (serviceAccount.private_key) {
+            serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+        }
+    } catch (e) {
+        console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT JSON:", e);
+    }
 } else {
-    // लोकल कम्प्युटरमा चलाउँदा serviceAccountKey.json प्रयोग गर्ने
     serviceAccount = require('./serviceAccountKey.json');
 }
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com" // तपाईंको Realtime Database URL
+    databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com" // Realtime Database URL
 });
 
 const db = admin.database();
-const firestore = admin.firestore(); // Firestore (अर्डर स्टेटस अपडेट गर्न)
+const firestore = admin.firestore(); // Firestore
 const app = express();
 
-// Render proxy को लागि अत्यावश्यक
+// Render proxy को लागि
 app.set('trust proxy', 1);
 
 const PORT = process.env.PORT || 10000;
 
 // AndroidArtist API Configuration
 const AA_API_BASE = "https://androidartist.com";
-const AA_API_KEY = process.env.AA_API_KEY || "YOUR_ANDROID_ARTIST_API_KEY"; // Render मा 'AA_API_KEY' नामको variable राख्नुहोला
+const AA_API_KEY = process.env.AA_API_KEY || "YOUR_ANDROID_ARTIST_API_KEY";
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static files serve गर्ने (Frontend को लागि)
+// Static files serve गर्ने
 app.use(express.static(path.join(__dirname)));
 
 // 1. TopUp Endpoint (Frontend बाट कल हुन्छ)
@@ -72,7 +78,7 @@ app.post('/api/topup', async (req, res) => {
 
         console.log(`[Sending to AA API] Player ID: ${playerId}, Code: ${voucherCode}, Callback: ${callbackUrl}`);
 
-        // Step B: AndroidArtist API मा Documentation अनुसार Request पठाउने
+        // Step B: AndroidArtist API मा Request पठाउने
         const aaResponse = await fetch(`${AA_API_BASE}/api/process-topup`, {
             method: 'POST',
             headers: {
@@ -158,5 +164,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`AndroidArtist Auto-TopUp Server running on port ${PORT}`);
+    console.log(`AndroidArtist AutoTopUp Server running on port ${PORT}`);
 });
