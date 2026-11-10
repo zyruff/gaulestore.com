@@ -6,14 +6,15 @@ const app = express();
 app.use(express.json());
 
 // ==========================================
-// Firebase Admin SDK Setup
-// (Render मा Environment Variables वा JSON file मार्फत मिलाउन सक्नुहुन्छ)
+// Firebase Admin SDK Setup (Render Environment Variables बाट)
 // ==========================================
-const serviceAccount = require('./path-to-your-firebase-service-account-key.json'); // आफ्नो Firebase Service Account Key को सहि path दिनुहोला
-
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined
+    })
   });
 }
 
@@ -110,7 +111,7 @@ app.post('/api/auto-topup/webhook', async (req, res) => {
     else if (webhookData.status === 'error') {
       console.log(`Order ${orderId} FAILED. Reason: ${webhookData.content}`);
       
-      // Firestore मा status 'cancel' बनाउने (तपाईंको आवश्यकता अनुसार)
+      // Firestore मा status 'cancel' बनाउने
       await orderRef.update({
         status: 'cancel',
         apiResponseMsg: webhookData.content || 'Failed'
