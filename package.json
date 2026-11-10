@@ -1,17 +1,13 @@
 {
   "name": "rg-digital-store",
   "version": "1.0.0",
-  "description": "Auto Topup Server",
+  "description": "Free Fire & Garena Topup API Server",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.18.2",
-    "firebase-admin": "^11.11.0"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+    "axios": "^1.7.9",
+    "express": "^4.21.2"
   }
 }
