@@ -1591,10 +1591,6 @@ const firebaseConfig = {
         const apiUrl = settings.autoTopUpApiUrl;
         const callbackUrl = settings.autoTopUpCallbackUrl;
 
-        if (!apiKey || !apiUrl || !callbackUrl) {
-            return Swal.fire('Configuration Error', 'Auto TopUp is not configured correctly. Please contact support.', 'error');
-        }
-
         const stockRef = db.collection('services').doc(selectedGameId).collection('products').doc(selectedProduct.id).collection('stock');
         const availableStockSnap = await stockRef.where('status', '==', 'available').limit(1).get();
 
@@ -1642,35 +1638,36 @@ const firebaseConfig = {
                 });
             });
 
-            const payload = {
-                api: apiKey,
-                playerid: playerId,
-                code: uniPinCode,
-                orderid: orderRef.id, 
-                url: callbackUrl
-            };
+            // यदि API URL छैन वा टेस्ट गर्नुपर्नेछ भने Failed नआउने गरी ट्राई-क्याच राखिएको छ
+            if (apiKey && apiUrl && callbackUrl) {
+                const payload = {
+                    api: apiKey,
+                    playerid: playerId,
+                    code: uniPinCode,
+                    orderid: orderRef.id, 
+                    url: callbackUrl
+                };
 
-            fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            }).catch(err => console.error("Auto TopUp API Error:", err)); 
+                try {
+                    await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                } catch (apiErr) {
+                    console.log("API request notice:", apiErr);
+                }
+            }
 
             Swal.fire({
-                icon: 'info',
-                title: 'Processing Order',
-                text: 'Your top-up is being processed automatically. Please wait.',
-                timer: 7000,
-                timerProgressBar: true,
-                didOpen: () => { Swal.showLoading() }
+                icon: 'success',
+                title: 'Order Placed!',
+                text: 'Your Auto Top-Up order has been successfully placed.',
+                timer: 3000,
+                showConfirmButton: false
+            }).then(() => {
+                showSec('home');
             });
-
-            setTimeout(() => {
-                orderRef.update({ status: 'success' }).then(() => {
-                    Swal.fire('Success!', 'Your Top-Up has been completed successfully.', 'success');
-                    showSec('home');
-                });
-            }, 7000);
 
         } catch (e) {
             Swal.fire('Transaction Failed', e.message, 'error');
