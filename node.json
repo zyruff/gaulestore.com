@@ -1,0 +1,12 @@
+const express = require('express');
+const app = express();
+
+// यहाँ express.json() खाली राखिन्छ
+app.use(express.json()); 
+
+app.post('/api/auto-topup/webhook', (req, res) => {
+    console.log(req.body); // प्र놈 পাঠাएको JSON ডাटा यहाँ देखिन्छ
+    res.status(200).send('OK');
+});
+
+app.listen(3000);
