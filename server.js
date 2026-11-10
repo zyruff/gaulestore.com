@@ -6,16 +6,18 @@ const app = express();
 app.use(express.json());
 
 // ==========================================
-// Firebase Admin SDK Setup (Render Environment Variables बाट)
+// Firebase Admin SDK Setup (Render Environment Variable बाट)
 // ==========================================
 if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined
-    })
-  });
+  try {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount)
+    });
+    console.log("Firebase Initialized Successfully using SERVICE_ACCOUNT JSON!");
+  } catch (error) {
+    console.error("Firebase Initialization Error:", error.message);
+  }
 }
 
 const db = admin.firestore();
@@ -31,35 +33,18 @@ app.post('/api/topup', async (req, res) => {
   try {
     const { api, orderid, playerid, code, url } = req.body;
 
-    // Basic Validation
     if (!api || !orderid || !playerid || !code || !url) {
       return res.status(400).json({
         status: 'error',
-        message: 'सबै fields (api, orderid, playerid, code, url) अनिवार्य छन्।'
+        message: 'सबै fields अनिवार्य छन्।'
       });
     }
 
-    // Payload for AndroidArtist
-    const payload = {
-      api,
-      orderid,
-      playerid,
-      code,
-      url // यहाँ तपाईंको https://gaule-store.onrender.com/api/auto-topup/webhook जानुपर्छ
-    };
+    const payload = { api, orderid, playerid, code, url };
 
-    console.log('--- Sending Top-Up Request to AndroidArtist ---');
-    console.log(JSON.stringify(payload, null, 2));
-
-    // Sending request to androidartist API
     const response = await axios.post(API_BASE_URL, payload, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      headers: { 'Content-Type': 'application/json' }
     });
-
-    console.log('--- AndroidArtist Immediate Response ---');
-    console.log(JSON.stringify(response.data, null, 2));
 
     return res.status(200).json(response.data);
 
@@ -74,7 +59,7 @@ app.post('/api/topup', async (req, res) => {
 });
 
 // ==========================================
-// 2. Webhook / Callback Listener Endpoint (Render मा Callback आउने ठाउँ)
+// 2. Webhook / Callback Listener Endpoint
 // ==========================================
 app.post('/api/auto-topup/webhook', async (req, res) => {
   const webhookData = req.body;
@@ -82,10 +67,10 @@ app.post('/api/auto-topup/webhook', async (req, res) => {
   console.log('--- Webhook Received from AndroidArtist ---');
   console.log(JSON.stringify(webhookData, null, 2));
 
-  const orderId = webhookData.orderid; // यो Firestore मा अर्डर बनाउँदाको Doc ID सँग मिल्नुपर्छ
+  const orderId = webhookData.orderid; 
 
   if (!orderId) {
-    return res.status(400).json({ status: 'error', message: 'Order ID missing in webhook data' });
+    return res.status(400).json({ status: 'error', message: 'Order ID missing' });
   }
 
   try {
@@ -94,31 +79,23 @@ app.post('/api/auto-topup/webhook', async (req, res) => {
 
     if (!orderDoc.exists) {
       console.log(`Order ID ${orderId} not found in Firestore.`);
-      return res.status(404).json({ status: 'error', message: 'Order not found in database' });
+      return res.status(404).json({ status: 'error', message: 'Order not found' });
     }
 
-    // जब अर्डर सफल हुन्छ
     if (webhookData.status === 'success') {
-      console.log(`Order ${orderId} is SUCCESSFUL.`);
-      
-      // Firestore मा status 'success' बनाउने
       await orderRef.update({
         status: 'success',
         apiResponseMsg: webhookData.content || 'Success'
       });
-    } 
-    // जब अर्डर असफल हुन्छ (Error / Cancel)
-    else if (webhookData.status === 'error') {
-      console.log(`Order ${orderId} FAILED. Reason: ${webhookData.content}`);
-      
-      // Firestore मा status 'cancel' बनाउने
+      console.log(`Order ${orderId} updated to success.`);
+    } else if (webhookData.status === 'error') {
       await orderRef.update({
         status: 'cancel',
         apiResponseMsg: webhookData.content || 'Failed'
       });
+      console.log(`Order ${orderId} updated to cancel.`);
     }
 
-    // एन्ड्रोइड आर्टिस्टलाई क्यालब्याक पायो भनेर HTTP 200 OK Response फर्काउने (अनिवार्य)
     return res.status(200).json({ received: true });
 
   } catch (dbError) {
@@ -127,7 +104,6 @@ app.post('/api/auto-topup/webhook', async (req, res) => {
   }
 });
 
-// Health Check Endpoint (Render सर्भरलाई जगाइराख्नको लागि)
 app.get('/', (req, res) => {
   res.send('Free Fire Automated Top-Up Server is Running!');
 });
