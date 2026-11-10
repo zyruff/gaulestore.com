@@ -29,7 +29,7 @@ app.post('/api/topup', async (req, res) => {
       orderid,
       playerid,
       code,
-      url // यहाँ तपाईंको https://gaule-store.onrender.com/api/auto-topup/webhook जानुपर्छ
+      url 
     };
 
     console.log('--- Sending Top-Up Request to AndroidArtist ---');
@@ -58,7 +58,7 @@ app.post('/api/topup', async (req, res) => {
 });
 
 // ==========================================
-// 2. Webhook / Callback Listener Endpoint (Render मा Callback आउने ठाउँ)
+// 2. Webhook / Callback Listener Endpoint
 // ==========================================
 app.post('/api/auto-topup/webhook', (req, res) => {
   const webhookData = req.body;
@@ -66,22 +66,39 @@ app.post('/api/auto-topup/webhook', (req, res) => {
   console.log('--- Webhook Received from AndroidArtist ---');
   console.log(JSON.stringify(webhookData, null, 2));
 
-  // जब अर्डर सफल हुन्छ
-  if (webhookData.status === 'success') {
-    console.log(`Order ${webhookData.orderid} is SUCCESSFUL.`);
-    // TODO: यहाँ आफ्नो Database मा अर्डर Status 'success' अपडेट गर्ने कोड राख्नुहोला
+  const orderid = webhookData.orderid;
+  const status = webhookData.status; // success, error, partial
+
+  // 1. यदि अर्डर सफल हुन्छ भने
+  if (status === 'success') {
+    console.log(`Order ${orderid} is SUCCESSFUL.`);
+    
+    // TODO: आफ्नो Database (Firebase/MongoDB/MySQL) मा status 'success' राख्ने कोड यहाँ लेख्नुहोला
+    // Jastai: 
+    // updateDatabaseOrderStatus(orderid, 'success');
   } 
-  // जब अर्डर असफल हुन्छ
-  else if (webhookData.status === 'error') {
-    console.log(`Order ${webhookData.orderid} FAILED. Reason: ${webhookData.content}`);
-    // TODO: यहाँ आफ्नो Database मा अर्डर Status 'failed' अपडेट गर्ने कोड राख्नुहोला
+  // 2. यदि अर्डर असफल हुन्छ भने (तपाईँको माग्नुभएको अनुसार 'cancel' गर्ने)
+  else if (status === 'error') {
+    console.log(`Order ${orderid} FAILED. Reason: ${webhookData.content}`);
+    
+    // TODO: आफ्नो Database मा status 'cancel' राख्ने कोड यहाँ लेख्नुहोला
+    // Jastai: 
+    // updateDatabaseOrderStatus(orderid, 'cancel');
+  }
+  // 3. यदि multi-voucher मा partial (आंशिक सफल) हुन्छ भने
+  else if (status === 'partial') {
+    console.log(`Order ${orderid} completed with PARTIAL status.`);
+    
+    // TODO: आवश्यकता अनुसार partial लाई पनि cancel वा partial नै save गर्ने
+    // Jastai: 
+    // updateDatabaseOrderStatus(orderid, 'cancel'); // वा 'partial'
   }
 
   // एन्ड्रोइड आर्टिस्टलाई क्यालब्याक पायो भनेर HTTP 200 OK Response फर्काउने (अनिवार्य)
   res.status(200).json({ received: true });
 });
 
-// Health Check Endpoint (Render सर्भरलाई जगाइराख्नको लागि)
+// Health Check Endpoint
 app.get('/', (req, res) => {
   res.send('Free Fire Automated Top-Up Server is Running!');
 });
