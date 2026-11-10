@@ -12,7 +12,7 @@ const API_BASE_URL = 'https://androidartist.com/api/process-topup';
 const API_SECRET = 'TPBD-XXXX-XXXX'; // Tapai ko original Merchant API Secret Key yaha rakhnus
 
 // Tapai ko Render Live Webhook URL
-const YOUR_WEBHOOK_URL = 'https://gaule-store.onrender.com/api/webhook';
+const YOUR_WEBHOOK_URL = 'https://gaule-store.onrender.com/api/auto-topup/webhook';
 
 // ==========================================
 // 1. WEBHOOK LISTENER ENDPOINT
