@@ -1,13 +1,3 @@
-const express = require('express');
-const axios = require('axios');
-const app = express();
-
-app.use(express.json());
-
-// API Configuration
-const API_BASE_URL = 'https://androidartist.com/api/process-topup';
-const PORT = process.env.PORT || 3000;
-
 // ==========================================
 // 1. Process Top-Up Endpoint
 // ==========================================
@@ -39,10 +29,9 @@ app.post('/api/topup', async (req, res) => {
       orderid,
       playerid,
       code,
-      url
+      url // 👈 सुनिश्चित गर्नुहोस् कि यो https://gaule-store.onrender.com/api/auto-topup/webhook हो
     };
 
-    // If Garena Shell Order
     if (code === 'shell') {
       if (!pkg || !username || !password || !autocode) {
         return res.status(400).json({
@@ -56,6 +45,10 @@ app.post('/api/topup', async (req, res) => {
       payload.autocode = autocode;
     }
 
+    // 🔍 1. AndroidArtist मा के डेटा जाँदैछ Log गर्ने
+    console.log('--- Sending Top-Up Request to AndroidArtist ---');
+    console.log(JSON.stringify(payload, null, 2));
+
     // Sending request to androidartist API
     const response = await axios.post(API_BASE_URL, payload, {
       headers: {
@@ -63,7 +56,10 @@ app.post('/api/topup', async (req, res) => {
       }
     });
 
-    // Return the API response back to client
+    // 🔍 2. AndroidArtist ले के रिप्लाई दियो Log गर्ने
+    console.log('--- AndroidArtist Immediate Response ---');
+    console.log(JSON.stringify(response.data, null, 2));
+
     return res.status(200).json(response.data);
 
   } catch (error) {
@@ -74,44 +70,4 @@ app.post('/api/topup', async (req, res) => {
       details: error.response ? error.response.data : error.message
     });
   }
-});
-
-// ==========================================
-// 2. Webhook Listener Endpoint (Your Site URL)
-// ==========================================
-// यो Endpoint तपाईंको site को URL (e.g., https://gaule-store.onrender.com/api/auto-topup/webhook) मा set गर्न सकिन्छ
-app.post('/api/auto-topup/webhook', (req, res) => {
-  const webhookData = req.body;
-
-  console.log('--- Webhook Received ---');
-  console.log(JSON.stringify(webhookData, null, 2));
-
-  // Single Voucher Callback Processing
-  if (webhookData.status === 'success' && !webhookData.parts) {
-    console.log(`Order ${webhookData.orderid} is SUCCESSFUL.`);
-    // TODO: DB मा status update गर्ने कोड यहाँ राख्नुहोस्
-  } 
-  // Multi-Voucher / Consolidated Callback Processing
-  else if (webhookData.parts) {
-    console.log(`Multi-Voucher Order ${webhookData.orderid} completed with status: ${webhookData.status}`);
-    console.log(`Total Success: ${webhookData.total_success}/${webhookData.total_vouchers}`);
-    // TODO: DB मा multi-part order status update गर्ने कोड यहाँ राख्नुहोस्
-  } 
-  // Error Callback Processing
-  else if (webhookData.status === 'error') {
-    console.log(`Order ${webhookData.orderid} FAILED. Reason: ${webhookData.content}`);
-    // TODO: DB मा order failed update गर्ने कोड यहाँ राख्नुहोस्
-  }
-
-  // API लाई HTTP 200 OK Response पठाउने
-  res.status(200).json({ received: true });
-});
-
-// Health Check Endpoint
-app.get('/', (req, res) => {
-  res.send('Free Fire Top-Up Automated Server is Running!');
-});
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
 });
