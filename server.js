@@ -1,51 +1,37 @@
+const express = require('express');
+const axios = require('axios');
+const app = express();
+
+app.use(express.json());
+
+// API Configuration
+const API_BASE_URL = 'https://androidartist.com/api/process-topup';
+const PORT = process.env.PORT || 10000;
+
 // ==========================================
-// 1. Process Top-Up Endpoint
+// 1. Process Top-Up Endpoint (AndroidArtist मा अर्डर पठाउने)
 // ==========================================
 app.post('/api/topup', async (req, res) => {
   try {
-    const { 
-      api, 
-      orderid, 
-      playerid, 
-      code, 
-      url, 
-      package: pkg, 
-      username, 
-      password, 
-      autocode 
-    } = req.body;
+    const { api, orderid, playerid, code, url } = req.body;
 
     // Basic Validation
     if (!api || !orderid || !playerid || !code || !url) {
       return res.status(400).json({
         status: 'error',
-        message: 'Missing required parameters: api, orderid, playerid, code, and url are required.'
+        message: 'सबै fields (api, orderid, playerid, code, url) अनिवार्य छन्।'
       });
     }
 
-    // Payload construction
+    // Payload for AndroidArtist
     const payload = {
       api,
       orderid,
       playerid,
       code,
-      url // 👈 सुनिश्चित गर्नुहोस् कि यो https://gaule-store.onrender.com/api/auto-topup/webhook हो
+      url // यहाँ तपाईंको https://gaule-store.onrender.com/api/auto-topup/webhook जानुपर्छ
     };
 
-    if (code === 'shell') {
-      if (!pkg || !username || !password || !autocode) {
-        return res.status(400).json({
-          status: 'error',
-          message: 'Missing required parameters for Garena Shell topup.'
-        });
-      }
-      payload.package = pkg;
-      payload.username = username;
-      payload.password = password;
-      payload.autocode = autocode;
-    }
-
-    // 🔍 1. AndroidArtist मा के डेटा जाँदैछ Log गर्ने
     console.log('--- Sending Top-Up Request to AndroidArtist ---');
     console.log(JSON.stringify(payload, null, 2));
 
@@ -56,7 +42,6 @@ app.post('/api/topup', async (req, res) => {
       }
     });
 
-    // 🔍 2. AndroidArtist ले के रिप्लाई दियो Log गर्ने
     console.log('--- AndroidArtist Immediate Response ---');
     console.log(JSON.stringify(response.data, null, 2));
 
@@ -66,8 +51,41 @@ app.post('/api/topup', async (req, res) => {
     console.error('TopUp API Error:', error.response ? error.response.data : error.message);
     return res.status(500).json({
       status: 'error',
-      message: 'Failed to process topup request',
+      message: 'Topup request failed',
       details: error.response ? error.response.data : error.message
     });
   }
+});
+
+// ==========================================
+// 2. Webhook / Callback Listener Endpoint (Render मा Callback आउने ठाउँ)
+// ==========================================
+app.post('/api/auto-topup/webhook', (req, res) => {
+  const webhookData = req.body;
+
+  console.log('--- Webhook Received from AndroidArtist ---');
+  console.log(JSON.stringify(webhookData, null, 2));
+
+  // जब अर्डर सफल हुन्छ
+  if (webhookData.status === 'success') {
+    console.log(`Order ${webhookData.orderid} is SUCCESSFUL.`);
+    // TODO: यहाँ आफ्नो Database मा अर्डर Status 'success' अपडेट गर्ने कोड राख्नुहोला
+  } 
+  // जब अर्डर असफल हुन्छ
+  else if (webhookData.status === 'error') {
+    console.log(`Order ${webhookData.orderid} FAILED. Reason: ${webhookData.content}`);
+    // TODO: यहाँ आफ्नो Database मा अर्डर Status 'failed' अपडेट गर्ने कोड राख्नुहोला
+  }
+
+  // एन्ड्रोइड आर्टिस्टलाई क्यालब्याक पायो भनेर HTTP 200 OK Response फर्काउने (अनिवार्य)
+  res.status(200).json({ received: true });
+});
+
+// Health Check Endpoint (Render सर्भरलाई जगाइराख्नको लागि)
+app.get('/', (req, res) => {
+  res.send('Free Fire Automated Top-Up Server is Running!');
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
