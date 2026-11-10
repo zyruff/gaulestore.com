@@ -857,6 +857,10 @@ const firebaseConfig = {
     
     let globalGameSkinboApiKey = "";
 
+    // 🛡️ डबल अर्डर र डबुल भेरिफिकेसन रोक्नका लागि Lock Flags
+    let isOrderProcessing = false;
+    let isVerifying = false;
+
     function loadHowToVideo() {
         db.collection("settings").doc("videos").get().then((doc) => {
             if (doc.exists && doc.data().howToAddMoney) {
@@ -1422,6 +1426,9 @@ const firebaseConfig = {
     }
 
     async function processOrder() {
+        // 🛡️ यदि अर्डर प्रोसेस भइरहेको छ भने फेरि क्लिक हुन नदिने
+        if (isOrderProcessing) return;
+
         if (!currentUser) {
             Swal.fire({
                 title: 'Login Required',
@@ -1492,19 +1499,31 @@ const firebaseConfig = {
         });
 
         if (result.isConfirmed) {
-            Swal.showLoading();
+            isOrderProcessing = true; // 🔒 Lock Order Button
+            Swal.fire({
+                title: 'Processing Order...',
+                text: 'Please wait, do not close or refresh the page.',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
             
             const userDocSnap = await db.collection('users').doc(currentUser.uid).get();
             const userData = userDocSnap.exists ? userDocSnap.data() : {};
             const orderUserName = userData.name || currentUser.displayName || currentUser.email || "User";
             const orderUserPhoto = userData.photoURL || currentUser.photoURL || "";
 
-            if (selectedGameType === 'code') {
-                processVoucherOrder(playerId, orderUserName, orderUserPhoto, 'Wallet Pay');
-            } else if (selectedGameType === 'auto-topup') {
-                processAutoTopUpOrder(playerId, orderUserName, orderUserPhoto, 'Wallet Pay');
-            } else {
-                processUidOrder(playerId, orderUserName, orderUserPhoto, 'Wallet Pay');
+            try {
+                if (selectedGameType === 'code') {
+                    await processVoucherOrder(playerId, orderUserName, orderUserPhoto, 'Wallet Pay');
+                } else if (selectedGameType === 'auto-topup') {
+                    await processAutoTopUpOrder(playerId, orderUserName, orderUserPhoto, 'Wallet Pay');
+                } else {
+                    await processUidOrder(playerId, orderUserName, orderUserPhoto, 'Wallet Pay');
+                }
+            } catch (err) {
+                Swal.fire('Error', err.message, 'error');
+            } finally {
+                isOrderProcessing = false; // 🔓 Unlock Order
             }
         }
     }
@@ -1568,34 +1587,28 @@ const firebaseConfig = {
 
         const isWalletPayment = paymentMethod === 'Wallet Pay';
         
-        const executeOrderPromise = async () => {
-            if (isWalletPayment) {
-                const newBalance = userBalance - selectedProduct.price;
-                await db.collection('users').doc(currentUser.uid).update({ balance: newBalance });
-            }
+        if (isWalletPayment) {
+            const newBalance = userBalance - selectedProduct.price;
+            await db.collection('users').doc(currentUser.uid).update({ balance: newBalance });
+        }
 
-            return db.collection('orders').add({
-                userId: currentUser.uid, 
-                userName: orderUserName, 
-                userPhoto: orderUserPhoto,
-                gameName: selectedGameName, 
-                gameId: selectedGameId,
-                playerId: playerId, 
-                productName: selectedProduct.name, 
-                price: selectedProduct.price, 
-                type: 'uid',
-                paymentMethod: paymentMethod, 
-                status: 'processing', 
-                date: new Date()
-            });
-        };
+        await db.collection('orders').add({
+            userId: currentUser.uid, 
+            userName: orderUserName, 
+            userPhoto: orderUserPhoto,
+            gameName: selectedGameName, 
+            gameId: selectedGameId,
+            playerId: playerId, 
+            productName: selectedProduct.name, 
+            price: selectedProduct.price, 
+            type: 'uid',
+            paymentMethod: paymentMethod, 
+            status: 'processing', 
+            date: new Date()
+        });
 
-        executeOrderPromise()
-        .then(() => {
-            Swal.fire('Success', 'Order Placed Successfully!', 'success');
-            showSec('home');
-        })
-        .catch(err => Swal.fire('Error', err.message, 'error'));
+        Swal.fire('Success', 'Order Placed Successfully!', 'success');
+        showSec('home');
     }
 
     async function processAutoTopUpOrder(playerId, orderUserName = "", orderUserPhoto = "", paymentMethod = 'Wallet Pay') {
@@ -2157,11 +2170,16 @@ const firebaseConfig = {
     }
 
     function handleNewVerify() {
+        // 🛡️ यदि भेरिफिकेसन भइरहेको छ भने फेरि क्लिक हुन नदिने
+        if (isVerifying) return;
+
         const trxId = document.getElementById('pay-trx-input').value.trim();
         
         if (!trxId) {
             return Swal.fire('Required', 'Please enter the Transaction ID / Reference.', 'warning');
         }
+
+        isVerifying = true; // 🔒 Lock Verify Button
 
         if (isAutoPayEnabled) {
             verifyAutoPayment(trxId, currentDepositAmount);
@@ -2171,22 +2189,24 @@ const firebaseConfig = {
     }
 
     async function submitDeposit(trxId, amount) {
-        Swal.showLoading();
-        
-        const userDocSnap = await db.collection('users').doc(currentUser.uid).get();
-        const userData = userDocSnap.exists ? userDocSnap.data() : {};
-        const orderUserName = userData.name || currentUser.displayName || currentUser.email || "User";
-        const orderUserPhoto = userData.photoURL || currentUser.photoURL || "";
+        try {
+            Swal.showLoading();
+            
+            const userDocSnap = await db.collection('users').doc(currentUser.uid).get();
+            const userData = userDocSnap.exists ? userDocSnap.data() : {};
+            const orderUserName = userData.name || currentUser.displayName || currentUser.email || "User";
+            const orderUserPhoto = userData.photoURL || currentUser.photoURL || "";
 
-        db.collection('deposits').add({
-            userId: currentUser.uid, 
-            amount: parseInt(amount), 
-            trxId: trxId.toUpperCase(), 
-            status: 'pending', 
-            date: new Date(), 
-            userEmail: currentUser.email,
-            method: currentPaymentMethod
-        }).then(() => {
+            await db.collection('deposits').add({
+                userId: currentUser.uid, 
+                amount: parseInt(amount), 
+                trxId: trxId.toUpperCase(), 
+                status: 'pending', 
+                date: new Date(), 
+                userEmail: currentUser.email,
+                method: currentPaymentMethod
+            });
+
             if (isDirectBuy && pendingDirectOrder) {
                 selectedGameId = pendingDirectOrder.gameId;
                 selectedGameName = pendingDirectOrder.gameName;
@@ -2194,28 +2214,30 @@ const firebaseConfig = {
                 selectedGameType = pendingDirectOrder.gameType || 'uid';
                 
                 if (selectedGameType === 'code') {
-                    return processVoucherOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod);
+                    await processVoucherOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod);
                 } else if (selectedGameType === 'auto-topup') {
-                    return processAutoTopUpOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod);
+                    await processAutoTopUpOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod);
                 } else {
-                    return processUidOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod);
+                    await processUidOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod);
                 }
             } else {
-                Swal.fire({
+                await Swal.fire({
                     title: 'Request Submitted', 
                     text: 'Your deposit request has been sent. Please wait for admin approval.', 
                     icon: 'success',
                     confirmButtonColor: '#d33'
-                }).then(() => {
-                    showSec('home');
                 });
+                showSec('home');
             }
-        }).then(() => {
+        } catch (err) {
+            Swal.fire('Error', err.message, 'error');
+        } finally {
+            isVerifying = false; // 🔓 Unlock Verify
             if (isDirectBuy) {
                 isDirectBuy = false;
                 pendingDirectOrder = null;
             }
-        }).catch(err => Swal.fire('Error', err.message, 'error'));
+        }
     }
 
     async function verifyAutoPayment(trxId, amount) {
@@ -2224,84 +2246,95 @@ const firebaseConfig = {
         Swal.fire({
             title: 'Verifying...',
             text: 'Please wait while we check your transaction.',
+            allowOutsideClick: false,
             didOpen: () => { Swal.showLoading() }
         });
 
-        const existingTrxCheck = await db.collection('deposits').where('trxId', '==', trxId).limit(1).get();
-        if (!existingTrxCheck.empty) {
-            return Swal.fire('Used', 'This Transaction ID has already been used.', 'error');
-        }
-
-        rtdb.ref('XNXANIKPAY').orderByChild('txid').equalTo(trxId).once('value', async (snapshot) => {
-            if (!snapshot.exists()) {
-                return Swal.fire('Not Found', 'Transaction ID not found. Please try again or contact support.', 'error');
-            }
-            
-            let paymentData = null;
-            snapshot.forEach((childSnapshot) => {
-                paymentData = childSnapshot.val();
-            });
-
-            if (parseInt(paymentData.amount) !== parseInt(amount)) {
-                return Swal.fire('Mismatch', `Amount mismatch! You entered ${amount} but system found ${paymentData.amount}.`, 'error');
+        try {
+            const existingTrxCheck = await db.collection('deposits').where('trxId', '==', trxId).limit(1).get();
+            if (!existingTrxCheck.empty) {
+                isVerifying = false;
+                return Swal.fire('Used', 'This Transaction ID has already been used.', 'error');
             }
 
-            const amountToAdd = parseInt(paymentData.amount);
-            const userRef = db.collection('users').doc(currentUser.uid);
-
-            try {
-                await db.runTransaction(async (transaction) => {
-                    const userDoc = await transaction.get(userRef);
-                    const newBalance = (userDoc.data().balance || 0) + amountToAdd;
-                    transaction.update(userRef, { balance: newBalance });
-                });
-                
-                await db.collection('deposits').add({
-                    userId: currentUser.uid,
-                    userEmail: currentUser.email,
-                    amount: amountToAdd,
-                    trxId: trxId,
-                    status: 'approved',
-                    method: currentPaymentMethod + ' (Auto)',
-                    date: new Date()
-                });
-                
-                if (isDirectBuy && pendingDirectOrder) {
-                    userBalance += amountToAdd; 
-                    
-                    Swal.fire({
-                        title: 'Payment Verified!',
-                        text: 'Processing your order now...',
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                    
-                    const uDocSnap = await db.collection('users').doc(currentUser.uid).get();
-                    const uData = uDocSnap.exists ? uDocSnap.data() : {};
-                    const orderUserName = uData.name || currentUser.displayName || currentUser.email || "User";
-                    const orderUserPhoto = uData.photoURL || currentUser.photoURL || "";
-
-                    if (pendingDirectOrder.gameType === 'code') {
-                         await processVoucherOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod + ' (Auto)');
-                    } else if (pendingDirectOrder.gameType === 'auto-topup') {
-                         await processAutoTopUpOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod + ' (Auto)');
-                    } else {
-                         processUidOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod + ' (Auto)');
-                    }
-                    
-                    isDirectBuy = false;
-                    pendingDirectOrder = null;
-                } else {
-                    Swal.fire('Success', `Successfully added Rs. ${amountToAdd} to your wallet.`, 'success')
-                        .then(() => showSec('home'));
+            rtdb.ref('XNXANIKPAY').orderByChild('txid').equalTo(trxId).once('value', async (snapshot) => {
+                if (!snapshot.exists()) {
+                    isVerifying = false;
+                    return Swal.fire('Not Found', 'Transaction ID not found. Please try again or contact support.', 'error');
                 }
                 
-            } catch (error) {
-                console.error("Auto payment error:", error);
-                Swal.fire('Failed', 'System error during balance update. Contact support.', 'error');
-            }
-        });
+                let paymentData = null;
+                snapshot.forEach((childSnapshot) => {
+                    paymentData = childSnapshot.val();
+                });
+
+                if (parseInt(paymentData.amount) !== parseInt(amount)) {
+                    isVerifying = false;
+                    return Swal.fire('Mismatch', `Amount mismatch! You entered ${amount} but system found ${paymentData.amount}.`, 'error');
+                }
+
+                const amountToAdd = parseInt(paymentData.amount);
+                const userRef = db.collection('users').doc(currentUser.uid);
+
+                try {
+                    await db.runTransaction(async (transaction) => {
+                        const userDoc = await transaction.get(userRef);
+                        const newBalance = (userDoc.data().balance || 0) + amountToAdd;
+                        transaction.update(userRef, { balance: newBalance });
+                    });
+                    
+                    await db.collection('deposits').add({
+                        userId: currentUser.uid,
+                        userEmail: currentUser.email,
+                        amount: amountToAdd,
+                        trxId: trxId,
+                        status: 'approved',
+                        method: currentPaymentMethod + ' (Auto)',
+                        date: new Date()
+                    });
+                    
+                    if (isDirectBuy && pendingDirectOrder) {
+                        userBalance += amountToAdd; 
+                        
+                        Swal.fire({
+                            title: 'Payment Verified!',
+                            text: 'Processing your order now...',
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        
+                        const uDocSnap = await db.collection('users').doc(currentUser.uid).get();
+                        const uData = uDocSnap.exists ? uDocSnap.data() : {};
+                        const orderUserName = uData.name || currentUser.displayName || currentUser.email || "User";
+                        const orderUserPhoto = uData.photoURL || currentUser.photoURL || "";
+
+                        if (pendingDirectOrder.gameType === 'code') {
+                             await processVoucherOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod + ' (Auto)');
+                        } else if (pendingDirectOrder.gameType === 'auto-topup') {
+                             await processAutoTopUpOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod + ' (Auto)');
+                        } else {
+                             await processUidOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod + ' (Auto)');
+                        }
+                        
+                        isDirectBuy = false;
+                        pendingDirectOrder = null;
+                    } else {
+                        await Swal.fire('Success', `Successfully added Rs. ${amountToAdd} to your wallet.`, 'success');
+                        showSec('home');
+                    }
+                    
+                } catch (error) {
+                    console.error("Auto payment error:", error);
+                    Swal.fire('Failed', 'System error during balance update. Contact support.', 'error');
+                } finally {
+                    isVerifying = false; // 🔓 Unlock Verify
+                }
+            });
+        } catch (error) {
+            isVerifying = false;
+            Swal.fire('Error', error.message, 'error');
+        }
     }
 </script>
 </body>
