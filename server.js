@@ -1,200 +1,203 @@
-// server.js (Pura & Final Code - Small letter status)
 const express = require('express');
 const axios = require('axios');
-const cors = require('cors');
-const admin = require('firebase-admin');
 
-// Initialize Firebase Admin securely using Environment Variable
-try {
-  if (process.env.FIREBASE_PRIVATE_KEY) {
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: "rg-digital-store",
-        clientEmail: "firebase-adminsdk-fbsvc@rg-digital-store.iam.gserviceaccount.com",
-        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-      }),
-      databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com"
-    });
-  } else {
-    admin.initializeApp({
-      databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com"
-    });
-  }
-} catch (e) {
-  // Already initialized fallback
-}
-
-const db = admin.database();
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Enable CORS for frontend accessibility
-app.use(cors());
+// JSON Body Middleware
 app.use(express.json());
 
-// Configurations
-const BASE_URL = process.env.BASE_URL || 'https://androidartist.com/api/process-topup';
-const API_KEY = process.env.API_KEY || 'YOUR_SECRET_KEY';
+// API Configuration Constants
+const API_BASE_URL = 'https://androidartist.com/api/process-topup';
+const API_SECRET = 'TPBD-XXXX-XXXX'; // Tapai ko original Merchant API Secret Key yaha rakhnus
 
-const getAuthHeaders = () => ({
-  'X-API-KEY': API_KEY,
-  'Content-Type': 'application/json',
-});
+// Tapai ko Render Live Webhook URL
+const YOUR_WEBHOOK_URL = 'https://gaule-store.onrender.com/api/webhook';
 
-// Root Route
-app.get('/', (req, res) => {
-  res.json({
-    status: 'success',
-    message: 'Gaule Store API Service is active',
-    endpoints: [
-      '/api/packages',
-      '/api/order/create',
-      '/api/order/status',
-      '/api/otp',
-      '/api/webhook'
-    ]
-  });
-});
+// ==========================================
+// 1. WEBHOOK LISTENER ENDPOINT
+// ==========================================
+/**
+ * Express Route for processing callbacks/webhooks sent by AndroidArtist
+ */
+app.post('/api/webhook', (req, res) => {
+    const data = req.body;
 
-// 1. GET Active Packages
-app.get('/api/packages', async (req, res) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/packages`, { headers: getAuthHeaders() });
-    res.json(response.data);
-  } catch (error) {
-    res.status(error.response?.status || 500).json({
-      status: 'error',
-      message: error.response?.data || error.message,
-    });
-  }
-});
+    console.log('\n================ WEBHOOK RECEIVED ================');
+    console.log('Order ID:', data.orderid);
+    console.log('Status  :', data.status);
 
-// 2. Create TopUp Order
-app.post('/api/order/create', async (req, res) => {
-  const { playerid, package: pkgId, code, orderid, callback_url } = req.body;
-
-  if (!playerid || !pkgId) {
-    return res.status(400).json({
-      status: 'failed',
-      message: 'playerid and package are required fields.',
-    });
-  }
-
-  try {
-    const payload = {
-      playerid: String(playerid),
-      package: Number(pkgId),
-      orderid: orderid || `GAULE-${Date.now()}`,
-      callback_url: callback_url || 'https://gaule-store.onrender.com/api/webhook'
-    };
-
-    if (code) payload.code = code;
-
-    const response = await axios.post(`${BASE_URL}/order/create`, payload, {
-      headers: getAuthHeaders(),
-    });
-
-    res.json(response.data);
-  } catch (error) {
-    res.status(error.response?.status || 500).json({
-      status: 'error',
-      message: error.response?.data || error.message,
-    });
-  }
-});
-
-// 3. Check Order Status
-app.get('/api/order/status', async (req, res) => {
-  const { order_id, user_order_id } = req.query;
-
-  if (!order_id && !user_order_id) {
-    return res.status(400).json({
-      status: 'failed',
-      message: 'Please provide either order_id or user_order_id.',
-    });
-  }
-
-  try {
-    const response = await axios.get(`${BASE_URL}/order/status`, {
-      headers: getAuthHeaders(),
-      params: { order_id, user_order_id },
-    });
-    res.json(response.data);
-  } catch (error) {
-    res.status(error.response?.status || 500).json({
-      status: 'error',
-      message: error.response?.data || error.message,
-    });
-  }
-});
-
-// 4. Generate TOTP Code
-app.get('/api/otp', async (req, res) => {
-  const { key } = req.query;
-
-  if (!key) {
-    return res.status(400).json({
-      status: 'failed',
-      message: 'Base32 secret key is required.',
-    });
-  }
-
-  try {
-    const response = await axios.get(`${BASE_URL}/otp`, {
-      headers: getAuthHeaders(),
-      params: { key },
-    });
-    res.json(response.data);
-  } catch (error) {
-    res.status(error.response?.status || 500).json({
-      status: 'error',
-      message: error.response?.data || error.message,
-    });
-  }
-});
-
-// 5. Webhook Listener (Updates Firebase order status to small letters: complete / failed)
-app.post('/api/webhook', async (req, res) => {
-  const payload = req.body;
-  console.log('--- Webhook Received ---', payload);
-
-  try {
-    const apiOrderId = payload.api_order_id || payload.order_id || payload.orderid;
-    const orderStatus = payload.status;
-
-    if (apiOrderId && orderStatus) {
-      const ordersRef = db.ref('orders');
-      const snapshot = await ordersRef.orderByChild('apiOrderId').equalTo(String(apiOrderId)).once('value');
-
-      if (snapshot.exists()) {
-        snapshot.forEach((childSnapshot) => {
-          const orderKey = childSnapshot.key;
-          let newStatus = "pending";
-          
-          const statusLower = String(orderStatus).toLowerCase();
-          if (statusLower === 'success' || statusLower === 'completed' || statusLower === 'complete') {
-            newStatus = "complete";
-          } else if (statusLower === 'failed' || statusLower === 'fail') {
-            newStatus = "failed";
-          }
-
-          db.ref(`orders/${orderKey}`).update({
-            status: newStatus,
-            updatedAt: Date.now()
-          });
-          console.log(`Order ${orderKey} updated to: ${newStatus}`);
-        });
-      }
+    // Multi-Voucher Callback Parsing
+    if (data.total_vouchers) {
+        console.log(`[MULTI-VOUCHER] Total: ${data.total_vouchers} | Success: ${data.total_success} | Failed: ${data.total_failed}`);
+        
+        if (data.parts && Array.isArray(data.parts)) {
+            data.parts.forEach((part) => {
+                console.log(`  -> Part ${part.part} (${part.orderid}): ${part.status}`);
+            });
+        }
     }
 
-    res.status(200).json({ status: 'success', message: 'Webhook processed and status updated' });
-  } catch (err) {
-    console.error("Webhook Database Error:", err);
-    res.status(500).json({ status: 'error', message: err.message });
-  }
+    // Status logic handle garna:
+    switch (data.status) {
+        case 'success':
+            console.log(' Message :', data.message || 'Transaction successful');
+            // TODO: Database ma Order Status Update (PAID / DELIVERED) garnuhos
+            break;
+
+        case 'partial':
+            console.log(' Warning :', data.message);
+            // TODO: Partially complete bhako order lai database ma handle garnuhos
+            break;
+
+        case 'error':
+            console.error(' Error   :', data.content || 'Transaction failed');
+            // TODO: Database order update (FAILED / REFUND) garnuhos
+            break;
+
+        default:
+            console.log(' Details :', data);
+    }
+    console.log('==================================================\n');
+
+    // AndroidArtist server lai HTTP 200 OK Response pathaune
+    return res.status(200).json({ status: 'received' });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// ==========================================
+// 2. HELPER FUNCTIONS TO PROCESS TOP-UPS
+// ==========================================
+
+/**
+ * Single UniPin Voucher TopUp
+ */
+async function processSingleVoucher(orderId, playerId, voucherCode) {
+    try {
+        const payload = {
+            api: API_SECRET,
+            orderid: String(orderId),
+            playerid: String(playerId),
+            code: voucherCode,
+            url: YOUR_WEBHOOK_URL
+        };
+
+        const response = await axios.post(API_BASE_URL, payload, {
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        console.log('[Single TopUp Response]:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('[Single TopUp Error]:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+}
+
+/**
+ * Multi-Voucher TopUp (Comma Separated Codes)
+ */
+async function processMultiVoucher(orderId, playerId, voucherCodesArray) {
+    try {
+        const payload = {
+            api: API_SECRET,
+            orderid: String(orderId),
+            playerid: String(playerId),
+            code: voucherCodesArray.join(','), // Pin code haru comma le join garinchha
+            url: YOUR_WEBHOOK_URL
+        };
+
+        const response = await axios.post(API_BASE_URL, payload, {
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        console.log('[Multi-Voucher Response]:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('[Multi-Voucher Error]:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+}
+
+/**
+ * Garena Shell Method TopUp
+ */
+async function processGarenaShell(orderId, playerId, packageId, username, password, autocode) {
+    try {
+        const payload = {
+            api: API_SECRET,
+            playerid: String(playerId),
+            package: String(packageId),
+            code: 'shell',
+            orderid: String(orderId),
+            url: YOUR_WEBHOOK_URL,
+            username: String(username),
+            password: String(password),
+            autocode: String(autocode)
+        };
+
+        const response = await axios.post(API_BASE_URL, payload, {
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        console.log('[Garena Shell Response]:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('[Garena Shell Error]:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+}
+
+// ==========================================
+// 3. SAMPLE TEST ENDPOINTS (OPTIONAL)
+// ==========================================
+
+// Single Voucher Trigger Route Example: GET http://localhost:3000/test-single
+app.get('/test-single', async (req, res) => {
+    try {
+        const result = await processSingleVoucher(
+            'ORD1001',
+            '5930993272',
+            'UPBD-Q-S-01473051 2237-3365-5974-7596'
+        );
+        res.json({ success: true, result });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
 });
-Yesto xa
+
+// Multi Voucher Trigger Route Example: GET http://localhost:3000/test-multi
+app.get('/test-multi', async (req, res) => {
+    try {
+        const pins = [
+            'UPBD-Q-S-01473051 2237-3365-5974-7596',
+            'UPBD-Q-S-01472883 1942-3457-3412-6272'
+        ];
+    const result = await processMultiVoucher('MULTI_2001', '5930993272', pins);
+        res.json({ success: true, result });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Garena Shell Trigger Route Example: GET http://localhost:3000/test-shell
+app.get('/test-shell', async (req, res) => {
+    try {
+        const result = await processGarenaShell(
+            'SHELL1001',
+            '5930993272',
+            '67383',
+            '6679515',
+            'mypassword',
+            '3MWJXGTEC'
+        );
+        res.json({ success: true, result });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Server Listen
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+    console.log(`Listening for Webhooks at: ${YOUR_WEBHOOK_URL}`);
+});
