@@ -45,7 +45,7 @@
             background: white;
             border: 1px solid #e5e7eb;
             border-radius: 6px;
-            padding: 10px;
+            padding: 8px 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -58,7 +58,7 @@
             background-color: #f0f9ff;
         }
         .product-bullet {
-            height: 12px; width: 12px; background-color: #e5e7eb; border-radius: 50%; margin-right: 8px; flex-shrink: 0;
+            height: 10px; width: 10px; background-color: #e5e7eb; border-radius: 50%; margin-right: 6px; flex-shrink: 0;
         }
         .product-card.selected .product-bullet { background-color: #03a9f4; }
         
@@ -581,19 +581,19 @@
                     </div>
                     
                     <div class="w-full grid grid-cols-2 gap-3 bg-white p-4 rounded-b-lg shadow-sm border border-gray-200 border-t-0">
-                        <button onclick="goToPaymentPage('eSewa', 'theme-esewa', 'https://img.sanishtech.com/u/b319aa71950ec25302decc381c7503ff.png')" 
+                        <button onclick="goToPaymentPage('eSewa', 'theme-esewa', 'https://roshantamang2.com.np/image/esewaa.png')" 
                                 class="bg-white border border-gray-200 rounded-lg p-2 flex items-center justify-center hover:border-green-500 hover:shadow-md transition h-16">
-                            <img src="https://img.sanishtech.com/u/b319aa71950ec25302decc381c7503ff.png" class="h-8 object-contain">
+                            <img src="https://roshantamang2.com.np/image/esewaa.png" class="h-8 object-contain">
                         </button>
                         
-                        <button onclick="goToPaymentPage('Khalti', 'theme-khalti', 'https://img.sanishtech.com/u/b70b03d3afa41478acac2e2f50de8715.png')" 
+                        <button onclick="goToPaymentPage('Khalti', 'theme-khalti', 'https://roshantamang2.com.np/image/khaltii.png')" 
                                 class="bg-white border border-gray-200 rounded-lg p-2 flex items-center justify-center hover:border-purple-500 hover:shadow-md transition h-16">
-                            <img src="https://img.sanishtech.com/u/b70b03d3afa41478acac2e2f50de8715.png" class="h-6 object-contain">
+                            <img src="https://roshantamang2.com.np/image/khaltii.png" class="h-6 object-contain">
                         </button>
 
-                        <button onclick="goToPaymentPage('Bank', 'theme-bank', 'https://img.sanishtech.com/u/2ae6d654c0a5095453cfbfceb473f3c0.jpg')" 
+                        <button onclick="goToPaymentPage('Bank', 'theme-bank', 'https://https://roshantamang2.com.np/image/bankk.png')" 
                                 class="col-span-2 bg-white border border-gray-200 rounded-lg p-2 flex items-center justify-center hover:border-blue-500 hover:shadow-md transition h-16">
-                            <img src="https://img.sanishtech.com/u/2ae6d654c0a5095453cfbfceb473f3c0.jpg" class="h-8 object-cover rounded">
+                            <img src="https://roshantamang2.com.np/image/bankk.png" class="h-8 object-cover rounded">
                         </button>
                     </div>
                 </div>
@@ -1399,14 +1399,14 @@ const firebaseConfig = {
                     }
 
                     card.innerHTML = `
-                        <div class="flex items-center min-w-0 mr-2">
+                        <div class="flex items-center min-w-0 mr-1 flex-1">
                             <div class="product-bullet"></div>
-                            <div class="truncate">
-                                <span class="text-xs font-bold text-gray-600 block">${prod.name}</span>
+                            <div class="min-w-0">
+                                <span class="text-[11px] font-bold text-gray-700 block leading-tight break-words">${prod.name}</span>
                                 ${stockBadge}
                             </div>
                         </div>
-                        <span class="text-sky-600 font-bold text-sm whitespace-nowrap">Rs. ${prod.price}</span>`;
+                        <span class="text-sky-600 font-bold text-xs md:text-sm whitespace-nowrap ml-1">Rs. ${prod.price}</span>`;
                     grid.appendChild(card);
                 });
             });
@@ -1426,7 +1426,6 @@ const firebaseConfig = {
     }
 
     async function processOrder() {
-        // 🛡️ यदि अर्डर प्रोसेस भइरहेको छ भने फेरि क्लिक हुन नदिने
         if (isOrderProcessing) return;
 
         if (!currentUser) {
@@ -1499,7 +1498,7 @@ const firebaseConfig = {
         });
 
         if (result.isConfirmed) {
-            isOrderProcessing = true; // 🔒 Lock Order Button
+            isOrderProcessing = true;
             Swal.fire({
                 title: 'Processing Order...',
                 text: 'Please wait, do not close or refresh the page.',
@@ -1523,7 +1522,7 @@ const firebaseConfig = {
             } catch (err) {
                 Swal.fire('Error', err.message, 'error');
             } finally {
-                isOrderProcessing = false; // 🔓 Unlock Order
+                isOrderProcessing = false;
             }
         }
     }
@@ -2170,7 +2169,6 @@ const firebaseConfig = {
     }
 
     function handleNewVerify() {
-        // 🛡️ यदि भेरिफिकेसन भइरहेको छ भने फेरि क्लिक हुन नदिने
         if (isVerifying) return;
 
         const trxId = document.getElementById('pay-trx-input').value.trim();
@@ -2179,7 +2177,7 @@ const firebaseConfig = {
             return Swal.fire('Required', 'Please enter the Transaction ID / Reference.', 'warning');
         }
 
-        isVerifying = true; // 🔒 Lock Verify Button
+        isVerifying = true;
 
         if (isAutoPayEnabled) {
             verifyAutoPayment(trxId, currentDepositAmount);
@@ -2232,7 +2230,7 @@ const firebaseConfig = {
         } catch (err) {
             Swal.fire('Error', err.message, 'error');
         } finally {
-            isVerifying = false; // 🔓 Unlock Verify
+            isVerifying = false;
             if (isDirectBuy) {
                 isDirectBuy = false;
                 pendingDirectOrder = null;
@@ -2328,7 +2326,7 @@ const firebaseConfig = {
                     console.error("Auto payment error:", error);
                     Swal.fire('Failed', 'System error during balance update. Contact support.', 'error');
                 } finally {
-                    isVerifying = false; // 🔓 Unlock Verify
+                    isVerifying = false;
                 }
             });
         } catch (error) {
