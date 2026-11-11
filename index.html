@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>R.G DIGITAL STORE</title>
@@ -606,8 +605,9 @@
                 </div>
 
                 <div class="flex-1 flex flex-col justify-center items-center px-6 max-w-md mx-auto w-full">
+                    <!-- Updated Center Logo Image Source -->
                     <div class="bg-white rounded-full w-32 h-32 flex items-center justify-center shadow-sm border border-gray-100 mb-6 p-4">
-                        <img src="" id="step2-center-logo" class="w-full object-contain">
+                        <img src="https://roshantamang2.com.np/image/payment.png" id="step2-center-logo" class="w-full object-contain">
                     </div>
                     
                     <h2 class="text-gray-600 font-medium mb-8 text-lg">Manual Pay</h2>
@@ -627,7 +627,7 @@
                             <img src="https://roshantamang2.com.np/image/khaltii.png" class="h-6 object-contain">
                         </button>
 
-                        <button onclick="goToPaymentPage('Bank', 'theme-bank', 'https://https://roshantamang2.com.np/image/bankk.png')" 
+                        <button onclick="goToPaymentPage('Bank', 'theme-bank', 'https://roshantamang2.com.np/image/bankk.png')" 
                                 class="col-span-2 bg-white border border-gray-200 rounded-lg p-2 flex items-center justify-center hover:border-blue-500 hover:shadow-md transition h-16">
                             <img src="https://roshantamang2.com.np/image/bankk.png" class="h-8 object-cover rounded">
                         </button>
@@ -950,7 +950,6 @@ const firebaseConfig = {
 
                 if(logoUrl) {
                     document.getElementById('step2-logo').src = logoUrl;
-                    document.getElementById('step2-center-logo').src = logoUrl;
                     document.getElementById('pay-site-logo-small').src = logoUrl;
                 }
 
