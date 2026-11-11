@@ -7,12 +7,12 @@
   "theme_color": "#03a9f4",
   "icons": [
     {
-      "src": "https://roshantamang2.com.np/image/manifest.png",
+      "src": "https://roshantamang2.com.np/owner.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://roshantamang2.com.np/owner.png",
+      "src": "https://roshantamang2.com.np/image/manifest.png",
       "sizes": "512x512",
       "type": "image/png"
     }
