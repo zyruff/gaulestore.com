@@ -10,7 +10,7 @@
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "R.G Digital Store",
-      "alternateName": ["RG Digital", "R.G DIGITAL STORE"],
+      "alternateName": ["RG Digital Store", "R.G DIGITAL STORE"],
       "url": "https://roshantamang2.com.np"
     }
     </script>
@@ -293,13 +293,13 @@
         </section>
 
         <section id="home-sec" class="animate-fade-in pb-8">
-            <div id="banner-container" class="mb-6 overflow-hidden shadow-md h-44 md:h-72 bg-gray-200 relative group rounded-xl hidden">
+            <div id="banner-container" class="mb-0 overflow-hidden shadow-md h-44 md:h-72 bg-gray-200 relative group rounded-xl hidden">
                 <div id="slider-wrapper" class="flex h-full w-full transition-transform duration-500 ease-out">
                 </div>
                 <div id="slider-dots" class="absolute bottom-3 left-0 right-0 flex justify-center gap-2 z-10"></div>
             </div>
 
-            <div class="grid grid-cols-3 gap-3 mb-5 px-2">
+            <div class="grid grid-cols-3 gap-3 mb-5 px-2 mt-4">
                 <a id="home-whatsapp" href="#" class="bg-white py-3 px-3 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-gray-100 flex items-center justify-between active:scale-95 transition h-12 no-underline">
                     <div class="w-8 h-8 rounded-full flex items-center justify-center bg-green-50 flex-shrink-0">
                         <i class="fab fa-whatsapp text-xl text-[#25D366]"></i>
@@ -325,6 +325,25 @@
             
             <div id="services-list" class="space-y-6 mb-8">
                 <div class="col-span-3 text-center py-10"><i class="fas fa-spinner fa-spin text-sky-500"></i> Loading Games...</div>
+            </div>
+
+            <!-- Top Spend Leaderboard Section -->
+            <div class="mt-8 mb-6">
+                <div class="flex items-center justify-between mb-3 px-1">
+                    <h3 class="font-bold text-gray-700 text-xl" style="letter-spacing: 0.5px">
+                        <i class="fas fa-trophy text-amber-500 mr-2"></i>Top Spenders
+                    </h3>
+                    <span class="text-xs text-sky-600 font-semibold bg-sky-50 px-2.5 py-1 rounded-full border border-sky-100">
+                        Leaderboard
+                    </span>
+                </div>
+
+                <div id="top-spenders-list" class="space-y-2 px-1">
+                    <div class="text-center py-6 bg-white rounded-xl shadow-sm border border-gray-100 text-gray-400 text-sm">
+                        <i class="fas fa-spinner fa-spin text-sky-500 text-lg mb-1"></i>
+                        <p>Loading Leaderboard...</p>
+                    </div>
+                </div>
             </div>
 
             <div class="mt-8 mb-6">
@@ -521,7 +540,7 @@
                              <img src="https://img.sanishtech.com/u/b70b03d3afa41478acac2e2f50de8715.png" class="h-4 object-contain">
                              <img src="https://img.sanishtech.com/u/2ae6d654c0a5095453cfbfceb473f3c0.jpg" class="h-5 object-contain">
                         </div>
-                        <div class="bg-gray-200 text-center py-1 text-xs font-bold text-gray-600">Instant Pay</div>
+                        <div class="bg-gray-200 text-center py-1 text-xs font-bold text-gray-600">Manual Pay</div>
                     </div>
                 </div>
 
@@ -605,7 +624,6 @@
                 </div>
 
                 <div class="flex-1 flex flex-col justify-center items-center px-6 max-w-md mx-auto w-full">
-                    <!-- Updated Center Logo Image Source -->
                     <div class="bg-white rounded-full w-32 h-32 flex items-center justify-center shadow-sm border border-gray-100 mb-6 p-4">
                         <img src="https://roshantamang2.com.np/image/payment.png" id="step2-center-logo" class="w-full object-contain">
                     </div>
@@ -893,7 +911,6 @@ const firebaseConfig = {
     
     let globalGameSkinboApiKey = "";
 
-    // 🛡️ डबल अर्डर र डबुल भेरिफिकेसन रोक्नका लागि Lock Flags
     let isOrderProcessing = false;
     let isVerifying = false;
 
@@ -1202,6 +1219,7 @@ const firebaseConfig = {
         loadTutorials();
         loadBanners();
         loadRecentOrdersGlobal(); 
+        loadTopSpendersLeaderboard();
     }
 
     async function loadGamesAndCategories() {
@@ -1309,6 +1327,150 @@ const firebaseConfig = {
             console.error("Failed to load games and categories:", error);
             listContainer.innerHTML = `<div class="text-center text-red-500">Failed to load games. Please try again later.</div>`;
         }
+    }
+
+    function loadTopSpendersLeaderboard() {
+        const container = document.getElementById('top-spenders-list');
+        if (!container) return;
+
+        db.collection('orders').get().then((snapshot) => {
+            if (snapshot.empty) {
+                container.innerHTML = '<div class="text-center text-gray-400 text-xs py-4 bg-white rounded-xl">No top spenders data yet</div>';
+                return;
+            }
+
+            const userSpends = {};
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const status = data.status ? data.status.toLowerCase() : '';
+
+                if (['success', 'complete', 'completed'].includes(status)) {
+                    const userId = data.userId || 'unknown';
+                    const price = parseInt(data.price || 0);
+                    
+                    let displayName = data.userName || "Customer";
+                    if (displayName.includes('@')) {
+                        displayName = displayName.split('@')[0];
+                    }
+
+                    if (!userSpends[userId]) {
+                        userSpends[userId] = {
+                            name: displayName,
+                            photo: data.userPhoto || '',
+                            totalSpent: 0
+                        };
+                    }
+                    userSpends[userId].totalSpent += price;
+                }
+            });
+
+            const sortedSpenders = Object.values(userSpends)
+                .sort((a, b) => b.totalSpent - a.totalSpent)
+                .slice(0, 10);
+
+            if (sortedSpenders.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-400 text-xs py-4 bg-white rounded-xl">No completed purchases yet</div>';
+                return;
+            }
+
+            container.innerHTML = "";
+
+            let podiumHTML = '<div class="grid grid-cols-3 gap-2 mb-3 items-end px-1">';
+            
+            let top2 = sortedSpenders[1] || null;
+            let top1 = sortedSpenders[0] || null;
+            let top3 = sortedSpenders[2] || null;
+
+            function renderPodiumCard(spender, rank) {
+                if (!spender) return '<div class="flex-1"></div>';
+                
+                let crownOrBadge = '';
+                let bgGradient = '';
+                let heightClass = '';
+                
+                if (rank === 1) {
+                    crownOrBadge = '<div class="absolute -top-4 bg-amber-400 text-white w-7 h-7 rounded-full flex items-center justify-center shadow-md font-bold text-xs"><i class="fas fa-crown"></i></div>';
+                    bgGradient = 'bg-gradient-to-b from-amber-50 to-amber-100/65 border-amber-300 shadow-md';
+                    heightClass = 'pt-5 pb-3 transform -translate-y-2';
+                } else if (rank === 2) {
+                    crownOrBadge = '<div class="absolute -top-3 bg-slate-300 text-gray-800 w-6 h-6 rounded-full flex items-center justify-center shadow-sm font-bold text-xs">2</div>';
+                    bgGradient = 'bg-gradient-to-b from-slate-50 to-slate-100/50 border-slate-200';
+                    heightClass = 'pt-4 pb-2';
+                } else if (rank === 3) {
+                    crownOrBadge = '<div class="absolute -top-3 bg-amber-700 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-sm font-bold text-xs">3</div>';
+                    bgGradient = 'bg-gradient-to-b from-amber-900/5 to-amber-900/10 border-amber-700/30';
+                    heightClass = 'pt-4 pb-2';
+                }
+
+                let avatarHtml = '';
+                if (spender.photo && spender.photo.trim() !== '') {
+                    avatarHtml = `<img src="${spender.photo}" class="w-full h-full object-cover rounded-full">`;
+                } else {
+                    const firstChar = spender.name.charAt(0).toUpperCase();
+                    avatarHtml = `<span class="text-white text-sm font-bold">${firstChar}</span>`;
+                }
+
+                return `
+                    <div class="${bgGradient} border rounded-xl ${heightClass} px-2 text-center relative flex flex-col items-center">
+                        ${crownOrBadge}
+                        <div class="w-10 h-10 rounded-full bg-sky-500 overflow-hidden flex items-center justify-center shadow-sm mb-1.5 mt-1 border-2 border-white">
+                            ${avatarHtml}
+                        </div>
+                        <span class="text-gray-800 font-bold text-xs truncate w-full px-1">${spender.name}</span>
+                        <span class="text-sky-600 font-bold text-[11px] mt-0.5">Rs. ${spender.totalSpent.toLocaleString()}</span>
+                    </div>
+                `;
+            }
+
+            podiumHTML += renderPodiumCard(top2, 2);
+            podiumHTML += renderPodiumCard(top1, 1);
+            podiumHTML += renderPodiumCard(top3, 3);
+            podiumHTML += '</div>';
+
+            container.innerHTML += podiumHTML;
+
+            if (sortedSpenders.length > 3) {
+                let restHTML = '<div class="space-y-2 mt-2">';
+                for (let i = 3; i < sortedSpenders.length; i++) {
+                    const spender = sortedSpenders[i];
+                    const rank = i + 1;
+
+                    let avatarHtml = '';
+                    if (spender.photo && spender.photo.trim() !== '') {
+                        avatarHtml = `<img src="${spender.photo}" class="w-full h-full object-cover rounded-full">`;
+                    } else {
+                        const firstChar = spender.name.charAt(0).toUpperCase();
+                        avatarHtml = `<span class="text-white text-xs font-bold">${firstChar}</span>`;
+                    }
+
+                    restHTML += `
+                        <div class="bg-white p-2.5 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="w-6 h-6 rounded-full bg-gray-100 text-gray-600 font-bold text-xs flex items-center justify-center">${rank}</span>
+                                <div class="w-8 h-8 bg-sky-500 rounded-full flex items-center justify-center overflow-hidden shadow-sm">
+                                    ${avatarHtml}
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-gray-800 font-bold text-xs leading-snug">${spender.name}</span>
+                                    <span class="text-gray-400 text-[9px]">Total Purchased</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-sky-600 font-bold text-xs bg-sky-50 px-2 py-0.5 rounded-lg border border-sky-100">
+                                    Rs. ${spender.totalSpent.toLocaleString()}
+                                </span>
+                            </div>
+                        </div>`;
+                }
+                restHTML += '</div>';
+                container.innerHTML += restHTML;
+            }
+
+        }).catch(error => {
+            console.error("Error loading top spenders: ", error);
+            container.innerHTML = `<div class="text-center text-red-400 py-3 text-xs">Failed to load leaderboard</div>`;
+        });
     }
 
     function loadTutorials() {
@@ -2018,9 +2180,31 @@ const firebaseConfig = {
         return hash;
     }
 
+    function timeAgo(date) {
+        if (!date) return "Just now";
+        const seconds = Math.floor((new Date() - date) / 1000);
+        
+        let interval = seconds / 31536000;
+        if (interval > 1) return Math.floor(interval) + " year" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
+        
+        interval = seconds / 2592000;
+        if (interval > 1) return Math.floor(interval) + " month" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
+        
+        interval = seconds / 86400;
+        if (interval > 1) return Math.floor(interval) + " day" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
+        
+        interval = seconds / 3600;
+        if (interval > 1) return Math.floor(interval) + " hr" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
+        
+        interval = seconds / 60;
+        if (interval > 1) return Math.floor(interval) + " minute" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
+        
+        return "Just now";
+    }
+
     function loadRecentOrdersGlobal() {
         const container = document.getElementById('latest-orders-list');
-        db.collection('orders').orderBy('date', 'desc').limit(5)
+        db.collection('orders').orderBy('date', 'desc').limit(10)
           .onSnapshot((snapshot) => {
               if (snapshot.empty) {
                   container.innerHTML = '<div class="text-center text-gray-700 text-xs py-2">No recent orders</div>'; return;
@@ -2051,6 +2235,9 @@ const firebaseConfig = {
                       statusText = 'processing';
                   }
 
+                  let orderDate = data.date && data.date.toDate ? data.date.toDate() : new Date();
+                  let timeAgoText = timeAgo(orderDate);
+
                   container.innerHTML += `
                     <div class="bg-white p-3 rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100 flex items-center justify-between">
                         <div class="flex items-center gap-3 overflow-hidden">
@@ -2059,7 +2246,7 @@ const firebaseConfig = {
                             </div>
                             <div class="flex flex-col truncate">
                                 <span class="text-gray-600 font-bold text-sm truncate">${displayName}</span>
-                                <span class="text-gray-500 text-[11px] font-medium truncate">${data.productName} - Rs. ${data.price}</span>
+                                <span class="text-gray-500 text-[11px] font-medium truncate">${data.productName} - Rs. ${data.price} <span class="text-gray-400 text-[10px] ml-1">• ${timeAgoText}</span></span>
                             </div>
                         </div>
                         <div class="${statusBadgeClass} px-3 py-1 rounded-full text-[10px] font-bold capitalize shadow-sm whitespace-nowrap ml-2">${statusText}</div>
@@ -2230,16 +2417,6 @@ const firebaseConfig = {
             const orderUserName = userData.name || currentUser.displayName || currentUser.email || "User";
             const orderUserPhoto = userData.photoURL || currentUser.photoURL || "";
 
-            await db.collection('deposits').add({
-                userId: currentUser.uid, 
-                amount: parseInt(amount), 
-                trxId: trxId.toUpperCase(), 
-                status: 'pending', 
-                date: new Date(), 
-                userEmail: currentUser.email,
-                method: currentPaymentMethod
-            });
-
             if (isDirectBuy && pendingDirectOrder) {
                 selectedGameId = pendingDirectOrder.gameId;
                 selectedGameName = pendingDirectOrder.gameName;
@@ -2247,13 +2424,23 @@ const firebaseConfig = {
                 selectedGameType = pendingDirectOrder.gameType || 'uid';
                 
                 if (selectedGameType === 'code') {
-                    await processVoucherOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod);
+                    await processVoucherOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod + ' (Manual)');
                 } else if (selectedGameType === 'auto-topup') {
-                    await processAutoTopUpOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod);
+                    await processAutoTopUpOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod + ' (Manual)');
                 } else {
-                    await processUidOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod);
+                    await processUidOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod + ' (Manual)');
                 }
             } else {
+                await db.collection('deposits').add({
+                    userId: currentUser.uid, 
+                    amount: parseInt(amount), 
+                    trxId: trxId.toUpperCase(), 
+                    status: 'pending', 
+                    date: new Date(), 
+                    userEmail: currentUser.email,
+                    method: currentPaymentMethod
+                });
+
                 await Swal.fire({
                     title: 'Request Submitted', 
                     text: 'Your deposit request has been sent. Please wait for admin approval.', 
@@ -2310,49 +2497,43 @@ const firebaseConfig = {
                 const userRef = db.collection('users').doc(currentUser.uid);
 
                 try {
-                    await db.runTransaction(async (transaction) => {
-                        const userDoc = await transaction.get(userRef);
-                        const newBalance = (userDoc.data().balance || 0) + amountToAdd;
-                        transaction.update(userRef, { balance: newBalance });
-                    });
-                    
-                    await db.collection('deposits').add({
-                        userId: currentUser.uid,
-                        userEmail: currentUser.email,
-                        amount: amountToAdd,
-                        trxId: trxId,
-                        status: 'approved',
-                        method: currentPaymentMethod + ' (Auto)',
-                        date: new Date()
-                    });
-                    
                     if (isDirectBuy && pendingDirectOrder) {
-                        userBalance += amountToAdd; 
-                        
-                        Swal.fire({
-                            title: 'Payment Verified!',
-                            text: 'Processing your order now...',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                        
                         const uDocSnap = await db.collection('users').doc(currentUser.uid).get();
                         const uData = uDocSnap.exists ? uDocSnap.data() : {};
                         const orderUserName = uData.name || currentUser.displayName || currentUser.email || "User";
                         const orderUserPhoto = uData.photoURL || currentUser.photoURL || "";
 
-                        if (pendingDirectOrder.gameType === 'code') {
+                        selectedGameId = pendingDirectOrder.gameId;
+                        selectedGameName = pendingDirectOrder.gameName;
+                        selectedProduct = pendingDirectOrder.product;
+                        selectedGameType = pendingDirectOrder.gameType || 'uid';
+
+                        Swal.close();
+
+                        if (selectedGameType === 'code') {
                              await processVoucherOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod + ' (Auto)');
-                        } else if (pendingDirectOrder.gameType === 'auto-topup') {
+                        } else if (selectedGameType === 'auto-topup') {
                              await processAutoTopUpOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod + ' (Auto)');
                         } else {
                              await processUidOrder(pendingDirectOrder.playerId, orderUserName, orderUserPhoto, currentPaymentMethod + ' (Auto)');
                         }
-                        
-                        isDirectBuy = false;
-                        pendingDirectOrder = null;
                     } else {
+                        await db.runTransaction(async (transaction) => {
+                            const userDoc = await transaction.get(userRef);
+                            const newBalance = (userDoc.data().balance || 0) + amountToAdd;
+                            transaction.update(userRef, { balance: newBalance });
+                        });
+                        
+                        await db.collection('deposits').add({
+                            userId: currentUser.uid,
+                            userEmail: currentUser.email,
+                            amount: amountToAdd,
+                            trxId: trxId,
+                            status: 'approved',
+                            method: currentPaymentMethod + ' (Auto)',
+                            date: new Date()
+                        });
+
                         await Swal.fire('Success', `Successfully added Rs. ${amountToAdd} to your wallet.`, 'success');
                         showSec('home');
                     }
@@ -2362,6 +2543,10 @@ const firebaseConfig = {
                     Swal.fire('Failed', 'System error during balance update. Contact support.', 'error');
                 } finally {
                     isVerifying = false;
+                    if (isDirectBuy) {
+                        isDirectBuy = false;
+                        pendingDirectOrder = null;
+                    }
                 }
             });
         } catch (error) {
