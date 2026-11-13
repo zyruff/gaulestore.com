@@ -5,8 +5,9 @@ require('dotenv').config();
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// --- FIREBASE INITIALIZATION ---
+// --- FIREBASE INITIALIZATION (rg-digital-store) ---
 const serviceAccount = require('./serviceAccountKey.json');
 
 admin.initializeApp({
@@ -20,7 +21,61 @@ const db = admin.firestore();
 const ALIC_BASE_URL = 'https://alicstore.com/api';
 
 // ==========================================
-// 1. GET VARIATIONS LIST (ALIC package_id dekhaune)
+// 0. BROWSER UI TO VIEW PACKAGE IDs EASILY
+// ==========================================
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Gaule Store - Package IDs Viewer</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <style>
+        body { font-family: Arial, sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        input, button { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; }
+        button:hover { background: #218838; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 13px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h2>AlicStore Package IDs Viewer</h2>
+        <form id="pkgForm">
+          <label><b>Master Secret Key:</b></label>
+          <input type="text" id="secret_key" placeholder="Enter your AlicStore Secret Key" required />
+          <button type="submit">Fetch Package IDs</button>
+        </form>
+        <h3>Response / Package List:</h3>
+        <pre id="result">Enter your secret key above and click the button...</pre>
+      </div>
+      <script>
+        document.getElementById('pkgForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const secret_key = document.getElementById('secret_key').value;
+          const resultPre = document.getElementById('result');
+          resultPre.textContent = 'Loading packages...';
+          try {
+            const res = await fetch('/api/variations', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ secret_key })
+            });
+            const data = await res.json();
+            resultPre.textContent = JSON.stringify(data, null, 2);
+          } catch (err) {
+            resultPre.textContent = 'Error: ' + err.message;
+          }
+        });
+      </script>
+    </body>
+    </html>
+  `);
+});
+
+// ==========================================
+// 1. GET VARIATIONS LIST (ALIC package_id)
 // ==========================================
 app.post('/api/variations', async (req, res) => {
   try {
@@ -34,13 +89,7 @@ app.post('/api/variations', async (req, res) => {
       secret_key: secret_key
     });
 
-    const variations = response.data.data;
-    console.log('Fetched Variations with Alic Package IDs:', variations);
-
-    return res.status(200).json({
-      status: 'success',
-      data: variations
-    });
+    return res.status(200).json(response.data);
 
   } catch (error) {
     console.error('Error fetching variations:', error.response?.data || error.message);
@@ -74,6 +123,7 @@ app.post('/api/place-order', async (req, res) => {
 
     const orderData = alicResponse.data;
 
+    // Save in Firebase (rg-digital-store)
     await db.collection('orders').doc(client_order_id).set({
       client_order_id,
       alic_order_id: orderData.orderid || null,
