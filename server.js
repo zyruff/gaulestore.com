@@ -1,8 +1,7 @@
-const express = class require('express') ? require('express') : null; // Express import
-const expressApp = require('express');
+const express = require('express');
 const cors = require('cors');
 
-const app = expressApp();
+const app = express();
 
 app.use(express.json());
 app.use(cors());
