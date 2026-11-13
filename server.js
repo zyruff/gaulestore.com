@@ -1,9 +1,17 @@
 const express = require('express');
+const admin = require('firebase-admin'); // Firebase admin include gareko
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+
+// Initialize Firebase Admin (Optional: yadi serviceAccountKey.json xa bhane or environment variables bata)
+// admin.initializeApp({
+//   credential: admin.credential.cert(require('./serviceAccountKey.json')),
+//   databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com"
+// });
+// const db = admin.database();
 
 const ALICSTORE_API_BASE = 'https://alicstore.com/api';
 const API_SECRET_KEY = process.env.API_SECRET_KEY || 'YOUR_API_SECRET_KEY';
@@ -42,7 +50,8 @@ app.post('/api/create-order', async (req, res) => {
             webhook_url: "https://gaule-store.onrender.com/api/webhook-receiver"
         };
 
-        const response = await fetch(`${ALICstore_API_BASE}/place-order`, { // Note: ensure ALICSTORE_API_BASE is correct casing
+        // FIX: ALICSTORE_API_BASE spelling correct banayeko (STORE capital)
+        const response = await fetch(`${ALICSTORE_API_BASE}/place-order`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -58,20 +67,26 @@ app.post('/api/create-order', async (req, res) => {
 /**
  * 3. Incoming Webhook Receiver Endpoint
  */
-app.post('/api/webhook-receiver', (req, res) => {
+app.post('/api/webhook-receiver', async (req, res) => {
     const { orderid, status, content } = req.body;
 
     console.log(`[Webhook Received] Order ID: ${orderid}, Status: ${status}, Content: ${content}`);
 
-    if (status === 'success') {
-        // TODO: Update your database (Mark order as success)
-        console.log(`Order ${orderid} completed successfully.`);
-    } else {
-        // TODO: Update your database (Mark order as failed/cancelled)
-        console.log(`Order ${orderid} failed or cancelled.`);
-    }
+    try {
+        if (status === 'success') {
+            console.log(`Order ${orderid} completed successfully.`);
+            // Yaha Firebase database ma order status update garne logic rakhnu hola
+            // Example: const snapshot = await db.ref('orders').orderByChild('apiOrderId').equalTo(orderid).once('value');
+            // snapshot.forEach(child => child.ref.update({ status: "Completed" }));
+        } else {
+            console.log(`Order ${orderid} failed or cancelled.`);
+            // Example: snapshot.forEach(child => child.ref.update({ status: "Failed" }));
+        }
 
-    res.status(200).json({ status: 'success', message: 'Webhook received successfully' });
+        res.status(200).json({ status: 'success', message: 'Webhook received successfully' });
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: err.message });
+    }
 });
 
 // Server Start
