@@ -1,131 +1,174 @@
-require('dotenv').config();
 const express = require('express');
-const axios = require('axios');
-const cors = require('cors');
+const admin = require('firebase-admin');
 
 const app = express();
-app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Render को Environment Variable बाट Key तान्छ, नभए यहाँ लेखेको Key प्रयोग गर्छ
-const ALIC_SECRET_KEY = process.env.ALIC_SECRET_KEY || 'YOUR_API_SECRET_KEY';
-const BASE_URL = 'https://alicstore.com/api';
+// Initialize Firebase Admin using Service Account JSON Environment Variable
+try {
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount)
+    });
+  } else {
+    // Fallback if configured locally or via default
+    admin.initializeApp({
+      credential: admin.credential.applicationDefault()
+    });
+  }
+  console.log("Firebase Initialized Successfully using SERVICE_ACCOUNT JSON!");
+} catch (error) {
+  console.error("Firebase initialization error:", error);
+}
 
-// Cloudflare र Server Block बाट बच्नको लागि साझा Headers
-const apiHeaders = {
-  'Content-Type': 'application/json',
-  'Accept': 'application/json',
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-};
+const db = admin.firestore();
 
-// ==========================================
-// ०. होम पेज (Server चलेको छ कि छैन चेक गर्न)
-// ==========================================
-app.get('/', (req, res) => {
-  res.send('Gaule Store ALIC API Server is Running!');
-});
+const PORT = process.env.PORT || 10000;
+const MASTER_API_SECRET = process.env.MASTER_API_SECRET;
+const MASTER_API_BASE = 'https://alicstore.com/api';
 
-// ==========================================
-// १. सबै Package ID र मूल्य (Variations) हेर्ने API
-// ==========================================
+// Function to fetch packages on startup & show in console table
+async function fetchMasterPackages() {
+  try {
+    if (!MASTER_API_SECRET) {
+      console.log("Could not fetch packages on startup (Check your MASTER_API_SECRET): Request failed with status code 401");
+      return;
+    }
+    const response = await fetch(`${MASTER_API_BASE}/variations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ secret_key: MASTER_API_SECRET })
+    });
+    const data = await response.json();
+    if (data.status === 'success') {
+      console.log("=== MASTER PANEL AVAILABLE PACKAGES ===");
+      console.table(data.data.map((pkg, index) => ({
+        index,
+        package_id: pkg.package_id,
+        name: pkg.name,
+        title: pkg.title,
+        price: pkg.price
+      })));
+    } else {
+      console.error("Failed to fetch packages:", data);
+    }
+  } catch (err) {
+    console.error("Error fetching packages on startup:", err.message);
+  }
+}
+
+// 1. Get Packages API (for your frontend website)
 app.get('/api/packages', async (req, res) => {
   try {
-    const response = await axios.post(
-      `${BASE_URL}/variations`,
-      { secret_key: ALIC_SECRET_KEY },
-      { headers: apiHeaders }
-    );
-
-    // यदि ALIC Store ले डेटा पठायो भने सिधै देखाउने
-    res.status(200).json(response.data);
-  } catch (error) {
-    console.error('Variations Error:', error.response?.data || error.message);
-    
-    // Error आएमा पूरा विवरण ब्राउजरमै देखाउने ताकि समस्या थाहा होस्
-    res.status(error.response?.status || 500).json({
-      status: 'error',
-      alic_status_code: error.response?.status || 'NO_RESPONSE',
-      alic_response: error.response?.data || error.message
+    const response = await fetch(`${MASTER_API_BASE}/variations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ secret_key: MASTER_API_SECRET })
     });
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
   }
 });
 
-// ==========================================
-// २. अर्डर पठाउने (Place Order) API
-// ==========================================
-app.post('/api/buy-topup', async (req, res) => {
-  const { package_id, player_id, client_order_id, quantity } = req.body;
-
-  // आवश्यक डेटा पठाइएको छ कि छैन चेक गर्ने
-  if (!package_id || !player_id) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'package_id ra player_id aniwarya chha!'
-    });
-  }
-
-  // यदि client_order_id पठाइएको छैन भने अटोमेटिक Unique ID बनाउने
-  const orderIdToSend = client_order_id || `ORD_${Date.now()}`;
-
+// 2. Place Order API (Forwards order from your store to Alicstore Master Panel)
+app.post('/api/place-order', async (req, res) => {
   try {
-    const payload = {
-      secret_key: ALIC_SECRET_KEY,
+    const { package_id, player_id, client_order_id, quantity } = req.body;
+
+    if (!package_id || !player_id || !client_order_id) {
+      return res.status(400).json({ status: 'error', message: 'Missing required fields (package_id, player_id, client_order_id)' });
+    }
+
+    // Automatically generate webhook URL based on your Render deployment domain
+    const webhook_url = `${req.protocol}://${req.get('host')}/api/webhook-receiver`;
+
+    // Forward request to Alicstore API
+    const masterResponse = await fetch(`${MASTER_API_BASE}/place-order`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        secret_key: MASTER_API_SECRET,
+        package_id: Number(package_id),
+        player_id: String(player_id),
+        client_order_id: String(client_order_id),
+        quantity: Number(quantity || 1),
+        webhook_url: webhook_url
+      })
+    });
+
+    const masterData = await masterResponse.json();
+
+    // Save order details to Firestore database
+    await db.collection('orders').doc(String(client_order_id)).set({
+      client_order_id: String(client_order_id),
       package_id: Number(package_id),
       player_id: String(player_id),
-      client_order_id: String(orderIdToSend),
-      quantity: Number(quantity) || 1,
-      webhook_url: 'https://gaule-store.onrender.com/api/webhook-receiver'
-    };
-
-    const response = await axios.post(
-      `${BASE_URL}/place-order`,
-      payload,
-      { headers: apiHeaders }
-    );
-
-    // अर्डर सफल भयो भने Response पठाउने
-    res.status(200).json({
-      sent_client_order_id: orderIdToSend,
-      alic_response: response.data
+      quantity: Number(quantity || 1),
+      master_order_id: masterData.orderid ? String(masterData.orderid) : null,
+      status: masterData.status || 'processing',
+      response_content: masterData.content || '',
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
+
+    res.status(masterResponse.status).json(masterData);
   } catch (error) {
-    console.error('Place Order Error:', error.response?.data || error.message);
-
-    res.status(error.response?.status || 400).json({
-      status: 'error',
-      alic_status_code: error.response?.status || 'NO_RESPONSE',
-      alic_response: error.response?.data || error.message
-    });
+    console.error("Place order error:", error);
+    res.status(500).json({ status: 'error', message: error.message });
   }
 });
 
-// ==========================================
-// ३. Webhook Receiver (Order Complete/Fail अपडेट आउने ठाउँ)
-// ==========================================
-app.post('/api/webhook-receiver', (req, res) => {
-  const { orderid, status, content } = req.body;
+// 3. Webhook Receiver API (Receives order updates from Master Panel)
+app.post('/api/webhook-receiver', async (req, res) => {
+  try {
+    const { orderid, status, content } = req.body;
+    console.log("Received Webhook Data:", req.body);
 
-  console.log('--- Webhook Received ---');
-  console.log('Order ID:', orderid);
-  console.log('Status:', status);
-  console.log('Message:', content);
+    if (!orderid) {
+      return res.status(400).json({ status: 'error', message: 'Missing orderid in webhook' });
+    }
 
-  if (status === 'success') {
-    // TODO: आफ्नो Database मा orderid लाई 'Completed' अपडेट गर्नुहोस्
-    console.log(`✅ Order ${orderid} Completed!`);
-  } else if (status === 'error') {
-    // TODO: आफ्नो Database मा orderid लाई 'Failed' अपडेट गरी युजरलाई Refund दिनुहोस्
-    console.log(`❌ Order ${orderid} Failed: ${content}`);
+    // Try finding order by client_order_id first
+    let orderRef = db.collection('orders').doc(String(orderid));
+    let doc = await orderRef.get();
+
+    if (!doc.exists) {
+      // If not found, try searching by master_order_id
+      const querySnapshot = await db.collection('orders').where('master_order_id', '==', String(orderid)).get();
+      if (!querySnapshot.empty) {
+        orderRef = querySnapshot.docs[0].ref;
+        doc = await querySnapshot.docs[0];
+      }
+    }
+
+    if (doc.exists) {
+      await orderRef.update({
+        status: status, // 'success' or 'error'
+        webhook_content: content,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+      return.status(200).json({ status: 'success', message: 'Order status updated successfully' });
+    } else {
+      console.warn(`Webhook order not found in database: ${orderid}`);
+      return res.status(404).json({ status: 'error', message: 'Order not found' });
+    }
+
+  } catch (error) {
+    console.error("Webhook processing error:", error);
+    res.status(500).json({ status: 'error', message: error.message });
   }
-
-  // ALIC Store लाई 200 OK पठाउनै पर्छ
-  res.status(200).json({ received: true });
 });
 
-// ==========================================
-// Server Start
-// ==========================================
-const PORT = process.env.PORT || 3000;
+// Root route
+app.get('/', (req, res) => {
+  res.send('GAULE STORE Server is Running Successfully! 🚀');
+});
+
+// Start Server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  fetchMasterPackages();
 });
