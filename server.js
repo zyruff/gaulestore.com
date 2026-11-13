@@ -23,7 +23,8 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 // API Configuration (Master Panel / Reseller API)
-const MASTER_API_URL = process.env.MASTER_API_URL || 'https://domain.com/api';
+// domain.com को ठाउँमा https://alicstore.com राखिएको छ
+const MASTER_API_URL = process.env.MASTER_API_URL || 'https://alicstore.com/api';
 const MASTER_API_SECRET = process.env.MASTER_API_SECRET || 'YOUR_API_SECRET_KEY';
 const PORT = process.env.PORT || 10000;
 
@@ -33,7 +34,6 @@ const PORT = process.env.PORT || 10000;
 // ==========================================
 app.post('/api/variations', async (req, res) => {
   try {
-    // Master panel मा secret_key पठाएर variations लिस्ट मगाउने
     const response = await axios.post(`${MASTER_API_URL}/variations`, {
       secret_key: MASTER_API_SECRET
     });
@@ -58,7 +58,6 @@ app.post('/api/place-order', async (req, res) => {
   try {
     const { package_id, player_id, client_order_id, quantity, webhook_url } = req.body;
 
-    // अनिवार्य fields चेक गर्ने
     if (!package_id || !player_id || !client_order_id || !quantity) {
       return res.status(400).json({
         status: 'error',
@@ -79,7 +78,6 @@ app.post('/api/place-order', async (req, res) => {
       headers: { 'Content-Type': 'application/json' }
     });
 
-    // Master panel बाट सफल response आएपछि Firestore मा अर्डर सेभ/अपडेट गर्न सकिन्छ
     const orderData = response.data;
     if (orderData.orderid) {
       await db.collection('orders').doc(client_order_id).set({
@@ -116,19 +114,16 @@ app.post('/api/webhook-receiver', async (req, res) => {
   console.log('--- Webhook Received from Master Panel ---');
   console.log(JSON.stringify(webhookData, null, 2));
 
-  const orderId = webhookData.orderid; // यहाँ client_order_id वा master orderid हुन सक्छ
+  const orderId = webhookData.orderid; 
 
   if (!orderId) {
     return res.status(400).json({ status: 'error', message: 'Order ID missing' });
   }
 
   try {
-    // Firestore मा client_order_id वा masterOrderId सँग म्याच गरेर अपडेट गर्ने
-    // यहाँ client_order_id प्रयोग भएको छ भने direct doc(orderId) काम गर्छ
     const orderRef = db.collection('orders').doc(orderId);
     let orderDoc = await orderRef.get();
 
-    // यदि direct doc भेटिएन भने masterOrderId बाट खोज्ने
     let querySnapshot = null;
     if (!orderDoc.exists) {
       querySnapshot = await db.collection('orders').where('masterOrderId', '==', orderId).get();
