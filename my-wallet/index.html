@@ -65,7 +65,7 @@
         /* Store Logo Size */
         .store-logo { height: 55px; width: auto; object-fit: contain; display: block; background-color: #ffffff; padding: 4px; border-radius: 6px; }
 
-        /* Main Container (कार्ड बक्स र स्याडो पूर्ण रूपमा हटाइएको छ) */
+        /* Main Container */
         .container { max-width: 480px; margin: 0 auto; background: #ffffff; padding: 20px; box-shadow: none; border-radius: 0; }
         
         /* Section Title */
@@ -452,7 +452,8 @@
             const now = new Date();
             const formattedDate = now.toLocaleString('en-US', { timeZone: 'Asia/Kathmandu' });
 
-            const requestsRef = ref(db, 'topup_requests');
+            // 'topup_requests' को सट्टा 'deposits' मा सेभ हुने गरी परिवर्तन गरिएको छ
+            const requestsRef = ref(db, 'deposits');
             
             push(requestsRef, {
                 uid: currentUser.uid,
