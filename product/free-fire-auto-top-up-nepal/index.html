@@ -96,13 +96,11 @@
         .action-btn { display: flex; justify-content: center; align-items: center; gap: 8px; border: none; cursor: pointer; font-weight: 700; color: #ffffff; background-color: #ffb300; transition: background 0.2s; width: 100%; height: 48px; font-size: 15px; border-radius: 25px; margin: 0 auto; }
         .action-btn.login-needed { background-color: #dc2626; }
         
-        /* Modal Base */
         .success-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 300; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out; }
         .success-modal.show { opacity: 1; pointer-events: auto; }
         .success-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(30px); transition: all 0.3s ease-in-out; position: relative; }
         .success-modal.show .success-card { transform: translateY(0); }
         
-        /* Confirm Checkout Modal Custom Styling */
         .checkout-card { max-width: 400px; text-align: left; padding: 24px; }
         .checkout-close { position: absolute; top: 16px; right: 16px; font-size: 20px; cursor: pointer; color: #718096; }
         .checkout-title { font-size: 18px; font-weight: 700; text-align: center; color: #1a202c; margin-bottom: 4px; }
@@ -228,49 +226,42 @@
     </div>
 
     <div class="cards-grid" id="diamonds-wrapper">
-        <!-- ID: 1773 -->
         <div class="pack-card" onclick="selectPack(this, '25 Diamonds', '1773', '25')">
             <div class="pack-title">25 Diamonds</div>
             <div class="pack-price">Rs25</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
 
-        <!-- ID: 1774 -->
         <div class="pack-card" onclick="selectPack(this, '50 Diamonds', '1774', '42')">
             <div class="pack-title">50 Diamonds</div>
             <div class="pack-price">Rs42</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
     
-        <!-- ID: 1775 -->
         <div class="pack-card" onclick="selectPack(this, '115 Diamonds', '1775', '95')">
             <div class="pack-title">115 Diamonds</div>
             <div class="pack-price">Rs95</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
 
-        <!-- ID: 1776 -->
         <div class="pack-card" onclick="selectPack(this, '240 Diamonds', '1776', '190')">
             <div class="pack-title">240 Diamonds</div>
             <div class="pack-price">Rs190</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
 
-        <!-- ID: 1777 -->
         <div class="pack-card" onclick="selectPack(this, '610 Diamonds', '1777', '475')">
             <div class="pack-title">610 Diamonds</div>
             <div class="pack-price">Rs475</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
 
-        <!-- ID: 1778 -->
         <div class="pack-card" onclick="selectPack(this, '1240 Diamonds', '1778', '938')">
             <div class="pack-title">1240 Diamonds</div>
             <div class="pack-price">Rs938</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
 
-        <!-- ID: 1779 -->
         <div class="pack-card" onclick="selectPack(this, '2530 Diamonds', '1779', '1875')">
             <div class="pack-title">2530 Diamonds</div>
             <div class="pack-price">Rs1875</div>
@@ -281,21 +272,18 @@
             Membership <span style="color:#e53e3e;">*</span>
         </div>
 
-        <!-- ID: 1801 (Weekly Lite) -->
         <div class="pack-card" onclick="selectPack(this, 'Weekly Lite', '1801', '52')">
             <div class="pack-title">Weekly Lite</div>
             <div class="pack-price">Rs52</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
 
-        <!-- ID: 1780 -->
         <div class="pack-card" onclick="selectPack(this, 'Weekly Membership', '1780', '190')">
             <div class="pack-title">Weekly Membership</div>
             <div class="pack-price">Rs190</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
 
-        <!-- ID: 1781 -->
         <div class="pack-card" onclick="selectPack(this, 'Monthly Membership', '1781', '930')">
             <div class="pack-title">Monthly Membership</div>
             <div class="pack-price">Rs930</div>
@@ -303,7 +291,6 @@
         </div>
     </div>
 
-    <!-- Order Summary & Buy Now Button -->
     <div class="bottom-drawer">
         <div class="drawer-inner">
             <div class="row-detail">
@@ -322,7 +309,6 @@
     </div>
 </div>
 
-<!-- Confirm Checkout Modal -->
 <div class="success-modal" id="checkoutModal">
     <div class="success-card checkout-card">
         <span class="checkout-close" onclick="closeCheckoutModal()">&times;</span>
@@ -372,7 +358,6 @@
     </div>
 </div>
 
-<!-- Success Modal -->
 <div class="success-modal" id="successModal">
     <div class="success-card">
         <div class="success-checkmark">
@@ -404,7 +389,6 @@
     </div>
 </div>
 
-<!-- Insufficient Balance Modal -->
 <div class="success-modal" id="insufficientModal">
     <div class="success-card">
         <div class="success-checkmark" style="background: #fef2f2; border: 1px solid #fca5a5;">
@@ -461,7 +445,6 @@
     let selectedItemName = "";
     let selectedPackageId = null;
     let selectedItemPrice = "";
-    let activeOrderFirebaseKey = null;
     let balanceListener = null;
     let currentWalletBalance = 0;
 
@@ -520,7 +503,6 @@
         });
     };
 
-    // Step 1: Validate inputs and open Confirm Checkout Modal
     mainActionBtn.onclick = function() {
         if (!currentUser) {
             signInWithPopup(auth, provider).catch((error) => {
@@ -549,14 +531,12 @@
 
         if(!isFormValid) return;
 
-        // Populate and open Checkout Modal
         document.getElementById('modal-checkout-uid').innerText = uidValue;
         document.getElementById('modal-checkout-item').innerText = selectedItemName;
         document.getElementById('modal-checkout-total').innerText = 'Rs ' + selectedItemPrice;
         document.getElementById('checkoutModal').classList.add('show');
     };
 
-    // Step 2: Final Confirmation & API Order execution from Modal
     confirmPayBtn.onclick = async function() {
         let uidValue = gameUidInput.value.trim();
         const itemPriceNum = parseFloat(selectedItemPrice);
@@ -573,7 +553,8 @@
         try {
             const userOrderId = 'GAULE-' + Date.now();
             
-            const response = await fetch('https://gaule-store.onrender.com/api/place-order', {
+            // Backend endpoint matches correctly here (/api/create-order)
+            const response = await fetch('https://gaule-store.onrender.com/api/create-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -596,7 +577,6 @@
                 const now = new Date();
                 
                 const orderRef = push(ref(db, 'orders'));
-                activeOrderFirebaseKey = orderRef.key;
 
                 set(orderRef, {
                     date: now.toLocaleDateString(),
