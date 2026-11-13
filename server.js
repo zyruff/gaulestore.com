@@ -42,7 +42,7 @@ app.post('/api/create-order', async (req, res) => {
             webhook_url: "https://gaule-store.onrender.com/api/webhook-receiver"
         };
 
-        const response = await fetch(`${ALICSTORE_API_BASE}/place-order`, {
+        const response = await fetch(`${ALICstore_API_BASE}/place-order`, { // Note: ensure ALICSTORE_API_BASE is correct casing
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
