@@ -21,13 +21,14 @@
             flex-direction: column; 
             justify-content: space-between; 
             align-items: center;
+            padding-bottom: 75px; 
         }
         
-        /* Header Layout - Edge to Edge with Blue Bottom Border */
+        /* Header Layout */
         .header { 
             display: flex; 
             align-items: center; 
-            padding: 12px 20px; 
+            padding: 12px 24px; 
             background: #ffffff; 
             border-bottom: 2px solid #2563EB; 
             justify-content: flex-start; 
@@ -46,6 +47,46 @@
             padding: 4px; 
             border-radius: 6px; 
         }
+
+        /* Bottom Nav Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 62px;
+            border-top: 1px solid #eaeaea;
+            padding: 0 5px;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+        .bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #888;
+            font-size: 11px;
+            font-weight: 500;
+            flex: 1;
+            height: 100%;
+            transition: all 0.2s ease-in-out;
+            background: transparent;
+            border: none;
+        }
+        .bottom-nav .nav-item svg { width: 18px; height: 18px; margin-bottom: 3px; stroke: currentColor; fill: none; }
+        .bottom-nav .nav-item.active { color: #333333; }
+
+        @media screen and (min-width: 1024px) {
+            main {
+                max-width: 460px !important;
+            }
+        }
     </style>
 </head>
 <body class="selection:bg-indigo-500 selection:text-white">
@@ -59,22 +100,22 @@
         </div>
     </header>
 
-    <!-- Main Authentication Container (Responsive for Mobile & Desktop) -->
-    <main class="w-full max-w-sm sm:max-w-md my-auto z-10 px-4 py-8 sm:p-8">
+    <!-- Main Authentication Container -->
+    <main class="w-full max-w-sm sm:max-w-md lg:max-w-lg my-auto z-10 px-4 py-8 sm:p-8">
         
         <!-- Welcome Header -->
         <div class="text-center mb-6">
-            <h1 id="page-title" class="text-2xl font-bold tracking-tight text-slate-900">Welcome Back</h1>
+            <h1 id="page-title" class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">Welcome Back</h1>
             <p id="page-subtitle" class="text-xs sm:text-sm text-slate-500 mt-1">Access your digital assets & dashboard</p>
         </div>
 
         <!-- Auth Card -->
-        <div id="auth-card-container" class="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-slate-200/60 backdrop-blur-sm">
+        <div id="auth-card-container" class="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl shadow-slate-200/60 backdrop-blur-sm">
 
             <!-- Alert Box -->
-            <div id="alert-box" class="hidden mb-4 p-3 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300"></div>
+            <div id="alert-box" class="hidden mb-4 p-3.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300"></div>
 
-            <!-- Tab Switcher (Hidden in Forgot Password mode) -->
+            <!-- Tab Switcher -->
             <div id="tab-switcher" class="flex bg-slate-100 p-1.5 rounded-2xl mb-6 border border-slate-200">
                 <button id="tab-login" onclick="switchTab('login')" class="flex-1 py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-600/20">Sign In</button>
                 <button id="tab-register" onclick="switchTab('register')" class="flex-1 py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all text-slate-600 hover:text-slate-900">Register</button>
@@ -98,7 +139,6 @@
                             <i id="toggle-login-icon" class="fa-regular fa-eye text-sm"></i>
                         </button>
                     </div>
-                    <!-- Forgot Password Link -->
                     <div class="flex justify-end mt-2">
                         <button type="button" onclick="showForgotPasswordView()" class="text-xs sm:text-sm text-indigo-600 hover:text-indigo-700 font-semibold transition-colors">Forgot Password?</button>
                     </div>
@@ -108,7 +148,7 @@
                 </button>
             </form>
 
-            <!-- FORGOT PASSWORD FORM (Hidden by default) -->
+            <!-- FORGOT PASSWORD FORM -->
             <form id="forgot-password-form" class="space-y-4 hidden" onsubmit="handleForgotPassword(event)">
                 <div>
                     <label class="block text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Enter Your Registered Email</label>
@@ -129,7 +169,6 @@
 
             <!-- REGISTER FORM -->
             <form id="register-form" class="space-y-4 hidden" onsubmit="handleRegister(event)">
-                <!-- First Name & Last Name Grid -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">First Name</label>
@@ -178,14 +217,14 @@
                 </button>
             </form>
 
-            <!-- Divider (Hidden in Forgot Password mode) -->
+            <!-- Divider -->
             <div id="auth-divider" class="relative flex py-5 items-center">
                 <div class="flex-grow border-t border-slate-200"></div>
                 <span class="flex-shrink mx-3 text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Or continue with</span>
                 <div class="flex-grow border-t border-slate-200"></div>
             </div>
 
-            <!-- Google Sign In Button (Hidden in Forgot Password mode) -->
+            <!-- Google Sign In Button -->
             <button id="google-btn" onclick="handleGoogleSignIn()" type="button" class="w-full flex items-center justify-center gap-2.5 py-3 px-4 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-700 shadow-sm">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24">
                     <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.8 7.3l3.7 2.9C6.4 7.1 9 5 12 5z"/>
@@ -198,8 +237,8 @@
         </div>
     </main>
 
-    <!-- Footer & Stay Connected -->
-    <footer class="w-full max-w-md pt-4 pb-6 px-4 flex flex-col items-center gap-3 z-10">
+    <!-- Footer & Social Icons -->
+    <footer class="w-full max-w-md pt-6 pb-4 px-4 flex flex-col items-center gap-3 z-10 mb-12">
         <div class="flex items-center gap-3">
             <a href="https://discord.com" target="_blank" class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-indigo-600 hover:border-indigo-300 shadow-sm transition-all"><i class="fa-brands fa-discord text-xs sm:text-sm"></i></a>
             <a href="https://whatsapp.com" target="_blank" class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-indigo-600 hover:border-indigo-300 shadow-sm transition-all"><i class="fa-brands fa-whatsapp text-xs sm:text-sm"></i></a>
@@ -209,6 +248,34 @@
             &copy; 2026 RG Digital Store. All rights reserved.
         </p>
     </footer>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <a href="https://roshantamang2.com.np" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span>Home</span>
+        </a>
+        <a href="https://roshantamang2.com.np/shop/" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+            <span>Shop</span>
+        </a>
+        <a href="https://roshantamang2.com.np/my-wallet/" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
+                <path d="M4 6v12a2 2 0 0 0 2 2h14v-4"></path>
+                <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path>
+            </svg>
+            <span>Wallet</span>
+        </a>
+        <a href="https://roshantamang2.com.np/order" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <span>Order</span>
+        </a>
+        <a href="https://roshantamang2.com.np/account/" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>Account</span>
+        </a>
+    </div>
 
     <!-- Firebase Script Logic -->
     <script type="module">
@@ -224,7 +291,6 @@
             updateProfile 
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        // Your Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCFUQu06EvmJCtplZ8dRqVhHnB7I1yQuKw",
             authDomain: "rg-digital-store.firebaseapp.com",
@@ -236,12 +302,10 @@
             measurementId: "G-S09Q860R4V"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const googleProvider = new GoogleAuthProvider();
 
-        // Toggle Password Visibility Helper
         window.togglePassword = function(fieldId, iconId) {
             const inputField = document.getElementById(fieldId);
             const icon = document.getElementById(iconId);
@@ -255,7 +319,6 @@
             }
         }
 
-        // UI Tab Switcher Helper
         window.switchTab = function(tab) {
             const loginForm = document.getElementById('login-form');
             const registerForm = document.getElementById('register-form');
@@ -270,7 +333,6 @@
             
             hideAlert();
 
-            // Show standard tabs & divider
             tabSwitcher.classList.remove('hidden');
             authDivider.classList.remove('hidden');
             googleBtn.classList.remove('hidden');
@@ -298,7 +360,6 @@
             }
         }
 
-        // Show Forgot Password View
         window.showForgotPasswordView = function() {
             const loginForm = document.getElementById('login-form');
             const registerForm = document.getElementById('register-form');
@@ -315,7 +376,6 @@
             registerForm.classList.add('hidden');
             forgotPasswordForm.classList.remove('hidden');
 
-            // Hide tab switcher, divider and google sign in during password reset
             tabSwitcher.classList.add('hidden');
             authDivider.classList.add('hidden');
             googleBtn.classList.add('hidden');
@@ -323,14 +383,12 @@
             pageTitle.innerText = "Reset Password";
             pageSubtitle.innerText = "We'll send a password reset link to your email";
 
-            // Pre-fill email if already typed in login form
             const loginEmailVal = document.getElementById('login-email').value;
             if(loginEmailVal) {
                 document.getElementById('forgot-email').value = loginEmailVal;
             }
         }
 
-        // Alert helper
         function showAlert(message, type = 'error') {
             const alertBox = document.getElementById('alert-box');
             alertBox.classList.remove('hidden');
@@ -346,21 +404,29 @@
             document.getElementById('alert-box').classList.add('hidden');
         }
 
-        // Login Handler
+        // Updated Login Handler with Success State & Loading Lock
         window.handleLogin = async function(e) {
             e.preventDefault();
             hideAlert();
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
+            const loginBtn = document.getElementById('login-btn');
 
             try {
+                loginBtn.disabled = true;
+                loginBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Signing in...`;
+
                 await signInWithEmailAndPassword(auth, email, password);
+                
+                // Login Success message display
+                showAlert("Login Successful! Redirecting...", "success");
             } catch (error) {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = "Sign In";
                 showAlert(error.message.replace('Firebase: ', ''));
             }
         }
 
-        // Register Handler
         window.handleRegister = async function(e) {
             e.preventDefault();
             hideAlert();
@@ -369,6 +435,7 @@
             const email = document.getElementById('reg-email').value;
             const password = document.getElementById('reg-password').value;
             const confirmPassword = document.getElementById('reg-confirm-password').value;
+            const regBtn = document.getElementById('reg-btn');
 
             if (password !== confirmPassword) {
                 showAlert("Passwords do not match!");
@@ -376,28 +443,32 @@
             }
 
             try {
+                regBtn.disabled = true;
+                regBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Creating account...`;
+
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const fullName = `${firstName} ${lastName}`.trim();
                 await updateProfile(userCredential.user, {
                     displayName: fullName
                 });
-                showAlert("Account created successfully!", "success");
+                showAlert("Account created successfully! Redirecting...", "success");
             } catch (error) {
+                regBtn.disabled = false;
+                regBtn.innerHTML = "Create Account";
                 showAlert(error.message.replace('Firebase: ', ''));
             }
         }
 
-        // Google Sign In Handler
         window.handleGoogleSignIn = async function() {
             hideAlert();
             try {
+                showAlert("Connecting to Google...", "success");
                 await signInWithPopup(auth, googleProvider);
             } catch (error) {
                 showAlert(error.message.replace('Firebase: ', ''));
             }
         }
 
-        // Forgot Password Submit Handler
         window.handleForgotPassword = async function(e) {
             e.preventDefault();
             hideAlert();
@@ -411,10 +482,11 @@
             }
         }
 
-        // Auth State Observer - Redirects to main website on successful login
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                window.location.href = "https://roshantamang2.com.np";
+                setTimeout(() => {
+                    window.location.href = "https://roshantamang2.com.np";
+                }, 800); // 0.8 सेकेन्डको छोटै डिले ताकि युजरले म्यासेज देख्न पाओस्
             } else {
                 const authCardContainer = document.getElementById('auth-card-container');
                 if(authCardContainer) authCardContainer.classList.remove('hidden');
