@@ -12,7 +12,8 @@ if (!admin.apps.length) {
   try {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
     admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
+      credential: admin.credential.cert(serviceAccount),
+      databaseURL: process.env.FIREBASE_DATABASE_URL // Example: https://your-app-default-rtdb.firebaseio.com
     });
     console.log("Firebase Initialized Successfully using SERVICE_ACCOUNT JSON!");
   } catch (error) {
@@ -20,7 +21,8 @@ if (!admin.apps.length) {
   }
 }
 
-const db = admin.firestore();
+// Firestore ko satta Realtime Database use gareko ✅
+const db = admin.database();
 
 // API Configuration (Master Panel / Reseller API - alicstore.com)
 const MASTER_API_URL = process.env.MASTER_API_URL || 'https://alicstore.com/api';
@@ -97,15 +99,17 @@ app.post('/api/place-order', async (req, res) => {
     });
 
     const orderData = response.data;
+    
+    // Realtime Database ma order save garne (client_order_id lai key banayera)
     if (orderData.orderid) {
-      await db.collection('orders').doc(client_order_id).set({
-        masterOrderId: orderData.orderid,
+      await db.ref('orders/' + client_order_id).set({
+        masterOrderId: String(orderData.orderid),
         package_id,
         player_id,
         quantity,
         status: orderData.status || 'processing',
         createdAt: new Date().toISOString()
-      }, { merge: true });
+      });
     }
 
     return res.status(200).json(orderData);
@@ -132,28 +136,30 @@ app.post('/api/webhook-receiver', async (req, res) => {
   console.log('--- Webhook Received from Master Panel ---');
   console.log(JSON.stringify(webhookData, null, 2));
 
-  const orderId = webhookData.orderid; 
+  const masterOrderId = String(webhookData.orderid); 
 
-  if (!orderId) {
+  if (!masterOrderId) {
     return res.status(400).json({ status: 'error', message: 'Order ID missing' });
   }
 
   try {
-    const orderRef = db.collection('orders').doc(orderId);
-    let orderDoc = await orderRef.get();
+    const ordersRef = db.ref('orders');
+    
+    // Realtime Database ma masterOrderId match garne order khojne query
+    const snapshot = await ordersRef.orderByChild('masterOrderId').equalTo(masterOrderId).once('value');
 
-    let querySnapshot = null;
-    if (!orderDoc.exists) {
-      // यहाँ अघي 'aait' थियो, जसलाई 'await' बनाइएको छ ✅
-      querySnapshot = await db.collection('orders').where('masterOrderId', '==', orderId).get();
-    }
-
-    if (!orderDoc.exists && (querySnapshot && querySnapshot.empty)) {
-      console.log(`Order ID ${orderId} not found in Firestore.`);
+    if (!snapshot.exists()) {
+      console.log(`Master Order ID ${masterOrderId} not found in Realtime Database.`);
       return res.status(404).json({ status: 'error', message: 'Order not found' });
     }
 
-    const targetRef = orderDoc.exists ? orderRef : querySnapshot.docs[0].ref;
+    // Match vako order ko key ra reference liyeko
+    let targetKey = null;
+    snapshot.forEach((childSnapshot) => {
+      targetKey = childSnapshot.key;
+    });
+
+    const targetRef = db.ref('orders/' + targetKey);
 
     if (webhookData.status === 'success') {
       await targetRef.update({
@@ -161,14 +167,14 @@ app.post('/api/webhook-receiver', async (req, res) => {
         apiResponseMsg: webhookData.content || 'Order completed successfully.',
         updatedAt: new Date().toISOString()
       });
-      console.log(`Order ${orderId} updated to success.`);
+      console.log(`Order with Master ID ${masterOrderId} updated to success.`);
     } else if (webhookData.status === 'error') {
       await targetRef.update({
         status: 'cancel',
         apiResponseMsg: webhookData.content || 'Order failed or was cancelled.',
         updatedAt: new Date().toISOString()
       });
-      console.log(`Order ${orderId} updated to cancel.`);
+      console.log(`Order with Master ID ${masterOrderId} updated to cancel.`);
     }
 
     return res.status(200).json({ status: "success", message: "Webhook received successfully." });
@@ -180,7 +186,7 @@ app.post('/api/webhook-receiver', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('Reseller API Automated Top-Up Server is Running!');
+  res.send('Reseller API Automated Top-Up Server is Running with Realtime Database!');
 });
 
 // Server Start हुँदा Render Logs मा स्वचालित रूपमा Package ID हरू प्रिन्ट हुनेछन्
