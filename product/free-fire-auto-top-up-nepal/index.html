@@ -553,8 +553,8 @@
         try {
             const userOrderId = 'GAULE-' + Date.now();
             
-            // Backend endpoint matches correctly here (/api/create-order)
-            const response = await fetch('https://gaule-store.onrender.com/api/create-order', {
+            // Fixed endpoint to match server.js (/api/place-order)
+            const response = await fetch('https://gaule-store.onrender.com/api/place-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
