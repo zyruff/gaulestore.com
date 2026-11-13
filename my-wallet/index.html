@@ -116,6 +116,18 @@
         }
         .login-prompt-btn:hover { background: #f8fafc; border-color: #94a3b8; }
 
+        /* Deposit History Section Styles */
+        .history-section { margin-top: 30px; }
+        .history-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .history-info { font-size: 13px; color: #334155; }
+        .history-info span { display: block; }
+        .history-amount { font-weight: 700; color: #0f172a; font-size: 14px; margin-bottom: 3px; }
+        .history-date { font-size: 11px; color: #64748b; }
+        .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; text-align: center; display: inline-block; }
+        .status-processing { background: #fef3c7; color: #d97706; }
+        .status-approved { background: #dcfce7; color: #16a34a; }
+        .status-rejected { background: #fee2e2; color: #dc2626; }
+
         /* Modal Overlay */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
         .modal-card { background: white; border-radius: 24px; max-width: 380px; width: 100%; padding: 32px 24px 24px 24px; text-align: center; box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.2); transform: scale(0.85); opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
@@ -271,6 +283,14 @@
 
             <button type="submit" class="submit-btn" id="submit-btn-text">Submit Deposit</button>
         </form>
+
+        <!-- Deposit History Section -->
+        <div class="history-section">
+            <h3 id="history-title">Deposit History</h3>
+            <div id="deposit-history-list">
+                <p style="font-size: 13px; color: #64748b; text-align: center;">Loading history...</p>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -366,7 +386,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, onValue, set, get, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, onValue, set, get, push, serverTimestamp, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCFUQu06EvmJCtplZ8dRqVhHnB7I1yQuKw",
@@ -421,6 +441,25 @@
                     document.getElementById("header-user-balance").innerText = data.balance || 0;
                 }
             });
+
+            // Check if user is admin (Gaulebro@gmail.com)
+            const depositsRef = ref(db, 'deposits');
+            
+            if (user.email === "Gaulebro@gmail.com") {
+                document.getElementById("history-title").innerText = "All Users Deposit Requests (Admin)";
+                // Admin ले सबैको डिपोजिट देख्ने
+                onValue(depositsRef, (snapshot) => {
+                    renderHistory(snapshot);
+                });
+            } else {
+                document.getElementById("history-title").innerText = "My Deposit History";
+                // साधारण प्रयोगकर्ताले आफ्नो मात्र डिपोजिट देख्ने
+                const userDepositsQuery = query(depositsRef, orderByChild('uid'), equalTo(user.uid));
+                onValue(userDepositsQuery, (snapshot) => {
+                    renderHistory(snapshot);
+                });
+            }
+
         } else {
             currentUser = null;
             document.getElementById("login-container").style.display = "flex";
@@ -432,6 +471,43 @@
             document.getElementById("login-prompt-box").style.display = "block";
         }
     });
+
+    function renderHistory(snapshot) {
+        const historyList = document.getElementById("deposit-history-list");
+        historyList.innerHTML = "";
+
+        if (snapshot.exists()) {
+            let depositsData = [];
+            snapshot.forEach((childSnapshot) => {
+                depositsData.push({ id: childSnapshot.key, ...childSnapshot.val() });
+            });
+
+            depositsData.reverse(); // Newest first
+
+            depositsData.forEach((dep) => {
+                let statusClass = "status-processing";
+                if (dep.status === "Approved") statusClass = "status-approved";
+                else if (dep.status === "Rejected") statusClass = "status-rejected";
+
+                const card = document.createElement("div");
+                card.className = "history-card";
+                card.innerHTML = `
+                    <div class="history-info">
+                        <span class="history-amount">Rs. ${dep.amount} (${dep.method})</span>
+                        <span style="font-size: 12px; font-weight: 600; color: #1e293b;">User: ${dep.name || 'N/A'}</span>
+                        <span style="font-size: 11px; color: #475569;">TXID: ${dep.transactionId}</span>
+                        <span class="history-date">${dep.date || 'N/A'}</span>
+                    </div>
+                    <div>
+                        <span class="status-badge ${statusClass}">${dep.status}</span>
+                    </div>
+                `;
+                historyList.appendChild(card);
+            });
+        } else {
+            historyList.innerHTML = `<p style="font-size: 13px; color: #64748b; text-align: center;">No deposit history found.</p>`;
+        }
+    }
 
     const form = document.getElementById("topup-form");
     const submitBtn = document.getElementById("submit-btn-text");
@@ -452,7 +528,6 @@
             const now = new Date();
             const formattedDate = now.toLocaleString('en-US', { timeZone: 'Asia/Kathmandu' });
 
-            // 'topup_requests' को सट्टा 'deposits' मा सेभ हुने गरी परिवर्तन गरिएको छ
             const requestsRef = ref(db, 'deposits');
             
             push(requestsRef, {
