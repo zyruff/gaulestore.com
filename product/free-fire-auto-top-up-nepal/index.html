@@ -225,6 +225,7 @@
         <i class="fa-solid fa-circle-exclamation"></i> <span>Please select a pack to proceed!</span>
     </div>
 
+    <!-- सहि ID हरू राखिएको प्याकेज कार्डहरू -->
     <div class="cards-grid" id="diamonds-wrapper">
         <div class="pack-card" onclick="selectPack(this, '25 Diamonds', '1773', '25')">
             <div class="pack-title">25 Diamonds</div>
@@ -553,7 +554,7 @@
         try {
             const userOrderId = 'GAULE-' + Date.now();
             
-            // Fixed endpoint to match server.js (/api/place-order)
+            // Render ब्याकएन्डमा सहि डाटा पठाउने
             const response = await fetch('https://gaule-store.onrender.com/api/place-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
