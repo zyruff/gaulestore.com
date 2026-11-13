@@ -1,49 +1,39 @@
 const express = require('express');
 const cors = require('cors');
-
+const fetch = require('node-fetch'); // or native fetch in newer Node versions
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors()); // Cross-Origin Resource Sharing enable garna ko lagi
 
-// आफ्नो Alic Store को Secret Key यहाँ राख्नुहोला (वा Environment Variable प्रयोग गर्न सक्नुहुन्छ)
-const ALIC_SECRET_KEY = process.env.ALIC_SECRET_KEY || "YOUR_API_SECRET_KEY";
-
-// १. सप्लायरबाट सबै Variations (List) तान्ने API Endpoint
+// 1. Get Variations / Packages List from AlicStore
 app.get('/api/variations', async (req, res) => {
     try {
-        const response = await fetch('https://alicstore.com/api/variations', {
+        const alicResponse = await fetch('https://alicstore.com/api/variations', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                secret_key: ALIC_SECRET_KEY
+                secret_key: process.env.ALIC_SECRET_KEY // Render Environment Variable ma huna parxa
             })
         });
 
-        const data = await response.json();
-        res.status(response.status).json(data);
+        const data = await alicResponse.json();
+        res.status(alicResponse.status).json(data);
     } catch (error) {
-        res.status(500).json({ 
-            status: 'error', 
-            message: 'Failed to fetch variations from supplier: ' + error.message 
-        });
+        res.status(500).json({ status: "error", message: error.message });
     }
 });
 
-// २. अर्डर प्लेस गर्ने API Endpoint (तपाईंको Frontend ले यसलाई कल गर्छ)
+// 2. Create Order Endpoint (Called from your frontend)
 app.post('/api/create-order', async (req, res) => {
     try {
         const { package_id, player_id, client_order_id, quantity } = req.body;
 
-        const response = await fetch('https://alicstore.com/api/place-order', {
+        const alicResponse = await fetch('https://alicstore.com/api/place-order', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                secret_key: ALIC_SECRET_KEY,
+                secret_key: process.env.ALIC_SECRET_KEY,
                 package_id: package_id,
                 player_id: player_id,
                 client_order_id: client_order_id,
@@ -52,30 +42,22 @@ app.post('/api/create-order', async (req, res) => {
             })
         });
 
-        const data = await response.json();
-        res.status(response.status).json(data);
+        const data = await alicResponse.json();
+        res.status(alicResponse.status).json(data);
     } catch (error) {
-        res.status(500).json({ 
-            status: 'error', 
-            message: 'Failed to place order: ' + error.message 
-        });
+        res.status(500).json({ status: "error", message: error.message });
     }
 });
 
-// ३. Webhook Receiver (अर्डर पूरा वा फेल हुँदा सप्लायरले यो URL मा डेटा पठाउँछ)
+// 3. Webhook Receiver Endpoint (Called by AlicStore when order completes)
 app.post('/api/webhook-receiver', (req, res) => {
-    const webhookData = req.body;
-    console.log("Webhook Received from Supplier:", webhookData);
+    const { orderid, status, content } = req.body;
     
-    // यहाँ तपाईंले प्राप्त भएको orderid र status अनुसार Firebase वा Database अपडेट गर्न सक्नुहुन्छ।
+    // Yaha tapai Firebase Admin SDK use garera database update garna saknu hunxa
+    console.log(`Webhook received for Order ID ${orderid}: Status -> ${status}, Content -> ${content}`);
 
-    res.status(200).json({ 
-        status: 'success', 
-        message: 'Webhook received successfully' 
-    });
+    res.status(200).json({ received: true });
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Gaule Store Server is running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
