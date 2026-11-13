@@ -382,7 +382,7 @@
             </div>
             <div class="receipt-row">
                 <span>Status:</span>
-                <span id="receipt-status" style="color: #f6ad55; font-weight: 700;">Pending / Processing</span>
+                <span id="receipt-status" style="color: #f6ad55; font-weight: 700;">pending</span>
             </div>
         </div>
 
@@ -590,14 +590,14 @@
                     amountDue: selectedItemPrice,
                     uid: uidValue,
                     apiOrderId: apiOrderId,
-                    status: "Pending"
+                    status: "pending" // <--- यहाँ "pending" राखिएको छ
                 });
 
                 closeCheckoutModal();
                 document.getElementById('receipt-uid').innerText = uidValue;
                 document.getElementById('receipt-item').innerText = selectedItemName;
                 document.getElementById('receipt-orderid').innerText = apiOrderId;
-                document.getElementById('receipt-status').innerText = "Pending / Processing";
+                document.getElementById('receipt-status').innerText = "pending";
                 document.getElementById('successModal').classList.add('show');
             } else {
                 let errMessage = result.message || result.error || JSON.stringify(result);
