@@ -1,5 +1,5 @@
 {
-  "name": "gaule-store",
+  "name": "rg-digital-store",
   "version": "1.0.0",
   "description": "Gaule Store API Server",
   "main": "server.js",
