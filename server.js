@@ -1,7 +1,12 @@
 const express = require('express');
 const admin = require('firebase-admin');
+const cors = require('cors'); // <--- 1. CORS प्याकेज इम्पोर्ट गरिएको
 
 const app = express();
+
+// Render वा प्रोक्सी सर्भरको लागि अति आवश्यक सेटिङहरू
+app.set('trust proxy', 1);
+app.use(cors()); // <--- 2. सबै डोमेनबाट आउने रिक्वेस्ट (CORS) अनुमति दिइएको
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -82,7 +87,10 @@ app.post('/api/place-order', async (req, res) => {
       return res.status(400).json({ status: 'error', message: 'Missing required fields (package_id, player_id, client_order_id)' });
     }
 
-    const webhook_url = `${req.protocol}://${req.get('host')}/api/webhook-receiver`;
+    // Render को लागि सुरक्षित तरिकाले https र host समात्ने
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const host = req.get('host');
+    const webhook_url = `${protocol}://${host}/api/webhook-receiver`;
 
     const masterResponse = await fetch(`${MASTER_API_BASE}/place-order`, {
       method: 'POST',
@@ -144,7 +152,6 @@ app.post('/api/webhook-receiver', async (req, res) => {
         webhook_content: content,
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       });
-      // Corrected line below (res.status instead of return.status)
       return res.status(200).json({ status: 'success', message: 'Order status updated successfully' });
     } else {
       console.warn(`Webhook order not found in database: ${orderid}`);
