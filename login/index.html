@@ -404,7 +404,7 @@
             document.getElementById('alert-box').classList.add('hidden');
         }
 
-        // Updated Login Handler with Success State & Loading Lock
+        // Updated Login Handler with Custom User-Friendly Error Messages
         window.handleLogin = async function(e) {
             e.preventDefault();
             hideAlert();
@@ -418,12 +418,23 @@
 
                 await signInWithEmailAndPassword(auth, email, password);
                 
-                // Login Success message display
                 showAlert("Login Successful! Redirecting...", "success");
             } catch (error) {
                 loginBtn.disabled = false;
                 loginBtn.innerHTML = "Sign In";
-                showAlert(error.message.replace('Firebase: ', ''));
+
+                let errorMsg = "An error occurred during login.";
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                    errorMsg = "Incorrect email or password!";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMsg = "Please enter a valid email address.";
+                } else if (error.code === 'auth/too-many-requests') {
+                    errorMsg = "Too many failed attempts. Please try again later.";
+                } else {
+                    errorMsg = error.message.replace('Firebase: ', '');
+                }
+
+                showAlert(errorMsg);
             }
         }
 
@@ -486,7 +497,7 @@
             if (user) {
                 setTimeout(() => {
                     window.location.href = "https://roshantamang2.com.np";
-                }, 800); // 0.8 सेकेन्डको छोटै डिले ताकि युजरले म्यासेज देख्न पाओस्
+                }, 800); 
             } else {
                 const authCardContainer = document.getElementById('auth-card-container');
                 if(authCardContainer) authCardContainer.classList.remove('hidden');
