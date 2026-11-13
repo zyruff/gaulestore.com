@@ -552,9 +552,10 @@
         confirmPayBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing Order...`;
 
         try {
-            const userOrderId = 'GAULE-' + Date.now();
+            // यहाँ अलि राम्रो कस्टम अर्डर आईडी बनाइएको छ (जस्तै: RG-UIB677IH)
+            const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const userOrderId = 'RG-' + randomString + Date.now().toString().slice(-4);
             
-            // Render ब्याकएन्डमा सहि डाटा पठाउने
             const response = await fetch('https://gaule-store.onrender.com/api/place-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -589,14 +590,15 @@
                     product: selectedItemName,
                     amountDue: selectedItemPrice,
                     uid: uidValue,
-                    apiOrderId: apiOrderId,
-                    status: "pending" // <--- यहाँ "pending" राखिएको छ
+                    clientOrderId: userOrderId, // कस्टम अर्डर आईडी
+                    apiOrderId: String(apiOrderId), // AlicStore को नम्बर
+                    status: "pending"
                 });
 
                 closeCheckoutModal();
                 document.getElementById('receipt-uid').innerText = uidValue;
                 document.getElementById('receipt-item').innerText = selectedItemName;
-                document.getElementById('receipt-orderid').innerText = apiOrderId;
+                document.getElementById('receipt-orderid').innerText = userOrderId; // रिसिप्टमा कस्टम आईडी देखाउने
                 document.getElementById('receipt-status').innerText = "pending";
                 document.getElementById('successModal').classList.add('show');
             } else {
