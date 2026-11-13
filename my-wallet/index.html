@@ -12,6 +12,9 @@
     <meta property="og:site_name" content="Gaule Store">
     <meta property="og:title" content="Gaule Store - Trusted Gaming Top Up Nepal">
 
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -23,24 +26,21 @@
     </script>
      
     <style>
-        body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; }
-        .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #dc2626; justify-content: space-between; }
-        .menu-icon { font-size: 28px; cursor: pointer; }
-        #nav-menu { display: none; position: absolute; top: 0; left: 0; background: #fff; border: 1px solid #ccc; padding: 20px; width: 250px; height: 100%; z-index: 1000; box-shadow: 2px 2px 10px #ccc; }
-        .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .close-btn { font-size: 30px; cursor: pointer; color: #dc2626; }
-        .search-box { display: flex; gap: 5px; margin-bottom: 20px; }
-        #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Outfit', sans-serif; margin: 0; background-color: #ffffff; padding-bottom: 70px; }
+        
+        /* Header Layout */
+        .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #2563EB; justify-content: flex-start; gap: 15px; position: sticky; top: 0; z-index: 1000; }
+        .header-right { display: flex; align-items: center; gap: 10px; position: relative; margin-left: auto; }
         
         /* Header Wallet Button Style */
         .header-wallet {
-            display: none; /* Login भएपछि JS ले flex बनाउँछ */
+            display: none;
             align-items: center;
             gap: 5px;
-            background-color: #fef2f2;
-            border: 1px solid #fca5a5;
-            color: #dc2626;
+            background-color: #eff6ff;
+            border: 1px solid #93c5fd;
+            color: #2563EB;
             padding: 5px 10px;
             border-radius: 20px;
             font-size: 13px;
@@ -48,49 +48,167 @@
             text-decoration: none;
             cursor: pointer;
         }
-        .header-wallet:hover {
-            background-color: #fee2e2;
-        }
-        .header-wallet svg {
-            width: 16px;
-            height: 16px;
-            fill: #dc2626;
-        }
+        .header-wallet:hover { background-color: #dbeafe; }
+        .header-wallet svg { width: 16px; height: 16px; fill: #2563EB; }
 
-        #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; }
+        /* Login Container & Icon */
+        #login-container { display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; display: block; }
+
+        #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; object-fit: cover; }
         #profile-dropdown { display: none; position: absolute; top: 50px; right: 0; background: white; border: 1px solid #ccc; padding: 15px; width: 200px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); border-radius: 8px; text-align: center; z-index: 1000; }
         .user-name { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
         .user-email { font-size: 12px; color: #666; margin-bottom: 10px; }
         .change-name { font-size: 11px; color: #dc2626; text-decoration: none; display: block; margin-bottom: 15px; }
         .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; cursor: pointer; border-radius: 4px; width: 100%; }
-        #nav-menu a { display: block; padding: 12px 0; color: black; text-decoration: none; border-bottom: 1px solid #eee; }
         
-        /* Store Title Logo Link */
-        .store-title { font-size: 1.5rem; font-weight: bold; color: black; text-decoration: none; }
-        .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
+        /* Store Logo Size */
+        .store-logo { height: 55px; width: auto; object-fit: contain; display: block; background-color: #ffffff; padding: 4px; border-radius: 6px; }
+
+        /* Main Container (कार्ड बक्स र स्याडो पूर्ण रूपमा हटाइएको छ) */
+        .container { max-width: 480px; margin: 0 auto; background: #ffffff; padding: 20px; box-shadow: none; border-radius: 0; }
+        
+        /* Section Title */
+        h3 { margin-top: 10px; margin-bottom: 20px; color: #0f172a; font-size: 17px; font-weight: 700; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+        
+        /* Form Controls */
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #475569; }
+        input, select { width: 100%; padding: 12px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 14px; outline: none; background-color: #f8fafc; transition: all 0.2s ease; }
+        input:focus, select:focus { border-color: #dc2626; background-color: #fff; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1); }
+        
+        /* Quick Amount Buttons Styling */
+        .quick-amounts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+        .amt-btn { background: #f1f5f9; border: 1.5px solid #cbd5e1; color: #334155; padding: 8px 0; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .amt-btn:hover { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
+        .amt-btn.active { background: #dc2626; border-color: #dc2626; color: white; }
+
+        /* QR Section */
+        .qr-section { text-align: center; margin-bottom: 25px; background: #fff1f2; padding: 20px; border: 1.5px dashed #fecdd3; border-radius: 12px; }
+        .qr-section p { margin: 0; font-size: 13px; color: #475569; }
+        .qr-section img { width: 160px; height: 160px; object-fit: contain; margin-top: 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; padding: 5px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        
+        /* Submit Button */
+        .submit-btn { background: #dc2626; color: white; border: none; padding: 14px; width: 100%; font-size: 15px; font-weight: 700; cursor: pointer; border-radius: 8px; transition: background 0.2s, transform 0.1s; box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2); }
+        .submit-btn:hover { background: #b91c1c; }
+        .submit-btn:active { transform: scale(0.98); }
+
+        /* Login Prompt Box for Logged out users */
+        #login-prompt-box {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .login-prompt-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 12px 24px;
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            transition: 0.2s;
+        }
+        .login-prompt-btn:hover { background: #f8fafc; border-color: #94a3b8; }
+
+        /* Modal Overlay */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal-card { background: white; border-radius: 24px; max-width: 380px; width: 100%; padding: 32px 24px 24px 24px; text-align: center; box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.2); transform: scale(0.85); opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .modal-overlay.active { display: flex; }
+        .modal-overlay.active .modal-card { transform: scale(1); opacity: 1; }
+
+        /* Stylish Green Check Icon */
+        .icon-circle-outer { width: 84px; height: 84px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; animation: pulseGlow 1.8s infinite ease-in-out; }
+        .icon-circle-inner { width: 62px; height: 62px; background: #22c55e; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 6px 16px rgba(34, 197, 94, 0.3); }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); transform: scale(0.95); }
+            50% { box-shadow: 0 0 0 14px rgba(34, 197, 94, 0); transform: scale(1.05); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); transform: scale(0.95); }
+        }
+
+        .modal-title { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 8px; letter-spacing: -0.3px; }
+        .modal-desc { font-size: 13.5px; color: #64748b; margin-bottom: 22px; line-height: 1.5; padding: 0 5px; }
+        
+        .receipt-box { background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 14px; padding: 14px 16px; margin-bottom: 22px; text-align: left; }
+        .receipt-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 9px; align-items: center; }
+        .receipt-row:last-child { margin-bottom: 0; }
+        .receipt-label { color: #64748b; font-weight: 500; }
+        .receipt-value { color: #0f172a; font-weight: 700; }
+        
+        .status-badge-processing { background: #fef3c7; color: #d97706; padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; }
+        .modal-btn { background: #1e293b; color: white; border: none; padding: 13px; width: 100%; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+        .modal-btn:hover { background: #0f172a; }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 62px;
+            border-top: 1px solid #eaeaea;
+            padding: 0 5px;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+        .bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #888;
+            font-size: 11px;
+            font-weight: 500;
+            flex: 1;
+            height: 100%;
+            transition: all 0.2s ease-in-out;
+            background: transparent;
+            border: none;
+            box-sizing: border-box;
+        }
+        .bottom-nav .nav-item svg {
+            width: 18px;
+            height: 18px;
+            margin-bottom: 3px;
+            stroke: currentColor;
+            fill: none;
+        }
+        .bottom-nav .nav-item.active {
+            color: #333333;
+        }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
-    
-    <!-- Logo मा क्लिक गर्दा index.html (Home) खुल्ने बनाइएको छ -->
-    <a href="../../index.html" class="store-title">GAULE <span style="color:#dc2626;">STORE</span></a>
+    <a href="https://roshantamang2.com.np" style="margin-left: 5px; text-decoration: none;">
+        <img src="https://roshantamang2.com.np/image/logo.png" alt="Gaule Store Logo" class="store-logo">
+    </a>
     
     <div class="header-right">
+        <!-- लगइन नभएको बेला देखिने Login Icon -->
         <div id="login-container" onclick="googleLogin()">
             <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
 
-        <!-- Login भएपछि profile को बायाँपट्टी देखिने Wallet Button -->
+        <!-- लगइन भएपछि देखिने Wallet Button -->
         <a href="my-wallet/" id="header-wallet-btn" class="header-wallet">
-            <svg viewBox="0 0 24 24">
-                <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
-            </svg>
+            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
             <span>Rs. <span id="header-user-balance">0</span></span>
         </a>
 
+        <!-- लगइन भएपछि देखिने Profile Picture -->
         <img id="profile-pic" onclick="toggleProfile()">
         <div id="profile-dropdown">
             <div id="display-name" class="user-name"></div>
@@ -101,231 +219,62 @@
     </div>
 </div>
 
-<div id="nav-menu">
-    <div class="menu-header">
-        <span style="font-weight:bold;">Menu</span>
-        <span class="close-btn" onclick="toggleMenu()">&times;</span>
-    </div>
-    <div class="search-box">
-        <input type="text" id="gameSearch" placeholder="Search games..." onkeyup="filterGames()">
-        <button onclick="filterGames()">Search</button>
-    </div>
-    <div id="search-results" style="margin-bottom: 15px; max-height: 200px; overflow-y: auto;"></div>
-    <a href="../../index.html">Home</a>
-    <a href="shop/">Shop</a>
-    <a href="my-wallet/">My Wallet</a>
-    <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
-</div>
-
-<div id="content-area" style="padding: 0px;"></div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    const firebaseConfig = {
-  apiKey: "AIzaSyCFUQu06EvmJCtplZ8dRqVhHnB7I1yQuKw",
-  authDomain: "rg-digital-store.firebaseapp.com",
-  databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com",
-  projectId: "rg-digital-store",
-  storageBucket: "rg-digital-store.firebasestorage.app",
-  messagingSenderId: "257332660691",
-  appId: "1:257332660691:web:e9ff5e85282a4e9d1d4726",
-  measurementId: "G-S09Q860R4V"
-};
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    const provider = new GoogleAuthProvider();
-
-    window.toggleMenu = () => { const m = document.getElementById("nav-menu"); m.style.display = (m.style.display === "block") ? "none" : "block"; };
-    window.toggleProfile = () => { const d = document.getElementById("profile-dropdown"); d.style.display = (d.style.display === "block") ? "none" : "block"; };
-    window.googleLogin = () => signInWithPopup(auth, provider);
-    window.logoutUser = () => signOut(auth).then(() => location.reload());
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.getElementById("login-container").style.display = "none";
-            document.getElementById("header-wallet-btn").style.display = "flex";
-            document.getElementById("profile-pic").style.display = "block";
-            document.getElementById("profile-pic").src = user.photoURL;
-            document.getElementById("display-name").innerText = user.displayName;
-            document.getElementById("display-email").innerText = user.email;
-
-            const userRef = ref(db, 'users/' + user.uid);
-
-            // पहिलोपटक लगइन गर्दा Database मा Data create गर्ने
-            get(userRef).then((snapshot) => {
-                if (!snapshot.exists()) {
-                    set(userRef, {
-                        name: user.displayName,
-                        email: user.email,
-                        balance: 0,
-                        role: "user"
-                    });
-                }
-            });
-
-            // Realtime ब्यालेन्स Sync गर्ने
-            onValue(userRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    document.getElementById("header-user-balance").innerText = data.balance || 0;
-                }
-            });
-        }
-    });
-</script>
-</body>
-</html>
-
-
-
-
-
-<style>
-    * { box-sizing: border-box; }
-    
-    /* Main Container */
-    .container { max-width: 480px; margin: 30px auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
-    
-    /* Section Title */
-    h3 { margin-top: 0; margin-bottom: 20px; color: #0f172a; font-size: 17px; font-weight: 700; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
-    
-    /* Form Controls */
-    .form-group { margin-bottom: 18px; }
-    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #475569; }
-    input, select { width: 100%; padding: 12px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 14px; outline: none; background-color: #f8fafc; transition: all 0.2s ease; }
-    input:focus, select:focus { border-color: #dc2626; background-color: #fff; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1); }
-    
-    /* Quick Amount Buttons Styling */
-    .quick-amounts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
-    .amt-btn { background: #f1f5f9; border: 1.5px solid #cbd5e1; color: #334155; padding: 8px 0; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-    .amt-btn:hover { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
-    .amt-btn.active { background: #dc2626; border-color: #dc2626; color: white; }
-
-    /* QR Section */
-    .qr-section { text-align: center; margin-bottom: 25px; background: #fff1f2; padding: 20px; border: 1.5px dashed #fecdd3; border-radius: 12px; }
-    .qr-section p { margin: 0; font-size: 13px; color: #475569; }
-    .qr-section img { width: 160px; height: 160px; object-fit: contain; margin-top: 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; padding: 5px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-    .id-badge { display: inline-block; background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 10px; }
-    
-    /* Submit Button */
-    .submit-btn { background: #dc2626; color: white; border: none; padding: 14px; width: 100%; font-size: 15px; font-weight: 700; cursor: pointer; border-radius: 8px; transition: background 0.2s, transform 0.1s; box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2); }
-    .submit-btn:hover { background: #b91c1c; }
-    .submit-btn:active { transform: scale(0.98); }
-
-    /* Modal Overlay */
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
-    .modal-card { background: white; border-radius: 24px; max-width: 380px; width: 100%; padding: 32px 24px 24px 24px; text-align: center; box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.2); transform: scale(0.85); opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    .modal-overlay.active { display: flex; }
-    .modal-overlay.active .modal-card { transform: scale(1); opacity: 1; }
-
-    /* Stylish Green Check Icon - Blinking Glow Animation */
-    .icon-circle-outer { 
-        width: 84px; 
-        height: 84px; 
-        background: #dcfce7; 
-        border-radius: 50%; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        margin: 0 auto 20px auto; 
-        animation: pulseGlow 1.8s infinite ease-in-out;
-    }
-    .icon-circle-inner { 
-        width: 62px; 
-        height: 62px; 
-        background: #22c55e; 
-        color: white; 
-        border-radius: 50%; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        font-size: 30px; 
-        box-shadow: 0 6px 16px rgba(34, 197, 94, 0.3); 
-    }
-
-    /* Pulse / Blink Animation Keyframes */
-    @keyframes pulseGlow {
-        0% {
-            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
-            transform: scale(0.95);
-        }
-        50% {
-            box-shadow: 0 0 0 14px rgba(34, 197, 94, 0);
-            transform: scale(1.05);
-        }
-        100% {
-            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
-            transform: scale(0.95);
-        }
-    }
-
-    .modal-title { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 8px; letter-spacing: -0.3px; }
-    .modal-desc { font-size: 13.5px; color: #64748b; margin-bottom: 22px; line-height: 1.5; padding: 0 5px; }
-    
-    /* Order Receipt Box */
-    .receipt-box { background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 14px; padding: 14px 16px; margin-bottom: 22px; text-align: left; }
-    .receipt-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 9px; align-items: center; }
-    .receipt-row:last-child { margin-bottom: 0; }
-    .receipt-label { color: #64748b; font-weight: 500; }
-    .receipt-value { color: #0f172a; font-weight: 700; }
-    
-    /* Processing Badge Style */
-    .status-badge-processing { background: #fef3c7; color: #d97706; padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; }
-
-    .modal-btn { background: #1e293b; color: white; border: none; padding: 13px; width: 100%; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.1s; }
-    .modal-btn:hover { background: #0f172a; }
-    .modal-btn:active { transform: scale(0.98); }
-</style>
-
 <div class="container">
     <h3>Add Balance to Wallet</h3>
     
-    <!-- Payment QR Section -->
-    <div class="qr-section">
-        <p>Scan QR via <b>eSewa / Khalti</b> to Pay</p>
-        <img src="qr_code.png" alt="Payment QR Code">
-        <div>
-            <span class="id-badge">ID: 9761081110 (Roshan Tamang)</span>
-        </div>
+    <!-- लगइन नभएको बेला देखाउने Login to deposit सेक्सन -->
+    <div id="login-prompt-box" style="display: none;">
+        <p style="font-weight: 700; color: #0f172a; font-size: 16px;">Please Login to Deposit</p>
+        <p style="color: #64748b; font-size: 13px; margin-top: 6px;">You need to sign in with your Google account to add balance to your wallet.</p>
+        <button class="login-prompt-btn" onclick="googleLogin()">
+            <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+            </svg>
+            Login to Deposit
+        </button>
     </div>
 
-    <!-- Top-up Request Form -->
-    <form id="topup-form">
-        <div class="form-group">
-            <label for="payment-method">Payment Method</label>
-            <select id="payment-method" required>
-                <option value="eSewa">eSewa</option>
-                <option value="Khalti">Khalti</option>
-            </select>
+    <!-- लगइन भएपछि मात्र देखिने QR र Form सेक्सन -->
+    <div id="wallet-content-box" style="display: none;">
+        <div class="qr-section">
+            <p>Scan QR via <b>eSewa / Khalti</b> to Pay</p>
+            <img src="qr_code.png" alt="Payment QR Code">
         </div>
 
-        <div class="form-group">
-            <label for="deposit-amount">Amount Sent (Rs.)</label>
-            <!-- Quick Amount Selector Buttons -->
-            <div class="quick-amounts">
-                <button type="button" class="amt-btn" onclick="setAmount(100, event)">100</button>
-                <button type="button" class="amt-btn" onclick="setAmount(200, event)">200</button>
-                <button type="button" class="amt-btn" onclick="setAmount(500, event)">500</button>
-                <button type="button" class="amt-btn" onclick="setAmount(1000, event)">1000</button>
+        <form id="topup-form">
+            <div class="form-group">
+                <label for="payment-method">Payment Method</label>
+                <select id="payment-method" required>
+                    <option value="eSewa">eSewa</option>
+                    <option value="Khalti">Khalti</option>
+                </select>
             </div>
-            <input type="number" id="deposit-amount" placeholder="Or enter custom amount" required min="10">
-        </div>
 
-        <div class="form-group">
-            <label for="transaction-id">Transaction ID / Reference ID</label>
-            <input type="text" id="transaction-id" placeholder="Enter Transaction ID" required>
-        </div>
+            <div class="form-group">
+                <label for="deposit-amount">Amount Sent (Rs.)</label>
+                <div class="quick-amounts">
+                    <button type="button" class="amt-btn" onclick="setAmount(100, event)">100</button>
+                    <button type="button" class="amt-btn" onclick="setAmount(200, event)">200</button>
+                    <button type="button" class="amt-btn" onclick="setAmount(500, event)">500</button>
+                    <button type="button" class="amt-btn" onclick="setAmount(1000, event)">1000</button>
+                </div>
+                <input type="number" id="deposit-amount" placeholder="Or enter custom amount" required min="10">
+            </div>
 
-        <button type="submit" class="submit-btn" id="submit-btn-text">Submit Deposit</button>
-    </form>
+            <div class="form-group">
+                <label for="transaction-id">Transaction ID / Reference ID</label>
+                <input type="text" id="transaction-id" placeholder="Enter Transaction ID" required>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submit-btn-text">Submit Deposit</button>
+        </form>
+    </div>
 </div>
 
-<!-- English Order Success Modal with Blinking Animation Icon -->
+<!-- Success Modal -->
 <div class="modal-overlay" id="success-modal">
     <div class="modal-card">
         <div class="icon-circle-outer">
@@ -358,435 +307,9 @@
     </div>
 </div>
 
-<script>
-    function setAmount(amount, event) {
-        document.getElementById('deposit-amount').value = amount;
-        let buttons = document.querySelectorAll('.amt-btn');
-        buttons.forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-    }
-
-    function closeModal() {
-        document.getElementById('success-modal').classList.remove('active');
-    }
-</script>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-        authDomain: "gaule-top-up-center.firebaseapp.com",
-        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-        projectId: "gaule-top-up-center",
-        storageBucket: "gaule-top-up-center.firebasestorage.app",
-        messagingSenderId: "645605489690",
-        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-
-    let currentUser = null;
-
-    // Check user authentication state
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            currentUser = user;
-        } else {
-            alert("Please login first to access wallet!");
-            window.location.href = "../index.html";
-        }
-    });
-
-    // Top-up Request Submit
-    const form = document.getElementById("topup-form");
-    const submitBtn = document.getElementById("submit-btn-text");
-
-    form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        
-        if (!currentUser) return;
-
-        submitBtn.innerText = "Submitting...";
-        submitBtn.disabled = true;
-
-        const method = document.getElementById("payment-method").value;
-        const amount = document.getElementById("deposit-amount").value;
-        const txId = document.getElementById("transaction-id").value;
-
-        // Nepal Timezone
-        const now = new Date();
-        const formattedDate = now.toLocaleString('en-US', { timeZone: 'Asia/Kathmandu' });
-
-        const requestsRef = ref(db, 'topup_requests');
-        
-        push(requestsRef, {
-            uid: currentUser.uid,
-            name: currentUser.displayName || "User",
-            email: currentUser.email || "",
-            method: method,
-            amount: Number(amount),
-            transactionId: txId,
-            status: "Processing",
-            date: formattedDate,
-            timestamp: serverTimestamp()
-        }).then(() => {
-            // Fill values in modal
-            document.getElementById("modal-amount").innerText = "Rs " + amount;
-            document.getElementById("modal-method").innerText = method;
-            document.getElementById("modal-txid").innerText = txId;
-
-            // Show Success Modal
-            document.getElementById("success-modal").classList.add("active");
-
-            // Reset Form & Button
-            form.reset();
-            submitBtn.innerText = "Submit Deposit";
-            submitBtn.disabled = false;
-            document.querySelectorAll('.amt-btn').forEach(btn => btn.classList.remove('active'));
-        }).catch((error) => {
-            alert("Error sending request: " + error.message);
-            submitBtn.innerText = "Submit Deposit";
-            submitBtn.disabled = false;
-        });
-    });
-</script>
-
-
-
-
-
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deposit History | Gaule Store</title>
-    <!-- Inter Font & Remix Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary: #dc2626;
-            --primary-light: #fee2e2;
-            --bg-body: #f8fafc;
-            --surface: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --success: #16a34a;
-            --success-bg: #dcfce7;
-            --warning: #d97706;
-            --warning-bg: #fef3c7;
-            --danger: #dc2626;
-            --danger-bg: #fee2e2;
-            --radius: 12px;
-            --shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-body); color: var(--text-main); padding: 16px 12px; }
-
-        .wrapper { max-width: 600px; margin: 0 auto; }
-
-        .navbar {
-            background: var(--surface);
-            padding: 14px 18px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            border: 1px solid var(--border);
-        }
-
-        .page-title { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
-        .page-title i { color: var(--primary); font-size: 20px; }
-
-        .btn-refresh {
-            background: #f1f5f9;
-            border: 1px solid var(--border);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
-            color: var(--text-main);
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .history-card-list { display: flex; flex-direction: column; gap: 12px; }
-        
-        .history-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 14px;
-            box-shadow: var(--shadow);
-            border-left: 4px solid var(--border);
-        }
-
-        .history-card.border-processing { border-left-color: var(--warning); }
-        .history-card.border-approved { border-left-color: var(--success); }
-        .history-card.border-rejected { border-left-color: var(--danger); }
-
-        .card-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #f1f5f9;
-            margin-bottom: 8px;
-        }
-
-        .user-name { font-size: 14px; font-weight: 700; color: var(--text-main); }
-        .user-email { font-size: 11px; color: var(--text-muted); display: block; }
-
-        .card-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px 12px;
-            font-size: 12px;
-        }
-
-        .detail-item span { display: block; color: var(--text-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; }
-        .detail-item strong { font-size: 13px; color: var(--text-main); }
-        .detail-item .amount { color: var(--primary); font-size: 15px; font-weight: 800; }
-
-        .tx-badge { font-family: monospace; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; color: #334155; }
-
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; }
-        .badge-processing { background: var(--warning-bg); color: var(--warning); }
-        .badge-approved { background: var(--success-bg); color: var(--success); }
-        .badge-rejected { background: var(--danger-bg); color: var(--danger); }
-
-        /* Admin Actions (Customer maate hidden rahase) */
-        .card-actions {
-            display: flex;
-            gap: 8px;
-            padding-top: 10px;
-            margin-top: 10px;
-            border-top: 1px solid #f1f5f9;
-        }
-
-        .btn {
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            flex: 1;
-        }
-
-        .btn-approve { background: var(--success); color: white; }
-        .btn-reject { background: var(--danger-bg); color: var(--danger); }
-        .btn-delete { background: #f1f5f9; color: var(--text-muted); flex: 0 0 auto; padding: 8px 10px; }
-        .btn-delete:hover { background: var(--danger-bg); color: var(--danger); }
-
-        .no-data { text-align: center; padding: 35px; color: var(--text-muted); font-size: 13px; font-weight: 600; }
-    </style>
-</head>
-<body>
-
-<div class="wrapper">
-    <div class="navbar">
-        <div class="page-title">
-            <i class="ri-history-line"></i> Deposit History
-        </div>
-        <button class="btn-refresh" onclick="location.reload()">
-            <i class="ri-refresh-line"></i> Refresh
-        </button>
-    </div>
-
-    <div class="history-card-list" id="history-container">
-        <div class="no-data"><i class="ri-loader-4-line ri-spin"></i> Loading...</div>
-    </div>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, onValue, update, remove, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-        authDomain: "gaule-top-up-center.firebaseapp.com",
-        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-        projectId: "gaule-top-up-center",
-        storageBucket: "gaule-top-up-center.firebasestorage.app",
-        messagingSenderId: "645605489690",
-        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-
-    let isAdmin = false;
-
-    onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            alert("Please login first!");
-            window.location.href = "../index.html";
-            return;
-        }
-
-        // Check if user is Admin
-        isAdmin = (user.email === "gaulestore.np@gmail.com");
-
-        const requestsRef = ref(db, 'topup_requests');
-        onValue(requestsRef, (snapshot) => {
-            const container = document.getElementById("history-container");
-            container.innerHTML = "";
-
-            if (!snapshot.exists()) {
-                container.innerHTML = '<div class="no-data">No deposit history found.</div>';
-                return;
-            }
-
-            const data = snapshot.val();
-            
-            // Filter: Admin ne badha dekhasa, customer ne maatra potana dekhasa[span_2](start_span)[span_2](end_span)
-            const requestsList = Object.keys(data)
-                .map(key => ({ id: key, ...data[key] }))
-                .filter(item => isAdmin || item.uid === user.uid)
-                .reverse();
-
-            if (requestsList.length === 0) {
-                container.innerHTML = '<div class="no-data">No deposit requests found.</div>';
-                return;
-            }
-
-            requestsList.forEach(item => {
-                let badgeClass = "badge-processing";
-                let borderClass = "border-processing";
-                let statusIcon = "ri-time-line";
-
-                if (item.status === "Approved") { 
-                    badgeClass = "badge-approved"; 
-                    borderClass = "border-approved";
-                    statusIcon = "ri-checkbox-circle-line"; 
-                } else if (item.status === "Rejected") { 
-                    badgeClass = "badge-rejected"; 
-                    borderClass = "border-rejected";
-                    statusIcon = "ri-close-circle-line"; 
-                }
-
-                const isPending = (item.status === "Processing" || item.status === "Pending");
-
-                const card = document.createElement("div");
-                card.className = `history-card ${borderClass}`;
-                
-                // HTML Template
-                let cardHTML = `
-                    <div class="card-top">
-                        <div>
-                            <span class="user-name">${item.name || 'User'}</span>
-                            <span class="user-email">${item.email || ''}</span>
-                        </div>
-                        <span class="badge ${badgeClass}"><i class="${statusIcon}"></i> ${item.status || 'Processing'}</span>
-                    </div>
-                    
-                    <div class="card-details">
-                        <div class="detail-item">
-                            <span>Amount</span>
-                            <strong class="amount">Rs. ${item.amount}</strong>
-                        </div>
-                        <div class="detail-item">
-                            <span>Method</span>
-                            <strong>${item.method || 'eSewa'}</strong>
-                        </div>
-                        <div class="detail-item">
-                            <span>Transaction ID</span>
-                            <span class="tx-badge">${item.transactionId || 'N/A'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span>Date & Time</span>
-                            <strong style="font-size:11px; font-weight:600; color:var(--text-muted);">${item.date || 'N/A'}</strong>
-                        </div>
-                    </div>
-                `;
-
-                // Admin Controls: Approve, Reject & Delete maatra Admin maate dekhasa[span_3](start_span)[span_3](end_span)
-                if (isAdmin) {
-                    cardHTML += `
-                        <div class="card-actions">
-                            ${isPending ? `
-                                <button class="btn btn-approve" onclick="approveDeposit('${item.id}', '${item.uid}', ${item.amount})"><i class="ri-check-line"></i> Approve</button>
-                                <button class="btn btn-reject" onclick="rejectDeposit('${item.id}')"><i class="ri-close-line"></i> Reject</button>
-                            ` : ''}
-                            <button class="btn btn-delete" title="Delete" onclick="deleteDeposit('${item.id}')"><i class="ri-delete-bin-line"></i> Delete</button>
-                        </div>
-                    `;
-                }
-
-                card.innerHTML = cardHTML;
-                container.appendChild(card);
-            });
-        });
-    });
-
-    // Admin Action Functions
-    window.approveDeposit = async (requestId, userUid, amount) => {
-        if (!confirm(`Approve Rs. ${amount}?`)) return;
-        const requestRef = ref(db, `topup_requests/${requestId}`);
-        const userBalanceRef = ref(db, `users/${userUid}/balance`);
-
-        try {
-            await update(requestRef, { status: "Approved", approvedAt: new Date().toISOString() });
-            await runTransaction(userBalanceRef, (curr) => (curr || 0) + Number(amount));
-            alert("✅ Approved & Balance Added!");
-        } catch (err) { alert("Error: " + err.message); }
-    };
-
-    window.rejectDeposit = async (requestId) => {
-        if (!confirm("Reject this request?")) return;
-        const requestRef = ref(db, `topup_requests/${requestId}`);
-        try {
-            await update(requestRef, { status: "Rejected", rejectedAt: new Date().toISOString() });
-            alert("Rejected!");
-        } catch (err) { alert("Error: " + err.message); }
-    };
-
-    window.deleteDeposit = async (requestId) => {
-        if (!confirm("⚠️ Permanently delete this record?")) return;
-        const requestRef = ref(db, `topup_requests/${requestId}`);
-        try {
-            await remove(requestRef);
-            alert("🗑️ Deleted!");
-        } catch (err) { alert("Error: " + err.message); }
-    };
-</script>
-
-</body>
-</html>
-
-
-
-
-<br>
-<br>
-
-
+<!-- Bottom Navigation Bar -->
 <div class="bottom-nav">
-    <a href="../../index.html" class="nav-item">
+    <a href="https://roshantamang2.com.np" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
         <span>Home</span>
     </a>
@@ -804,55 +327,23 @@
     </a>
 </div>
 
-<style>
-    .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: #ffffff;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        height: 62px;
-        border-top: 1px solid #eaeaea;
-        padding: 0 5px;
-        z-index: 1000;
-        box-sizing: border-box;
-    }
-
-    .bottom-nav .nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        color: #888;
-        font-size: 11px;
-        font-weight: 500;
-        flex: 1;
-        height: 100%;
-        transition: all 0.2s ease-in-out;
-        background: transparent;
-        border: none;
-        box-sizing: border-box;
-    }
-
-    .bottom-nav .nav-item svg {
-        width: 18px;
-        height: 18px;
-        margin-bottom: 3px;
-        stroke: currentColor;
-        fill: none;
-    }
-
-    /* Active huda yellow color hatauna yaha changes garieko xa */
-    .bottom-nav .nav-item.active {
-        color: #333333; /* Active huda kasto color rakhne, yaha dark gray haleko xa */
-    }
-</style>
-
 <script>
+    function setAmount(amount, event) {
+        document.getElementById('deposit-amount').value = amount;
+        let buttons = document.querySelectorAll('.amt-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('success-modal').classList.remove('active');
+    }
+
+    function toggleProfile() { 
+        const d = document.getElementById("profile-dropdown"); 
+        d.style.display = (d.style.display === "block") ? "none" : "block"; 
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         const currentPath = window.location.pathname;
         const navItems = document.querySelectorAll('.bottom-nav .nav-item');
@@ -871,3 +362,126 @@
         });
     });
 </script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, onValue, set, get, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCFUQu06EvmJCtplZ8dRqVhHnB7I1yQuKw",
+        authDomain: "rg-digital-store.firebaseapp.com",
+        databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com",
+        projectId: "rg-digital-store",
+        storageBucket: "rg-digital-store.firebasestorage.app",
+        messagingSenderId: "257332660691",
+        appId: "1:257332660691:web:e9ff5e85282a4e9d1d4726",
+        measurementId: "G-S09Q860R4V"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const provider = new GoogleAuthProvider();
+
+    window.googleLogin = () => signInWithPopup(auth, provider);
+    window.logoutUser = () => signOut(auth).then(() => location.reload());
+
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user;
+            document.getElementById("login-container").style.display = "none";
+            document.getElementById("header-wallet-btn").style.display = "flex";
+            document.getElementById("profile-pic").style.display = "block";
+            document.getElementById("profile-pic").src = user.photoURL || 'https://via.placeholder.com/35';
+            document.getElementById("display-name").innerText = user.displayName || 'User';
+            document.getElementById("display-email").innerText = user.email || '';
+
+            document.getElementById("login-prompt-box").style.display = "none";
+            document.getElementById("wallet-content-box").style.display = "block";
+
+            const userRef = ref(db, 'users/' + user.uid);
+
+            get(userRef).then((snapshot) => {
+                if (!snapshot.exists()) {
+                    set(userRef, {
+                        name: user.displayName,
+                        email: user.email,
+                        balance: 0,
+                        role: "user"
+                    });
+                }
+            });
+
+            onValue(userRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    document.getElementById("header-user-balance").innerText = data.balance || 0;
+                }
+            });
+        } else {
+            currentUser = null;
+            document.getElementById("login-container").style.display = "flex";
+            document.getElementById("header-wallet-btn").style.display = "none";
+            document.getElementById("profile-pic").style.display = "none";
+            document.getElementById("profile-dropdown").style.display = "none";
+
+            document.getElementById("wallet-content-box").style.display = "none";
+            document.getElementById("login-prompt-box").style.display = "block";
+        }
+    });
+
+    const form = document.getElementById("topup-form");
+    const submitBtn = document.getElementById("submit-btn-text");
+
+    if (form) {
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            
+            if (!currentUser) return;
+
+            submitBtn.innerText = "Submitting...";
+            submitBtn.disabled = true;
+
+            const method = document.getElementById("payment-method").value;
+            const amount = document.getElementById("deposit-amount").value;
+            const txId = document.getElementById("transaction-id").value;
+
+            const now = new Date();
+            const formattedDate = now.toLocaleString('en-US', { timeZone: 'Asia/Kathmandu' });
+
+            const requestsRef = ref(db, 'topup_requests');
+            
+            push(requestsRef, {
+                uid: currentUser.uid,
+                name: currentUser.displayName || "User",
+                email: currentUser.email || "",
+                method: method,
+                amount: Number(amount),
+                transactionId: txId,
+                status: "Processing",
+                date: formattedDate,
+                timestamp: serverTimestamp()
+            }).then(() => {
+                document.getElementById("modal-amount").innerText = "Rs " + amount;
+                document.getElementById("modal-method").innerText = method;
+                document.getElementById("modal-txid").innerText = txId;
+
+                document.getElementById("success-modal").classList.add("active");
+
+                form.reset();
+                submitBtn.innerText = "Submit Deposit";
+                submitBtn.disabled = false;
+                document.querySelectorAll('.amt-btn').forEach(btn => btn.classList.remove('active'));
+            }).catch((error) => {
+                alert("Error sending request: " + error.message);
+                submitBtn.innerText = "Submit Deposit";
+                submitBtn.disabled = false;
+            });
+        });
+    }
+</script>
+</body>
+</html>
