@@ -113,7 +113,7 @@ app.post('/api/place-order', async (req, res) => {
       player_id: String(player_id),
       quantity: Number(quantity || 1),
       master_order_id: masterData.orderid ? String(masterData.orderid) : null,
-      status: masterData.status || 'processing',
+      status: 'pending', // सुरुमा database मा pending बस्छ
       response_content: masterData.content || '',
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
@@ -135,6 +135,16 @@ app.post('/api/webhook-receiver', async (req, res) => {
       return res.status(400).json({ status: 'error', message: 'Missing orderid in webhook' });
     }
 
+    // AlicStore बाट आएको status अनुसार database को status तय गर्ने
+    let updatedStatus = 'pending';
+    if (status === 'success') {
+      updatedStatus = 'complete';
+    } else if (status === 'error') {
+      updatedStatus = 'cancelled';
+    } else {
+      updatedStatus = status; // यदि अर्को कुनै status आएमा जस्ताको तस्तै राख्ने
+    }
+
     let orderRef = db.collection('orders').doc(String(orderid));
     let doc = await orderRef.get();
 
@@ -148,7 +158,7 @@ app.post('/api/webhook-receiver', async (req, res) => {
 
     if (doc.exists) {
       await orderRef.update({
-        status: status, 
+        status: updatedStatus, // यहाँ 'complete' वा 'cancelled' सेभ हुन्छ
         webhook_content: content,
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       });
