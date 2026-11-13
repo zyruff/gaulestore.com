@@ -144,7 +144,8 @@ app.post('/api/webhook-receiver', async (req, res) => {
 
     let querySnapshot = null;
     if (!orderDoc.exists) {
-      querySnapshot = aait db.collection('orders').where('masterOrderId', '==', orderId).get();
+      // यहाँ अघي 'aait' थियो, जसलाई 'await' बनाइएको छ ✅
+      querySnapshot = await db.collection('orders').where('masterOrderId', '==', orderId).get();
     }
 
     if (!orderDoc.exists && (querySnapshot && querySnapshot.empty)) {
