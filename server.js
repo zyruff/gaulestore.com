@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
         input, button { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         button { background: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; }
         button:hover { background: #218838; }
-        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 13px; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 13px; max-height: 300px; }
       </style>
     </head>
     <body>
@@ -80,21 +80,25 @@ app.get('/', (req, res) => {
 app.post('/api/variations', async (req, res) => {
   try {
     const { secret_key } = req.body;
+    console.log('--- FETCH VARIATIONS REQUEST RECEIVED ---');
 
     if (!secret_key) {
+      console.log('Error: Secret key is missing');
       return res.status(400).json({ status: 'error', message: 'Secret key is required.' });
     }
 
+    console.log('Sending request to AlicStore API...');
     const response = await axios.post(`${ALIC_BASE_URL}/variations`, {
       secret_key: secret_key
     });
 
+    console.log('AlicStore Success Response Data:', response.data);
     return res.status(200).json(response.data);
 
   } catch (error) {
-    console.error('Error fetching variations:', error.response?.data || error.message);
+    console.error('AlicStore API Error:', error.response?.data || error.message);
     return res.status(error.response?.status || 500).json(
-      error.response?.data || { status: 'error', message: 'Internal Server Error' }
+      error.response?.data || { status: 'error', message: error.message || 'Internal Server Error' }
     );
   }
 });
@@ -147,7 +151,7 @@ app.post('/api/place-order', async (req, res) => {
 
 // ==========================================
 // 3. WEBHOOK RECEIVER (Incoming from AlicStore)
-// ==========================================
+// =================php=========================
 app.post('/api/webhook-receiver', async (req, res) => {
   try {
     const { orderid, status, content } = req.body;
