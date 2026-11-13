@@ -1,95 +1,82 @@
-const express = require('express');
-const admin = require('firebase-admin'); // Firebase admin include gareko
-const app = express();
-const PORT = process.env.PORT || 3000;
+const express = class require('express') ? require('express') : null; // Express import
+const expressApp = require('express');
+const cors = require('cors');
 
-// Middleware to parse JSON bodies
+const app = expressApp();
+
 app.use(express.json());
+app.use(cors());
 
-// Initialize Firebase Admin (Optional: yadi serviceAccountKey.json xa bhane or environment variables bata)
-// admin.initializeApp({
-//   credential: admin.credential.cert(require('./serviceAccountKey.json')),
-//   databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com"
-// });
-// const db = admin.database();
+// आफ्नो Alic Store को Secret Key यहाँ राख्नुहोला (वा Environment Variable प्रयोग गर्न सक्नुहुन्छ)
+const ALIC_SECRET_KEY = process.env.ALIC_SECRET_KEY || "YOUR_API_SECRET_KEY";
 
-const ALICSTORE_API_BASE = 'https://alicstore.com/api';
-const API_SECRET_KEY = process.env.API_SECRET_KEY || 'YOUR_API_SECRET_KEY';
-
-/**
- * 1. Get Variations List Endpoint
- */
-app.get('/api/get-variations', async (req, res) => {
+// १. सप्लायरबाट सबै Variations (List) तान्ने API Endpoint
+app.get('/api/variations', async (req, res) => {
     try {
-        const response = await fetch(`${ALICSTORE_API_BASE}/variations`, {
+        const response = await fetch('https://alicstore.com/api/variations', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ secret_key: API_SECRET_KEY })
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                secret_key: ALIC_SECRET_KEY
+            })
         });
-        
+
         const data = await response.json();
         res.status(response.status).json(data);
     } catch (error) {
-        res.status(500).json({ status: 'error', message: error.message });
+        res.status(500).json({ 
+            status: 'error', 
+            message: 'Failed to fetch variations from supplier: ' + error.message 
+        });
     }
 });
 
-/**
- * 2. Place Order Endpoint
- */
+// २. अर्डर प्लेस गर्ने API Endpoint (तपाईंको Frontend ले यसलाई कल गर्छ)
 app.post('/api/create-order', async (req, res) => {
     try {
         const { package_id, player_id, client_order_id, quantity } = req.body;
 
-        const payload = {
-            secret_key: API_SECRET_KEY,
-            package_id: package_id,
-            player_id: player_id,
-            client_order_id: client_order_id,
-            quantity: quantity || 1,
-            webhook_url: "https://gaule-store.onrender.com/api/webhook-receiver"
-        };
-
-        // FIX: ALICSTORE_API_BASE spelling correct banayeko (STORE capital)
-        const response = await fetch(`${ALICSTORE_API_BASE}/place-order`, {
+        const response = await fetch('https://alicstore.com/api/place-order', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                secret_key: ALIC_SECRET_KEY,
+                package_id: package_id,
+                player_id: player_id,
+                client_order_id: client_order_id,
+                quantity: quantity || 1,
+                webhook_url: "https://gaule-store.onrender.com/api/webhook-receiver"
+            })
         });
 
         const data = await response.json();
         res.status(response.status).json(data);
     } catch (error) {
-        res.status(500).json({ status: 'error', message: error.message });
+        res.status(500).json({ 
+            status: 'error', 
+            message: 'Failed to place order: ' + error.message 
+        });
     }
 });
 
-/**
- * 3. Incoming Webhook Receiver Endpoint
- */
-app.post('/api/webhook-receiver', async (req, res) => {
-    const { orderid, status, content } = req.body;
+// ३. Webhook Receiver (अर्डर पूरा वा फेल हुँदा सप्लायरले यो URL मा डेटा पठाउँछ)
+app.post('/api/webhook-receiver', (req, res) => {
+    const webhookData = req.body;
+    console.log("Webhook Received from Supplier:", webhookData);
+    
+    // यहाँ तपाईंले प्राप्त भएको orderid र status अनुसार Firebase वा Database अपडेट गर्न सक्नुहुन्छ।
 
-    console.log(`[Webhook Received] Order ID: ${orderid}, Status: ${status}, Content: ${content}`);
-
-    try {
-        if (status === 'success') {
-            console.log(`Order ${orderid} completed successfully.`);
-            // Yaha Firebase database ma order status update garne logic rakhnu hola
-            // Example: const snapshot = await db.ref('orders').orderByChild('apiOrderId').equalTo(orderid).once('value');
-            // snapshot.forEach(child => child.ref.update({ status: "Completed" }));
-        } else {
-            console.log(`Order ${orderid} failed or cancelled.`);
-            // Example: snapshot.forEach(child => child.ref.update({ status: "Failed" }));
-        }
-
-        res.status(200).json({ status: 'success', message: 'Webhook received successfully' });
-    } catch (err) {
-        res.status(500).json({ status: 'error', message: err.message });
-    }
+    res.status(200).json({ 
+        status: 'success', 
+        message: 'Webhook received successfully' 
+    });
 });
 
-// Server Start
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Reseller server is running on port ${PORT}`);
+    console.log(`Gaule Store Server is running on port ${PORT}`);
 });
