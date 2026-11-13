@@ -13,7 +13,6 @@ try {
       credential: admin.credential.cert(serviceAccount)
     });
   } else {
-    // Fallback if configured locally or via default
     admin.initializeApp({
       credential: admin.credential.applicationDefault()
     });
@@ -83,10 +82,8 @@ app.post('/api/place-order', async (req, res) => {
       return res.status(400).json({ status: 'error', message: 'Missing required fields (package_id, player_id, client_order_id)' });
     }
 
-    // Automatically generate webhook URL based on your Render deployment domain
     const webhook_url = `${req.protocol}://${req.get('host')}/api/webhook-receiver`;
 
-    // Forward request to Alicstore API
     const masterResponse = await fetch(`${MASTER_API_BASE}/place-order`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -102,7 +99,6 @@ app.post('/api/place-order', async (req, res) => {
 
     const masterData = await masterResponse.json();
 
-    // Save order details to Firestore database
     await db.collection('orders').doc(String(client_order_id)).set({
       client_order_id: String(client_order_id),
       package_id: Number(package_id),
@@ -131,26 +127,25 @@ app.post('/api/webhook-receiver', async (req, res) => {
       return res.status(400).json({ status: 'error', message: 'Missing orderid in webhook' });
     }
 
-    // Try finding order by client_order_id first
     let orderRef = db.collection('orders').doc(String(orderid));
     let doc = await orderRef.get();
 
     if (!doc.exists) {
-      // If not found, try searching by master_order_id
       const querySnapshot = await db.collection('orders').where('master_order_id', '==', String(orderid)).get();
       if (!querySnapshot.empty) {
         orderRef = querySnapshot.docs[0].ref;
-        doc = await querySnapshot.docs[0];
+        doc = querySnapshot.docs[0];
       }
     }
 
     if (doc.exists) {
       await orderRef.update({
-        status: status, // 'success' or 'error'
+        status: status, 
         webhook_content: content,
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       });
-      return.status(200).json({ status: 'success', message: 'Order status updated successfully' });
+      // Corrected line below (res.status instead of return.status)
+      return res.status(200).json({ status: 'success', message: 'Order status updated successfully' });
     } else {
       console.warn(`Webhook order not found in database: ${orderid}`);
       return res.status(404).json({ status: 'error', message: 'Order not found' });
@@ -162,12 +157,10 @@ app.post('/api/webhook-receiver', async (req, res) => {
   }
 });
 
-// Root route
 app.get('/', (req, res) => {
   res.send('GAULE STORE Server is Running Successfully! 🚀');
 });
 
-// Start Server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   fetchMasterPackages();
