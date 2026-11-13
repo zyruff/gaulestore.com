@@ -22,8 +22,7 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
-// API Configuration (Master Panel / Reseller API)
-// domain.com को ठाउँमा https://alicstore.com राखिएको छ
+// API Configuration (Master Panel / Reseller API - alicstore.com)
 const MASTER_API_URL = process.env.MASTER_API_URL || 'https://alicstore.com/api';
 const MASTER_API_SECRET = process.env.MASTER_API_SECRET || 'YOUR_API_SECRET_KEY';
 const PORT = process.env.PORT || 10000;
@@ -47,6 +46,25 @@ app.post('/api/variations', async (req, res) => {
     return res.status(500).json({
       status: "error",
       message: "Internal server error while fetching variations."
+    });
+  }
+});
+
+// ==========================================
+// Browser बाट सजिलै Package ID हरू हेर्नको लागि (GET Route)
+// Route: GET /packages OR /check-packages
+// ==========================================
+app.get(['/packages', '/check-packages'], async (req, res) => {
+  try {
+    const response = await axios.post(`${MASTER_API_URL}/variations`, {
+      secret_key: MASTER_API_SECRET
+    });
+    return res.status(200).json(response.data);
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Failed to fetch packages from master panel",
+      details: error.response ? error.response.data : error.message
     });
   }
 });
@@ -126,7 +144,7 @@ app.post('/api/webhook-receiver', async (req, res) => {
 
     let querySnapshot = null;
     if (!orderDoc.exists) {
-      querySnapshot = await db.collection('orders').where('masterOrderId', '==', orderId).get();
+      querySnapshot = aait db.collection('orders').where('masterOrderId', '==', orderId).get();
     }
 
     if (!orderDoc.exists && (querySnapshot && querySnapshot.empty)) {
@@ -164,6 +182,17 @@ app.get('/', (req, res) => {
   res.send('Reseller API Automated Top-Up Server is Running!');
 });
 
-app.listen(PORT, () => {
+// Server Start हुँदा Render Logs मा स्वचालित रूपमा Package ID हरू प्रिन्ट हुनेछन्
+app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
+
+  try {
+    const response = await axios.post(`${MASTER_API_URL}/variations`, {
+      secret_key: MASTER_API_SECRET
+    });
+    console.log("=== MASTER PANEL AVAILABLE PACKAGES ===");
+    console.table(response.data.data);
+  } catch (err) {
+    console.log("Could not fetch packages on startup (Check your MASTER_API_SECRET):", err.message);
+  }
 });
