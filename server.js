@@ -9,7 +9,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 1. Initialize Firebase Admin with Realtime Database URL
 try {
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -28,9 +27,7 @@ try {
   console.error("Firebase initialization error:", error);
 }
 
-const rtdb = admin.database(); // Realtime Database reference
-const db = admin.firestore();  // Firestore backup reference (if needed)
-
+const rtdb = admin.database();
 const PORT = process.env.PORT || 10000;
 const MASTER_API_SECRET = process.env.MASTER_API_SECRET;
 const MASTER_API_BASE = 'https://alicstore.com/api';
@@ -66,7 +63,7 @@ app.get('/api/packages', async (req, res) => {
   }
 });
 
-// 2. Place Order API
+// Place Order API
 app.post('/api/place-order', async (req, res) => {
   try {
     const { package_id, player_id, client_order_id, quantity } = req.body;
@@ -102,7 +99,7 @@ app.post('/api/place-order', async (req, res) => {
   }
 });
 
-// 3. Webhook Receiver API (Updates Realtime Database directly)
+// Webhook Receiver API
 app.post('/api/webhook-receiver', async (req, res) => {
   try {
     const { orderid, status, content } = req.body;
@@ -112,7 +109,6 @@ app.post('/api/webhook-receiver', async (req, res) => {
       return res.status(400).json({ status: 'error', message: 'Missing orderid in webhook' });
     }
 
-    // AlicStore को status अनुसार 'complete' वा 'cancelled' म्याप गर्ने
     let updatedStatus = 'pending';
     if (status === 'success' || status === 'completed') {
       updatedStatus = 'complete';
@@ -125,7 +121,6 @@ app.post('/api/webhook-receiver', async (req, res) => {
     const targetOrderId = String(orderid);
     let orderUpdated = false;
 
-    // Realtime Database को 'orders' भित्र खोज्ने
     const ordersRef = rtdb.ref('orders');
     const snapshot = await ordersRef.once('value');
 
@@ -134,7 +129,7 @@ app.post('/api/webhook-receiver', async (req, res) => {
       snapshot.forEach((childSnapshot) => {
         const orderData = childSnapshot.val();
         
-        // चाहे त्यो client_order_id होस् वा apiOrderId (जस्तै 92891), दुवैसँग म्याच गराउने
+        // चाहे AlicStore ले नम्बर पठाओस् वा कस्टम आईडी, दुवैलाई म्याच गराउने
         if (
           String(orderData.clientOrderId) === targetOrderId || 
           String(orderData.apiOrderId) === targetOrderId ||
@@ -162,7 +157,7 @@ app.post('/api/webhook-receiver', async (req, res) => {
   }
 });
 
-app.get('/', () => {
+app.get('/', (req, res) => {
   res.send('GAULE STORE Server is Running Successfully! 🚀');
 });
 
