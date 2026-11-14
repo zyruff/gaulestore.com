@@ -1,567 +1,464 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <link rel="canonical" href="https://roshantamang2.com.np/" />
+    <link rel="canonical" href="https://roshantamang2.com.np/account/" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaule Store | Free Fire Top Up Nepal</title>
-<link rel="icon" href="favicon.ico" type="image/x-icon">
-<meta name="description" content="Gaule Store provides fast and secure gaming top-up services in Nepal.">
-<link rel="manifest" href="manifest.json">
-
-<meta property="og:site_name" content="Gaule Store">
-<meta property="og:title" content="Gaule Store | Free Fire Top Up Nepal">
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Gaule Store",
-  "alternateName": "GAULE STORE",
-  "url": "https://roshantamang2.com.np/"
-}
-</script>
-     
-
+    <title>User Profile | RG DIGITAL STORE</title>
+    <meta property="og:image" content="https://roshantamang2.com.np/owner.png">
+    <link rel="icon" href="../owner.png" type="image/png">
+    
+    <!-- FontAwesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; }
-        .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #dc2626; justify-content: space-between; }
-        .menu-icon { font-size: 28px; cursor: pointer; }
-        #nav-menu { display: none; position: absolute; top: 0; left: 0; background: #fff; border: 1px solid #ccc; padding: 20px; width: 250px; height: 100%; z-index: 1000; box-shadow: 2px 2px 10px #ccc; }
-        .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .close-btn { font-size: 30px; cursor: pointer; color: #dc2626; }
-        .search-box { display: flex; gap: 5px; margin-bottom: 20px; }
-        #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
-        #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; }
-        #profile-dropdown { display: none; position: absolute; top: 50px; right: 0; background: white; border: 1px solid #ccc; padding: 15px; width: 200px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); border-radius: 8px; text-align: center; z-index: 1000; }
-        .user-name { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
-        .user-email { font-size: 12px; color: #666; margin-bottom: 10px; }
-        .change-name { font-size: 11px; color: #dc2626; text-decoration: none; display: block; margin-bottom: 15px; }
-        .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; cursor: pointer; border-radius: 4px; }
-        #nav-menu a { display: block; padding: 12px 0; color: black; text-decoration: none; border-bottom: 1px solid #eee; }
-        .order-card { background: white; border-left: 5px solid #dc2626; padding: 10px; margin-bottom: 8px; border-radius: 5px; box-shadow: 0 2px 5px #ddd; }
-        .store-title { font-size: 1.5rem; font-weight: bold; }
-        .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
-    </style>
-</head>
-<body>
+        :root {
+            --primary: #2563EB;
+            --primary-dark: #1E40AF;
+            --primary-light: #EFF6FF;
+            --success: #10B981;
+            --danger: #EF4444;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --bg-body: #f0f4f9;
+            --card-bg: #FFFFFF;
+            --border-color: #E2E8F0;
+        }
 
-<div class="header">
-    <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
-    <div class="store-title">GAULE <span style="color:#dc2626;">STORE</span></div>
-    <div class="header-right">
-        <div id="login-container" onclick="googleLogin()">
-            <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-        </div>
-        <img id="profile-pic" onclick="toggleProfile()">
-        <div id="profile-dropdown">
-            <div id="display-name" class="user-name"></div>
-            <div id="display-email" class="user-email"></div>
-            <a href="https://myaccount.google.com/personal-info" target="_blank" class="change-name">Change Name</a>
-            <button class="logout-btn" onclick="logoutUser()">Logout</button>
-        </div>
-    </div>
-</div>
-
-<div id="nav-menu">
-    <div class="menu-header">
-        <span style="font-weight:bold;">Menu</span>
-        <span class="close-btn" onclick="toggleMenu()">&times;</span>
-    </div>
-    <div class="search-box">
-        <input type="text" id="gameSearch" placeholder="Search games...">
-        <button onclick="alert('Searching...')">Search</button>
-    </div>
-    <a href="index.html">Home</a>
-    <div id="my-orders-link" style="display:none;"><a href="#" onclick="showOrders()">My Orders</a></div>
-    <a href="shop/">Shop</a>
-    <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
-</div>
-
-
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, query, orderByChild, equalTo, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-        authDomain: "gaule-top-up-center.firebaseapp.com",
-        databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-        projectId: "gaule-top-up-center",
-        storageBucket: "gaule-top-up-center.firebasestorage.app",
-        messagingSenderId: "645605489690",
-        appId: "1:645605489690:web:10e333176acd07eec1e5a3"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    const provider = new GoogleAuthProvider();
-
-    window.toggleMenu = () => { const m = document.getElementById("nav-menu"); m.style.display = (m.style.display === "block") ? "none" : "block"; };
-    window.toggleProfile = () => { const d = document.getElementById("profile-dropdown"); d.style.display = (d.style.display === "block") ? "none" : "block"; };
-    window.googleLogin = () => signInWithPopup(auth, provider);
-    window.logoutUser = () => signOut(auth).then(() => location.reload());
-
-    window.showOrders = () => {
-        toggleMenu();
-        const user = auth.currentUser;
-        if (!user) return;
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            margin: 0; 
+            background-color: var(--bg-body); 
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: var(--text-main);
+            padding-bottom: 90px; 
+            box-sizing: border-box; 
+        }
         
-        const area = document.getElementById("content-area");
-        
-        // पछाडि फर्किने बटन र हेडिङ
-        area.innerHTML = `
-            <button onclick="location.reload()" style="margin-bottom:15px; padding:8px 15px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer;">
-                ← Back
-            </button>
-            <h2>My Orders</h2>
-        `;
-
-        const ordersRef = query(ref(db, 'orders'), orderByChild('userId'), equalTo(user.uid));
-        
-        onValue(ordersRef, (snapshot) => {
-            // अर्डर सूची देखाउनु अघि 'Back' बटन यथावत राख्न
-            let orderHtml = `
-                <button onclick="location.reload()" style="margin-bottom:15px; padding:8px 15px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer;">
-                    ← Back
-                </button>
-                <h2>My Orders</h2>
-            `;
-            
-            let orderArray = [];
-            snapshot.forEach((s) => { orderArray.push(s.val()); });
-            orderArray.reverse(); 
-
-            if (orderArray.length > 0) {
-                orderArray.forEach((o) => {
-                    let statusColor = '#eab308';
-                    if (o.status === 'Complete') statusColor = 'green';
-                    else if (o.status === 'Rejected') statusColor = 'red';
-
-                    orderHtml += `
-                        <div class="order-card">
-                            <p style="font-size: 14px; margin: 3px 0;">Product: <b>${o.product || "N/A"}</b></p>
-                            <p style="font-size: 14px; margin: 3px 0;">Player ID: <b>${o.uid || "N/A"}</b></p>
-                            <p style="font-size: 14px; margin: 3px 0;">Status: <b style="color:${statusColor}">${o.status}</b></p>
-                        </div>`;
-                });
-                area.innerHTML = orderHtml;
-            } else { 
-                area.innerHTML = orderHtml + "<p>No Order History</p>"; 
-            }
-        });
-    };
-
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.getElementById("my-orders-link").style.display = "block";
-            document.getElementById("login-container").style.display = "none";
-            document.getElementById("profile-pic").style.display = "block";
-            document.getElementById("profile-pic").src = user.photoURL;
-            document.getElementById("display-name").innerText = user.displayName;
-            document.getElementById("display-email").innerText = user.email;
+        /* Modern Glass Header */
+        .header { 
+            display: flex; 
+            align-items: center; 
+            padding: 14px 28px; 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color); 
+            justify-content: space-between; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
         }
-    });
-</script>
-</body>
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Account - Firebase Auth & Dynamic View</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+        .header-right { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
         }
-
-        body {
-            background: linear-gradient(180deg, #f4f5f7 0%, #ffffff 100%);
-            color: #1d1d1f;
-            min-height: 100vh;
-            padding-bottom: 60px;
-        }
-
-        .account-container {
-            max-width: 480px;
-            margin: 32px auto;
-            padding: 0 20px;
-        }
-
-        /* Profile Card */
-        .profile-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            padding: 24px;
-            border-radius: 20px;
+        .header-wallet {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .profile-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .profile-info h2 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #111111;
-            letter-spacing: -0.01em;
-            margin-bottom: 4px;
-        }
-
-        .profile-info p {
+            gap: 6px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border: 1px solid #bfdbfe;
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 30px;
             font-size: 13px;
-            color: #71717a;
-        }
-
-        /* Menu Groups */
-        .menu-group {
-            background: #ffffff;
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            border-radius: 20px;
-            overflow: hidden;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 20px;
+            font-weight: 700;
             text-decoration: none;
-            color: #18181b;
-            border-bottom: 1px solid #f4f4f5;
-            transition: background 0.2s ease, padding-left 0.2s ease;
+            box-shadow: 0 2px 6px rgba(37,99,235,0.08);
+        }
+        .header-wallet svg { width: 16px; height: 16px; fill: var(--primary); }
+        .store-logo { height: 40px; width: auto; object-fit: contain; display: block; border-radius: 6px; background-color: #ffffff; padding: 4px; }
+        #header-user-img { width: 38px; height: 38px; border-radius: 50%; cursor: pointer; border: 2px solid var(--primary); object-fit: cover; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+        /* Profile Main Wrapper */
+        .profile-container {
+            width: 92%;
+            max-width: 480px;
+            margin: 24px auto 16px auto;
+        }
+
+        /* Profile Top Banner & Avatar */
+        .profile-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .profile-avatar-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+        .profile-avatar {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            border: 4px solid #ffffff;
+            object-fit: cover;
+            background: #ffffff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .user-greeting {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+        .user-email-text {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .available-balance-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .available-balance-text i {
             cursor: pointer;
+            color: var(--primary);
+            transition: transform 0.3s;
+        }
+        .available-balance-text i:hover {
+            transform: rotate(180deg);
         }
 
-        .menu-item:last-child {
-            border-bottom: none;
+        /* 4 Stats Grid Box */
+        .stats-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            width: 92%;
+            max-width: 480px;
+            margin: 20px auto;
+        }
+        .stat-box-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 22px 16px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.03);
+            border: 1px solid var(--border-color);
+        }
+        .stat-box-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+        .stat-box-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
         }
 
-        a.menu-item:hover {
-            background-color: #fafafa;
-            padding-left: 24px;
+        /* Section Cards */
+        .section-box {
+            width: 92%;
+            max-width: 480px;
+            margin: 20px auto;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
         }
-
-        .menu-item-left {
+        .section-header {
             display: flex;
             align-items: center;
-            gap: 14px;
-            font-size: 14px;
-            font-weight: 500;
+            gap: 12px;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        .section-header i { 
+            color: var(--primary); 
+            background: var(--primary-light);
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 16px;
         }
 
-        /* Icon Colors Styling */
-        .icon-box {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
+        /* Balance Inner Card */
+        .balance-inner-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .balance-inner-amount {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-top: 6px;
+        }
+
+        /* Account Status Card */
+        .verified-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 18px;
+            text-align: center;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            margin-bottom: 16px;
         }
-
-        .icon-orders { background-color: #eff6ff; color: #2563eb; }
-        .icon-settings { background-color: #f4f4f5; color: #52525b; }
-        .icon-support { background-color: #fef3c7; color: #d97706; }
-        
-        .icon-facebook { background-color: #eff6ff; color: #1877f2; }
-        .icon-tiktok { background-color: #f4f4f5; color: #000000; }
-        .icon-youtube { background-color: #fef2f2; color: #ff0000; }
-        .icon-whatsapp { background-color: #f0fdf4; color: #25d366; }
-
-        .icon-box svg {
-            width: 18px;
-            height: 18px;
-            stroke: currentColor;
-            fill: none;
-        }
-
-        .icon-box svg.fill-icon {
-            fill: currentColor;
-            stroke: none;
-        }
-
-        .menu-item-right {
+        .verified-icon-badge {
+            width: 40px;
+            height: 40px;
+            background: #eff6ff;
+            color: var(--primary);
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            font-size: 18px;
         }
-
-        .count-badge {
-            background-color: #eff6ff;
-            color: #2563eb;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 3px 10px;
-            border-radius: 20px;
-        }
-
-        .arrow {
-            width: 16px;
-            height: 16px;
-            stroke: #a1a1aa;
-            fill: none;
-            transition: transform 0.2s ease;
-        }
-
-        /* Support Dropdown */
-        .support-dropdown {
-            display: none;
-            background-color: #fafafa;
-            padding: 18px 20px;
-            border-bottom: 1px solid #f4f4f5;
-            font-size: 13px;
-            color: #52525b;
-            line-height: 1.7;
-        }
-
-        .support-dropdown p {
-            margin-bottom: 8px;
-        }
-
-        .support-dropdown p:last-child {
-            margin-bottom: 0;
-        }
-
-        .support-dropdown strong {
-            color: #18181b;
+        .verified-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-main);
         }
 
         /* Logout Button */
         .logout-btn {
             width: 100%;
-            padding: 15px;
-            background-color: #ffffff;
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            border-radius: 18px;
-            font-size: 14px;
-            font-weight: 600;
+            background: #fef2f2;
+            color: var(--danger);
+            border: 1px solid #fecaca;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
-            display: none;
+            display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            text-decoration: none;
-            margin-top: 28px;
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.04);
-            transition: all 0.2s ease;
+            gap: 8px;
+            transition: background 0.2s;
         }
-
         .logout-btn:hover {
-            background-color: #fef2f2;
-            border-color: rgba(239, 68, 68, 0.4);
-            transform: translateY(-1px);
+            background: #fee2e2;
         }
 
-        .logout-btn svg {
-            width: 18px;
-            height: 18px;
-            stroke: currentColor;
-            fill: none;
+        /* Social Icons Styles with White Background & Border */
+        .social-container-box {
+            width: 92%;
+            max-width: 480px;
+            margin: 24px auto;
+            text-align: center;
+        }
+        .social-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .social-icons-container { 
+            display: flex; 
+            justify-content: center; 
+            gap: 16px; 
+            align-items: center; 
+            padding: 10px; 
+        }
+        .social-icon-btn {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+            transition: all 0.2s ease-in-out;
+            text-decoration: none;
+        }
+        .social-icon-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+
+        /* Bottom Nav Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 62px;
+            border-top: 1px solid #eaeaea;
+            padding: 0 5px;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+        .bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #888;
+            font-size: 11px;
+            font-weight: 500;
+            flex: 1;
+            height: 100%;
+            transition: all 0.2s ease-in-out;
+            background: transparent;
+            border: none;
+        }
+        .bottom-nav .nav-item svg { width: 18px; height: 18px; margin-bottom: 3px; stroke: currentColor; fill: none; }
+        .bottom-nav .nav-item.active { color: #333333; }
+
+        /* DESKTOP RESPONSIVE STYLES (Expanded Full Size Layout) */
+        @media (min-width: 768px) {
+            .profile-container,
+            .stats-grid-4,
+            .section-box,
+            .social-container-box {
+                max-width: 960px !important;
+            }
+            .stats-grid-4 {
+                grid-template-columns: repeat(4, 1fr) !important;
+            }
+            body {
+                padding-bottom: 80px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="account-container">
-        <!-- Profile Header -->
-        <div class="profile-card">
-            <div class="profile-info">
-                <h2 id="user-name">Checking...</h2>
-                <p id="user-email">Please wait...</p>
-            </div>
-            <!-- Edit Button Removed -->
-        </div>
+<!-- Header Section -->
+<div class="header">
+    <a href="../index.html" style="display:flex; align-items:center;">
+        <img src="https://roshantamang2.com.np/image/logo.png" alt="Gaule Store Logo" class="store-logo">
+    </a>
 
-        <!-- Main Links Group -->
-        <div class="menu-group">
-            <div class="menu-item" style="cursor: default;">
-                <div class="menu-item-left">
-                    <div class="icon-box icon-orders">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                    </div>
-                    <span>Total Orders</span>
-                </div>
-                <div class="menu-item-right">
-                    <span class="count-badge" id="total-orders">0</span>
-                </div>
-            </div>
-
-            <a href="settings.html" class="menu-item">
-                <div class="menu-item-left">
-                    <div class="icon-box icon-settings">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06-.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
-                    </div>
-                    <span>Settings</span>
-                </div>
-                <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </a>
-
-            <div class="menu-item" onclick="toggleSupport()">
-                <div class="menu-item-left">
-                    <div class="icon-box icon-support">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                    </div>
-                    <span>Help & Support</span>
-                </div>
-                <svg class="arrow" id="support-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </div>
-            <div id="support-dropdown" class="support-dropdown">
-                <p>📞 <strong>Phone:</strong> +9779761081110</p>
-                <p>✉️ <strong>Email:</strong> gaulestore.np@gmail.com</p>
-                <p>⏰ <strong>Open:</strong>(6:00 AM - 10:00 PM)</p>
-            </div>
-        </div>
-
-        <!-- Social Media Group -->
-        <div class="menu-group">
-            <a href="https://www.facebook.com/gauletopupcenter" target="_blank" class="menu-item">
-                <div class="menu-item-left">
-                    <div class="icon-box icon-facebook">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-                    </div>
-                    <span>Facebook</span>
-                </div>
-                <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </a>
-
-            <a href="https://tiktok.com/@gaule_store" target="_blank" class="menu-item">
-                <div class="menu-item-left">
-                    <div class="icon-box icon-tiktok">
-                        <svg xmlns="https://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>
-                    </div>
-                    <span>TikTok</span>
-                </div>
-                <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </a>
-
-            <a href="https://www.youtube.com/@GAULE_STORE" target="_blank" class="menu-item">
-                <div class="menu-item-left">
-                    <div class="icon-box icon-youtube">
-                        <svg class="fill-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                    </div>
-                    <span>YouTube</span>
-                </div>
-                <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </a>
-
-            <a href="https://chat.whatsapp.com/GqvRSSHyEvG1u1w1OqPmVa" target="_blank" class="menu-item">
-                <div class="menu-item-left">
-                    <div class="icon-box icon-whatsapp">
-                        <svg class="fill-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                    </div>
-                    <span>WhatsApp Community</span>
-                </div>
-                <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </a>
-        </div>
-
-        <a href="#" id="logout-btn" class="logout-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-            <span>Log Out</span>
+    <div class="header-right">
+        <a href="../my-wallet/" class="header-wallet">
+            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            <span><span id="header-balance">0</span>Rs</span>
         </a>
+        <img id="header-user-img" src="https://ui-avatars.com/api/?name=Loading&background=2563EB&color=fff" alt="Profile">
+    </div>
+</div>
+
+<!-- Profile Top Greeting Card -->
+<div class="profile-container">
+    <div class="profile-card">
+        <div class="profile-avatar-container">
+            <img id="profile-avatar" src="https://ui-avatars.com/api/?name=Loading&background=2563EB&color=fff" class="profile-avatar" alt="Avatar">
+        </div>
+        <div class="user-greeting">Hi, <span id="profile-name">Loading...</span></div>
+        <div class="user-email-text" id="profile-email">Please wait while we load your details</div>
+        <div class="available-balance-text">
+            Available Balance : <span id="sub-balance">0</span> Rs <i class="fa-solid fa-rotate-right" onclick="location.reload()"></i>
+        </div>
+    </div>
+</div>
+
+<!-- 4 Stats Grid Box -->
+<div class="stats-grid-4">
+    <div class="stat-box-card">
+        <div class="stat-box-value" id="stat-pin">-----</div>
+        <div class="stat-box-label">Support Pin</div>
+    </div>
+    <div class="stat-box-card">
+        <div class="stat-box-value" id="stat-weekly">0 RS</div>
+        <div class="stat-box-label">Weekly Spent</div>
+    </div>
+    <div class="stat-box-card">
+        <div class="stat-box-value" id="stat-spent">0 RS</div>
+        <div class="stat-box-label">Total Spent</div>
+    </div>
+    <div class="stat-box-card">
+        <div class="stat-box-value" id="stat-orders">0</div>
+        <div class="stat-box-label">Total Order</div>
+    </div>
+</div>
+
+<!-- Account Information Section -->
+<div class="section-box">
+    <div class="section-header">
+        <i class="fa-solid fa-folder-open"></i> Account Information
+    </div>
+    
+    <div class="balance-inner-card">
+        <div class="available-balance-text"><i class="fa-solid fa-wallet"></i> Available Balance</div>
+        <div class="balance-inner-amount">Rs. <span id="account-balance">0.00</span></div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    <div class="verified-card">
+        <div class="verified-icon-badge">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div class="verified-title" id="auth-status-text">Account Verified</div>
+    </div>
 
-        const firebaseConfig = {
-          apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
-          authDomain: "gaule-top-up-center.firebaseapp.com",
-          databaseURL: "https://gaule-top-up-center-default-rtdb.firebaseio.com",
-          projectId: "gaule-top-up-center",
-          storageBucket: "gaule-top-up-center.firebasestorage.app",
-          messagingSenderId: "645605489690",
-          appId: "1:645605489690:web:0b0f2898d295be03c1e5a3"
-        };
+    <!-- Logout Button -->
+    <button id="logout-btn" class="logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout Account
+    </button>
+</div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
+<!-- Stay Connected Section -->
+<div class="social-container-box">
+    <div class="social-title">Contact Us & Stay Connected</div>
+    <div class="social-icons-container">
+        <!-- Facebook -->
+        <a href="https://www.facebook.com/gauletopupcenter" target="_blank" class="social-icon-btn" style="color: #1877F2;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+        </a>
+        <!-- YouTube -->
+        <a href="https://www.youtube.com/@GAULE_STORE" target="_blank" class="social-icon-btn" style="color: #FF0000;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </a>
+        <!-- TikTok -->
+        <a href="https://www.tiktok.com/@gaule_gaming_official" target="_blank" class="social-icon-btn" style="color: #000000;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.68h-3.13v12.4a2.67 2.67 0 1 1-2.67-2.67c.21 0 .41.02.61.07V8.64a5.8 5.8 0 0 0-.61-.03A5.8 5.8 0 1 0 15.82 14V8.72a7.93 7.93 0 0 0 4.64 1.48V6.69h-.87z"/></svg>
+        </a>
+        <!-- WhatsApp Group / Channel -->
+        <a href="https://chat.whatsapp.com/GqvRSSHyEvG1u1w1OqPmVa" target="_blank" class="social-icon-btn" style="color: #25D366;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </a>
+        <!-- Email -->
+        <a href="mailto:gaulestore.np@gmail.com" target="_blank" class="social-icon-btn" style="color: #D44638;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        </a>
+    </div>
+</div>
 
-        const logoutBtn = document.getElementById('logout-btn');
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                logoutBtn.style.display = 'flex';
-                try {
-                    const userRef = ref(db, 'users/' + user.uid);
-                    const snapshot = await get(userRef);
-                    if (snapshot.exists()) {
-                        const data = snapshot.val();
-                        document.getElementById('user-name').innerText = data.name || "User";
-                        document.getElementById('user-email').innerText = data.email || user.email;
-                        document.getElementById('total-orders').innerText = data.totalOrders || 0;
-                    } else {
-                        document.getElementById('user-name').innerText = user.displayName || "User";
-                        document.getElementById('user-email').innerText = user.email;
-                    }
-                } catch (error) {
-                    console.error("Error loading user data:", error);
-                }
-            } else {
-                logoutBtn.style.display = 'none';
-                document.getElementById('user-name').innerText = "Guest User";
-                document.getElementById('user-email').innerText = "Please login to your account";
-                document.getElementById('total-orders').innerText = "0";
-            }
-        });
-
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            signOut(auth).then(() => {
-                window.location.reload();
-            }).catch((error) => {
-                console.error("Sign out error:", error);
-            });
-        });
-    </script>
-
-    <script>
-        function toggleSupport() {
-            const dropdown = document.getElementById('support-dropdown');
-            const arrow = document.getElementById('support-arrow');
-            if (dropdown.style.display === 'block') {
-                dropdown.style.display = 'none';
-                arrow.style.transform = 'rotate(0deg)';
-            } else {
-                dropdown.style.display = 'block';
-                arrow.style.transform = 'rotate(90deg)';
-            }
-        }
-    </script>
-</body>
-</html>
-
-
-
-
-<br>
+<!-- Bottom Navigation Bar -->
 <div class="bottom-nav">
     <a href="../index.html" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -571,80 +468,120 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
         <span>Shop</span>
     </a>
-    <a href="../order" class="nav-item">
+    <a href="../my-wallet/" class="nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
+            <path d="M4 6v12a2 2 0 0 0 2 2h14v-4"></path>
+            <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path>
+        </svg>
+        <span>Wallet</span>
+    </a>
+    <a href="../order/" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         <span>Order</span>
     </a>
-    <a href="index.html" class="nav-item">
+    <a href="index.html" class="nav-item active">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         <span>Account</span>
     </a>
 </div>
 
-<style>
-    .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: #ffffff;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        height: 62px;
-        border-top: 1px solid #eaeaea;
-        padding: 0 5px;
-        z-index: 1000;
-        box-sizing: border-box;
-    }
+<!-- Firebase & Script Integration -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    .bottom-nav .nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        color: #888;
-        font-size: 11px;
-        font-weight: 500;
-        flex: 1;
-        height: 100%;
-        transition: all 0.2s ease-in-out;
-        background: transparent;
-        border: none;
-        box-sizing: border-box;
-    }
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFUQu06EvmJCtplZ8dRqVhHnB7I1yQuKw",
+      authDomain: "rg-digital-store.firebaseapp.com",
+      databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com",
+      projectId: "rg-digital-store",
+      storageBucket: "rg-digital-store.firebasestorage.app",
+      messagingSenderId: "257332660691",
+      appId: "1:257332660691:web:e9ff5e85282a4e9d1d4726",
+      measurementId: "G-S09Q860R4V"
+    };
 
-    .bottom-nav .nav-item svg {
-        width: 18px;
-        height: 18px;
-        margin-bottom: 3px;
-        stroke: currentColor;
-        fill: none;
-    }
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
 
-    /* Active huda yellow color hatauna yaha changes garieko xa */
-    .bottom-nav .nav-item.active {
-        color: #333333; /* Active huda kasto color rakhne, yaha dark gray haleko xa */
-    }
-</style>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const currentPath = window.location.pathname;
-        const navItems = document.querySelectorAll('.bottom-nav .nav-item');
-
-        navItems.forEach(item => {
-            const href = item.getAttribute('href');
-            const cleanHref = href.replace(/\.\./g, '').replace(/\/+/g, '/');
+    // Authentication State Listener
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // Logged In User Data
+            const photoUrl = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || "User")}&background=2563EB&color=fff`;
+            document.getElementById("profile-avatar").src = photoUrl;
+            document.getElementById("header-user-img").src = photoUrl;
+            document.getElementById("profile-name").innerText = user.displayName || "User";
+            document.getElementById("profile-email").innerText = user.email || "No email linked";
             
-            if (cleanHref !== "/" && currentPath.includes(cleanHref)) {
-                navItems.forEach(nav => nav.classList.remove('active'));
-                item.classList.add('active');
-            } else if (cleanHref === "/" && (currentPath === "/" || currentPath.endsWith("index.html"))) {
-                navItems.forEach(nav => nav.classList.remove('active'));
-                item.classList.add('active');
-            }
-        });
+            const shortPin = user.uid.substring(0, 5).toUpperCase();
+            document.getElementById("stat-pin").innerText = shortPin;
+            document.getElementById("auth-status-text").innerText = "Account Verified";
+
+            // Fetch user wallet balance from database
+            const userRef = ref(db, 'users/' + user.uid);
+            onValue(userRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    const bal = data.balance || 0;
+
+                    document.getElementById("header-balance").innerText = bal;
+                    document.getElementById("sub-balance").innerText = bal;
+                    document.getElementById("account-balance").innerText = parseFloat(bal).toFixed(2);
+                }
+            });
+
+            // Fetch orders and calculate Total Spent & Weekly Spent
+            const ordersRef = ref(db, 'orders');
+            onValue(ordersRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    let orderCount = 0;
+                    let totalSpent = 0;
+                    let weeklySpent = 0;
+
+                    const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+
+                    snapshot.forEach((childSnap) => {
+                        const order = childSnap.val();
+                        if (order.userId === user.uid || order.email === user.email) {
+                            orderCount++;
+                            if ((order.status || "").toLowerCase() === "complete") {
+                                const amount = parseFloat(order.amountDue) || 0;
+                                totalSpent += amount;
+
+                                const orderTime = order.createdAt || order.timestamp || 0;
+                                if (orderTime >= oneWeekAgo) {
+                                    weeklySpent += amount;
+                                }
+                            }
+                        }
+                    });
+
+                    document.getElementById("stat-orders").innerText = orderCount;
+                    document.getElementById("stat-spent").innerText = totalSpent.toLocaleString() + " RS";
+                    document.getElementById("stat-weekly").innerText = weeklySpent.toLocaleString() + " RS";
+                }
+            });
+        } else {
+            // Not Logged In -> Redirect to Login Page
+            window.location.href = "https://roshantamang2.com.np/login/";
+        }
+    });
+
+    // Handle Logout functionality
+    document.getElementById("logout-btn").addEventListener("click", () => {
+        if (confirm("Are you sure you want to log out?")) {
+            signOut(auth).then(() => {
+                window.location.href = "https://roshantamang2.com.np/login/";
+            }).catch((error) => {
+                alert("Error signing out: " + error.message);
+            });
+        }
     });
 </script>
+
+</body>
+</html>
