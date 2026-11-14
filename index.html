@@ -4,7 +4,7 @@
     <link rel="canonical" href="https://roshantamang2.com.np/" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaule Store | Fast & Secure Gaming Top Up in Nepal</title>
+    <title>RG DIGITAL STORE  | Fast & Secure Gaming Top Up in Nepal</title>
     <meta property="og:image" content="https://roshantamang2.com.np/owner.png">
     <link rel="icon" href="owner.png" type="image/png">
     <link rel="manifest" href="/manifest.json">
@@ -21,8 +21,8 @@
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "Gaule Store",
-      "alternateName": "GAULE STORE",
+      "name": "RG DIGITAL STORE",
+      "alternateName": "RG DIGITAL STORE",
       "url": "https://roshantamang2.com.np"
     }
     </script>
@@ -31,7 +31,6 @@
         body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; padding-bottom: 70px; }
         
         /* Header Layout */
-        /* Logo मुनिको line (border-bottom) लाई रातोबाट नीलो (#2563EB) बनाइएको छ */
         .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #2563EB; justify-content: flex-start; gap: 15px; position: sticky; top: 0; z-index: 1000; }
         .header-right { display: flex; align-items: center; gap: 10px; position: relative; margin-left: auto; }
         
@@ -41,7 +40,7 @@
         .search-box { display: flex; gap: 5px; margin-bottom: 20px; }
         #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
         
-        /* Header Wallet: background र text रङ्गलाई नीलो बनाइएको छ */
+        /* Header Wallet */
         .header-wallet {
             display: none;
             align-items: center;
@@ -160,8 +159,8 @@
         }
         .service-card {
             display: block;
-            width: 102px;
-            height: 102px;
+            width: 90px;
+            height: 90px;
             text-decoration: none;
             border-radius: 22px;
             border: 1px solid rgba(0,0,0,0.1);
@@ -169,6 +168,11 @@
             overflow: hidden;
             background: #fff;
             position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .service-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.18);
         }
         .service-card img {
             width: 102px;
@@ -187,77 +191,53 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
+        /* 🌟 REDESIGNED AUTO DELIVERY BADGE */
         .badge-tag {
             position: absolute;
             top: 0;
             left: 0;
-            background-color: #2563EB;
+            background: linear-gradient(135deg, #2563EB 0%, #1d4ed8 100%);
             color: #fff;
             font-size: 8px;
-            font-weight: 700;
-            padding: 2px 6px;
+            font-weight: 800;
+            padding: 3px 8px;
             border-top-left-radius: 22px;
-            border-bottom-right-radius: 8px;
+            border-bottom-right-radius: 12px;
             z-index: 2;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            animation: pulseBadge 2s infinite;
+        }
+        @keyframes pulseBadge {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+            100% { transform: scale(1); }
         }
 
         /* Mobile Landscape */
         @media screen and (max-height: 550px) and (orientation: landscape) {
-            .services-wrapper {
-                max-width: 95% !important;
-            }
-            .service-container {
-                justify-content: space-between !important;
-                padding: 0 50px !important;
-            }
-            .service-item {
-                width: 115px;
-            }
-            .service-card {
-                width: 115px;
-                height: 115px;
-                border-radius: 22px;
-            }
-            .service-card img {
-                width: 115px;
-                height: 115px;
-            }
-            .service-label {
-                font-size: 11px;
-            }
-            .main-wrapper, #review-container, #reviews-container {
-                max-width: 90% !important;
-            }
+            .services-wrapper { max-width: 95% !important; }
+            .service-container { justify-content: space-between !important; padding: 0 50px !important; }
+            .service-item { width: 115px; }
+            .service-card { width: 115px; height: 115px; border-radius: 22px; }
+            .service-card img { width: 115px; height: 115px; }
+            .service-label { font-size: 11px; }
+            .main-wrapper, #review-container, #reviews-container, .leaderboard-wrapper { max-width: 90% !important; }
         }
 
         /* Actual Desktop / Laptop View */
         @media screen and (min-width: 1024px) {
-            .services-wrapper {
-                max-width: 850px !important;
-            }
-            .service-container {
-                justify-content: space-between !important;
-                padding: 0 40px !important;
-            }
-            .service-item {
-                width: 130px;
-            }
-            .service-card {
-                width: 130px;
-                height: 130px;
-                border-radius: 26px;
-            }
-            .service-card img {
-                width: 130px;
-                height: 130px;
-            }
-            .service-label {
-                font-size: 12px;
-                margin-top: 8px;
-            }
-            .main-wrapper, #review-container, #reviews-container {
-                max-width: 850px !important;
-            }
+            .services-wrapper { max-width: 850px !important; }
+            .service-container { justify-content: space-between !important; padding: 0 40px !important; }
+            .service-item { width: 130px; }
+            .service-card { width: 130px; height: 130px; border-radius: 26px; }
+            .service-card img { width: 130px; height: 130px; }
+            .service-label { font-size: 12px; margin-top: 8px; }
+            .main-wrapper, #review-container, #reviews-container, .leaderboard-wrapper { max-width: 850px !important; }
         }
 
         /* Order Table */
@@ -276,6 +256,180 @@
         th { background: #333; color: white; }
         td { border-bottom: 1px solid #eee; }
         h3.section-title { text-align: center; color: #333; font-size: 16px; margin-bottom: 15px; }
+
+        /* Top Spend Leaderboard Styles (Podium: 2 Left, 1 Center, 3 Right) */
+        .leaderboard-wrapper {
+            width: 92%;
+            max-width: 500px;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 20px 15px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            border: 1px solid #f1f5f9;
+            box-sizing: border-box;
+        }
+        .lb-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .lb-title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 800;
+            color: #0f172a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .podium-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .podium-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 31%;
+            position: relative;
+        }
+        .podium-avatar-wrap {
+            position: relative;
+            margin-bottom: 8px;
+        }
+        .podium-avatar {
+            border-radius: 50%;
+            object-fit: cover;
+            background: #f1f5f9;
+        }
+        .rank-badge {
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+        }
+
+        /* Rank 1 (Center) */
+        .rank-1 { order: 2; transform: translateY(-12px); }
+        .rank-1 .crown-icon {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #f59e0b;
+            font-size: 20px;
+            animation: floatCrown 2s ease-in-out infinite;
+        }
+        @keyframes floatCrown {
+            0%, 100% { transform: translate(-50%, 0); }
+            50% { transform: translate(-50%, -4px); }
+        }
+        .rank-1 .podium-avatar { width: 72px; height: 72px; border: 3px solid #f59e0b; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35); }
+        .rank-1 .rank-badge { background: #f59e0b; }
+
+        /* Rank 2 (Left) */
+        .rank-2 { order: 1; }
+        .rank-2 .podium-avatar { width: 58px; height: 58px; border: 3px solid #94a3b8; box-shadow: 0 4px 12px rgba(148, 163, 184, 0.3); }
+        .rank-2 .rank-badge { background: #94a3b8; }
+
+        /* Rank 3 (Right) */
+        .rank-3 { order: 3; }
+        .rank-3 .podium-avatar { width: 58px; height: 58px; border: 3px solid #d97706; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3); }
+        .rank-3 .rank-badge { background: #d97706; }
+
+        .podium-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: #1e293b;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+        .podium-amount {
+            font-size: 11px;
+            font-weight: 800;
+            color: #2563EB;
+            background: #eff6ff;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-top: 4px;
+        }
+
+        /* Rank 4 to 10 List */
+        .lb-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .lb-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 1px solid #f1f5f9;
+        }
+        .lb-row-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
+        }
+        .lb-rank-num {
+            font-size: 12px;
+            font-weight: 800;
+            color: #64748b;
+            width: 20px;
+            text-align: center;
+        }
+        .lb-row-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .lb-row-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .lb-row-amount {
+            font-size: 12px;
+            font-weight: 700;
+            color: #16a34a;
+            background: #f0fdf4;
+            padding: 4px 10px;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
 
         /* Customer Reviews - Compact Design */
         #review-container { 
@@ -303,9 +457,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transition: background 0.2s;
         }
-        .btn-write:hover {
-            background: #1e293b !important;
-        }
+        .btn-write:hover { background: #1e293b !important; }
         .stars { display: flex; flex-direction: row-reverse; justify-content: center; gap: 6px; margin: 10px 0; }
         .stars input { display: none; }
         .stars label { font-size: 28px; color: #ddd; cursor: pointer; transition: 0.2s; }
@@ -533,8 +685,6 @@
     </div>
 </div>
 
-
-
 <!-- Swiper Banner Slider -->
 <div class="swiper">
     <div class="swiper-wrapper">
@@ -565,19 +715,19 @@
 <div class="services-wrapper">
     <div class="service-container">
         <div class="service-item">
-            <a href="https://roshantamang2.com.np/product/free-fire-auto-top-up-nepal" class="service-card">
+            <a href="https://roshantamang2.com.np/product/free-fire-auto-top-up-nepal" class="service-card" style="border: 2px solid #2563EB;">
+                <div class="badge-tag"><i class="fa-solid fa-bolt" style="font-size: 7px;"></i> AUTO</div>
                 <img src="https://roshantamang2.com.np/product/free-fire-top-up-nepal/free_fire.png" alt="Free Fire">
             </a>
             <div class="service-label">FREE FIRE</div>
         </div>
        
-<div class="service-item">
+        <div class="service-item">
             <a href="https://roshantamang2.com.np/product/level-up-pass-top-up-nepal" class="service-card">
                 <img src="https://roshantamang2.com.np/product/level-up-pass-top-up-nepal/levelup.png" alt="Less Is More">
             </a>
             <div class="service-label">LESS IS MORE</div>
         </div>
-
 
         <div class="service-item">
             <a href="https://roshantamang2.com.np/product/pubg-uc-top-up-nepal" class="service-card">
@@ -670,7 +820,7 @@
             <div class="service-label">PUBG VOUCHER</div>
         </div>
     </div>
-
+</div>
 
 <!-- Live Order Status Table -->
 <div class="main-wrapper">
@@ -689,6 +839,21 @@
             </tbody>
         </table>
     </div>
+</div>
+
+<!-- Top Spend Leaderboard Section -->
+<div class="leaderboard-wrapper">
+    <div class="lb-header">
+        <h3 class="lb-title"><i class="fa-solid fa-trophy" style="color: #f59e0b;"></i> TOP SPENDERS</h3>
+    </div>
+
+    <!-- Top 3 Podium (2 Left, 1 Center, 3 Right) -->
+    <div class="podium-container" id="lb-podium">
+        <div style="font-size: 12px; color: #94a3b8;">Loading leaderboard...</div>
+    </div>
+
+    <!-- Rank 4 to 10 List -->
+    <div class="lb-list" id="lb-list"></div>
 </div>
 
 <!-- Customer Review Section -->
@@ -828,15 +993,15 @@
     import { getDatabase, ref, onValue, set, get, push, update, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
-  apiKey: "AIzaSyCFUQu06EvmJCtplZ8dRqVhHnB7I1yQuKw",
-  authDomain: "rg-digital-store.firebaseapp.com",
-  databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com",
-  projectId: "rg-digital-store",
-  storageBucket: "rg-digital-store.firebasestorage.app",
-  messagingSenderId: "257332660691",
-  appId: "1:257332660691:web:e9ff5e85282a4e9d1d4726",
-  measurementId: "G-S09Q860R4V"
-};
+      apiKey: "AIzaSyCFUQu06EvmJCtplZ8dRqVhHnB7I1yQuKw",
+      authDomain: "rg-digital-store.firebaseapp.com",
+      databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com",
+      projectId: "rg-digital-store",
+      storageBucket: "rg-digital-store.firebasestorage.app",
+      messagingSenderId: "257332660691",
+      appId: "1:257332660691:web:e9ff5e85282a4e9d1d4726",
+      measurementId: "G-S09Q860R4V"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -854,7 +1019,7 @@
     });
 
     onAuthStateChanged(auth, (user) => {
-        let isAdmin = user?.email === "gaulestore.np@gmail.com";
+        let isAdmin = user?.email === "ffzyru@gmail.com";
         if (user) {
             document.getElementById("login-container").style.display = "none";
             document.getElementById("header-wallet-btn").style.display = "flex";
@@ -869,9 +1034,12 @@
                     set(userRef, {
                         name: user.displayName,
                         email: user.email,
+                        photoURL: user.photoURL || "",
                         balance: 0,
                         role: "user"
                     });
+                } else {
+                    update(userRef, { photoURL: user.photoURL || "" });
                 }
             });
 
@@ -902,33 +1070,137 @@
         return interval + " minute" + (interval > 1 ? "s" : "") + " ago";
     }
 
+    // Collect user photos from users and reviews database nodes
+    let userPhotosMap = {};
+    onValue(ref(db, 'users'), (snap) => {
+        if (snap.exists()) {
+            snap.forEach(child => {
+                const u = child.val();
+                const pic = u.photoURL || u.photo || u.image;
+                if (pic) {
+                    userPhotosMap[child.key] = pic;
+                    if (u.email) userPhotosMap[u.email] = pic;
+                }
+            });
+        }
+    });
+
+    onValue(ref(db, 'reviews'), (snap) => {
+        if (snap.exists()) {
+            snap.forEach(child => {
+                const r = child.val();
+                if (r.photo) {
+                    if (r.userId) userPhotosMap[r.userId] = r.photo;
+                    if (r.email) userPhotosMap[r.email] = r.photo;
+                }
+            });
+        }
+    });
+
     onValue(ref(db, 'orders'), (snapshot) => {
         const data = snapshot.val();
         const tbody = document.getElementById('orderTableBody');
-        if(!tbody) return;
-        tbody.innerHTML = '';
-        if (!data) return;
+        const podiumDiv = document.getElementById('lb-podium');
+        const listDiv = document.getElementById('lb-list');
+
+        if (tbody) tbody.innerHTML = '';
+        if (!data) {
+            if (podiumDiv) podiumDiv.innerHTML = '<div style="font-size:12px; color:#94a3b8;">No data available</div>';
+            return;
+        }
 
         const ordersArray = Object.keys(data).map(key => data[key]);
-        const recentOrders = ordersArray.reverse().slice(0, 10);
-        
-        recentOrders.forEach(o => {
-            let statusColor = '#999';
-            const stat = (o.status || "").toLowerCase();
-            if (stat === 'pending') statusColor = '#FFC107';
-            else if (stat === 'rejected') statusColor = '#F44336';
-            else if (stat === 'complete') statusColor = '#4CAF50';
-            else if (stat === 'refunded') statusColor = '#9E9E9E';
-            
-            tbody.innerHTML += `
-                <tr>
-                    <td>${o.name || ''}</td>
-                    <td>${o.product || ''}</td>
-                    <td>${getTimeAgo(o.timestamp)}</td>
-                    <td style="color: ${statusColor}; font-weight: bold;">${(o.status || '').toUpperCase()}</td>
-                </tr>
-            `;
+
+        // 1. Update Latest Orders Table
+        if (tbody) {
+            const recentOrders = [...ordersArray].reverse().slice(0, 10);
+            recentOrders.forEach(o => {
+                let statusColor = '#999';
+                const stat = (o.status || "").toLowerCase();
+                if (stat === 'pending') statusColor = '#FFC107';
+                else if (stat === 'rejected') statusColor = '#F44336';
+                else if (stat === 'complete') statusColor = '#4CAF50';
+                else if (stat === 'refunded') statusColor = '#9E9E9E';
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${o.name || ''}</td>
+                        <td>${o.product || ''}</td>
+                        <td>${getTimeAgo(o.timestamp)}</td>
+                        <td style="color: ${statusColor}; font-weight: bold;">${(o.status || '').toUpperCase()}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // 2. Calculate Top Spenders (Only 'complete' orders)
+        const spenderMap = {};
+        ordersArray.forEach(o => {
+            if ((o.status || "").toLowerCase() === "complete") {
+                const key = o.userId || o.email || o.name || "Unknown";
+                const amount = parseFloat(o.amountDue) || 0;
+                if (!spenderMap[key]) {
+                    spenderMap[key] = {
+                        name: o.name || "Customer",
+                        email: o.email || "",
+                        userId: o.userId || "",
+                        total: 0
+                    };
+                }
+                spenderMap[key].total += amount;
+                if (o.name) spenderMap[key].name = o.name;
+            }
         });
+
+        const top10 = Object.values(spenderMap)
+            .sort((a, b) => b.total - a.total)
+            .slice(0, 10);
+
+        if (podiumDiv && listDiv) {
+            podiumDiv.innerHTML = '';
+            listDiv.innerHTML = '';
+
+            if (top10.length === 0) {
+                podiumDiv.innerHTML = '<div style="font-size:12px; color:#94a3b8;">No completed orders yet</div>';
+                return;
+            }
+
+            // Render Top 3 Podium (Rank 2 Left, Rank 1 Center, Rank 3 Right)
+            top10.slice(0, 3).forEach((user, index) => {
+                const rank = index + 1;
+                const avatar = userPhotosMap[user.userId] || userPhotosMap[user.email] || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=e2e8f0&color=1e293b&bold=true`;
+                const crown = rank === 1 ? `<i class="fa-solid fa-crown crown-icon"></i>` : '';
+
+                podiumDiv.innerHTML += `
+                    <div class="podium-item rank-${rank}">
+                        <div class="podium-avatar-wrap">
+                            ${crown}
+                            <img src="${avatar}" class="podium-avatar" alt="${user.name}">
+                            <div class="rank-badge">${rank}</div>
+                        </div>
+                        <div class="podium-name">${user.name}</div>
+                        <div class="podium-amount">Rs. ${user.total.toLocaleString()}</div>
+                    </div>
+                `;
+            });
+
+            // Render Rank 4 to 10
+            top10.slice(3, 10).forEach((user, index) => {
+                const rank = index + 4;
+                const avatar = userPhotosMap[user.userId] || userPhotosMap[user.email] || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=f1f5f9&color=334155&bold=true`;
+
+                listDiv.innerHTML += `
+                    <div class="lb-row">
+                        <div class="lb-row-left">
+                            <span class="lb-rank-num">#${rank}</span>
+                            <img src="${avatar}" class="lb-row-avatar" alt="${user.name}">
+                            <span class="lb-row-name">${user.name}</span>
+                        </div>
+                        <div class="lb-row-amount">Rs. ${user.total.toLocaleString()}</div>
+                    </div>
+                `;
+            });
+        }
     });
 
     const fill = document.getElementById("fill");
@@ -1067,7 +1339,7 @@
 
         reviewsToShow.forEach(review => {
             const photo = review.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.name || "U")}&background=e2e8f0&color=1e293b`;
-            const isOwner = review.email === "gaulestore.np@gmail.com";
+            const isOwner = review.email === "ffzyru@gmail.com";
             const starCount = Number(review.stars || 5);
             const starsDisplay = `<span style="color:#f59e0b; font-size:12px; letter-spacing: 2px;">${"★".repeat(starCount)}</span>`;
             
