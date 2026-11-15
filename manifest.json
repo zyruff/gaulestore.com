@@ -3,8 +3,8 @@
   "short_name": "RG DIGITAL STORE",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "FFFFFF",
-  "theme_color": "#FFFFFF",
+  "background_color": "ffffff",
+  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "https://roshantamang2.com.np/owner.png",
