@@ -262,7 +262,7 @@
                     <label for="custUID">Game UID (e.g. Free Fire UID)</label>
                     <input type="text" id="custUID" placeholder="Enter your UID">
                 </div>
-                <button type="submit" class="primary-btn" id="registerBtn">Login Now</button>
+                <button type="submit" class="primary-btn" id="registerBtn">Register for Spin</button>
             </form>
             <div id="custMsg" class="msg"></div>
         </div>
@@ -409,6 +409,12 @@
 
         // --- 2. AUTHENTICATION & PROFILE DISPLAY & ADMIN CHECK ---
         auth.onAuthStateChanged((user) => {
+            // यदि युजर लगइन छैन भने सिधै login पेजमा पठाउने
+            if (!user) {
+                window.location.href = "https://roshantamang2.com.np/login";
+                return;
+            }
+
             currentUser = user;
             const registerBtn = document.getElementById('registerBtn');
             const loginContainer = document.getElementById('login-container');
@@ -416,66 +422,47 @@
             const avatarContainer = document.getElementById('profile-avatar-container');
             const adminControls = document.getElementById('adminControls');
 
-            if (user) {
-                loginContainer.style.display = 'none';
-                const profilePic = document.getElementById('profile-pic');
-                profilePic.style.display = 'block';
-                profilePic.src = user.photoURL || 'https://via.placeholder.com/35';
-                document.getElementById('display-name').innerText = user.displayName || 'User';
-                document.getElementById('display-email').innerText = user.email || '';
-                document.getElementById('header-wallet-btn').style.display = 'flex';
+            loginContainer.style.display = 'none';
+            const profilePic = document.getElementById('profile-pic');
+            profilePic.style.display = 'block';
+            profilePic.src = user.photoURL || 'https://via.placeholder.com/35';
+            document.getElementById('display-name').innerText = user.displayName || 'User';
+            document.getElementById('display-email').innerText = user.email || '';
+            document.getElementById('header-wallet-btn').style.display = 'flex';
 
-                userProfileBox.style.display = 'flex';
-                document.getElementById('form-user-name').innerText = user.displayName || 'User';
-                document.getElementById('form-user-email').innerText = user.email || '';
+            userProfileBox.style.display = 'flex';
+            document.getElementById('form-user-name').innerText = user.displayName || 'User';
+            document.getElementById('form-user-email').innerText = user.email || '';
 
-                if (user.photoURL) {
-                    avatarContainer.innerHTML = `<img src="${user.photoURL}" alt="Profile">`;
-                } else {
-                    const initial = user.displayName ? user.displayName.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U');
-                    avatarContainer.innerHTML = `<span id="profile-initial">${initial}</span>`;
-                }
-
-                if (!isWinnerDeclared) {
-                    registerBtn.innerText = "Register for Spin";
-                    registerBtn.style.background = "#2563EB";
-                    registerBtn.type = "submit"; 
-                }
-
-                const userBalanceRef = db.ref(`users/${user.uid}/balance`);
-                userBalanceRef.on('value', (snapshot) => {
-                    const balance = snapshot.val();
-                    document.getElementById('header-user-balance').innerText = balance !== null ? Number(balance) : 0;
-                });
-
-                if (user.email === 'ffzyru@gmail.com') {
-                    adminControls.style.display = 'block';
-                } else {
-                    adminControls.style.display = 'none';
-                }
+            if (user.photoURL) {
+                avatarContainer.innerHTML = `<img src="${user.photoURL}" alt="Profile">`;
             } else {
-                loginContainer.style.display = 'block';
-                document.getElementById('profile-pic').style.display = 'none';
-                document.getElementById('profile-dropdown').style.display = 'none';
-                document.getElementById('header-wallet-btn').style.display = 'none';
-                document.getElementById('header-user-balance').innerText = '0';
-                userProfileBox.style.display = 'none';
+                const initial = user.displayName ? user.displayName.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U');
+                avatarContainer.innerHTML = `<span id="profile-initial">${initial}</span>`;
+            }
+
+            if (!isWinnerDeclared) {
+                registerBtn.innerText = "Register for Spin";
+                registerBtn.style.background = "#2563EB";
+                registerBtn.type = "submit"; 
+            }
+
+            const userBalanceRef = db.ref(`users/${user.uid}/balance`);
+            userBalanceRef.on('value', (snapshot) => {
+                const balance = snapshot.val();
+                document.getElementById('header-user-balance').innerText = balance !== null ? Number(balance) : 0;
+            });
+
+            if (user.email === 'ffzyru@gmail.com') {
+                adminControls.style.display = 'block';
+            } else {
                 adminControls.style.display = 'none';
-                
-                if (!isWinnerDeclared) {
-                    registerBtn.innerText = "Login Now";
-                    registerBtn.style.background = "#dc2626";
-                    registerBtn.type = "button";
-                    registerBtn.onclick = function() {
-                        window.location.href = "https://roshantamang2.com.np/login";
-                    };
-                }
             }
         });
 
         window.logoutUser = function() {
             auth.signOut().then(() => {
-                toggleProfile();
+                window.location.href = "https://roshantamang2.com.np/login";
             });
         };
 
@@ -483,13 +470,13 @@
         function saveCustomerUID(e) {
             e.preventDefault();
 
-            if (isWinnerDeclared) {
-                showMsg('Winner has already been announced! Registration is closed.', 'error');
+            if (!currentUser) {
+                window.location.href = "https://roshantamang2.com.np/login";
                 return;
             }
 
-            if (!currentUser) {
-                window.location.href = "https://roshantamang2.com.np/login";
+            if (isWinnerDeclared) {
+                showMsg('Winner has already been announced! Registration is closed.', 'error');
                 return;
             }
 
@@ -587,7 +574,6 @@
                 customersList.sort((a, b) => a.uid.localeCompare(b.uid, undefined, {numeric: true}));
 
                 customersList.forEach((c) => {
-                    // Populate Table with ALL historical participants
                     let avatarHTML = '';
                     if (c.userPhoto) {
                         avatarHTML = `<img src="${c.userPhoto}" style="width:26px; height:26px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:6px; border:1px solid #cbd5e0;">`;
@@ -608,7 +594,6 @@
                     </tr>`;
                     publicTbody.innerHTML += rowHTML;
 
-                    // Push to wheel ONLY if the UID was registered after the current wheelResetTime
                     if ((c.timestamp || 0) >= wheelResetTime) {
                         customerDataMap[c.uid] = c.key;
                         fetchedUIDs.push(c.uid);
@@ -627,10 +612,30 @@
             drawWheelOnCanvas(ctx, canvas, wheelSegments);
         });
 
-        // --- 5. WHEEL DRAWING FUNCTION ---
+        // --- 5. WHEEL DRAWING FUNCTION WITH SMALL CENTER CIRCLE ---
         function drawWheelOnCanvas(ctx, canvas, segments) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const radius = canvas.width / 2;
+
+            if (segments.length === 1 && segments[0] === "No UIDs Yet") {
+                ctx.beginPath();
+                ctx.fillStyle = "#2563EB";
+                ctx.arc(radius, radius, radius - 4, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = "#ffffff";
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(radius, radius, 14, 0, 2 * Math.PI);
+                ctx.fillStyle = "#ffffff";
+                ctx.fill();
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = "#1d4ed8";
+                ctx.stroke();
+                return;
+            }
+
             const numSegments = segments.length;
             const arc = (2 * Math.PI) / numSegments;
 
@@ -657,6 +662,14 @@
                 ctx.fillText(displayText, radius - 15, 4);
                 ctx.restore();
             }
+
+            ctx.beginPath();
+            ctx.arc(radius, radius, 14, 0, 2 * Math.PI);
+            ctx.fillStyle = "#ffffff";
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "#2563EB";
+            ctx.stroke();
         }
 
         drawWheelOnCanvas(ctx, canvas, wheelSegments);
