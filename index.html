@@ -229,8 +229,8 @@
             .main-wrapper, #review-container, #reviews-container, .leaderboard-wrapper { max-width: 90% !important; }
         }
 
-        /* Actual Desktop / Laptop View (6 Items Per Row & 1000px Wider Containers) */
-        @media screen and (min-width: 1024px) {
+        /* Desktop View & Mobile Desktop Site Mode (6 Items Per Row & 1000px Wider Containers) */
+        @media screen and (min-width: 900px) {
             .services-wrapper { 
                 max-width: 1000px !important; 
                 display: grid !important; 
@@ -530,7 +530,7 @@
         .footer-links a { color: #777; text-decoration: none; }
         .footer-links a:hover { color: #000; }
         .footer-links .pipe { color: #ccc; margin: 0 8px; }
-        @media screen and (min-width: 1024px) {
+        @media screen and (min-width: 900px) {
             .footer-links { line-height: 1.5; }
             .mobile-break { display: none; }
         }
@@ -1455,7 +1455,7 @@
 
     function toggleChatMenu(e) {
         e.stopPropagation();
-        localStorage.setItem('chatClicked', 'true');
+        localStorage.getItem('chatClicked') === 'true' ? null : localStorage.setItem('chatClicked', 'true');
         chatBtn.classList.remove('has-notification');
         if (chatMenu.classList.contains('active')) {
             closeChatMenu();
@@ -1474,6 +1474,7 @@
 
 </body>
 </html>
+
 
 
 
