@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="canonical" href="https://roshantamang2.com.np/product/unipin-voucher-nepal" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Gaule Store - Lucky Spin Wheel" />
+    <meta property="og:description" content="Spin and win exciting rewards with Gaule Store." />
+    <meta property="og:type" content="website" />
+
+    <title>RG Digital Store | Lucky Spin Wheel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background-color: #ffffff; color: #2d3748; padding-bottom: 80px; }
+        
+        /* Header Layout */
+        .header { display: flex; align-items: center; padding: 20px; background: white; border-bottom: 2px solid #2563EB; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
+        .store-logo { height: 50px; width: auto; object-fit: contain; display: block; }
+        .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
+        
+        /* Header Wallet */
+        .header-wallet {
+            display: none;
+            align-items: center;
+            gap: 5px;
+            background-color: #eff6ff;
+            border: 1px solid #93c5fd;
+            color: #2563EB;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .header-wallet:hover { background-color: #dbeafe; }
+        .header-wallet svg { width: 16px; height: 16px; fill: #2563EB; }
+
+        #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; object-fit: cover; }
+        #profile-dropdown { display: none; position: absolute; top: 50px; right: 0; background: white; border: 1px solid #ccc; padding: 15px; width: 200px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); border-radius: 8px; text-align: center; z-index: 1000; }
+        .user-name { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+        .user-email { font-size: 12px; color: #666; margin-bottom: 10px; }
+        .change-name { font-size: 11px; color: #dc2626; text-decoration: none; display: block; margin-bottom: 15px; }
+        .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; cursor: pointer; border-radius: 4px; width: 100%; }
+        
+        .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; display: block; }
+
+        /* Main Container & Cards */
+        main { max-width: 600px; width: 100%; margin: 20px auto; padding: 0 15px; }
+        .card-panel { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 20px; }
+        h3 { margin-bottom: 15px; color: #1a202c; font-size: 18px; font-weight: 700; border-bottom: 2px solid #f1f3f4; padding-bottom: 8px; }
+        
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: #4a5568; font-size: 13px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 15px; outline: none; background: #f7fafc; transition: 0.2s; }
+        input:focus, select:focus { border-color: #2563EB; background: #fff; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
+        
+        button.primary-btn { background: #2563EB; color: white; border: none; padding: 12px 20px; font-size: 15px; font-weight: 700; border-radius: 8px; cursor: pointer; width: 100%; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+        button.primary-btn:hover { background: #1d4ed8; }
+
+        .msg { margin-top: 15px; padding: 12px; border-radius: 8px; text-align: center; font-weight: 500; font-size: 14px; display: none; }
+        .msg.success { background: #e6f4ea; color: #137333; }
+        .msg.error { background: #fce8e6; color: #c5221f; }
+
+        /* User Profile Info Box inside UID Form */
+        #user-profile-box { display: none; align-items: center; gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; margin-bottom: 15px; }
+        .profile-avatar-container { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #2563EB; color: white; font-weight: bold; font-size: 16px; border: 2px solid #2563EB; }
+        .profile-avatar-container img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-details { display: flex; flex-direction: column; overflow: hidden; }
+        .profile-user-name { font-weight: 600; font-size: 14px; color: #1a202c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .profile-user-email { font-size: 12px; color: #718096; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Spin Wheel Styles (10s duration) */
+        .wheel-container { display: flex; flex-direction: column; align-items: center; position: relative; margin-top: 10px; }
+        canvas { border-radius: 50%; box-shadow: 0 8px 20px rgba(0,0,0,0.12); transition: transform 10s cubic-bezier(0.15, 0.95, 0.15, 1); background: #fff; }
+        .pointer { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 26px solid #dc2626; z-index: 10; }
+        .result-box { margin-top: 15px; font-size: 16px; font-weight: bold; color: #2563EB; text-align: center; }
+        .countdown-display { font-size: 13px; color: #dc2626; margin-top: 6px; font-weight: 700; background: #fef2f2; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #fecaca; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px 12px; border: 1px solid #e2e8f0; text-align: left; font-size: 13px; }
+        th { background: #f8fafc; color: #4a5568; font-weight: 700; }
+
+        /* Premium Congratulations Modal Styles */
+        .congrats-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .congrats-modal-content {
+            background: #ffffff;
+            width: 90%;
+            max-width: 380px;
+            border-radius: 24px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+            transform: scale(0.8);
+            animation: scaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .congrats-icon-box {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border: 2px solid #93c5fd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 15px auto;
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.15);
+        }
+
+        .congrats-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .congrats-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .winner-uid-badge {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e0;
+            color: #2563EB;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .congrats-btn {
+            background: linear-gradient(135deg, #2563EB 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transition: 0.2s;
+        }
+
+        .congrats-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleUp {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #ffffff; display: flex; justify-content: space-around; align-items: center; height: 60px; border-top: 1px solid #eaeaea; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); }
+        .bottom-nav .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #718096; font-size: 11px; font-weight: 500; flex: 1; height: 100%; transition: all 0.2s; }
+        .bottom-nav .nav-item svg { width: 18px; height: 18px; margin-bottom: 3px; stroke: currentColor; fill: none; }
+        .bottom-nav .nav-item.active { color: #2563EB; }
+    </style>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <a href="https://roshantamang2.com.np" style="display: flex; align-items: center; text-decoration: none;">
+            <img src="https://roshantamang2.com.np/image/logo.png" alt="Gaule Store Logo" class="store-logo" onerror="this.style.display='none'; document.getElementById('fallback-logo-text').style.display='block';">
+            <span id="fallback-logo-text" style="display: none; font-weight: 700; font-size: 18px; color: #2563EB;">RG DIGITAL STORE</span>
+        </a>
+        <div class="header-right">
+            <a href="../../my-wallet/" id="header-wallet-btn" class="header-wallet">
+                <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                <span>Rs. <span id="header-user-balance">0</span></span>
+            </a>
+
+            <a href="https://roshantamang2.com.np/login" id="login-container">
+                <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </a>
+            <img id="profile-pic" onclick="toggleProfile()">
+            <div id="profile-dropdown">
+                <div id="display-name" class="user-name"></div>
+                <div id="display-email" class="user-email"></div>
+                <a href="https://myaccount.google.com/personal-info" target="_blank" class="change-name">Change Name</a>
+                <button class="logout-btn" onclick="logoutUser()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <!-- 1. LIVE SPIN WHEEL SECTION -->
+        <div class="card-panel" style="text-align: center;">
+            <h3 style="border: none; margin-bottom: 5px;">1 Lucky Winner 🏆 Weekly Lite <br>   🎁 Lucky Spin Wheel</h3>
+            <p style="font-size: 12px; color: #718096; margin-bottom: 15px;">Registered UIDs are live on the wheel!</p>
+            <div class="wheel-container">
+                <div class="pointer"></div>
+                <canvas id="wheelCanvas" width="260" height="260"></canvas>
+            </div>
+            <div class="result-box" id="resultBox">Waiting for spin announcement...</div>
+            <div style="margin-top: 8px;">
+                <div class="countdown-display" id="countdownDisplay">⏳ Loading Countdown...</div>
+            </div>
+
+            <!-- ADMIN CONTROLS (Visible ONLY when logged in as ffzyru@gmail.com) -->
+            <div id="adminControls" style="display: none; margin-top: 20px; border-top: 1px dashed #cbd5e0; padding-top: 15px; text-align: left;">
+                <div style="text-align: center; display: flex; gap: 10px; justify-content: center;">
+                    <button class="primary-btn" onclick="spinWheel()" id="spinBtn" style="width: 170px;">SPIN (RANDOM)</button>
+                    <button class="primary-btn" onclick="resetCountdown()" style="background: #d97706; width: 150px; font-size: 13px;">Reset 3 Days</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. UID REGISTRATION FORM -->
+        <div class="card-panel">
+            <h3>🎮 Enter Game UID</h3>
+            
+            <div id="user-profile-box">
+                <div class="profile-avatar-container" id="profile-avatar-container">
+                    <span id="profile-initial">U</span>
+                </div>
+                <div class="profile-details">
+                    <div class="profile-user-name" id="form-user-name">User Name</div>
+                    <div class="profile-user-email" id="form-user-email">email@gmail.com</div>
+                </div>
+            </div>
+
+            <form id="uidForm" onsubmit="saveCustomerUID(event)">
+                <div class="form-group">
+                    <label for="custUID">Game UID (e.g. Free Fire UID)</label>
+                    <input type="text" id="custUID" placeholder="Enter your UID">
+                </div>
+                <button type="submit" class="primary-btn" id="registerBtn">Join Now</button>
+            </form>
+            <div id="custMsg" class="msg"></div>
+        </div>
+
+        <!-- 3. PUBLIC PARTICIPANTS LIST -->
+        <div class="card-panel">
+            <h3>Joined Participants</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Participant</th>
+                            <th>Game UID</th>
+                            <th>Status / Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="publicTableBody">
+                        <tr><td colspan="3" style="text-align:center; color:#718096;">Loading participants...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Premium Congratulations Popup Modal -->
+    <div id="congratsModal" class="congrats-modal-overlay">
+        <div class="congrats-modal-content">
+            <div class="congrats-icon-box">
+                <span>🎉</span>
+            </div>
+            <h2 class="congrats-title">Congratulations!</h2>
+            <p class="congrats-subtitle" id="congratsMessage">You have won the Lucky Spin reward!</p>
+            
+            <div class="winner-uid-badge" id="modalWinnerUID">UID: ---</div>
+
+            <button class="congrats-btn" onclick="closeCongratsModal()">Awesome, Claim!</button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <a href="https://roshantamang2.com.np" class="nav-item">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span>Home</span>
+        </a>
+        <a href="../../shop/" class="nav-item">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+            <span>Shop</span>
+        </a>
+        <a href="../../my-wallet/" class="nav-item">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"></path><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path></svg>
+            <span>Wallet</span>
+        </a>
+        <a href="../../order/" class="nav-item">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            <span>Order</span>
+        </a>
+        <a href="../../account/" class="nav-item">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>Account</span>
+        </a>
+    </div>
+
+    <script>
+        function toggleProfile() {
+            const dropdown = document.getElementById('profile-dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // --- POPUP FUNCTIONS ---
+        function showCongratsPopup(winnerUID) {
+            document.getElementById('modalWinnerUID').innerText = `Winner UID: ${winnerUID}`;
+            document.getElementById('congratsModal').style.display = 'flex';
+        }
+
+        function closeCongratsModal() {
+            document.getElementById('congratsModal').style.display = 'none';
+        }
+
+        // --- 1. FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCFUQu06EvmJCtplZ8dRqVhHnB7I1yQuKw",
+            authDomain: "rg-digital-store.firebaseapp.com",
+            databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com",
+            projectId: "rg-digital-store",
+            storageBucket: "rg-digital-store.firebasestorage.app",
+            messagingSenderId: "257332660691",
+            appId: "1:257332660691:web:e9ff5e85282a4e9d1d4726"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const auth = firebase.auth();
+        const provider = new firebase.auth.GoogleAuthProvider();
+
+        let currentUser = null;
+        let targetCountdownTime = null;
+        let wheelResetTime = 0;
+        let isWinnerDeclared = false;
+
+        // --- LISTEN TO SPIN ACTION & COUNTDOWN & RESET TIME ---
+        db.ref('spin_action').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                targetCountdownTime = data.targetTime || null;
+                wheelResetTime = data.wheelResetTime || 0;
+            }
+        });
+
+        setInterval(() => {
+            if (!isWinnerDeclared && targetCountdownTime) {
+                const now = new Date().getTime();
+                const distance = targetCountdownTime - now;
+
+                if (distance < 0) {
+                    document.getElementById('countdownDisplay').innerText = "⏳ Announcement Time Reached! Ready to Spin!";
+                } else {
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    document.getElementById('countdownDisplay').innerText = `⏳ Spin in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+                }
+            }
+        }, 1000);
+
+        window.resetCountdown = function() {
+            const user = auth.currentUser;
+            if (!user || user.email !== 'ffzyru@gmail.com') {
+                alert('Unauthorized!');
+                return;
+            }
+            const newTarget = new Date().getTime() + (3 * 24 * 60 * 60 * 1000);
+            
+            db.ref('spin_action').update({
+                targetTime: newTarget,
+                winnerUID: null,
+                winTime: null,
+                rotation: 0,
+                wheelResetTime: Date.now()
+            });
+            alert('Reset Successful! Wheel UIDs cleared for new round (Joined Participants retained).');
+        };
+
+        // --- 2. AUTHENTICATION & PROFILE DISPLAY & ADMIN CHECK ---
+        auth.onAuthStateChanged((user) => {
+            // यदि युजर लगइन छैन भने सिधै login पेजमा पठाउने
+            if (!user) {
+                window.location.href = "https://roshantamang2.com.np/login";
+                return;
+            }
+
+            currentUser = user;
+            const registerBtn = document.getElementById('registerBtn');
+            const loginContainer = document.getElementById('login-container');
+            const userProfileBox = document.getElementById('user-profile-box');
+            const avatarContainer = document.getElementById('profile-avatar-container');
+            const adminControls = document.getElementById('adminControls');
+
+            loginContainer.style.display = 'none';
+            const profilePic = document.getElementById('profile-pic');
+            profilePic.style.display = 'block';
+            profilePic.src = user.photoURL || 'https://via.placeholder.com/35';
+            document.getElementById('display-name').innerText = user.displayName || 'User';
+            document.getElementById('display-email').innerText = user.email || '';
+            document.getElementById('header-wallet-btn').style.display = 'flex';
+
+            userProfileBox.style.display = 'flex';
+            document.getElementById('form-user-name').innerText = user.displayName || 'User';
+            document.getElementById('form-user-email').innerText = user.email || '';
+
+            if (user.photoURL) {
+                avatarContainer.innerHTML = `<img src="${user.photoURL}" alt="Profile">`;
+            } else {
+                const initial = user.displayName ? user.displayName.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U');
+                avatarContainer.innerHTML = `<span id="profile-initial">${initial}</span>`;
+            }
+
+            if (!isWinnerDeclared) {
+                registerBtn.innerText = "Join Nou";
+                registerBtn.style.background = "#2563EB";
+                registerBtn.type = "submit"; 
+            }
+
+            const userBalanceRef = db.ref(`users/${user.uid}/balance`);
+            userBalanceRef.on('value', (snapshot) => {
+                const balance = snapshot.val();
+                document.getElementById('header-user-balance').innerText = balance !== null ? Number(balance) : 0;
+            });
+
+            if (user.email === 'ffzyru@gmail.com') {
+                adminControls.style.display = 'block';
+            } else {
+                adminControls.style.display = 'none';
+            }
+        });
+
+        window.logoutUser = function() {
+            auth.signOut().then(() => {
+                window.location.href = "https://roshantamang2.com.np/login";
+            });
+        };
+
+        // --- 3. SAVE CUSTOMER UID ---
+        function saveCustomerUID(e) {
+            e.preventDefault();
+
+            if (!currentUser) {
+                window.location.href = "https://roshantamang2.com.np/login";
+                return;
+            }
+
+            if (isWinnerDeclared) {
+                showMsg('Winner has already been announced! Registration is closed.', 'error');
+                return;
+            }
+
+            const uidInput = document.getElementById('custUID');
+            const uid = uidInput.value.trim();
+
+            if (!uid) {
+                showMsg('Please enter your Game UID first!', 'error');
+                return;
+            }
+
+            const customersRef = db.ref('spin_customers');
+            
+            customersRef.orderByChild('userId').equalTo(currentUser.uid).once('value', userSnapshot => {
+                let alreadyRegisteredThisRound = false;
+                userSnapshot.forEach(child => {
+                    const val = child.val();
+                    if ((val.timestamp || 0) >= wheelResetTime) {
+                        alreadyRegisteredThisRound = true;
+                    }
+                });
+
+                if (alreadyRegisteredThisRound) {
+                    showMsg('You have already registered for this round!', 'error');
+                    return;
+                }
+
+                customersRef.orderByChild('uid').equalTo(uid).once('value', uidSnapshot => {
+                    let uidTakenThisRound = false;
+                    uidSnapshot.forEach(child => {
+                        const val = child.val();
+                        if ((val.timestamp || 0) >= wheelResetTime) {
+                            uidTakenThisRound = true;
+                        }
+                    });
+
+                    if(uidTakenThisRound) {
+                        showMsg('This Game UID is already registered for this round!', 'error');
+                    } else {
+                        const newRef = customersRef.push();
+                        newRef.set({
+                            id: newRef.key,
+                            uid: uid,
+                            userId: currentUser.uid,
+                            userEmail: currentUser.email,
+                            userName: currentUser.displayName || 'User',
+                            userPhoto: currentUser.photoURL || '',
+                            status: 'Registered',
+                            timestamp: firebase.database.ServerValue.TIMESTAMP
+                        }, (error) => {
+                            if(error) {
+                                showMsg('Error saving. Try again.', 'error');
+                            } else {
+                                showMsg('UID saved successfully!', 'success');
+                                document.getElementById('uidForm').reset();
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        function showMsg(text, type) {
+            const msg = document.getElementById('custMsg');
+            msg.innerText = text;
+            msg.style.display = 'block';
+            msg.className = type === 'success' ? 'msg success' : 'msg error';
+        }
+
+        // --- 4. LOAD & LISTEN UIDS & RENDER PARTICIPANTS TABLE ---
+        let customerDataMap = {};
+        let wheelSegments = ["No UIDs Yet"];
+        const colors = ["#2563EB", "#dc2626", "#d97706", "#16a34a", "#9333ea", "#0891b2", "#ea580c", "#0d9488", "#4f46e5"];
+
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+
+        db.ref('spin_customers').on('value', (snapshot) => {
+            const publicTbody = document.getElementById('publicTableBody');
+
+            publicTbody.innerHTML = '';
+            customerDataMap = {};
+            
+            let fetchedUIDs = [];
+            let customersList = [];
+
+            if(snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const key = childSnapshot.key;
+                    const c = childSnapshot.val();
+                    c.key = key;
+                    customersList.push(c);
+                });
+
+                customersList.sort((a, b) => a.uid.localeCompare(b.uid, undefined, {numeric: true}));
+
+                customersList.forEach((c) => {
+                    let avatarHTML = '';
+                    if (c.userPhoto) {
+                        avatarHTML = `<img src="${c.userPhoto}" style="width:26px; height:26px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:6px; border:1px solid #cbd5e0;">`;
+                    } else {
+                        const initial = c.userName ? c.userName.charAt(0).toUpperCase() : 'U';
+                        avatarHTML = `<span style="display:inline-block; width:26px; height:26px; border-radius:50%; background:#2563EB; color:#fff; text-align:center; line-height:26px; font-size:12px; font-weight:bold; vertical-align:middle; margin-right:6px;">${initial}</span>`;
+                    }
+
+                    let statusDisplay = c.status;
+                    if (c.winTime) {
+                        statusDisplay += `<br><span style="font-size: 10px; color: #137333;">🕒 ${c.winTime}</span>`;
+                    }
+
+                    const rowHTML = `<tr>
+                        <td>${avatarHTML} <span style="font-weight: 500;">${c.userName || 'User'}</span></td>
+                        <td>${c.uid}</td>
+                        <td>${statusDisplay}</td>
+                    </tr>`;
+                    publicTbody.innerHTML += rowHTML;
+
+                    if ((c.timestamp || 0) >= wheelResetTime) {
+                        customerDataMap[c.uid] = c.key;
+                        fetchedUIDs.push(c.uid);
+                    }
+                });
+            } else {
+                publicTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#718096;">No participants joined yet.</td></tr>`;
+            }
+
+            if(fetchedUIDs.length > 0) {
+                wheelSegments = fetchedUIDs;
+            } else {
+                wheelSegments = ["No UIDs Yet"];
+            }
+
+            drawWheelOnCanvas(ctx, canvas, wheelSegments);
+        });
+
+        // --- 5. WHEEL DRAWING FUNCTION WITH SMALL CENTER CIRCLE ---
+        function drawWheelOnCanvas(ctx, canvas, segments) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const radius = canvas.width / 2;
+
+            if (segments.length === 1 && segments[0] === "No UIDs Yet") {
+                ctx.beginPath();
+                ctx.fillStyle = "#2563EB";
+                ctx.arc(radius, radius, radius - 4, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = "#ffffff";
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(radius, radius, 4, 0, 2 * Math.PI);
+                ctx.fillStyle = "#ffffff";
+                ctx.fill();
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = "#1d4ed8";
+                ctx.stroke();
+                return;
+            }
+
+            const numSegments = segments.length;
+            const arc = (2 * Math.PI) / numSegments;
+
+            for (let i = 0; i < numSegments; i++) {
+                const angle = i * arc;
+                ctx.beginPath();
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.moveTo(radius, radius);
+                ctx.arc(radius, radius, radius - 4, angle, angle + arc, false);
+                ctx.lineTo(radius, radius);
+                ctx.fill();
+                ctx.save();
+
+                ctx.translate(radius, radius);
+                ctx.rotate(angle + arc / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "#fff";
+                ctx.font = "bold 11px sans-serif";
+                
+                let displayText = segments[i];
+                if(displayText.length > 10) {
+                    displayText = displayText.substring(0, 8) + '..';
+                }
+                ctx.fillText(displayText, radius - 15, 4);
+                ctx.restore();
+            }
+
+            ctx.beginPath();
+            ctx.arc(radius, radius, 14, 0, 2 * Math.PI);
+            ctx.fillStyle = "#ffffff";
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "#2563EB";
+            ctx.stroke();
+        }
+
+        drawWheelOnCanvas(ctx, canvas, wheelSegments);
+
+        let currentRotation = 0;
+        db.ref('spin_action').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if(data) {
+                currentRotation = data.rotation || 0;
+                canvas.style.transform = `rotate(${currentRotation}deg)`;
+                
+                const registerBtn = document.getElementById('registerBtn');
+                const custUIDInput = document.getElementById('custUID');
+
+                if(data.winnerUID) {
+                    isWinnerDeclared = true;
+                    let winText = `🎉 Winner UID: ${data.winnerUID}!`;
+                    document.getElementById('resultBox').innerText = winText;
+                    if(data.winTime) {
+                        document.getElementById('countdownDisplay').innerText = `🏆 Announced at: ${data.winTime}`;
+                    }
+
+                    if (registerBtn) {
+                        registerBtn.disabled = true;
+                        registerBtn.innerText = "🔒 Registration Closed (Winner Announced)";
+                        registerBtn.style.background = "#94a3b8";
+                        registerBtn.style.cursor = "not-allowed";
+                    }
+                    if (custUIDInput) {
+                        custUIDInput.disabled = true;
+                        custUIDInput.placeholder = "Registration is closed";
+                        custUIDInput.style.background = "#e2e8f0";
+                    }
+                } else {
+                    isWinnerDeclared = false;
+                    document.getElementById('resultBox').innerText = "Waiting for spin announcement...";
+                    if (registerBtn) {
+                        registerBtn.disabled = false;
+                        registerBtn.innerText = "Join Now";
+                        registerBtn.style.background = "#2563EB";
+                        registerBtn.style.cursor = "pointer";
+                    }
+                    if (custUIDInput) {
+                        custUIDInput.disabled = false;
+                        custUIDInput.placeholder = "Enter your UID";
+                        custUIDInput.style.background = "#f7fafc";
+                    }
+                }
+            }
+        });
+
+        // --- 6. PRECISE SPIN LOGIC ---
+        let isSpinning = false;
+        function spinWheel() {
+            const user = auth.currentUser;
+            if (!user || user.email !== 'ffzyru@gmail.com') {
+                alert('Unauthorized! Only ffzyru@gmail.com can spin the wheel.');
+                return;
+            }
+
+            if(wheelSegments.includes("No UIDs Yet") || wheelSegments.length === 0) {
+                alert('There are no UIDs on the wheel!');
+                return;
+            }
+            if(isSpinning) return;
+            isSpinning = true;
+            document.getElementById('resultBox').innerText = "Spinning...";
+
+            const randomIndex = Math.floor(Math.random() * wheelSegments.length);
+            const selectedUID = wheelSegments[randomIndex];
+
+            const numSegments = wheelSegments.length;
+            const degPerSegment = 360 / numSegments;
+            const segmentCenterAngle = (randomIndex * degPerSegment) + (degPerSegment / 2);
+            
+            const targetMod = (270 - segmentCenterAngle) % 360;
+            const normalizedTarget = targetMod < 0 ? targetMod + 360 : targetMod;
+            
+            const currentMod = currentRotation % 360;
+            let diff = normalizedTarget - currentMod;
+            if (diff <= 0) diff += 360;
+            
+            const extraSpins = 360 * 6;
+            const newRotation = currentRotation + diff + extraSpins;
+
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0, 10);
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            const timeStr = `${hours}:${minutes}:${seconds} ${ampm}`;
+            const fullDateTime = `${dateStr} ${timeStr}`;
+
+            db.ref('spin_action').update({
+                rotation: newRotation,
+                winnerUID: selectedUID,
+                winTime: fullDateTime
+            });
+
+            setTimeout(() => {
+                isSpinning = false;
+                const firebaseKey = customerDataMap[selectedUID];
+                if(firebaseKey) {
+                    db.ref('spin_customers/' + firebaseKey).update({
+                        status: 'Winner! 🏆 1 Weekly Lite',
+                        winTime: fullDateTime
+                    });
+                }
+                
+                showCongratsPopup(selectedUID);
+
+            }, 10000);
+        }
+    </script>
+</body>
+</html>
