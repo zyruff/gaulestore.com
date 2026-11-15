@@ -435,9 +435,11 @@
                     avatarContainer.innerHTML = `<span id="profile-initial">${initial}</span>`;
                 }
 
-                registerBtn.innerText = "Register for Spin";
-                registerBtn.style.background = "#2563EB";
-                registerBtn.type = "submit"; 
+                if (!isWinnerDeclared) {
+                    registerBtn.innerText = "Register for Spin";
+                    registerBtn.style.background = "#2563EB";
+                    registerBtn.type = "submit"; 
+                }
 
                 const userBalanceRef = db.ref(`users/${user.uid}/balance`);
                 userBalanceRef.on('value', (snapshot) => {
@@ -459,12 +461,14 @@
                 userProfileBox.style.display = 'none';
                 adminControls.style.display = 'none';
                 
-                registerBtn.innerText = "Login Now";
-                registerBtn.style.background = "#dc2626";
-                registerBtn.type = "button";
-                registerBtn.onclick = function() {
-                    window.location.href = "https://roshantamang2.com.np/login";
-                };
+                if (!isWinnerDeclared) {
+                    registerBtn.innerText = "Login Now";
+                    registerBtn.style.background = "#dc2626";
+                    registerBtn.type = "button";
+                    registerBtn.onclick = function() {
+                        window.location.href = "https://roshantamang2.com.np/login";
+                    };
+                }
             }
         });
 
@@ -477,6 +481,11 @@
         // --- 3. SAVE CUSTOMER UID ---
         function saveCustomerUID(e) {
             e.preventDefault();
+
+            if (isWinnerDeclared) {
+                showMsg('Winner has already been announced! Registration is closed.', 'error');
+                return;
+            }
 
             if (!currentUser) {
                 window.location.href = "https://roshantamang2.com.np/login";
@@ -532,7 +541,7 @@
             msg.className = type === 'success' ? 'msg success' : 'msg error';
         }
 
-        // --- 4. LOAD & LISTEN UIDS & RENDER PARTICIPANTS TABLE ---
+        // --- 4. LOAD & LISTEN UIDS & RENDER PARTICIPANTS TABLE (Deterministic Sorting) ---
         let customerDataMap = {};
         let wheelSegments = ["No UIDs Yet"];
         const colors = ["#2563EB", "#dc2626", "#d97706", "#16a34a", "#9333ea", "#0891b2", "#ea580c", "#0d9488", "#4f46e5"];
@@ -557,7 +566,8 @@
                     customersList.push(c);
                 });
 
-                customersList.reverse();
+                // Deterministic sorting so wheel segments order never changes across reloads/devices
+                customersList.sort((a, b) => a.uid.localeCompare(b.uid, undefined, {numeric: true}));
 
                 customersList.forEach((c) => {
                     customerDataMap[c.uid] = c.key;
@@ -644,11 +654,26 @@
                     if(data.winTime) {
                         document.getElementById('countdownDisplay').innerText = `🏆 Announced at: ${data.winTime}`;
                     }
+
+                    // Lock registration form
+                    const registerBtn = document.getElementById('registerBtn');
+                    const custUIDInput = document.getElementById('custUID');
+                    if (registerBtn) {
+                        registerBtn.disabled = true;
+                        registerBtn.innerText = "🔒 Registration Closed (Winner Announced)";
+                        registerBtn.style.background = "#94a3b8";
+                        registerBtn.style.cursor = "not-allowed";
+                    }
+                    if (custUIDInput) {
+                        custUIDInput.disabled = true;
+                        custUIDInput.placeholder = "Registration is closed";
+                        custUIDInput.style.background = "#e2e8f0";
+                    }
                 }
             }
         });
 
-        // --- 6. SPIN LOGIC (10s duration + Popup trigger) ---
+        // --- 6. PRECISE SPIN LOGIC (Lands exactly on winner under pointer) ---
         let isSpinning = false;
         function spinWheel() {
             const user = auth.currentUser;
@@ -665,11 +690,23 @@
             isSpinning = true;
             document.getElementById('resultBox').innerText = "Spinning...";
 
+            // 1. Pick a random winner index
             const randomIndex = Math.floor(Math.random() * wheelSegments.length);
             const selectedUID = wheelSegments[randomIndex];
 
-            const randomDegree = Math.floor(Math.random() * 360) + 1800; 
-            const newRotation = currentRotation + randomDegree;
+            // 2. Calculate exact rotation so this segment lands precisely under the top pointer (270°)
+            const numSegments = wheelSegments.length;
+            const degPerSegment = 360 / numSegments;
+            const segmentCenterAngle = (randomIndex * degPerSegment) + (degPerSegment / 2);
+            
+            const targetPointerAngle = 270; // Top pointer position
+            const extraSpins = 360 * 5; // 5 full rotations for smooth spinning animation
+            
+            const currentMod = (currentRotation + segmentCenterAngle) % 360;
+            let diff = targetPointerAngle - currentMod;
+            if (diff <= 0) diff += 360;
+            
+            const newRotation = currentRotation + diff + extraSpins;
 
             const now = new Date();
             const dateStr = now.toISOString().slice(0, 10);
