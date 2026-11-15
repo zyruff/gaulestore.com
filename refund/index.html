@@ -18,7 +18,7 @@
         
         /* Header Layout */
         .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #2563EB; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
-        .store-logo { height: 45px; width: auto; object-fit: contain; display: block; cursor: pointer; }
+        .store-logo { height: 45px; width: auto; object-fit: contain; display: block; }
         .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
         
         /* Header Wallet */
@@ -60,8 +60,6 @@
         
         button.primary-btn { background: #2563EB; color: white; border: none; padding: 12px 20px; font-size: 15px; font-weight: 700; border-radius: 8px; cursor: pointer; width: 100%; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
         button.primary-btn:hover { background: #1d4ed8; }
-        button.google-btn { background: #dc2626; color: white; }
-        button.google-btn:hover { background: #b91c1c; }
 
         .msg { margin-top: 15px; padding: 12px; border-radius: 8px; text-align: center; font-weight: 500; font-size: 14px; display: none; }
         .msg.success { background: #e6f4ea; color: #137333; }
@@ -79,8 +77,8 @@
         .wheel-container { display: flex; flex-direction: column; align-items: center; position: relative; margin-top: 10px; }
         canvas { border-radius: 50%; box-shadow: 0 8px 20px rgba(0,0,0,0.12); transition: transform 4s cubic-bezier(0.15, 0.95, 0.15, 1); background: #fff; }
         .pointer { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 26px solid #dc2626; z-index: 10; }
-        .spin-btn-wrapper { margin-top: 20px; width: 180px; }
         .result-box { margin-top: 15px; font-size: 16px; font-weight: bold; color: #2563EB; text-align: center; }
+        .countdown-display { font-size: 13px; color: #dc2626; margin-top: 6px; font-weight: 700; background: #fef2f2; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #fecaca; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 10px 12px; border: 1px solid #e2e8f0; text-align: left; font-size: 13px; }
@@ -102,7 +100,10 @@
 
     <!-- Header -->
     <div class="header">
-        <img src="https://roshantamang2.com.np/image/logo.png" alt="Gaule Store Logo" class="store-logo" id="secretLogoTrigger" title="Click 3 times for Admin Login">
+        <a href="https://roshantamang2.com.np" style="display: flex; align-items: center; text-decoration: none;">
+            <img src="https://roshantamang2.com.np/image/logo.png" alt="Gaule Store Logo" class="store-logo" onerror="this.style.display='none'; document.getElementById('fallback-logo-text').style.display='block';">
+            <span id="fallback-logo-text" style="display: none; font-weight: 700; font-size: 18px; color: #2563EB;">RG DIGITAL STORE</span>
+        </a>
         <div class="header-right">
             <a href="../../my-wallet/" id="header-wallet-btn" class="header-wallet">
                 <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
@@ -131,33 +132,22 @@
                 <div class="pointer"></div>
                 <canvas id="wheelCanvas" width="260" height="260"></canvas>
             </div>
-            <div class="result-box" id="resultBox">Waiting for admin to spin...</div>
+            <div class="result-box" id="resultBox">Waiting for spin announcement...</div>
+            <div style="margin-top: 8px;">
+                <div class="countdown-display" id="countdownDisplay">⏳ Loading 3-Day Countdown...</div>
+            </div>
 
-            <!-- ADMIN CONTROLS -->
+            <!-- ADMIN CONTROLS (Visible ONLY when logged in as ffzyru@gmail.com) -->
             <div id="adminControls" style="display: none; margin-top: 25px; border-top: 1px dashed #cbd5e0; padding-top: 20px; text-align: left;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #e6f4ea; padding: 10px; border-radius: 8px;">
                     <span style="font-size: 12px; color: #137333; font-weight: 600;">👑 Admin Mode Active (ffzyru@gmail.com)</span>
                     <button onclick="adminLogout()" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Logout</button>
                 </div>
 
-                <div class="form-group">
-                    <label for="selectCustomer">Select Participating UID to Spin</label>
-                    <select id="selectCustomer">
-                        <option value="">-- Select UID --</option>
-                    </select>
+                <div style="text-align: center; display: flex; gap: 10px; justify-content: center;">
+                    <button class="primary-btn" onclick="spinWheel()" id="spinBtn" style="width: 170px;">SPIN (RANDOM)</button>
+                    <button class="primary-btn" onclick="resetCountdown()" style="background: #d97706; width: 150px; font-size: 13px;">Reset 3 Days</button>
                 </div>
-
-                <div style="text-align: center;">
-                    <button class="primary-btn" onclick="spinWheel()" id="spinBtn" style="margin: 0 auto; width: 200px;">SPIN WHEEL</button>
-                </div>
-            </div>
-
-            <!-- ADMIN LOGIN BUTTON -->
-            <div id="adminLoginWrapper" style="margin-top: 20px; display: none;">
-                <button class="primary-btn google-btn" onclick="adminGoogleLogin()" style="font-size: 13px; padding: 8px 15px; width: auto; margin: 0 auto;">
-                    <i class="fa-brands fa-google"></i> Admin Login (ffzyru@gmail.com)
-                </button>
-                <div id="adminAuthMsg" class="msg error" style="margin-top: 10px; font-size: 12px;"></div>
             </div>
         </div>
 
@@ -165,7 +155,6 @@
         <div class="card-panel">
             <h3>🎮 Enter Game UID</h3>
             
-            <!-- Logged In User Profile Box (Shows Photo or First Letter Initial) -->
             <div id="user-profile-box">
                 <div class="profile-avatar-container" id="profile-avatar-container">
                     <span id="profile-initial">U</span>
@@ -193,12 +182,13 @@
                 <table>
                     <thead>
                         <tr>
+                            <th>Participant</th>
                             <th>Game UID</th>
-                            <th>Status</th>
+                            <th>Status / Time</th>
                         </tr>
                     </thead>
                     <tbody id="publicTableBody">
-                        <tr><td colspan="2" style="text-align:center; color:#718096;">Loading participants...</td></tr>
+                        <tr><td colspan="3" style="text-align:center; color:#718096;">Loading participants...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -235,21 +225,6 @@
             dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         }
 
-        // Secret Triple-Tap Trigger on Store Logo to show/hide Admin Login button
-        let logoClicks = 0;
-        let logoTimer = null;
-        document.getElementById('secretLogoTrigger').addEventListener('click', function(e) {
-            e.preventDefault();
-            logoClicks++;
-            if (logoClicks === 3) {
-                const loginWrapper = document.getElementById('adminLoginWrapper');
-                loginWrapper.style.display = loginWrapper.style.display === 'none' ? 'block' : 'none';
-                logoClicks = 0;
-            }
-            clearTimeout(logoTimer);
-            logoTimer = setTimeout(() => { logoClicks = 0; }, 1000);
-        });
-
         // --- 1. FIREBASE CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyCFUQu06EvmJCtplZ8dRqVhHnB7I1yQuKw",
@@ -266,14 +241,64 @@
         const provider = new firebase.auth.GoogleAuthProvider();
 
         let currentUser = null;
+        let targetCountdownTime = null;
+        let isWinnerDeclared = false;
 
-        // --- 2. AUTHENTICATION & PROFILE DISPLAY ---
+        // --- SYNCHRONIZED 3-DAY COUNTDOWN TIMER ---
+        db.ref('spin_action/targetTime').on('value', (snapshot) => {
+            const val = snapshot.val();
+            if (val) {
+                targetCountdownTime = val;
+            } else {
+                // Default 3 days from now if not set
+                const defaultTarget = new Date().getTime() + (3 * 24 * 60 * 60 * 1000);
+                db.ref('spin_action/targetTime').set(defaultTarget);
+                targetCountdownTime = defaultTarget;
+            }
+        });
+
+        setInterval(() => {
+            if (!isWinnerDeclared && targetCountdownTime) {
+                const now = new Date().getTime();
+                const distance = targetCountdownTime - now;
+
+                if (distance < 0) {
+                    document.getElementById('countdownDisplay').innerText = "⏳ Announcement Time Reached! Ready to Spin!";
+                } else {
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    document.getElementById('countdownDisplay').innerText = `⏳ Spin in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+                }
+            }
+        }, 1000);
+
+        // Admin function to reset 3-day countdown
+        window.resetCountdown = function() {
+            const user = auth.currentUser;
+            if (!user || user.email !== 'ffzyru@gmail.com') {
+                alert('Unauthorized!');
+                return;
+            }
+            const newTarget = new Date().getTime() + (3 * 24 * 60 * 60 * 1000);
+            db.ref('spin_action').update({
+                targetTime: newTarget,
+                winnerUID: null,
+                winTime: null
+            });
+            alert('3-Day Countdown Reset Successful!');
+        };
+
+        // --- 2. AUTHENTICATION & PROFILE DISPLAY & ADMIN CHECK ---
         auth.onAuthStateChanged((user) => {
             currentUser = user;
             const registerBtn = document.getElementById('registerBtn');
             const loginContainer = document.getElementById('login-container');
             const userProfileBox = document.getElementById('user-profile-box');
             const avatarContainer = document.getElementById('profile-avatar-container');
+            const adminControls = document.getElementById('adminControls');
 
             if (user) {
                 loginContainer.style.display = 'none';
@@ -284,7 +309,6 @@
                 document.getElementById('display-email').innerText = user.email || '';
                 document.getElementById('header-wallet-btn').style.display = 'flex';
 
-                // Display user info in UID form box
                 userProfileBox.style.display = 'flex';
                 document.getElementById('form-user-name').innerText = user.displayName || 'User';
                 document.getElementById('form-user-email').innerText = user.email || '';
@@ -307,8 +331,9 @@
                 });
 
                 if (user.email === 'ffzyru@gmail.com') {
-                    document.getElementById('adminLoginWrapper').style.display = 'none';
-                    document.getElementById('adminControls').style.display = 'block';
+                    adminControls.style.display = 'block';
+                } else {
+                    adminControls.style.display = 'none';
                 }
             } else {
                 loginContainer.style.display = 'block';
@@ -317,6 +342,7 @@
                 document.getElementById('header-wallet-btn').style.display = 'none';
                 document.getElementById('header-user-balance').innerText = '0';
                 userProfileBox.style.display = 'none';
+                adminControls.style.display = 'none';
                 
                 registerBtn.innerText = "Login Now";
                 registerBtn.style.background = "#dc2626";
@@ -324,9 +350,6 @@
                 registerBtn.onclick = function() {
                     window.location.href = "https://roshantamang2.com.np/login";
                 };
-
-                document.getElementById('adminLoginWrapper').style.display = 'none';
-                document.getElementById('adminControls').style.display = 'none';
             }
         });
 
@@ -336,28 +359,8 @@
             });
         };
 
-        window.adminGoogleLogin = function() {
-            auth.signInWithPopup(provider).then((result) => {
-                const user = result.user;
-                if (user.email === 'ffzyru@gmail.com') {
-                    document.getElementById('adminLoginWrapper').style.display = 'none';
-                    document.getElementById('adminControls').style.display = 'block';
-                } else {
-                    auth.signOut();
-                    const authMsg = document.getElementById('adminAuthMsg');
-                    authMsg.innerText = "Access Denied! Keval ffzyru@gmail.com le matrai admin garna milcha.";
-                    authMsg.style.display = 'block';
-                }
-            }).catch((error) => {
-                alert("Login Error: " + error.message);
-            });
-        };
-
         window.adminLogout = function() {
-            auth.signOut().then(() => {
-                document.getElementById('adminLoginWrapper').style.display = 'none';
-                document.getElementById('adminControls').style.display = 'none';
-            });
+            auth.signOut();
         };
 
         // --- 3. SAVE CUSTOMER UID ---
@@ -396,6 +399,7 @@
                             userId: currentUser.uid,
                             userEmail: currentUser.email,
                             userName: currentUser.displayName || 'User',
+                            userPhoto: currentUser.photoURL || '',
                             status: 'Registered'
                         }, (error) => {
                             if(error) {
@@ -417,7 +421,7 @@
             msg.className = type === 'success' ? 'msg success' : 'msg error';
         }
 
-        // --- 4. LOAD & LISTEN UIDS & UPDATE WHEEL & TABLES ---
+        // --- 4. LOAD & LISTEN UIDS & RENDER PARTICIPANTS TABLE ---
         let customerDataMap = {};
         let wheelSegments = ["No UIDs Yet"];
         const colors = ["#2563EB", "#dc2626", "#d97706", "#16a34a", "#9333ea", "#0891b2", "#ea580c", "#0d9488", "#4f46e5"];
@@ -426,32 +430,50 @@
         const ctx = canvas.getContext('2d');
 
         db.ref('spin_customers').on('value', (snapshot) => {
-            const select = document.getElementById('selectCustomer');
             const publicTbody = document.getElementById('publicTableBody');
 
-            select.innerHTML = '<option value="">-- Select UID --</option>';
             publicTbody.innerHTML = '';
             customerDataMap = {};
             
             let fetchedUIDs = [];
+            let customersList = [];
 
             if(snapshot.exists()) {
                 snapshot.forEach((childSnapshot) => {
                     const key = childSnapshot.key;
                     const c = childSnapshot.val();
-                    customerDataMap[c.uid] = key;
+                    c.key = key;
+                    customersList.push(c);
+                });
+
+                customersList.reverse();
+
+                customersList.forEach((c) => {
+                    customerDataMap[c.uid] = c.key;
                     fetchedUIDs.push(c.uid);
 
-                    const opt = document.createElement('option');
-                    opt.value = c.uid;
-                    opt.text = `UID: ${c.uid} - [${c.status}]`;
-                    select.add(opt);
+                    let avatarHTML = '';
+                    if (c.userPhoto) {
+                        avatarHTML = `<img src="${c.userPhoto}" style="width:26px; height:26px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:6px; border:1px solid #cbd5e0;">`;
+                    } else {
+                        const initial = c.userName ? c.userName.charAt(0).toUpperCase() : 'U';
+                        avatarHTML = `<span style="display:inline-block; width:26px; height:26px; border-radius:50%; background:#2563EB; color:#fff; text-align:center; line-height:26px; font-size:12px; font-weight:bold; vertical-align:middle; margin-right:6px;">${initial}</span>`;
+                    }
 
-                    const rowHTML = `<tr><td>${c.uid}</td><td>${c.status}</td></tr>`;
+                    let statusDisplay = c.status;
+                    if (c.winTime) {
+                        statusDisplay += `<br><span style="font-size: 10px; color: #137333;">🕒 ${c.winTime}</span>`;
+                    }
+
+                    const rowHTML = `<tr>
+                        <td>${avatarHTML} <span style="font-weight: 500;">${c.userName || 'User'}</span></td>
+                        <td>${c.uid}</td>
+                        <td>${statusDisplay}</td>
+                    </tr>`;
                     publicTbody.innerHTML += rowHTML;
                 });
             } else {
-                publicTbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#718096;">No participants joined yet.</td></tr>`;
+                publicTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#718096;">No participants joined yet.</td></tr>`;
             }
 
             if(fetchedUIDs.length > 0) {
@@ -501,11 +523,16 @@
         db.ref('spin_action').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
-                currentRotation = data.rotation;
+                currentRotation = data.rotation || 0;
                 canvas.style.transform = `rotate(${currentRotation}deg)`;
                 
                 if(data.winnerUID) {
-                    document.getElementById('resultBox').innerText = `🎉 Winner UID: ${data.winnerUID}!`;
+                    isWinnerDeclared = true;
+                    let winText = `🎉 Winner UID: ${data.winnerUID}!`;
+                    document.getElementById('resultBox').innerText = winText;
+                    if(data.winTime) {
+                        document.getElementById('countdownDisplay').innerText = `🏆 Announced at: ${data.winTime}`;
+                    }
                 }
             }
         });
@@ -519,12 +546,7 @@
                 return;
             }
 
-            const selectedUID = document.getElementById('selectCustomer').value;
-            if(!selectedUID) {
-                alert('Pahile euta UID select garnuhos!');
-                return;
-            }
-            if(wheelSegments.includes("No UIDs Yet")) {
+            if(wheelSegments.includes("No UIDs Yet") || wheelSegments.length === 0) {
                 alert('Wheel ma kunai UID chaina!');
                 return;
             }
@@ -532,12 +554,27 @@
             isSpinning = true;
             document.getElementById('resultBox').innerText = "Spinning...";
 
+            const randomIndex = Math.floor(Math.random() * wheelSegments.length);
+            const selectedUID = wheelSegments[randomIndex];
+
             const randomDegree = Math.floor(Math.random() * 360) + 1800; 
             const newRotation = currentRotation + randomDegree;
 
-            db.ref('spin_action').set({
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0, 10);
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            const timeStr = `${hours}:${minutes}:${seconds} ${ampm}`;
+            const fullDateTime = `${dateStr} ${timeStr}`;
+
+            db.ref('spin_action').update({
                 rotation: newRotation,
-                winnerUID: selectedUID
+                winnerUID: selectedUID,
+                winTime: fullDateTime
             });
 
             setTimeout(() => {
@@ -545,7 +582,8 @@
                 const firebaseKey = customerDataMap[selectedUID];
                 if(firebaseKey) {
                     db.ref('spin_customers/' + firebaseKey).update({
-                        status: 'Winner! 🏆'
+                        status: 'Winner! 🏆',
+                        winTime: fullDateTime
                     });
                 }
             }, 4000);
