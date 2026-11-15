@@ -18,7 +18,7 @@
         
         /* Header Layout */
         .header { display: flex; align-items: center; padding: 20px; background: white; border-bottom: 2px solid #2563EB; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
-        .store-logo { height: 52px; width: auto; object-fit: contain; display: block; }
+        .store-logo { height: 50px; width: auto; object-fit: contain; display: block; }
         .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
         
         /* Header Wallet */
@@ -262,7 +262,7 @@
                     <label for="custUID">Game UID (e.g. Free Fire UID)</label>
                     <input type="text" id="custUID" placeholder="Enter your UID">
                 </div>
-                <button type="submit" class="primary-btn" id="registerBtn">Register for Spin</button>
+                <button type="submit" class="primary-btn" id="registerBtn">Join Now</button>
             </form>
             <div id="custMsg" class="msg"></div>
         </div>
@@ -627,7 +627,7 @@
                 ctx.stroke();
 
                 ctx.beginPath();
-                ctx.arc(radius, radius, 14, 0, 2 * Math.PI);
+                ctx.arc(radius, radius, 4, 0, 2 * Math.PI);
                 ctx.fillStyle = "#ffffff";
                 ctx.fill();
                 ctx.lineWidth = 3;
