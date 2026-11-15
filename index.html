@@ -229,15 +229,37 @@
             .main-wrapper, #review-container, #reviews-container, .leaderboard-wrapper { max-width: 90% !important; }
         }
 
-        /* Actual Desktop / Laptop View */
+        /* Actual Desktop / Laptop View (6 Items Per Row & 1000px Wider Containers) */
         @media screen and (min-width: 1024px) {
-            .services-wrapper { max-width: 850px !important; }
-            .service-container { justify-content: space-between !important; padding: 0 40px !important; }
-            .service-item { width: 130px; }
-            .service-card { width: 130px; height: 130px; border-radius: 26px; }
-            .service-card img { width: 130px; height: 130px; }
-            .service-label { font-size: 12px; margin-top: 8px; }
-            .main-wrapper, #review-container, #reviews-container, .leaderboard-wrapper { max-width: 850px !important; }
+            .services-wrapper { 
+                max-width: 1000px !important; 
+                display: grid !important; 
+                grid-template-columns: repeat(6, 1fr) !important; 
+                gap: 18px !important; 
+            }
+            .service-container { 
+                display: contents !important; 
+            }
+            .service-item { 
+                width: 100% !important; 
+            }
+            .service-card { 
+                width: 100% !important; 
+                aspect-ratio: 1 / 1 !important; 
+                height: auto !important; 
+                border-radius: 24px !important; 
+            }
+            .service-card img { 
+                width: 100% !important; 
+                height: 100% !important; 
+            }
+            .service-label { 
+                font-size: 12px; 
+                margin-top: 8px; 
+            }
+            .main-wrapper, #review-container, #reviews-container, .leaderboard-wrapper { 
+                max-width: 1000px !important; 
+            }
         }
 
         /* Order Table */
@@ -1456,6 +1478,7 @@
 
 
 
+
 <!-- Floating Spin Wheel Button -->
 <a href="https://roshantamang2.com.np/product/spin-wheel" class="spin-wheel-float" title="Spin & Win">
   <div class="spin-badge">GIVEAWAY</div>
@@ -1525,6 +1548,3 @@
     100% { transform: rotate(360deg); }
   }
 </style>
-
-
-
