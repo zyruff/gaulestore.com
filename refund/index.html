@@ -17,8 +17,8 @@
         body { background-color: #ffffff; color: #2d3748; padding-bottom: 80px; }
         
         /* Header Layout */
-        .header { display: flex; align-items: center; padding: 20px; background: white; border-bottom: 2px solid #2563EB; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
-        .store-logo { height: 52px; width: auto; object-fit: contain; display: block; }
+        .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #2563EB; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
+        .store-logo { height: 45px; width: auto; object-fit: contain; display: block; }
         .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
         
         /* Header Wallet */
@@ -359,17 +359,15 @@
 
         let currentUser = null;
         let targetCountdownTime = null;
+        let wheelResetTime = 0;
         let isWinnerDeclared = false;
 
-        // --- SYNCHRONIZED COUNTDOWN TIMER ---
-        db.ref('spin_action/targetTime').on('value', (snapshot) => {
-            const val = snapshot.val();
-            if (val) {
-                targetCountdownTime = val;
-            } else {
-                const defaultTarget = new Date().getTime() + (3 * 24 * 60 * 60 * 1000);
-                db.ref('spin_action/targetTime').set(defaultTarget);
-                targetCountdownTime = defaultTarget;
+        // --- LISTEN TO SPIN ACTION & COUNTDOWN & RESET TIME ---
+        db.ref('spin_action').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                targetCountdownTime = data.targetTime || null;
+                wheelResetTime = data.wheelResetTime || 0;
             }
         });
 
@@ -398,12 +396,15 @@
                 return;
             }
             const newTarget = new Date().getTime() + (3 * 24 * 60 * 60 * 1000);
+            
             db.ref('spin_action').update({
                 targetTime: newTarget,
                 winnerUID: null,
-                winTime: null
+                winTime: null,
+                rotation: 0,
+                wheelResetTime: Date.now()
             });
-            alert('3-Day Countdown Reset Successful!');
+            alert('Reset Successful! Wheel UIDs cleared for new round (Joined Participants retained).');
         };
 
         // --- 2. AUTHENTICATION & PROFILE DISPLAY & ADMIN CHECK ---
@@ -503,14 +504,30 @@
             const customersRef = db.ref('spin_customers');
             
             customersRef.orderByChild('userId').equalTo(currentUser.uid).once('value', userSnapshot => {
-                if (userSnapshot.exists()) {
-                    showMsg('You have already registered one UID! You cannot add another UID.', 'error');
+                let alreadyRegisteredThisRound = false;
+                userSnapshot.forEach(child => {
+                    const val = child.val();
+                    if ((val.timestamp || 0) >= wheelResetTime) {
+                        alreadyRegisteredThisRound = true;
+                    }
+                });
+
+                if (alreadyRegisteredThisRound) {
+                    showMsg('You have already registered for this round!', 'error');
                     return;
                 }
 
                 customersRef.orderByChild('uid').equalTo(uid).once('value', uidSnapshot => {
-                    if(uidSnapshot.exists()) {
-                        showMsg('This Game UID is already registered!', 'error');
+                    let uidTakenThisRound = false;
+                    uidSnapshot.forEach(child => {
+                        const val = child.val();
+                        if ((val.timestamp || 0) >= wheelResetTime) {
+                            uidTakenThisRound = true;
+                        }
+                    });
+
+                    if(uidTakenThisRound) {
+                        showMsg('This Game UID is already registered for this round!', 'error');
                     } else {
                         const newRef = customersRef.push();
                         newRef.set({
@@ -520,7 +537,8 @@
                             userEmail: currentUser.email,
                             userName: currentUser.displayName || 'User',
                             userPhoto: currentUser.photoURL || '',
-                            status: 'Registered'
+                            status: 'Registered',
+                            timestamp: firebase.database.ServerValue.TIMESTAMP
                         }, (error) => {
                             if(error) {
                                 showMsg('Error saving. Try again.', 'error');
@@ -541,7 +559,7 @@
             msg.className = type === 'success' ? 'msg success' : 'msg error';
         }
 
-        // --- 4. LOAD & LISTEN UIDS & RENDER PARTICIPANTS TABLE (Deterministic Sorting) ---
+        // --- 4. LOAD & LISTEN UIDS & RENDER PARTICIPANTS TABLE ---
         let customerDataMap = {};
         let wheelSegments = ["No UIDs Yet"];
         const colors = ["#2563EB", "#dc2626", "#d97706", "#16a34a", "#9333ea", "#0891b2", "#ea580c", "#0d9488", "#4f46e5"];
@@ -566,13 +584,10 @@
                     customersList.push(c);
                 });
 
-                // Deterministic sorting so wheel segments order never changes across reloads/devices
                 customersList.sort((a, b) => a.uid.localeCompare(b.uid, undefined, {numeric: true}));
 
                 customersList.forEach((c) => {
-                    customerDataMap[c.uid] = c.key;
-                    fetchedUIDs.push(c.uid);
-
+                    // Populate Table with ALL historical participants
                     let avatarHTML = '';
                     if (c.userPhoto) {
                         avatarHTML = `<img src="${c.userPhoto}" style="width:26px; height:26px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:6px; border:1px solid #cbd5e0;">`;
@@ -592,6 +607,12 @@
                         <td>${statusDisplay}</td>
                     </tr>`;
                     publicTbody.innerHTML += rowHTML;
+
+                    // Push to wheel ONLY if the UID was registered after the current wheelResetTime
+                    if ((c.timestamp || 0) >= wheelResetTime) {
+                        customerDataMap[c.uid] = c.key;
+                        fetchedUIDs.push(c.uid);
+                    }
                 });
             } else {
                 publicTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#718096;">No participants joined yet.</td></tr>`;
@@ -647,6 +668,9 @@
                 currentRotation = data.rotation || 0;
                 canvas.style.transform = `rotate(${currentRotation}deg)`;
                 
+                const registerBtn = document.getElementById('registerBtn');
+                const custUIDInput = document.getElementById('custUID');
+
                 if(data.winnerUID) {
                     isWinnerDeclared = true;
                     let winText = `🎉 Winner UID: ${data.winnerUID}!`;
@@ -655,9 +679,6 @@
                         document.getElementById('countdownDisplay').innerText = `🏆 Announced at: ${data.winTime}`;
                     }
 
-                    // Lock registration form
-                    const registerBtn = document.getElementById('registerBtn');
-                    const custUIDInput = document.getElementById('custUID');
                     if (registerBtn) {
                         registerBtn.disabled = true;
                         registerBtn.innerText = "🔒 Registration Closed (Winner Announced)";
@@ -669,11 +690,25 @@
                         custUIDInput.placeholder = "Registration is closed";
                         custUIDInput.style.background = "#e2e8f0";
                     }
+                } else {
+                    isWinnerDeclared = false;
+                    document.getElementById('resultBox').innerText = "Waiting for spin announcement...";
+                    if (registerBtn) {
+                        registerBtn.disabled = false;
+                        registerBtn.innerText = "Register for Spin";
+                        registerBtn.style.background = "#2563EB";
+                        registerBtn.style.cursor = "pointer";
+                    }
+                    if (custUIDInput) {
+                        custUIDInput.disabled = false;
+                        custUIDInput.placeholder = "Enter your UID";
+                        custUIDInput.style.background = "#f7fafc";
+                    }
                 }
             }
         });
 
-        // --- 6. PRECISE SPIN LOGIC (Lands exactly on winner under pointer) ---
+        // --- 6. PRECISE SPIN LOGIC ---
         let isSpinning = false;
         function spinWheel() {
             const user = auth.currentUser;
@@ -690,22 +725,21 @@
             isSpinning = true;
             document.getElementById('resultBox').innerText = "Spinning...";
 
-            // 1. Pick a random winner index
             const randomIndex = Math.floor(Math.random() * wheelSegments.length);
             const selectedUID = wheelSegments[randomIndex];
 
-            // 2. Calculate exact rotation so this segment lands precisely under the top pointer (270°)
             const numSegments = wheelSegments.length;
             const degPerSegment = 360 / numSegments;
             const segmentCenterAngle = (randomIndex * degPerSegment) + (degPerSegment / 2);
             
-            const targetPointerAngle = 270; // Top pointer position
-            const extraSpins = 360 * 5; // 5 full rotations for smooth spinning animation
+            const targetMod = (270 - segmentCenterAngle) % 360;
+            const normalizedTarget = targetMod < 0 ? targetMod + 360 : targetMod;
             
-            const currentMod = (currentRotation + segmentCenterAngle) % 360;
-            let diff = targetPointerAngle - currentMod;
+            const currentMod = currentRotation % 360;
+            let diff = normalizedTarget - currentMod;
             if (diff <= 0) diff += 360;
             
+            const extraSpins = 360 * 6;
             const newRotation = currentRotation + diff + extraSpins;
 
             const now = new Date();
@@ -725,7 +759,6 @@
                 winTime: fullDateTime
             });
 
-            // 10-second timeout matching CSS transition
             setTimeout(() => {
                 isSpinning = false;
                 const firebaseKey = customerDataMap[selectedUID];
@@ -736,7 +769,6 @@
                     });
                 }
                 
-                // Trigger Premium Congratulations Popup after spin completes
                 showCongratsPopup(selectedUID);
 
             }, 10000);
