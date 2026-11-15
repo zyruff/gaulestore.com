@@ -17,8 +17,8 @@
         body { background-color: #ffffff; color: #2d3748; padding-bottom: 80px; }
         
         /* Header Layout */
-        .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #2563EB; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
-        .store-logo { height: 45px; width: auto; object-fit: contain; display: block; }
+        .header { display: flex; align-items: center; padding: 20px; background: white; border-bottom: 2px solid #2563EB; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
+        .store-logo { height: 52px; width: auto; object-fit: contain; display: block; }
         .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
         
         /* Header Wallet */
@@ -73,9 +73,9 @@
         .profile-user-name { font-weight: 600; font-size: 14px; color: #1a202c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .profile-user-email { font-size: 12px; color: #718096; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Spin Wheel Styles */
+        /* Spin Wheel Styles (10s duration) */
         .wheel-container { display: flex; flex-direction: column; align-items: center; position: relative; margin-top: 10px; }
-        canvas { border-radius: 50%; box-shadow: 0 8px 20px rgba(0,0,0,0.12); transition: transform 4s cubic-bezier(0.15, 0.95, 0.15, 1); background: #fff; }
+        canvas { border-radius: 50%; box-shadow: 0 8px 20px rgba(0,0,0,0.12); transition: transform 10s cubic-bezier(0.15, 0.95, 0.15, 1); background: #fff; }
         .pointer { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 26px solid #dc2626; z-index: 10; }
         .result-box { margin-top: 15px; font-size: 16px; font-weight: bold; color: #2563EB; text-align: center; }
         .countdown-display { font-size: 13px; color: #dc2626; margin-top: 6px; font-weight: 700; background: #fef2f2; padding: 6px 12px; border-radius: 6px; display: inline-block; border: 1px solid #fecaca; }
@@ -83,6 +83,103 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 10px 12px; border: 1px solid #e2e8f0; text-align: left; font-size: 13px; }
         th { background: #f8fafc; color: #4a5568; font-weight: 700; }
+
+        /* Premium Congratulations Modal Styles */
+        .congrats-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .congrats-modal-content {
+            background: #ffffff;
+            width: 90%;
+            max-width: 380px;
+            border-radius: 24px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+            transform: scale(0.8);
+            animation: scaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .congrats-icon-box {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border: 2px solid #93c5fd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 15px auto;
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.15);
+        }
+
+        .congrats-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .congrats-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .winner-uid-badge {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e0;
+            color: #2563EB;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .congrats-btn {
+            background: linear-gradient(135deg, #2563EB 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transition: 0.2s;
+        }
+
+        .congrats-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleUp {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
 
         /* Bottom Navigation Bar */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #ffffff; display: flex; justify-content: space-around; align-items: center; height: 60px; border-top: 1px solid #eaeaea; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); }
@@ -134,16 +231,11 @@
             </div>
             <div class="result-box" id="resultBox">Waiting for spin announcement...</div>
             <div style="margin-top: 8px;">
-                <div class="countdown-display" id="countdownDisplay">⏳ Loading 3-Day Countdown...</div>
+                <div class="countdown-display" id="countdownDisplay">⏳ Loading Countdown...</div>
             </div>
 
             <!-- ADMIN CONTROLS (Visible ONLY when logged in as ffzyru@gmail.com) -->
-            <div id="adminControls" style="display: none; margin-top: 25px; border-top: 1px dashed #cbd5e0; padding-top: 20px; text-align: left;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #e6f4ea; padding: 10px; border-radius: 8px;">
-                    <span style="font-size: 12px; color: #137333; font-weight: 600;">👑 Admin Mode Active (ffzyru@gmail.com)</span>
-                    <button onclick="adminLogout()" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Logout</button>
-                </div>
-
+            <div id="adminControls" style="display: none; margin-top: 20px; border-top: 1px dashed #cbd5e0; padding-top: 15px; text-align: left;">
                 <div style="text-align: center; display: flex; gap: 10px; justify-content: center;">
                     <button class="primary-btn" onclick="spinWheel()" id="spinBtn" style="width: 170px;">SPIN (RANDOM)</button>
                     <button class="primary-btn" onclick="resetCountdown()" style="background: #d97706; width: 150px; font-size: 13px;">Reset 3 Days</button>
@@ -195,6 +287,21 @@
         </div>
     </main>
 
+    <!-- Premium Congratulations Popup Modal -->
+    <div id="congratsModal" class="congrats-modal-overlay">
+        <div class="congrats-modal-content">
+            <div class="congrats-icon-box">
+                <span>🎉</span>
+            </div>
+            <h2 class="congrats-title">Congratulations!</h2>
+            <p class="congrats-subtitle" id="congratsMessage">You have won the Lucky Spin reward!</p>
+            
+            <div class="winner-uid-badge" id="modalWinnerUID">UID: ---</div>
+
+            <button class="congrats-btn" onclick="closeCongratsModal()">Awesome, Claim!</button>
+        </div>
+    </div>
+
     <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
         <a href="https://roshantamang2.com.np" class="nav-item">
@@ -225,6 +332,16 @@
             dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         }
 
+        // --- POPUP FUNCTIONS ---
+        function showCongratsPopup(winnerUID) {
+            document.getElementById('modalWinnerUID').innerText = `Winner UID: ${winnerUID}`;
+            document.getElementById('congratsModal').style.display = 'flex';
+        }
+
+        function closeCongratsModal() {
+            document.getElementById('congratsModal').style.display = 'none';
+        }
+
         // --- 1. FIREBASE CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyCFUQu06EvmJCtplZ8dRqVhHnB7I1yQuKw",
@@ -244,13 +361,12 @@
         let targetCountdownTime = null;
         let isWinnerDeclared = false;
 
-        // --- SYNCHRONIZED 3-DAY COUNTDOWN TIMER ---
+        // --- SYNCHRONIZED COUNTDOWN TIMER ---
         db.ref('spin_action/targetTime').on('value', (snapshot) => {
             const val = snapshot.val();
             if (val) {
                 targetCountdownTime = val;
             } else {
-                // Default 3 days from now if not set
                 const defaultTarget = new Date().getTime() + (3 * 24 * 60 * 60 * 1000);
                 db.ref('spin_action/targetTime').set(defaultTarget);
                 targetCountdownTime = defaultTarget;
@@ -275,7 +391,6 @@
             }
         }, 1000);
 
-        // Admin function to reset 3-day countdown
         window.resetCountdown = function() {
             const user = auth.currentUser;
             if (!user || user.email !== 'ffzyru@gmail.com') {
@@ -359,10 +474,6 @@
             });
         };
 
-        window.adminLogout = function() {
-            auth.signOut();
-        };
-
         // --- 3. SAVE CUSTOMER UID ---
         function saveCustomerUID(e) {
             e.preventDefault();
@@ -376,7 +487,7 @@
             const uid = uidInput.value.trim();
 
             if (!uid) {
-                showMsg('Pahile afno Game UID halnu hos!', 'error');
+                showMsg('Please enter your Game UID first!', 'error');
                 return;
             }
 
@@ -384,13 +495,13 @@
             
             customersRef.orderByChild('userId').equalTo(currentUser.uid).once('value', userSnapshot => {
                 if (userSnapshot.exists()) {
-                    showMsg('Tapai le pahile nai euta UID register garisaknu bhayo! Arko UID rakhna mildaina.', 'error');
+                    showMsg('You have already registered one UID! You cannot add another UID.', 'error');
                     return;
                 }
 
                 customersRef.orderByChild('uid').equalTo(uid).once('value', uidSnapshot => {
                     if(uidSnapshot.exists()) {
-                        showMsg('Yo Game UID pahile nai register bhaisakeko cha!', 'error');
+                        showMsg('This Game UID is already registered!', 'error');
                     } else {
                         const newRef = customersRef.push();
                         newRef.set({
@@ -405,7 +516,7 @@
                             if(error) {
                                 showMsg('Error saving. Try again.', 'error');
                             } else {
-                                showMsg('UID safalpurvak save bhayo!', 'success');
+                                showMsg('UID saved successfully!', 'success');
                                 document.getElementById('uidForm').reset();
                             }
                         });
@@ -537,17 +648,17 @@
             }
         });
 
-        // --- 6. SPIN LOGIC ---
+        // --- 6. SPIN LOGIC (10s duration + Popup trigger) ---
         let isSpinning = false;
         function spinWheel() {
             const user = auth.currentUser;
             if (!user || user.email !== 'ffzyru@gmail.com') {
-                alert('Unauthorized! Keval ffzyru@gmail.com le matrai spin garna milcha.');
+                alert('Unauthorized! Only ffzyru@gmail.com can spin the wheel.');
                 return;
             }
 
             if(wheelSegments.includes("No UIDs Yet") || wheelSegments.length === 0) {
-                alert('Wheel ma kunai UID chaina!');
+                alert('There are no UIDs on the wheel!');
                 return;
             }
             if(isSpinning) return;
@@ -577,6 +688,7 @@
                 winTime: fullDateTime
             });
 
+            // 10-second timeout matching CSS transition
             setTimeout(() => {
                 isSpinning = false;
                 const firebaseKey = customerDataMap[selectedUID];
@@ -586,7 +698,11 @@
                         winTime: fullDateTime
                     });
                 }
-            }, 4000);
+                
+                // Trigger Premium Congratulations Popup after spin completes
+                showCongratsPopup(selectedUID);
+
+            }, 10000);
         }
     </script>
 </body>
