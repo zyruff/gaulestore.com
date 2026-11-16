@@ -14,6 +14,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
         body { background-color: #ffffff; color: #2d3748; padding-bottom: 130px; }
@@ -122,7 +127,7 @@
         /* Modals */
         .success-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 300; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out; }
         .success-modal.show { opacity: 1; pointer-events: auto; }
-        .success-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(30px); transition: all 0.3s ease-in-out; position: relative; }
+        .success-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(30px); transition: all 0.3s ease-in-out; position: relative; max-height: 90vh; overflow-y: auto; }
         .success-modal.show .success-card { transform: translateY(0); }
         
         .checkout-card { max-width: 400px; text-align: left; padding: 24px; }
@@ -134,15 +139,21 @@
         .wallet-box-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #dc2626; letter-spacing: 0.5px; }
         .wallet-box-amount { font-size: 22px; font-weight: 800; color: #dc2626; margin-top: 2px; }
 
-        .payment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
-        .payment-card { background-color: #fafbfc; border: 1px solid #cbd5e0; border-radius: 10px; padding: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; }
+        .payment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+        .payment-card { background-color: #fafbfc; border: 1px solid #cbd5e0; border-radius: 10px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; transition: all 0.2s; }
         .payment-card.selected { border: 2px solid #ffb300; background-color: #fffdf5; }
-        .payment-info { display: flex; flex-direction: column; }
+        .payment-info { display: flex; flex-direction: column; margin-top: 4px; }
         .payment-name { font-size: 12px; font-weight: 700; color: #2d3748; }
         .payment-sub { font-size: 10px; font-weight: 500; color: #4a5568; }
-        .esewa-logo { width: 24px; height: 24px; object-fit: contain; border-radius: 50%; flex-shrink: 0; }
+        .esewa-logo { width: 22px; height: 22px; object-fit: contain; border-radius: 50%; }
 
-        .checkout-details-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; font-size: 13px; margin-bottom: 20px; }
+        .modal-qr-box { background: #ffffff; border: 1px dashed #f97316; border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 16px; }
+        .qr-image { width: 130px; height: 130px; border-radius: 6px; border: 1px solid #e2e8f0; padding: 4px; margin: 8px auto; object-fit: contain; display: block; }
+        .qr-acc-no { font-size: 13px; font-weight: 800; color: #ea580c; background: #fff7ed; padding: 2px 8px; border-radius: 6px; display: inline-block; margin-top: 2px; }
+
+        .wallet-box { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 16px; }
+
+        .checkout-details-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; font-size: 13px; margin-bottom: 16px; }
         .checkout-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
         .checkout-row span:first-child { color: #718096; }
         .checkout-row span:last-child { color: #1a202c; font-weight: 600; }
@@ -363,26 +374,61 @@
         <span class="checkout-close" onclick="closeCheckoutModal()">&times;</span>
         <div class="checkout-title">Confirm Checkout</div>
         <div class="checkout-subtitle">Pay securely using your preferred payment method</div>
-        
-        <div class="wallet-box-banner">
-            <div class="wallet-box-label">Available Wallet Balance</div>
-            <div class="wallet-box-amount">Rs <span id="modal-user-balance">0</span></div>
-        </div>
 
+        <!-- Payment Methods Grid -->
         <div class="payment-grid">
-            <div class="payment-card selected" id="pay-method-wallet" onclick="selectPaymentMethod('wallet')">
+            <div class="payment-card selected" id="pay-method-wallet" onclick="selectPaymentMethod('Wallet', 'wallet', '')">
                 <i class="fa-solid fa-wallet" style="font-size: 20px; color: #ffb300;"></i>
                 <div class="payment-info">
-                    <div class="payment-name">Wallet Balance</div>
+                    <div class="payment-name">Wallet</div>
                     <div class="payment-sub">Instant Pay</div>
                 </div>
             </div>
-            <div class="payment-card" id="pay-method-esewa" onclick="selectPaymentMethod('esewa')">
+            
+            <div class="payment-card" id="pay-method-esewa" onclick="selectPaymentMethod('eSewa', '9761081110', 'esewa.png')">
                 <img src="https://esewa.com.np/common/images/esewa_logo.png" alt="eSewa" class="esewa-logo">
                 <div class="payment-info">
                     <div class="payment-name" style="color: #60bb46;">eSewa</div>
-                    <div class="payment-sub">Online Payment</div>
+                    <div class="payment-sub">QR Scan</div>
                 </div>
+            </div>
+
+            <div class="payment-card" id="pay-method-khalti" onclick="selectPaymentMethod('Khalti', '9761081110', 'khalti.png')">
+                <i class="fa-solid fa-bolt" style="font-size: 18px; color: #5C2D91;"></i>
+                <div class="payment-info">
+                    <div class="payment-name" style="color: #5C2D91;">Khalti</div>
+                    <div class="payment-sub">QR Scan</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Wallet Box -->
+        <div id="walletPayContainer" class="wallet-box">
+            <div class="wallet-box-label">Available Wallet Balance</div>
+            <div class="wallet-box-amount">Rs <span id="modal-user-balance">0</span></div>
+            <div style="font-size: 11px; color: #64748b; margin-top: 4px;">Amount will be automatically deducted from your store wallet.</div>
+        </div>
+
+        <!-- Dynamic QR Box -->
+        <div id="qrPayContainer" class="modal-qr-box" style="display: none;">
+            <div style="font-size: 13px; font-weight: 700; color: #0f172a;" id="qrTitle">Scan QR Code</div>
+            <img id="modalQrImage" class="qr-image" src="" alt="Payment QR Code">
+            <div style="font-size: 12px; color: #64748b;">
+                Pay Amount: <strong id="qrPayAmount" style="color: #ea580c;">Rs 0</strong><br>
+                Account Number / ID:<br>
+                <span class="qr-acc-no" id="modalAccNo">9761081110</span><br>
+                Name: <strong>Roshan Tamang</strong>
+            </div>
+        </div>
+
+        <!-- Transaction ID Input Field -->
+        <div class="form-group" id="txGroup" style="margin-bottom: 14px; display: none;">
+            <label class="form-label" style="font-size: 12px; font-weight: 600; color: #0f172a; margin-bottom: 4px; display: block;">
+                Transaction / Reference ID <span style="color: #ea580c;">*</span>
+            </label>
+            <input type="text" id="txIdInput" class="uid-input" style="width: 100%; padding: 11px 14px;" placeholder="Enter Transaction ID (e.g. 05829104)" />
+            <div id="txError" class="error-message" style="display: none; margin-top: 4px;">
+                <i class="fa-solid fa-circle-exclamation"></i> <span>Please enter the Transaction ID.</span>
             </div>
         </div>
 
@@ -402,7 +448,7 @@
         </div>
 
         <button id="confirm-pay-btn" class="action-btn" style="border-radius: 8px; width: 100%;">
-            Pay from Balance
+            Confirm Payment
         </button>
     </div>
 </div>
@@ -433,6 +479,10 @@
                 <span>Payment:</span>
                 <span id="receipt-payment" style="color: #3182ce; font-weight: 600;">-</span>
             </div>
+            <div class="receipt-row" id="receiptTxRow" style="display: none;">
+                <span>TxID:</span>
+                <span id="receipt-txid" style="color: #3182ce; font-weight: 600;">-</span>
+            </div>
             <div class="receipt-row">
                 <span>Status:</span>
                 <span id="receipt-status" style="color: #f6ad55; font-weight: 700;">Pending</span>
@@ -450,7 +500,7 @@
             <i class="fa-solid fa-wallet" style="color: #dc2626; font-size: 28px;"></i>
         </div>
         <div class="success-title">Insufficient Balance</div>
-        <p class="success-msg">Your wallet balance is insufficient! You can select eSewa or top up your account balance before proceeding.</p>
+        <p class="success-msg">Your wallet balance is insufficient! You can select eSewa or Khalti QR to pay directly.</p>
         <button class="success-close-btn" style="background-color: #dc2626;" onclick="closeInsufficientModal()">Got It</button>
     </div>
 </div>
@@ -521,11 +571,7 @@
 </script>
 
 <!-- Firebase Script & Logic -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, push, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
+<script>
     const firebaseConfig = {
       apiKey: "AIzaSyCFUQu06EvmJCtplZ8dRqVhHnB7I1yQuKw",
       authDomain: "rg-digital-store.firebaseapp.com",
@@ -537,15 +583,18 @@
       measurementId: "G-S09Q860R4V"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.database();
 
     let currentUser = null;
     let selectedItemName = "";
-    let selectedItemPrice = "";
-    let selectedPaymentMethod = "wallet"; // 'wallet' or 'esewa'
-    let balanceListener = null;
+    let selectedItemPrice = 0;
+    let selectedPaymentMethod = "Wallet";
+    let selectedPaymentAccount = "wallet";
+    let selectedQrImage = "";
     let currentWalletBalance = 0;
 
     const mainActionBtn = document.getElementById('main-action-btn');
@@ -555,7 +604,7 @@
     const packError = document.getElementById('pack-error');
     const diamondsWrapper = document.getElementById('diamonds-wrapper');
 
-    onAuthStateChanged(auth, (user) => {
+    auth.onAuthStateChanged((user) => {
         if (user) {
             currentUser = user;
             mainActionBtn.innerHTML = `<i class="fa-solid fa-bag-shopping"></i> Buy Now`;
@@ -569,8 +618,7 @@
             document.getElementById('display-email').innerText = user.email || '';
             document.getElementById('header-wallet-btn').style.display = 'flex';
 
-            const userBalanceRef = ref(db, `users/${user.uid}/balance`);
-            balanceListener = onValue(userBalanceRef, (snapshot) => {
+            db.ref(`users/${user.uid}/balance`).on('value', (snapshot) => {
                 const balance = snapshot.val();
                 currentWalletBalance = balance !== null ? Number(balance) : 0;
                 document.getElementById('header-user-balance').innerText = currentWalletBalance;
@@ -597,23 +645,46 @@
         });
     };
 
-    window.selectPaymentMethod = function(method) {
+    window.selectPaymentMethod = function(method, account, qrUrl) {
         selectedPaymentMethod = method;
-        const walletCard = document.getElementById('pay-method-wallet');
-        const esewaCard = document.getElementById('pay-method-esewa');
+        selectedPaymentAccount = account;
+        selectedQrImage = qrUrl;
 
-        if (method === 'wallet') {
-            walletCard.classList.add('selected');
-            esewaCard.classList.remove('selected');
-            confirmPayBtn.innerText = "Pay from Balance";
+        document.getElementById('pay-method-wallet').classList.remove('selected');
+        document.getElementById('pay-method-esewa').classList.remove('selected');
+        document.getElementById('pay-method-khalti').classList.remove('selected');
+
+        if (account === 'wallet') {
+            document.getElementById('pay-method-wallet').classList.add('selected');
+        } else if (method === 'eSewa') {
+            document.getElementById('pay-method-esewa').classList.add('selected');
+        } else if (method === 'Khalti') {
+            document.getElementById('pay-method-khalti').classList.add('selected');
+        }
+
+        const walletBox = document.getElementById('walletPayContainer');
+        const qrBox = document.getElementById('qrPayContainer');
+        const txGroup = document.getElementById('txGroup');
+
+        if (account === 'wallet') {
+            walletBox.style.display = 'block';
+            qrBox.style.display = 'none';
+            txGroup.style.display = 'none';
+            confirmPayBtn.innerText = "Confirm Payment";
         } else {
-            esewaCard.classList.add('selected');
-            walletCard.classList.remove('selected');
-            confirmPayBtn.innerText = "Pay with eSewa";
+            walletBox.style.display = 'none';
+            qrBox.style.display = 'block';
+            txGroup.style.display = 'block';
+
+            document.getElementById('qrTitle').innerText = `Scan ${method} QR Code`;
+            document.getElementById('modalAccNo').innerText = account;
+            document.getElementById('qrPayAmount').innerText = 'Rs ' + selectedItemPrice;
+            document.getElementById('modalQrImage').src = qrUrl;
+            confirmPayBtn.innerText = "Confirm Payment";
         }
     };
 
-    mainActionBtn.onclick = function(e) {
+    mainActionBtn.onclick = function() {
         if (!currentUser) {
             window.location.href = "https://roshantamang2.com.np/login";
             return;
@@ -643,18 +714,30 @@
         document.getElementById('modal-checkout-item').innerText = selectedItemName;
         document.getElementById('modal-checkout-total').innerText = 'Rs ' + selectedItemPrice;
         
-        selectPaymentMethod('wallet');
+        selectPaymentMethod('Wallet', 'wallet', '');
         document.getElementById('checkoutModal').classList.add('show');
     };
 
     confirmPayBtn.onclick = async function() {
         let uidValue = gameUidInput.value.trim();
         const itemPriceNum = parseFloat(selectedItemPrice);
+        let txId = "";
 
-        if (selectedPaymentMethod === 'wallet' && currentWalletBalance < itemPriceNum) {
-            closeCheckoutModal();
-            document.getElementById('insufficientModal').classList.add('show');
-            return;
+        if (selectedPaymentAccount === 'wallet') {
+            if (currentWalletBalance < itemPriceNum) {
+                closeCheckoutModal();
+                document.getElementById('insufficientModal').classList.add('show');
+                return;
+            }
+            txId = "Wallet Paid";
+        } else {
+            txId = document.getElementById('txIdInput').value.trim();
+            const txError = document.getElementById('txError');
+            if (!txId) {
+                txError.style.display = 'block';
+                return;
+            }
+            txError.style.display = 'none';
         }
 
         confirmPayBtn.disabled = true;
@@ -664,17 +747,17 @@
             const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
             const userOrderId = 'RG-GLORY-' + randomString + Date.now().toString().slice(-4);
             
-            if (selectedPaymentMethod === 'wallet') {
+            if (selectedPaymentAccount === 'wallet') {
                 const newBalance = currentWalletBalance - itemPriceNum;
-                await update(ref(db, `users/${currentUser.uid}`), {
+                await db.ref(`users/${currentUser.uid}`).update({
                     balance: newBalance
                 });
             }
 
             const now = new Date();
-            const orderRef = push(ref(db, 'orders'));
+            const orderRef = db.ref('orders').push();
 
-            await set(orderRef, {
+            await orderRef.set({
                 date: now.toLocaleDateString(),
                 time: now.toLocaleTimeString(),
                 timestamp: Date.now(),
@@ -685,7 +768,8 @@
                 amountDue: selectedItemPrice,
                 uid: uidValue,
                 clientOrderId: userOrderId,
-                paymentMethod: selectedPaymentMethod === 'wallet' ? 'Wallet Balance' : 'eSewa',
+                paymentMethod: selectedPaymentAccount === 'wallet' ? 'Wallet Balance' : selectedPaymentMethod,
+                transactionId: txId,
                 status: "Pending"
             });
 
@@ -693,15 +777,24 @@
             document.getElementById('receipt-uid').innerText = uidValue;
             document.getElementById('receipt-item').innerText = selectedItemName;
             document.getElementById('receipt-orderid').innerText = userOrderId;
-            document.getElementById('receipt-payment').innerText = selectedPaymentMethod === 'wallet' ? 'Wallet Balance' : 'eSewa (Pending Verification)';
+            document.getElementById('receipt-payment').innerText = selectedPaymentAccount === 'wallet' ? 'Wallet Balance' : selectedPaymentMethod;
+            
+            if (selectedPaymentAccount !== 'wallet') {
+                document.getElementById('receiptTxRow').style.display = 'flex';
+                document.getElementById('receipt-txid').innerText = txId;
+            } else {
+                document.getElementById('receiptTxRow').style.display = 'none';
+            }
+
             document.getElementById('receipt-status').innerText = "Pending";
             document.getElementById('successModal').classList.add('show');
+            document.getElementById('txIdInput').value = '';
 
         } catch (err) {
             alert("Error: " + err.message);
         } finally {
             confirmPayBtn.disabled = false;
-            confirmPayBtn.innerHTML = selectedPaymentMethod === 'wallet' ? 'Pay from Balance' : 'Pay with eSewa';
+            confirmPayBtn.innerHTML = `Confirm Payment`;
         }
     };
 
