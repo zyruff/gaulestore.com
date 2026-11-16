@@ -116,7 +116,7 @@
         .row-detail .val-white { color: #1a202c; font-weight: 500; }
         .total-row { margin-top: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
         .total-price { font-size: 20px; font-weight: 700; color: #ffb300; }
-        .action-btn { display: flex; justify-content: center; align-items: center; gap: 8px; border: none; cursor: pointer; font-weight: 700; color: #ffffff; background-color: #ffb300; transition: background 0.2s; width: 100%; height: 48px; font-size: 15px; border-radius: 25px; margin: 0 auto; }
+        .action-btn { display: flex; justify-content: center; align-items: center; gap: 8px; border: none; cursor: pointer; font-weight: 700; color: #ffffff; background-color: #ffb300; transition: background 0.2s; width: 100%; height: 48px; font-size: 15px; border-radius: 25px; margin: 0 auto; text-decoration: none; }
         .action-btn.login-needed { background-color: #dc2626; }
         
         /* Modals */
@@ -135,11 +135,10 @@
         .wallet-box-amount { font-size: 22px; font-weight: 800; color: #dc2626; margin-top: 2px; }
 
         .payment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
-        .payment-card { background-color: #fafbfc; border: 1px solid #cbd5e0; border-radius: 10px; padding: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .payment-card { background-color: #fafbfc; border: 1px solid #cbd5e0; border-radius: 10px; padding: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; }
         .payment-card.selected { border: 2px solid #ffb300; background-color: #fffdf5; }
-        .payment-card.disabled { opacity: 0.55; background-color: #edf2f7; cursor: not-allowed; border: 1px dashed #a0aec0; }
         .payment-info { display: flex; flex-direction: column; }
-        .payment-name { font-size: 12px; font-weight: 700; color: #ffb300; }
+        .payment-name { font-size: 12px; font-weight: 700; color: #2d3748; }
         .payment-sub { font-size: 10px; font-weight: 500; color: #4a5568; }
         .esewa-logo { width: 24px; height: 24px; object-fit: contain; border-radius: 50%; flex-shrink: 0; }
 
@@ -206,9 +205,11 @@
             <span>Rs. <span id="header-user-balance">0</span></span>
         </a>
 
-        <div id="login-container" onclick="googleLogin()">
+        <!-- Upper Login Icon Link -->
+        <a href="https://roshantamang2.com.np/login" id="login-container">
             <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-        </div>
+        </a>
+        
         <img id="profile-pic" onclick="toggleProfile()">
         <div id="profile-dropdown">
             <div id="display-name" class="user-name"></div>
@@ -312,9 +313,9 @@
                 <span class="total-price" id="summary-total">Rs 0.00</span>
             </div>
             
-            <button id="main-action-btn" class="action-btn">
+            <a id="main-action-btn" class="action-btn" href="javascript:void(0);">
                 <i class="fa-solid fa-bag-shopping"></i> Buy Now
-            </button>
+            </a>
         </div>
     </div>
 </div>
@@ -328,7 +329,7 @@
         <ul style="padding-left: 18px; margin: 0;">
             <li><strong>Correct Guild ID:</strong> Please input the correct Guild ID (UID). Refunds or exchanges will not be provided for wrong IDs.</li>
             <li><strong>Delivery Time:</strong> Glory will be added to your guild within 1 to 5 minutes after order confirmation.</li>
-            <li><strong>Secure Payment:</strong> You can safely and quickly purchase items using your wallet balance.</li>
+            <li><strong>Secure Payment:</strong> You can safely and quickly purchase items using your wallet balance or eSewa.</li>
             <li><strong>Support:</strong> If you face any issues with your order or payment, please contact us via WhatsApp or Messenger below.</li>
         </ul>
     </div>
@@ -361,7 +362,7 @@
     <div class="success-card checkout-card">
         <span class="checkout-close" onclick="closeCheckoutModal()">&times;</span>
         <div class="checkout-title">Confirm Checkout</div>
-        <div class="checkout-subtitle">Pay securely using your account balance</div>
+        <div class="checkout-subtitle">Pay securely using your preferred payment method</div>
         
         <div class="wallet-box-banner">
             <div class="wallet-box-label">Available Wallet Balance</div>
@@ -369,18 +370,18 @@
         </div>
 
         <div class="payment-grid">
-            <div class="payment-card selected">
-                <i class="fa-solid fa-wallet" style="font-size: 16px; color: #ffb300;"></i>
+            <div class="payment-card selected" id="pay-method-wallet" onclick="selectPaymentMethod('wallet')">
+                <i class="fa-solid fa-wallet" style="font-size: 20px; color: #ffb300;"></i>
                 <div class="payment-info">
                     <div class="payment-name">Wallet Balance</div>
                     <div class="payment-sub">Instant Pay</div>
                 </div>
             </div>
-            <div class="payment-card disabled">
+            <div class="payment-card" id="pay-method-esewa" onclick="selectPaymentMethod('esewa')">
                 <img src="https://esewa.com.np/common/images/esewa_logo.png" alt="eSewa" class="esewa-logo">
                 <div class="payment-info">
-                    <div class="payment-name" style="color: #718096;">eSewa</div>
-                    <div class="payment-sub">Disabled</div>
+                    <div class="payment-name" style="color: #60bb46;">eSewa</div>
+                    <div class="payment-sub">Online Payment</div>
                 </div>
             </div>
         </div>
@@ -429,6 +430,10 @@
                 <span id="receipt-orderid" style="color: #3182ce;">-</span>
             </div>
             <div class="receipt-row">
+                <span>Payment:</span>
+                <span id="receipt-payment" style="color: #3182ce; font-weight: 600;">-</span>
+            </div>
+            <div class="receipt-row">
                 <span>Status:</span>
                 <span id="receipt-status" style="color: #f6ad55; font-weight: 700;">Pending</span>
             </div>
@@ -445,7 +450,7 @@
             <i class="fa-solid fa-wallet" style="color: #dc2626; font-size: 28px;"></i>
         </div>
         <div class="success-title">Insufficient Balance</div>
-        <p class="success-msg">Your wallet balance is insufficient! Please top up your account balance before proceeding.</p>
+        <p class="success-msg">Your wallet balance is insufficient! You can select eSewa or top up your account balance before proceeding.</p>
         <button class="success-close-btn" style="background-color: #dc2626;" onclick="closeInsufficientModal()">Got It</button>
     </div>
 </div>
@@ -518,7 +523,7 @@
 <!-- Firebase Script & Logic -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getDatabase, ref, push, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
@@ -535,11 +540,11 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
-    const provider = new GoogleAuthProvider();
 
     let currentUser = null;
     let selectedItemName = "";
     let selectedItemPrice = "";
+    let selectedPaymentMethod = "wallet"; // 'wallet' or 'esewa'
     let balanceListener = null;
     let currentWalletBalance = 0;
 
@@ -586,23 +591,31 @@
         }
     });
 
-    window.googleLogin = function() {
-        signInWithPopup(auth, provider).catch((error) => {
-            alert("Login failed: " + error.message);
-        });
-    };
-
     window.logoutUser = function() {
         auth.signOut().then(() => {
-            toggleProfile();
+            window.location.href = "https://roshantamang2.com.np/login";
         });
     };
 
-    mainActionBtn.onclick = function() {
+    window.selectPaymentMethod = function(method) {
+        selectedPaymentMethod = method;
+        const walletCard = document.getElementById('pay-method-wallet');
+        const esewaCard = document.getElementById('pay-method-esewa');
+
+        if (method === 'wallet') {
+            walletCard.classList.add('selected');
+            esewaCard.classList.remove('selected');
+            confirmPayBtn.innerText = "Pay from Balance";
+        } else {
+            esewaCard.classList.add('selected');
+            walletCard.classList.remove('selected');
+            confirmPayBtn.innerText = "Pay with eSewa";
+        }
+    };
+
+    mainActionBtn.onclick = function(e) {
         if (!currentUser) {
-            signInWithPopup(auth, provider).catch((error) => {
-                alert("Login failed: " + error.message);
-            });
+            window.location.href = "https://roshantamang2.com.np/login";
             return;
         }
 
@@ -629,6 +642,8 @@
         document.getElementById('modal-checkout-uid').innerText = uidValue;
         document.getElementById('modal-checkout-item').innerText = selectedItemName;
         document.getElementById('modal-checkout-total').innerText = 'Rs ' + selectedItemPrice;
+        
+        selectPaymentMethod('wallet');
         document.getElementById('checkoutModal').classList.add('show');
     };
 
@@ -636,7 +651,7 @@
         let uidValue = gameUidInput.value.trim();
         const itemPriceNum = parseFloat(selectedItemPrice);
 
-        if (currentWalletBalance < itemPriceNum) {
+        if (selectedPaymentMethod === 'wallet' && currentWalletBalance < itemPriceNum) {
             closeCheckoutModal();
             document.getElementById('insufficientModal').classList.add('show');
             return;
@@ -649,10 +664,12 @@
             const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
             const userOrderId = 'RG-GLORY-' + randomString + Date.now().toString().slice(-4);
             
-            const newBalance = currentWalletBalance - itemPriceNum;
-            await update(ref(db, `users/${currentUser.uid}`), {
-                balance: newBalance
-            });
+            if (selectedPaymentMethod === 'wallet') {
+                const newBalance = currentWalletBalance - itemPriceNum;
+                await update(ref(db, `users/${currentUser.uid}`), {
+                    balance: newBalance
+                });
+            }
 
             const now = new Date();
             const orderRef = push(ref(db, 'orders'));
@@ -668,6 +685,7 @@
                 amountDue: selectedItemPrice,
                 uid: uidValue,
                 clientOrderId: userOrderId,
+                paymentMethod: selectedPaymentMethod === 'wallet' ? 'Wallet Balance' : 'eSewa',
                 status: "Pending"
             });
 
@@ -675,6 +693,7 @@
             document.getElementById('receipt-uid').innerText = uidValue;
             document.getElementById('receipt-item').innerText = selectedItemName;
             document.getElementById('receipt-orderid').innerText = userOrderId;
+            document.getElementById('receipt-payment').innerText = selectedPaymentMethod === 'wallet' ? 'Wallet Balance' : 'eSewa (Pending Verification)';
             document.getElementById('receipt-status').innerText = "Pending";
             document.getElementById('successModal').classList.add('show');
 
@@ -682,7 +701,7 @@
             alert("Error: " + err.message);
         } finally {
             confirmPayBtn.disabled = false;
-            confirmPayBtn.innerHTML = `Pay from Balance`;
+            confirmPayBtn.innerHTML = selectedPaymentMethod === 'wallet' ? 'Pay from Balance' : 'Pay with eSewa';
         }
     };
 
