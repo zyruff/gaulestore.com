@@ -6,7 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RG DIGITAL STORE  | Fast & Secure Gaming Top Up in Nepal</title>
     <meta property="og:image" content="https://roshantamang2.com.np/owner.png">
-    <link rel="icon" href="owner.png" type="image/png">
+    
+    <!-- Favicon & Icons for Google Search & Browsers -->
+    <link rel="icon" href="https://roshantamang2.com.np/owner.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://roshantamang2.com.np/owner.png">
+    
     <link rel="manifest" href="/manifest.json">
     <meta name="description" content="RG Digital Store provides fast and secure gaming top-up services in Nepal.">
     <meta property="og:site_name" content="RG Digital Store">
@@ -23,7 +27,8 @@
       "@type": "WebSite",
       "name": "RG DIGITAL STORE",
       "alternateName": "RG DIGITAL STORE",
-      "url": "https://roshantamang2.com.np"
+      "url": "https://roshantamang2.com.np",
+      "logo": "https://roshantamang2.com.np/owner.png"
     }
     </script>
      
@@ -1226,7 +1231,6 @@
         renderReviews();
     });
 
-    // Collect user photos from users and reviews database nodes
     let userPhotosMap = {};
     onValue(ref(db, 'users'), (snap) => {
         if (snap.exists()) {
@@ -1276,7 +1280,6 @@
 
         const ordersArray = Object.keys(data).map(key => data[key]);
 
-        // 1. Update Recent Orders List (Card Style)
         if (ordersListDiv) {
             ordersListDiv.innerHTML = '';
             const recentOrders = [...ordersArray].reverse().slice(0, 10);
@@ -1289,7 +1292,7 @@
 
                 let badgeClass = 'status-pending';
                 let badgeIcon = 'fa-clock';
-                let badgeLabel = 'Processing'; // Default to Processing for pending/blank status
+                let badgeLabel = 'Processing';
 
                 if (stat === 'complete') {
                     badgeClass = 'status-done';
@@ -1339,7 +1342,6 @@
             });
         }
 
-        // 2. Calculate Top Spenders (Only 'complete' orders)
         const spenderMap = {};
         ordersArray.forEach(o => {
             if ((o.status || "").toLowerCase() === "complete") {
@@ -1371,7 +1373,7 @@
                 return;
             }
 
-            top10.slice(0, 3).forEach((user, index) => {
+            top10.slice(0, 3).reduce((acc, user, index) => {
                 const rank = index + 1;
                 const avatar = userPhotosMap[user.userId] || userPhotosMap[user.email] || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=e2e8f0&color=1e293b&bold=true`;
                 const crown = rank === 1 ? `<i class="fa-solid fa-crown crown-icon"></i>` : '';
@@ -1387,7 +1389,7 @@
                         <div class="podium-amount">Rs. ${user.total.toLocaleString()}</div>
                     </div>
                 `;
-            });
+            }, 0);
 
             top10.slice(3, 10).forEach((user, index) => {
                 const rank = index + 4;
@@ -1624,6 +1626,8 @@
 
 </body>
 </html>
+
+
 
 
 
