@@ -14,14 +14,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase JS SDK -->
+    <!-- Firebase JS SDK (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { background-color: #ffffff; color: #2d3748; padding-bottom: 130px; }
+        body { background-color: #f7fafc; color: #2d3748; padding-bottom: 140px; }
         
         /* Header Layout */
         .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #2563EB; justify-content: flex-start; gap: 15px; position: sticky; top: 0; z-index: 1000; }
@@ -87,7 +87,7 @@
         
         .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 4px; border-radius: 14px; border: 2px solid transparent; transition: all 0.2s ease; }
         .cards-grid.error-border { border: 2px solid #e53e3e !important; background-color: #fff5f5; padding: 8px; }
-        .pack-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; position: relative; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02); text-align: center; transition: transform 0.1s, border-color 0.2s; }
+        .pack-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; position: relative; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02); text-align: center; transition: transform 0.1s, border-color 0.2s; display: flex; flex-direction: column; align-items: center; }
         .pack-card:active { transform: scale(0.98); }
         .pack-card.selected { border: 2px solid #ffb300 !important; background-color: #fffdf5; }
 
@@ -115,7 +115,19 @@
             border-top: 1px solid #e2e8f0;
         }
 
-        .bottom-drawer { margin-top: 20px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        /* Bottom Drawer */
+        .bottom-drawer {
+            position: fixed;
+            bottom: 62px;
+            left: 4px;
+            right: 4px;
+            background-color: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
         .drawer-inner { max-width: 600px; margin: 0 auto; }
         .row-detail { display: flex; justify-content: space-between; font-size: 13px; color: #4a5568; margin-bottom: 8px; }
         .row-detail .val-white { color: #1a202c; font-weight: 500; }
@@ -127,7 +139,7 @@
         /* Modals */
         .success-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 300; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out; }
         .success-modal.show { opacity: 1; pointer-events: auto; }
-        .success-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(30px); transition: all 0.3s ease-in-out; position: relative; max-height: 90vh; overflow-y: auto; }
+        .success-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 380px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(30px); transition: all 0.3s ease-in-out; position: relative; max-height: 90vh; overflow-y: auto; }
         .success-modal.show .success-card { transform: translateY(0); }
         
         .checkout-card { max-width: 400px; text-align: left; padding: 24px; }
@@ -147,8 +159,11 @@
         .payment-sub { font-size: 10px; font-weight: 500; color: #4a5568; }
         .esewa-logo { width: 22px; height: 22px; object-fit: contain; border-radius: 50%; }
 
+        /* QR and Notice Box styling */
+        .account-details-box { background: #fffdf5; border: 1px solid #ffb300; padding: 10px; border-radius: 8px; margin-bottom: 14px; font-size: 12px; text-align: left; line-height: 1.5; color: #713f12; }
         .modal-qr-box { background: #ffffff; border: 1px dashed #f97316; border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 16px; }
-        .qr-image { width: 130px; height: 130px; border-radius: 6px; border: 1px solid #e2e8f0; padding: 4px; margin: 8px auto; object-fit: contain; display: block; }
+        .qr-image-wrapper { background-color: #f7fafc; padding: 10px; border-radius: 10px; display: inline-block; margin: 8px 0; border: 1px solid #e2e8f0; }
+        .qr-image { width: 140px; height: 140px; object-fit: contain; display: block; margin: 0 auto; }
         .qr-acc-no { font-size: 13px; font-weight: 800; color: #ea580c; background: #fff7ed; padding: 2px 8px; border-radius: 6px; display: inline-block; margin-top: 2px; }
 
         .wallet-box { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 16px; }
@@ -340,7 +355,7 @@
         <ul style="padding-left: 18px; margin: 0;">
             <li><strong>Correct Guild ID:</strong> Please input the correct Guild ID (UID). Refunds or exchanges will not be provided for wrong IDs.</li>
             <li><strong>Delivery Time:</strong> Glory will be added to your guild within 1 to 5 minutes after order confirmation.</li>
-            <li><strong>Secure Payment:</strong> You can safely and quickly purchase items using your wallet balance or eSewa.</li>
+            <li><strong>Secure Payment:</strong> You can safely and quickly purchase items using your wallet balance or eSewa/Khalti.</li>
             <li><strong>Support:</strong> If you face any issues with your order or payment, please contact us via WhatsApp or Messenger below.</li>
         </ul>
     </div>
@@ -385,7 +400,7 @@
                 </div>
             </div>
             
-            <div class="payment-card" id="pay-method-esewa" onclick="selectPaymentMethod('eSewa', '9761081110', 'esewa.png')">
+            <div class="payment-card" id="pay-method-esewa" onclick="selectPaymentMethod('eSewa', '9761081110', 'https://roshantamang2.com.np/image/qr.png')">
                 <img src="https://esewa.com.np/common/images/esewa_logo.png" alt="eSewa" class="esewa-logo">
                 <div class="payment-info">
                     <div class="payment-name" style="color: #60bb46;">eSewa</div>
@@ -393,7 +408,7 @@
                 </div>
             </div>
 
-            <div class="payment-card" id="pay-method-khalti" onclick="selectPaymentMethod('Khalti', '9761081110', 'khalti.png')">
+            <div class="payment-card" id="pay-method-khalti" onclick="selectPaymentMethod('Khalti', '9761081110', 'https://roshantamang2.com.np/image/qr.png')">
                 <i class="fa-solid fa-bolt" style="font-size: 18px; color: #5C2D91;"></i>
                 <div class="payment-info">
                     <div class="payment-name" style="color: #5C2D91;">Khalti</div>
@@ -409,14 +424,22 @@
             <div style="font-size: 11px; color: #64748b; margin-top: 4px;">Amount will be automatically deducted from your store wallet.</div>
         </div>
 
-        <!-- Dynamic QR Box -->
+        <!-- Dynamic QR Box with Notice Box -->
         <div id="qrPayContainer" class="modal-qr-box" style="display: none;">
-            <div style="font-size: 13px; font-weight: 700; color: #0f172a;" id="qrTitle">Scan QR Code</div>
-            <img id="modalQrImage" class="qr-image" src="" alt="Payment QR Code">
-            <div style="font-size: 12px; color: #64748b;">
+            <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 6px;" id="qrTitle">Scan QR Code</div>
+            
+            <div class="account-details-box">
+                <strong>Notice:</strong> RG Digital Store <br>
+                <strong>Remark:</strong> Please write your real name in the remarks. Do not write Free Fire.
+            </div>
+
+            <div class="qr-image-wrapper">
+                <img id="modalQrImage" class="qr-image" src="" alt="Payment QR Code">
+            </div>
+
+            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
                 Pay Amount: <strong id="qrPayAmount" style="color: #ea580c;">Rs 0</strong><br>
-                Account Number / ID:<br>
-                <span class="qr-acc-no" id="modalAccNo">9761081110</span><br>
+                Account Number / ID: <span class="qr-acc-no" id="modalAccNo">9761081110</span><br>
                 Name: <strong>Roshan Tamang</strong>
             </div>
         </div>
@@ -426,7 +449,7 @@
             <label class="form-label" style="font-size: 12px; font-weight: 600; color: #0f172a; margin-bottom: 4px; display: block;">
                 Transaction / Reference ID <span style="color: #ea580c;">*</span>
             </label>
-            <input type="text" id="txIdInput" class="uid-input" style="width: 100%; padding: 11px 14px;" placeholder="Enter Transaction ID (e.g. 05829104)" />
+            <input type="text" id="txIdInput" class="uid-input" style="width: 100%; padding: 11px 14px;" placeholder="Enter Transaction ID (e.g. 05829104)" oninput="validateTxIdLive()" />
             <div id="txError" class="error-message" style="display: none; margin-top: 4px;">
                 <i class="fa-solid fa-circle-exclamation"></i> <span>Please enter the Transaction ID.</span>
             </div>
@@ -603,6 +626,8 @@
     const uidError = document.getElementById('uid-error');
     const packError = document.getElementById('pack-error');
     const diamondsWrapper = document.getElementById('diamonds-wrapper');
+    const txIdInput = document.getElementById('txIdInput');
+    const txError = document.getElementById('txError');
 
     auth.onAuthStateChanged((user) => {
         if (user) {
@@ -681,6 +706,17 @@
             document.getElementById('qrPayAmount').innerText = 'Rs ' + selectedItemPrice;
             document.getElementById('modalQrImage').src = qrUrl;
             confirmPayBtn.innerText = "Confirm Payment";
+
+            txIdInput.value = "";
+            txIdInput.classList.remove('error-border');
+            txError.style.display = 'none';
+        }
+    };
+
+    window.validateTxIdLive = function() {
+        if (txIdInput.value.trim() !== "") {
+            txIdInput.classList.remove('error-border');
+            txError.style.display = 'none';
         }
     };
 
@@ -731,9 +767,9 @@
             }
             txId = "Wallet Paid";
         } else {
-            txId = document.getElementById('txIdInput').value.trim();
-            const txError = document.getElementById('txError');
+            txId = txIdInput.value.trim();
             if (!txId) {
+                txIdInput.classList.add('error-border');
                 txError.style.display = 'block';
                 return;
             }
@@ -788,7 +824,7 @@
 
             document.getElementById('receipt-status').innerText = "Pending";
             document.getElementById('successModal').classList.add('show');
-            document.getElementById('txIdInput').value = '';
+            txIdInput.value = '';
 
         } catch (err) {
             alert("Error: " + err.message);
