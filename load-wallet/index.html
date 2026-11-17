@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Load Wallet - RG Digital Store</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Firebase SDKs (Compat version for seamless single-file integration) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --surface-color: #f8fafc;
+      --border-color: #e2e8f0;
+      --primary: #111827;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --success: #10b981;
+      --success-soft: #ecfdf5;
+      --warning: #f59e0b;
+      --warning-soft: #fef3c7;
+      --danger: #ef4444;
+      --danger-soft: #fee2e2;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: none; /* Login verify नभएसम्म लुकाइराख्ने */
+      flex-direction: column;
+      align-items: center;
+      padding: 0 0 80px 0;
+    }
+
+    /* Header Layout */
+    .header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      padding: 18px 18px;
+      background: white;
+      border-bottom: 2px solid #2563EB;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .store-logo { height: 50px; width: auto; object-fit: contain; display: block; background-color: #ffffff; padding: 0px; border-radius: 6px; }
+    
+    .header-right { display: flex; align-items: center; gap: 15px; position: relative; }
+
+    .header-wallet {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      background-color: #eff6ff;
+      border: 1px solid #93c5fd;
+      color: #2563EB;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .header-wallet:hover { background-color: #dbeafe; }
+    .header-wallet svg { width: 16px; height: 16px; fill: #2563EB; }
+
+    #profile-pic { width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; border: 2px solid #dc2626; object-fit: cover; }
+    #profile-dropdown { display: none; position: absolute; top: 45px; right: 0; background: white; border: 1px solid #ccc; padding: 15px; width: 200px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); border-radius: 8px; text-align: center; z-index: 1000; }
+    .user-name { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+    .user-email { font-size: 12px; color: #666; margin-bottom: 10px; }
+    .change-name { font-size: 11px; color: #dc2626; text-decoration: none; display: block; margin-bottom: 15px; }
+    .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; cursor: pointer; border-radius: 4px; width: 100%; }
+
+    .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; display: block; }
+
+    .wallet-container {
+      width: 100%;
+      max-width: 520px;
+      padding: 24px 16px 20px;
+    }
+
+    .page-main-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--text-main);
+    }
+
+    /* Balance Card */
+    .balance-card {
+      background: #ffffff;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .balance-card::after {
+      content: "";
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .balance-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .balance-amount {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      color: var(--text-main);
+    }
+
+    .balance-amount span {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* Section Styling */
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Smaller Payment Methods Grid */
+    .methods-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .method-card {
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #ffffff;
+    }
+
+    .method-card:hover {
+      border-color: #cbd5e1;
+    }
+
+    .method-card.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .method-badge {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      line-height: 32px;
+      font-weight: 800;
+      font-size: 12px;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+
+    .esewa-bg { background: #60bb46; }
+    .khalti-bg { background: #5c2d91; }
+
+    .method-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Amount Input & Shake Animation */
+    .amount-input-box {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .amount-input-box.shake .amount-input {
+      border-color: #ef4444 !important;
+      animation: shake 0.4s ease-in-out;
+    }
+
+    .currency-prefix {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+
+    .amount-input {
+      width: 100%;
+      padding: 15px 16px 15px 52px;
+      font-size: 20px;
+      font-weight: 700;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      outline: none;
+      color: var(--text-main);
+      transition: border-color 0.2s;
+      background: #ffffff;
+    }
+
+    .amount-input:focus {
+      border-color: var(--accent);
+    }
+
+    /* QR & Payment Details Box */
+    .qr-box {
+      background: var(--surface-color);
+      border: 1px dashed #cbd5e1;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .qr-placeholder {
+      width: 210px;
+      height: 210px;
+      margin: 0 auto 14px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .qr-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .account-info {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .qr-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .copy-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-main);
+      transition: background 0.2s;
+    }
+
+    .copy-pill:hover {
+      background: var(--surface-color);
+    }
+
+    .copy-pill:active {
+      transform: scale(0.97);
+    }
+
+    /* Form Inputs */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 0;
+    }
+
+    .view-example-link {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .view-example-link:hover {
+      color: #1d4ed8;
+    }
+
+    .text-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      background: #ffffff;
+    }
+
+    .text-input:focus {
+      border-color: var(--accent);
+    }
+
+    /* Modal Popup for Transaction Example */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 16px;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: var(--shadow-md);
+      animation: scaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes scaleUp {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-img-box {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px;
+      margin: 14px 0;
+      text-align: center;
+    }
+
+    .modal-img-box img {
+      width: 100%;
+      max-height: 240px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+      width: 100%;
+      height: 48px;
+      padding: 0 16px;
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+      margin-top: 4px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .submit-btn:hover {
+      background: #1e293b;
+      transform: translateY(-1px);
+    }
+
+    .submit-btn.login-needed {
+      background-color: #dc2626 !important;
+      border-radius: 25px !important;
+    }
+    .submit-btn.login-needed:hover {
+      background-color: #b91c1c !important;
+    }
+
+    .submit-btn:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Deposit History Section */
+    .history-card {
+      background: var(--surface-color);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .history-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .history-amt {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .history-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Styled Txn Code Badge */
+    .txn-badge {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.02em;
+    }
+
+    /* Status Badges */
+    .status-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .status-processing {
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+
+    .status-approved {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .status-rejected, .status-canceled, .status-cancelled {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    /* Success Screen Animation Styles */
+    .main-form-content {
+      transition: opacity 0.3s ease;
+    }
+
+    .success-screen {
+      display: none;
+      opacity: 0;
+      text-align: center;
+      padding: 30px 20px;
+      background: #ffffff;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      transform: scale(0.95);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .success-screen.show {
+      display: block;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    @keyframes bounceCheck {
+      0% { transform: scale(0); opacity: 0; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .success-icon {
+      width: 72px;
+      height: 72px;
+      background: var(--success-soft);
+      color: var(--success);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      animation: bounceCheck 0.6s ease-out forwards;
+    }
+
+    .success-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .success-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .success-details-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-align: left;
+      margin-bottom: 24px;
+    }
+
+    .success-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .success-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .success-row span:first-child {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .success-row span:last-child {
+      color: var(--text-main);
+      font-weight: 700;
+    }
+
+    .new-deposit-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .new-deposit-btn:hover {
+      background: #1d4ed8;
+    }
+
+    /* Stay Connected / Support Section */
+    .social-section {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .social-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .social-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 6px;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background: #ffffff;
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      gap: 6px;
+    }
+
+    .social-btn:hover {
+      background: var(--surface-color);
+      border-color: #cbd5e1;
+      transform: translateY(-2px);
+    }
+
+    .social-btn.yt:hover { color: #ff0000; border-color: #ff0000; }
+    .social-btn.tk:hover { color: #000000; border-color: #000000; }
+    .social-btn.fb:hover { color: #1877f2; border-color: #1877f2; }
+    .social-btn.wa:hover { color: #25d366; border-color: #25d366; }
+    .social-btn.ms:hover { color: #006aff; border-color: #006aff; }
+
+    /* Footer Copyright */
+    .footer-copyright {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 24px;
+      font-weight: 500;
+      padding-bottom: 20px;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 75px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 999;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #ffffff;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 62px;
+      border-top: 1px solid #eaeaea;
+      padding: 0 5px;
+      z-index: 1000;
+      box-sizing: border-box;
+    }
+    .bottom-nav .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #888;
+      font-size: 11px;
+      font-weight: 500;
+      flex: 1;
+      height: 100%;
+      transition: all 0.2s ease-in-out;
+      background: transparent;
+      border: none;
+    }
+    .bottom-nav .nav-item svg { width: 18px; height: 18px; margin-bottom: 3px; stroke: currentColor; fill: none; }
+    .bottom-nav .nav-item.active { color: #333333; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header with Logo & Login/Wallet -->
+  <div class="header">
+    <a href="https://roshantamang2.com.np" style="margin-left: 5px;">
+        <img src="https://roshantamang2.com.np/image/logo.png" alt="Gaule Store Logo" class="store-logo">
+    </a>
+    <div class="header-right">
+        <a href="#" id="header-wallet-btn" class="header-wallet">
+            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            <span>Rs. <span id="header-user-balance">0</span></span>
+        </a>
+
+        <!-- Original Login Icon (Redirects to login page when clicked) -->
+        <div id="login-container" onclick="window.location.href='https://roshantamang2.com.np/login'">
+            <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+
+        <img id="profile-pic" onclick="toggleProfile()">
+        <div id="profile-dropdown">
+            <div id="display-name" class="user-name"></div>
+            <div id="display-email" class="user-email"></div>
+            <a href="https://myaccount.google.com/personal-info" target="_blank" class="change-name">Change Name</a>
+            <button class="logout-btn" onclick="logoutUser()">Logout</button>
+        </div>
+    </div>
+  </div>
+
+  <div class="wallet-container">
+    <div class="page-main-title">Add Wallet Balance</div>
+
+    <!-- Main Interactive Form Wrapper -->
+    <div id="mainFormContent" class="main-form-content">
+      <!-- Current Balance Card -->
+      <div class="balance-card">
+        <div class="balance-label">Available Wallet Balance</div>
+        <div class="balance-amount"><span id="userBalance">NPR 0.00</span></div>
+      </div>
+
+      <!-- Step 1: Payment Method -->
+      <div class="section-title">1. Select Payment Method</div>
+      <div class="methods-grid">
+        <div class="method-card active" onclick="selectMethod('esewa', this)">
+          <div class="method-badge esewa-bg">eS</div>
+          <div class="method-name">eSewa</div>
+        </div>
+        <div class="method-card" onclick="selectMethod('khalti', this)">
+          <div class="method-badge khalti-bg">Kh</div>
+          <div class="method-name">Khalti</div>
+        </div>
+      </div>
+
+      <!-- Step 2: Enter Amount -->
+      <div class="section-title">
+        <span>2. Enter Amount</span>
+        <span style="font-size: 12px; color: var(--text-muted); font-weight: 500;">Min: NPR 10</span>
+      </div>
+      <div class="amount-input-box" id="amountBox">
+        <span class="currency-prefix">NPR</span>
+        <input type="number" id="amountInput" class="amount-input" placeholder="0" min="10" />
+      </div>
+
+      <!-- Step 3: Scan & Pay -->
+      <div class="section-title">3. Scan QR & Pay</div>
+      <div class="qr-box">
+        <div class="qr-placeholder">
+          <img id="qrImage" src="https://roshantamang2.com.np/image/esewa_qr.png" alt="Payment QR" />
+        </div>
+        <div class="account-info" id="accountTitle">eSewa ID: Bishal Tamang</div>
+        
+        <div class="qr-actions">
+          <div class="copy-pill" onclick="copyAccount()">
+            <span id="accountNumber">9763397430</span>
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </div>
+          <div class="copy-pill" onclick="downloadQR()">
+            <i class="fa-solid fa-download"></i> Save QR
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Payment Proof & Submit -->
+      <form id="depositForm" onsubmit="handleDepositSubmit(event)">
+        <div class="form-group">
+          <div class="form-label-row">
+            <label class="form-label">Transaction ID / Remarks</label>
+            <span class="view-example-link" onclick="openTxnExampleModal()">View Example</span>
+          </div>
+          <input type="text" id="txnId" class="text-input" placeholder="e.g. 0A7X92B or Sender Name" />
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">Submit Deposit Request</button>
+      </form>
+
+      <!-- My Deposit History Section -->
+      <div class="section-title">My Deposit History</div>
+      <div class="history-card">
+        <div class="history-list" id="historyList">
+          <div style="text-align: center; padding: 16px; color: var(--text-muted); font-size: 13px;">Loading history...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction ID Example Modal -->
+    <div id="txnModal" class="modal-overlay">
+      <div class="modal-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h3 id="modalTitle" style="font-size: 16px; font-weight: 700; color: var(--text-main);">eSewa Transaction ID Example</h3>
+          <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 18px; color: var(--text-muted);" onclick="closeTxnExampleModal()"></i>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.4;">Payment complete भएपछि statement वा receipt मा देखिने Transaction ID तल हेर्नुहोस्:</p>
+        <div class="modal-img-box">
+          <img id="txnExampleImg" src="https://roshantamang2.com.np/image/esewaexample.png" alt="Transaction ID Example" />
+        </div>
+        <button type="button" class="new-deposit-btn" onclick="closeTxnExampleModal()">Got It</button>
+      </div>
+    </div>
+
+    <!-- Success Screen Animation View -->
+    <div id="successScreen" class="success-screen">
+      <div class="success-icon">
+        <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="success-title">Deposit Request Submitted!</div>
+      <div class="success-desc">Your deposit request has been successfully sent. Admin will verify and approve soon.</div>
+      
+      <div class="success-details-card">
+        <div class="success-row">
+          <span>Method</span>
+          <span id="resMethod">eSewa</span>
+        </div>
+        <div class="success-row" style="margin-top: 8px;">
+          <span>Amount</span>
+          <span id="resAmount">NPR 500</span>
+        </div>
+        <div class="success-row" style="margin-top: 8px;">
+          <span>Transaction ID</span>
+          <span id="resTxn" class="txn-badge">0A7X92B</span>
+        </div>
+      </div>
+
+      <button class="new-deposit-btn" onclick="resetToForm()">Make Another Deposit</button>
+    </div>
+
+    <!-- Stay Connected & Support Section -->
+    <div class="social-section">
+      <div class="section-title" style="margin-bottom: 8px;">Stay Connected & Support</div>
+      <div class="social-grid">
+        <!-- YouTube -->
+        <a href="https://youtube.com" target="_blank" class="social-btn yt" title="YouTube">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          <span>YouTube</span>
+        </a>
+        <!-- TikTok -->
+        <a href="https://tiktok.com" target="_blank" class="social-btn tk" title="TikTok">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+          <span>TikTok</span>
+        </a>
+        <!-- Facebook -->
+        <a href="https://facebook.com" target="_blank" class="social-btn fb" title="Facebook">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          <span>Facebook</span>
+        </a>
+        <!-- WhatsApp -->
+        <a href="https://chat.whatsapp.com/GqvRSSHyEvG1u1w1OqPmVa" target="_blank" class="social-btn wa" title="WhatsApp">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.124-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+          <span>WhatsApp</span>
+        </a>
+        <!-- Messenger -->
+        <a href="https://messenger.com" target="_blank" class="social-btn ms" title="Messenger">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 4.974 0 11.111c0 3.497 1.745 6.616 4.472 8.652V24l4.085-2.242c1.053.301 2.174.467 3.343.467 6.627 0 12-4.974 12-11.111S18.627 0 12 0zm1.191 14.963l-3.055-3.26-5.963 3.26 6.559-6.963 3.13 3.26 5.888-3.26-6.559 6.963z"/></svg>
+          <span>Messenger</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Copyright Footer -->
+    <div class="footer-copyright">
+      &copy; 2026 RG Digital Store. All rights reserved.
+    </div>
+  </div>
+
+  <!-- Toast Message -->
+  <div id="toast" class="toast">Copied to clipboard!</div>
+
+  <!-- Bottom Navigation Bar -->
+  <div class="bottom-nav">
+      <a href="https://roshantamang2.com.np" class="nav-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <span>Home</span>
+      </a>
+      <a href="https://roshantamang2.com.np" class="nav-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span>Shop</span>
+      </a>
+      <a href="https://roshantamang2.com.np/load-wallet" class="nav-item active">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
+              <path d="M4 6v12a2 2 0 0 0 2 2h14v-4"></path>
+              <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path>
+          </svg>
+          <span>Wallet</span>
+      </a>
+      <a href="https://roshantamang2.com.np/order" class="nav-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <span>Order</span>
+      </a>
+      <a href="https://roshantamang2.com.np/account" class="nav-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <span>Account</span>
+      </a>
+  </div>
+
+  <script>
+    // Firebase Initialization
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFUQu06EvmJCtplZ8dRqVhHnB7I1yQuKw",
+      authDomain: "rg-digital-store.firebaseapp.com",
+      databaseURL: "https://rg-digital-store-default-rtdb.firebaseio.com",
+      projectId: "rg-digital-store",
+      storageBucket: "rg-digital-store.firebasestorage.app",
+      messagingSenderId: "257332660691",
+      appId: "1:257332660691:web:e9ff5e85282a4e9d1d4726",
+      measurementId: "G-S09Q860R4V"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const auth = firebase.auth();
+
+    let selectedMethod = 'esewa';
+    let currentUser = null;
+
+    const paymentDetails = {
+      esewa: {
+        title: 'eSewa ID: Bishal Tamang',
+        number: '9763397430',
+        qr: 'https://roshantamang2.com.np/image/esewa_qr.png',
+        exampleImg: 'https://roshantamang2.com.np/image/esewaexample.png'
+      },
+      khalti: {
+        title: 'Khalti ID: Roshan Tamang',
+        number: '9761081110',
+        qr: 'https://roshantamang2.com.np/image/khalti_qr.png',
+        exampleImg: 'https://roshantamang2.com.np/image/khalti_txn_example.png'
+      }
+    };
+
+    function selectMethod(method, element) {
+      selectedMethod = method;
+      document.querySelectorAll('.method-card').forEach(card => card.classList.remove('active'));
+      element.classList.add('active');
+
+      const info = paymentDetails[method];
+      document.getElementById('accountTitle').innerText = info.title;
+      document.getElementById('accountNumber').innerText = info.number;
+      document.getElementById('qrImage').src = info.qr;
+    }
+
+    function openTxnExampleModal() {
+      const modal = document.getElementById('txnModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const img = document.getElementById('txnExampleImg');
+      
+      if (selectedMethod === 'esewa') {
+        modalTitle.innerText = 'eSewa Transaction ID Example';
+        img.src = paymentDetails.esewa.exampleImg;
+      } else {
+        modalTitle.innerText = 'Khalti Transaction ID Example';
+        img.src = paymentDetails.khalti.exampleImg;
+      }
+      modal.classList.add('show');
+    }
+
+    function closeTxnExampleModal() {
+      document.getElementById('txnModal').classList.remove('show');
+    }
+
+    function copyAccount() {
+      const num = document.getElementById('accountNumber').innerText;
+      navigator.clipboard.writeText(num);
+      showToast('Account number copied: ' + num);
+    }
+
+    function downloadQR() {
+      const imgUrl = document.getElementById('qrImage').src;
+      const fileName = selectedMethod === 'esewa' ? 'esewa_qr.png' : 'khalti_qr.png';
+      
+      fetch(imgUrl)
+        .then(response => response.blob())
+        .then(blob => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+          showToast('QR code saved successfully!');
+        })
+        .catch(err => {
+          const a = document.createElement('a');
+          a.href = imgUrl;
+          a.download = fileName;
+          a.target = '_blank';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          showToast('Downloading QR code...');
+        });
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    function toggleProfile() {
+        const dropdown = document.getElementById('profile-dropdown');
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function logoutUser() {
+        auth.signOut().then(() => {
+            window.location.href = 'https://roshantamang2.com.np/login';
+        });
+    }
+
+    // Auth state listener and live data sync
+    auth.onAuthStateChanged((user) => {
+      if (!user) {
+        // यदि युजर लग-इन छैन भने तुरुन्तै लग-इन पेजमा पठाउने
+        window.location.href = 'https://roshantamang2.com.np/login';
+        return;
+      }
+
+      // युजर लग-इन प्रमाणित भएपछि मात्र पेज देखाउने
+      document.body.style.display = 'flex';
+      currentUser = user;
+
+      const submitBtn = document.getElementById('submitBtn');
+      const loginContainer = document.getElementById('login-container');
+      
+      loginContainer.style.display = 'none';
+      const profilePic = document.getElementById('profile-pic');
+      profilePic.style.display = 'block';
+      profilePic.src = user.photoURL || 'https://via.placeholder.com/35';
+      document.getElementById('display-name').innerText = user.displayName || 'User';
+      document.getElementById('display-email').innerText = user.email || '';
+      document.getElementById('header-wallet-btn').style.display = 'flex';
+
+      submitBtn.innerText = 'Submit Deposit Request';
+      submitBtn.classList.remove('login-needed');
+
+      // Fetch User Balance following rules: users/{uid}/balance
+      db.ref(`users/${user.uid}/balance`).on('value', (snapshot) => {
+        const bal = snapshot.val() || 0;
+        document.getElementById('userBalance').innerText = 'NPR ' + Number(bal).toFixed(2);
+        document.getElementById('header-user-balance').innerText = Number(bal).toFixed(2);
+      });
+
+      // Fetch Deposit History following rules: deposits (.read: auth != null)
+      const historyList = document.getElementById('historyList');
+      db.ref('deposits').on('value', (snapshot) => {
+        historyList.innerHTML = '';
+        const deposits = [];
+        
+        snapshot.forEach((childSnapshot) => {
+          const val = childSnapshot.val();
+          if (user.email === 'ffzyru@gmail.com' || val.uid === user.uid) {
+            deposits.push({ id: childSnapshot.key, ...val });
+          }
+        });
+
+        deposits.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+        if (deposits.length === 0) {
+          historyList.innerHTML = '<div style="text-align: center; padding: 16px; color: var(--text-muted); font-size: 13px;">No deposit history found.</div>';
+          return;
+        }
+
+        deposits.forEach(item => {
+          const rawStatus = (item.status || 'processing').toLowerCase();
+          let statusClass = 'status-processing';
+          if (rawStatus === 'approved') statusClass = 'status-approved';
+          else if (rawStatus === 'rejected' || rawStatus === 'canceled' || rawStatus === 'cancelled') statusClass = 'status-rejected';
+
+          const statusText = rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1);
+          const methodName = item.method || 'eSewa';
+          const formattedDate = item.date || new Date(item.timestamp || Date.now()).toLocaleString();
+          const txnId = item.transactionId || item.txnId || 'N/A';
+          const amountVal = Number(item.amount || 0).toFixed(2);
+
+          const historyItem = document.createElement('div');
+          historyItem.className = 'history-item';
+          historyItem.innerHTML = `
+            <div class="history-info">
+              <span class="history-amt">NPR ${amountVal} <span style="font-size:11px; color:var(--text-muted); font-weight:500;">(${methodName})</span></span>
+              <span class="history-meta">Txn: <span class="txn-badge">${txnId}</span> • ${formattedDate}</span>
+            </div>
+            <span class="status-badge ${statusClass}">${statusText}</span>
+          `;
+          historyList.appendChild(historyItem);
+        });
+      });
+    });
+
+    // Handle Deposit Submit with strict Amount check first, then Transaction ID
+    function handleDepositSubmit(e) {
+      e.preventDefault();
+
+      if (!currentUser) {
+        window.location.href = 'https://roshantamang2.com.np/login';
+        return;
+      }
+
+      const amountInput = document.getElementById('amountInput');
+      const amountBox = document.getElementById('amountBox');
+      const txnIdInput = document.getElementById('txnId');
+      
+      const amount = parseFloat(amountInput.value);
+      const txnId = txnIdInput.value.trim();
+
+      // Step A: Strictly check Amount first (Minimum NPR 10 required)
+      if (!amount || isNaN(amount) || amount < 10) {
+        showToast('Please enter a valid amount (Minimum NPR 10)');
+        amountBox.classList.add('shake');
+        setTimeout(() => amountBox.classList.remove('shake'), 400);
+        amountInput.focus();
+        return;
+      }
+
+      // Step B: Check Transaction ID next
+      if (!txnId) {
+        showToast('Please enter Transaction ID or Remarks');
+        txnIdInput.focus();
+        return;
+      }
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerText = 'Submitting to Firebase...';
+
+      const depositData = {
+        amount: amount,
+        date: new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        email: currentUser.email || 'ffzyru@gmail.com',
+        method: selectedMethod === 'esewa' ? 'eSewa' : 'Khalti',
+        name: currentUser.displayName || currentUser.email.split('@')[0],
+        status: 'processing',
+        timestamp: Date.now(),
+        transactionId: txnId,
+        uid: currentUser.uid
+      };
+
+      // Push data strictly matching rules: auth != null && (!data.exists() || auth.token.email === 'ffzyru@gmail.com')
+      db.ref('deposits').push(depositData)
+        .then(() => {
+          document.getElementById('resMethod').innerText = depositData.method;
+          document.getElementById('resAmount').innerText = 'NPR ' + amount.toFixed(2);
+          document.getElementById('resTxn').innerText = txnId;
+
+          document.getElementById('mainFormContent').style.display = 'none';
+          const successScreen = document.getElementById('successScreen');
+          successScreen.classList.add('show');
+
+          btn.disabled = false;
+          btn.innerText = 'Submit Deposit Request';
+        })
+        .catch((error) => {
+          console.error("Firebase Deposit Error:", error);
+          showToast('Permission denied or network error.');
+          btn.disabled = false;
+          btn.innerText = 'Submit Deposit Request';
+        });
+    }
+
+    function resetToForm() {
+      document.getElementById('depositForm').reset();
+      document.getElementById('amountInput').value = '';
+      document.getElementById('successScreen').classList.remove('show');
+      document.getElementById('mainFormContent').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
