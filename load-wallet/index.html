@@ -798,7 +798,7 @@
       <!-- Current Balance Card -->
       <div class="balance-card">
         <div class="balance-label">Available Wallet Balance</div>
-        <div class="balance-amount"><span id="userBalance">NPR 0.00</span></div>
+        <div class="balance-amount"><span id="userBalance">NPR 0</span></div>
       </div>
 
       <!-- Step 1: Payment Method -->
@@ -1101,12 +1101,10 @@
     // Auth state listener and live data sync
     auth.onAuthStateChanged((user) => {
       if (!user) {
-        // यदि युजर लग-इन छैन भने तुरुन्तै लग-इन पेजमा पठाउने
         window.location.href = 'https://roshantamang2.com.np/login';
         return;
       }
 
-      // युजर लग-इन प्रमाणित भएपछि मात्र पेज देखाउने
       document.body.style.display = 'flex';
       currentUser = user;
 
@@ -1124,14 +1122,14 @@
       submitBtn.innerText = 'Submit Deposit Request';
       submitBtn.classList.remove('login-needed');
 
-      // Fetch User Balance following rules: users/{uid}/balance
+      // Fetch User Balance (.toFixed(0) राखेर .00 हटाइएको छ)
       db.ref(`users/${user.uid}/balance`).on('value', (snapshot) => {
         const bal = snapshot.val() || 0;
-        document.getElementById('userBalance').innerText = 'NPR ' + Number(bal).toFixed(2);
-        document.getElementById('header-user-balance').innerText = Number(bal).toFixed(2);
+        document.getElementById('userBalance').innerText = 'NPR ' + Math.round(Number(bal));
+        document.getElementById('header-user-balance').innerText = Math.round(Number(bal));
       });
 
-      // Fetch Deposit History following rules: deposits (.read: auth != null)
+      // Fetch Deposit History (.toFixed(0) राखेर .00 हटाइएको छ)
       const historyList = document.getElementById('historyList');
       db.ref('deposits').on('value', (snapshot) => {
         historyList.innerHTML = '';
@@ -1161,7 +1159,7 @@
           const methodName = item.method || 'eSewa';
           const formattedDate = item.date || new Date(item.timestamp || Date.now()).toLocaleString();
           const txnId = item.transactionId || item.txnId || 'N/A';
-          const amountVal = Number(item.amount || 0).toFixed(2);
+          const amountVal = Math.round(Number(item.amount || 0));
 
           const historyItem = document.createElement('div');
           historyItem.className = 'history-item';
@@ -1193,7 +1191,6 @@
       const amount = parseFloat(amountInput.value);
       const txnId = txnIdInput.value.trim();
 
-      // Step A: Strictly check Amount first (Minimum NPR 10 required)
       if (!amount || isNaN(amount) || amount < 10) {
         showToast('Please enter a valid amount (Minimum NPR 10)');
         amountBox.classList.add('shake');
@@ -1202,7 +1199,6 @@
         return;
       }
 
-      // Step B: Check Transaction ID next
       if (!txnId) {
         showToast('Please enter Transaction ID or Remarks');
         txnIdInput.focus();
@@ -1225,11 +1221,10 @@
         uid: currentUser.uid
       };
 
-      // Push data strictly matching rules: auth != null && (!data.exists() || auth.token.email === 'ffzyru@gmail.com')
       db.ref('deposits').push(depositData)
         .then(() => {
           document.getElementById('resMethod').innerText = depositData.method;
-          document.getElementById('resAmount').innerText = 'NPR ' + amount.toFixed(2);
+          document.getElementById('resAmount').innerText = 'NPR ' + Math.round(amount);
           document.getElementById('resTxn').innerText = txnId;
 
           document.getElementById('mainFormContent').style.display = 'none';
