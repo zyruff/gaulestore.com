@@ -301,7 +301,7 @@
         <i class="fa-solid fa-circle-exclamation"></i> <span>Please select a pack to proceed!</span>
     </div>
 
-    <!-- प्याकेज कार्डहरूमा Normal Price र Reseller Price (Normal, Reseller) राखिएको छ -->
+    <!-- Normal Price र Reseller Price यहाँ राखिएको छ (Normal, Reseller) -->
     <div class="cards-grid" id="diamonds-wrapper">
         <div class="pack-card" onclick="selectPack(this, '25 Diamonds', '1773', 30, 25)">
             <div class="pack-title">25 Diamonds</div>
@@ -550,13 +550,13 @@
     let selectedPackageId = null;
     let selectedItemPrice = "";
     let balanceListener = null;
-    let resellerListener = null;
+    let roleListener = null;
     let currentWalletBalance = 0;
-    let isUserReseller = false; // युजर Reseller हो कि हैन छुट्याउन
+    let isUserReseller = false; 
     let verifiedPlayerName = "";
     let fetchedApiKey = "";
     let currentCheckedUid = "";
-    let activeSelectedCard = null; // अहिले सेलेक्ट भएको कार्ड स्टोर गर्न
+    let activeSelectedCard = null;
 
     const mainActionBtn = document.getElementById('main-action-btn');
     const confirmPayBtn = document.getElementById('confirm-pay-btn');
@@ -571,7 +571,7 @@
         fetchedApiKey = snapshot.val() || "";
     });
 
-    // मूल्यहरू अपडेट गर्ने function (Normal वा Reseller मूल्य देखाउन)
+    // युजरको role हेरेर मूल्य बदल्ने function
     function updatePricesOnUI() {
         const priceElements = document.querySelectorAll('.pack-price');
         priceElements.forEach(el => {
@@ -580,7 +580,6 @@
             el.innerText = 'Rs ' + (isUserReseller ? reseller : normal);
         });
 
-        // यदि कुनै प्याकेज पहिले नै सेलेक्ट गरिएको छ भने मूल्य अपडेट गर्ने
         if (activeSelectedCard) {
             const priceEl = activeSelectedCard.querySelector('.pack-price');
             selectedItemPrice = isUserReseller ? priceEl.getAttribute('data-reseller') : priceEl.getAttribute('data-normal');
@@ -610,10 +609,11 @@
                 document.getElementById('modal-user-balance').innerText = currentWalletBalance;
             });
 
-            // युजरको isReseller स्टेटस तानेर चेक गर्ने
-            const resellerRef = ref(db, `users/${user.uid}/isReseller`);
-            resellerListener = onValue(resellerRef, (snapshot) => {
-                isUserReseller = snapshot.val() === true;
+            // युजरको role ("reseller" वा "user") चेक गर्ने
+            const roleRef = ref(db, `users/${user.uid}/role`);
+            roleListener = onValue(roleRef, (snapshot) => {
+                const userRole = snapshot.val();
+                isUserReseller = (userRole === "reseller");
                 updatePricesOnUI();
             });
         } else {
@@ -836,6 +836,7 @@
         diamondsWrapper.classList.remove('error-border');
         packError.style.display = "none";
 
+        document.querySelectorAll('.pack-card').cards?.forEach(card => card.classList.remove('selected'));
         document.querySelectorAll('.pack-card').forEach(card => card.classList.remove('selected'));
         element.classList.add('selected');
         
@@ -843,7 +844,6 @@
         selectedItemName = name;
         selectedPackageId = packageId;
         
-        // Reseller भए resellerPrice, नत्र normalPrice लिने
         selectedItemPrice = isUserReseller ? resellerPrice : normalPrice;
 
         document.getElementById('summary-item').innerText = name + (isUserReseller ? " (Reseller)" : "");
