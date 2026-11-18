@@ -27,7 +27,7 @@
         #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
         .header-right { display: flex; align-items: center; gap: 10px; position: relative; margin-left: auto; }
         
-        /* Header Wallet (नीलो स्टाइल) */
+        /* Header Wallet */
         .header-wallet {
             display: none;
             align-items: center;
@@ -77,7 +77,6 @@
         
         .uid-input { width: 100%; background-color: #f7fafc; border: 1px solid #cbd5e0; border-radius: 8px; padding: 12px 14px; color: #1a202c; font-size: 14px; outline: none; transition: all 0.2s; }
         
-        /* Red Border & Shake Animation CSS */
         .uid-input.error-border { border: 1px solid #e53e3e !important; background-color: #fff5f5 !important; }
         
         @keyframes shake {
@@ -90,12 +89,10 @@
         }
         .shake { animation: shake 0.4s ease-in-out; }
 
-        /* Full-Width Check Button */
         .check-full-btn { background-color: #2563EB; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; }
         .check-full-btn:hover { background-color: #1d4ed8; }
         .check-full-btn:disabled { opacity: 0.7; cursor: not-allowed; }
         
-        /* White & Centered Player Info Box Style */
         .player-info-box { 
             display: none; 
             margin-top: 10px; 
@@ -172,7 +169,6 @@
         .receipt-row span:last-child { color: #2d3748; font-weight: 600; }
         .success-close-btn { background-color: #1a202c; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; }
 
-        /* Bottom Navigation Bar */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -276,12 +272,10 @@
             <input type="text" id="game-uid" class="uid-input" placeholder="PLAYER ID (UID)" oninput="validateUIDLive()">
         </div>
 
-        <!-- Check Button -->
         <button type="button" class="check-full-btn" id="check-trigger-btn" onclick="checkPlayerUID()">
             <i class="fa-solid fa-magnifying-glass"></i> Check
         </button>
 
-        <!-- Player Name Display Box (White Background, Centered) -->
         <div class="player-info-box" id="player-info-box">
             <i class="fa-solid fa-user-check" style="color: #2563EB;"></i>
             <strong id="verified-player-name">-</strong>
@@ -307,47 +301,47 @@
         <i class="fa-solid fa-circle-exclamation"></i> <span>Please select a pack to proceed!</span>
     </div>
 
-    <!-- प्याकेज कार्डहरू -->
+    <!-- Normal Price र Reseller Price (Normal, Reseller) -->
     <div class="cards-grid" id="diamonds-wrapper">
-        <div class="pack-card" onclick="selectPack(this, '25 Diamonds', '1773', '30')">
+        <div class="pack-card" onclick="selectPack(this, '25 Diamonds', '1773', 30, 27)">
             <div class="pack-title">25 Diamonds</div>
-            <div class="pack-price">Rs30</div>
+            <div class="pack-price" data-normal="30" data-reseller="27">Rs30</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
 
-        <div class="pack-card" onclick="selectPack(this, '50 Diamonds', '1774', '50')">
+        <div class="pack-card" onclick="selectPack(this, '50 Diamonds', '1774', 50, 47)">
             <div class="pack-title">50 Diamonds</div>
-            <div class="pack-price">Rs50</div>
+            <div class="pack-price" data-normal="50" data-reseller="47">Rs50</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
     
-        <div class="pack-card" onclick="selectPack(this, '115 Diamonds', '1775', '100')">
+        <div class="pack-card" onclick="selectPack(this, '115 Diamonds', '1775', 100, 97)">
             <div class="pack-title">115 Diamonds</div>
-            <div class="pack-price">Rs100</div>
+            <div class="pack-price" data-normal="100" data-reseller="97">Rs100</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
 
-        <div class="pack-card" onclick="selectPack(this, '240 Diamonds', '1776', '200')">
+        <div class="pack-card" onclick="selectPack(this, '240 Diamonds', '1776', 200, 195)">
             <div class="pack-title">240 Diamonds</div>
-            <div class="pack-price">Rs200</div>
+            <div class="pack-price" data-normal="200" data-reseller="195">Rs200</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
 
-        <div class="pack-card" onclick="selectPack(this, '610 Diamonds', '1777', '505')">
+        <div class="pack-card" onclick="selectPack(this, '610 Diamonds', '1777', 505, 485)">
             <div class="pack-title">610 Diamonds</div>
-            <div class="pack-price">Rs505</div>
+            <div class="pack-price" data-normal="505" data-reseller="485">Rs505</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
 
-        <div class="pack-card" onclick="selectPack(this, '1240 Diamonds', '1778', '1000')">
+        <div class="pack-card" onclick="selectPack(this, '1240 Diamonds', '1778', 1000, 960)">
             <div class="pack-title">1240 Diamonds</div>
-            <div class="pack-price">Rs1000</div>
+            <div class="pack-price" data-normal="1000" data-reseller="960">Rs1000</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
 
-        <div class="pack-card" onclick="selectPack(this, '2530 Diamonds', '1779', '2000')">
+        <div class="pack-card" onclick="selectPack(this, '2530 Diamonds', '1779', 2000, 1920)">
             <div class="pack-title">2530 Diamonds</div>
-            <div class="pack-price">Rs2000</div>
+            <div class="pack-price" data-normal="2000" data-reseller="1920">Rs2000</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
 
@@ -355,21 +349,21 @@
             Membership <span style="color:#e53e3e;">*</span>
         </div>
 
-        <div class="pack-card" onclick="selectPack(this, 'Weekly Lite', '1801', '60')">
+        <div class="pack-card" onclick="selectPack(this, 'Weekly Lite', '1801', 60, 55)">
             <div class="pack-title">Weekly Lite</div>
-            <div class="pack-price">Rs60</div>
+            <div class="pack-price" data-normal="60" data-reseller="55">Rs60</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
 
-        <div class="pack-card" onclick="selectPack(this, 'Weekly Membership', '1780', '200')">
+        <div class="pack-card" onclick="selectPack(this, 'Weekly Membership', '1780', 200, 195)">
             <div class="pack-title">Weekly Membership</div>
-            <div class="pack-price">Rs200</div>
+            <div class="pack-price" data-normal="200" data-reseller="195">Rs200</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
 
-        <div class="pack-card" onclick="selectPack(this, 'Monthly Membership', '1781', '1000')">
+        <div class="pack-card" onclick="selectPack(this, 'Monthly Membership', '1781', 1000, 950)">
             <div class="pack-title">Monthly Membership</div>
-            <div class="pack-price">Rs1000</div>
+            <div class="pack-price" data-normal="1000" data-reseller="950">Rs1000</div>
             <i class="fa-solid fa-gem diamond-icon"></i>
         </div>
     </div>
@@ -483,7 +477,6 @@
     </div>
 </div>
 
-<!-- Bottom Navigation Bar -->
 <div class="bottom-nav">
     <a href="https://roshantamang2.com.np" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -557,10 +550,13 @@
     let selectedPackageId = null;
     let selectedItemPrice = "";
     let balanceListener = null;
+    let roleListener = null;
     let currentWalletBalance = 0;
+    let isUserReseller = localStorage.getItem('isResellerCached') === 'true'; 
     let verifiedPlayerName = "";
     let fetchedApiKey = "";
     let currentCheckedUid = "";
+    let activeSelectedCard = null;
 
     const mainActionBtn = document.getElementById('main-action-btn');
     const confirmPayBtn = document.getElementById('confirm-pay-btn');
@@ -571,7 +567,26 @@
     const checkTriggerBtn = document.getElementById('check-trigger-btn');
     const playerInfoBox = document.getElementById('player-info-box');
 
-    // Fetch API key dynamically from Firebase Realtime Database
+    // युजरको role हेरेर मूल्य बदल्ने function
+    function updatePricesOnUI() {
+        const priceElements = document.querySelectorAll('.pack-price');
+        priceElements.forEach(el => {
+            const normal = el.getAttribute('data-normal');
+            const reseller = el.getAttribute('data-reseller');
+            el.innerText = 'Rs ' + (isUserReseller ? reseller : normal);
+        });
+
+        if (activeSelectedCard) {
+            const priceEl = activeSelectedCard.querySelector('.pack-price');
+            selectedItemPrice = isUserReseller ? priceEl.getAttribute('data-reseller') : priceEl.getAttribute('data-normal');
+            document.getElementById('summary-item').innerText = selectedItemName;
+            document.getElementById('summary-total').innerText = 'Rs ' + selectedItemPrice;
+        }
+    }
+
+    // पेज खुल्ने बित्तिकै cached अवस्था अनुसार मूल्य देखाउने
+    updatePricesOnUI();
+
     onValue(ref(db, 'settings/apiKey'), (snapshot) => {
         fetchedApiKey = snapshot.val() || "";
     });
@@ -597,9 +612,22 @@
                 document.getElementById('header-user-balance').innerText = currentWalletBalance;
                 document.getElementById('modal-user-balance').innerText = currentWalletBalance;
             });
+
+            // युजरको role ("reseller" वा "user") चेक गर्ने र cache अपडेट गर्ने
+            const roleRef = ref(db, `users/${user.uid}/role`);
+            roleListener = onValue(roleRef, (snapshot) => {
+                const userRole = snapshot.val();
+                isUserReseller = (userRole === "reseller");
+                localStorage.setItem('isResellerCached', isUserReseller);
+                updatePricesOnUI();
+            });
         } else {
             currentUser = null;
             currentWalletBalance = 0;
+            isUserReseller = false;
+            localStorage.removeItem('isResellerCached');
+            updatePricesOnUI();
+
             mainActionBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login to Buy`;
             mainActionBtn.classList.add('login-needed');
             
@@ -620,11 +648,11 @@
 
     window.logoutUser = function() {
         auth.signOut().then(() => {
+            localStorage.removeItem('isResellerCached');
             toggleProfile();
         });
     };
 
-    // Helper function to extract player name from API response
     function extractPlayerName(obj) {
         if (!obj || typeof obj !== 'object') return null;
         const keys = ['nickname', 'name', 'username', 'player_name', 'playername', 'AccountName', 'accountName', 'user_name', 'ign'];
@@ -643,7 +671,6 @@
         return null;
     }
 
-    // Trigger Error Animation Function (Red Border + Shake)
     function triggerUidError(errorText) {
         gameUidInput.classList.add('error-border', 'shake');
         uidError.style.display = "flex";
@@ -655,7 +682,6 @@
         }, 400);
     }
 
-    // Check Player UID function
     window.checkPlayerUID = async function() {
         const uidValue = gameUidInput.value.trim();
         if (!uidValue) {
@@ -674,14 +700,10 @@
         try {
             const response = await fetch(`https://api.gameskinbo.com/ff-info/get?uid=${encodeURIComponent(uidValue)}`, {
                 method: 'GET',
-                headers: {
-                    'x-api-key': fetchedApiKey
-                }
+                headers: { 'x-api-key': fetchedApiKey }
             });
 
             const data = await response.json();
-            console.log("FF Info API Response:", data);
-
             const playerName = extractPlayerName(data);
 
             if (response.ok && playerName) {
@@ -817,19 +839,21 @@
         }
     };
 
-    window.selectPack = function(element, name, packageId, price) {
+    window.selectPack = function(element, name, packageId, normalPrice, resellerPrice) {
         diamondsWrapper.classList.remove('error-border');
         packError.style.display = "none";
 
         document.querySelectorAll('.pack-card').forEach(card => card.classList.remove('selected'));
         element.classList.add('selected');
         
+        activeSelectedCard = element;
         selectedItemName = name;
         selectedPackageId = packageId;
-        selectedItemPrice = price;
+        
+        selectedItemPrice = isUserReseller ? resellerPrice : normalPrice;
 
         document.getElementById('summary-item').innerText = name;
-        document.getElementById('summary-total').innerText = 'Rs ' + price;
+        document.getElementById('summary-total').innerText = 'Rs ' + selectedItemPrice;
     };
 
     window.validateUIDLive = function() {
