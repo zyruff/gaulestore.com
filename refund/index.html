@@ -579,7 +579,7 @@
         if (activeSelectedCard) {
             const priceEl = activeSelectedCard.querySelector('.pack-price');
             selectedItemPrice = isUserReseller ? priceEl.getAttribute('data-reseller') : priceEl.getAttribute('data-normal');
-            document.getElementById('summary-item').innerText = selectedItemName + (isUserReseller ? " (Reseller)" : "");
+            document.getElementById('summary-item').innerText = selectedItemName;
             document.getElementById('summary-total').innerText = 'Rs ' + selectedItemPrice;
         }
     }
@@ -852,7 +852,7 @@
         
         selectedItemPrice = isUserReseller ? resellerPrice : normalPrice;
 
-        document.getElementById('summary-item').innerText = name + (isUserReseller ? " (Reseller)" : "");
+        document.getElementById('summary-item').innerText = name;
         document.getElementById('summary-total').innerText = 'Rs ' + selectedItemPrice;
     };
 
