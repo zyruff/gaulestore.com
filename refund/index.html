@@ -27,7 +27,7 @@
         #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
         .header-right { display: flex; align-items: center; gap: 10px; position: relative; margin-left: auto; }
         
-        /* Header Wallet (नीलो स्टाइल) */
+        /* Header Wallet */
         .header-wallet {
             display: none;
             align-items: center;
@@ -301,7 +301,7 @@
         <i class="fa-solid fa-circle-exclamation"></i> <span>Please select a pack to proceed!</span>
     </div>
 
-    <!-- Normal Price र Reseller Price यहाँ राखिएको छ (Normal, Reseller) -->
+    <!-- Normal Price र Reseller Price (Normal, Reseller) -->
     <div class="cards-grid" id="diamonds-wrapper">
         <div class="pack-card" onclick="selectPack(this, '25 Diamonds', '1773', 30, 25)">
             <div class="pack-title">25 Diamonds</div>
@@ -552,7 +552,7 @@
     let balanceListener = null;
     let roleListener = null;
     let currentWalletBalance = 0;
-    let isUserReseller = false; 
+    let isUserReseller = localStorage.getItem('isResellerCached') === 'true'; 
     let verifiedPlayerName = "";
     let fetchedApiKey = "";
     let currentCheckedUid = "";
@@ -567,10 +567,6 @@
     const checkTriggerBtn = document.getElementById('check-trigger-btn');
     const playerInfoBox = document.getElementById('player-info-box');
 
-    onValue(ref(db, 'settings/apiKey'), (snapshot) => {
-        fetchedApiKey = snapshot.val() || "";
-    });
-
     // युजरको role हेरेर मूल्य बदल्ने function
     function updatePricesOnUI() {
         const priceElements = document.querySelectorAll('.pack-price');
@@ -583,9 +579,17 @@
         if (activeSelectedCard) {
             const priceEl = activeSelectedCard.querySelector('.pack-price');
             selectedItemPrice = isUserReseller ? priceEl.getAttribute('data-reseller') : priceEl.getAttribute('data-normal');
+            document.getElementById('summary-item').innerText = selectedItemName + (isUserReseller ? " (Reseller)" : "");
             document.getElementById('summary-total').innerText = 'Rs ' + selectedItemPrice;
         }
     }
+
+    // पेज खुल्ने बित्तिकै cached अवस्था अनुसार मूल्य देखाउने
+    updatePricesOnUI();
+
+    onValue(ref(db, 'settings/apiKey'), (snapshot) => {
+        fetchedApiKey = snapshot.val() || "";
+    });
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
@@ -609,17 +613,19 @@
                 document.getElementById('modal-user-balance').innerText = currentWalletBalance;
             });
 
-            // युजरको role ("reseller" वा "user") चेक गर्ने
+            // युजरको role ("reseller" वा "user") चेक गर्ने र cache अपडेट गर्ने
             const roleRef = ref(db, `users/${user.uid}/role`);
             roleListener = onValue(roleRef, (snapshot) => {
                 const userRole = snapshot.val();
                 isUserReseller = (userRole === "reseller");
+                localStorage.setItem('isResellerCached', isUserReseller);
                 updatePricesOnUI();
             });
         } else {
             currentUser = null;
             currentWalletBalance = 0;
             isUserReseller = false;
+            localStorage.removeItem('isResellerCached');
             updatePricesOnUI();
 
             mainActionBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login to Buy`;
@@ -642,6 +648,7 @@
 
     window.logoutUser = function() {
         auth.signOut().then(() => {
+            localStorage.removeItem('isResellerCached');
             toggleProfile();
         });
     };
@@ -836,7 +843,6 @@
         diamondsWrapper.classList.remove('error-border');
         packError.style.display = "none";
 
-        document.querySelectorAll('.pack-card').cards?.forEach(card => card.classList.remove('selected'));
         document.querySelectorAll('.pack-card').forEach(card => card.classList.remove('selected'));
         element.classList.add('selected');
         
