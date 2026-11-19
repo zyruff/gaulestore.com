@@ -45,8 +45,28 @@
         body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; padding-bottom: 70px; }
         
         /* Header Layout */
-        .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #2563EB; justify-content: flex-start; gap: 15px; position: sticky; top: 0; z-index: 1000; }
-        .header-right { display: flex; align-items: center; gap: 10px; position: relative; margin-left: auto; flex-shrink: 0; }
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-bottom: 2px solid #2563EB;
+            justify-content: space-between;
+            gap: 8px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-sizing: border-box;
+            width: 100%;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
         
         #nav-menu { display: none; position: fixed; top: 0; left: 0; background: #fff; border: 1px solid #ccc; padding: 20px; width: 250px; height: 100%; z-index: 2000; box-shadow: 2px 2px 10px #ccc; }
         .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -58,13 +78,13 @@
         .header-wallet {
             display: none;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             background-color: #eff6ff;
             border: 1px solid #93c5fd;
             color: #2563EB;
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: bold;
             text-decoration: none;
             cursor: pointer;
@@ -83,7 +103,7 @@
         .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; cursor: pointer; border-radius: 4px; width: 100%; }
         #nav-menu a { display: block; padding: 12px 0; color: black; text-decoration: none; border-bottom: 1px solid #eee; }
         
-        .store-logo { height: 50px; width: auto; object-fit: contain; display: block; background-color: #ffffff; padding: 4px; border-radius: 6px; }
+        .store-logo { height: 44px; width: auto; object-fit: contain; display: block; background-color: #ffffff; padding: 2px; border-radius: 6px; }
         .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; display: block; }
 
         /* Swiper Slider Styles */
@@ -847,7 +867,7 @@
 
 <!-- Header Section -->
 <div class="header">
-    <a href="https://roshantamang2.com.np" style="margin-left: 5px; flex-shrink: 0;">
+    <a href="https://roshantamang2.com.np" style="flex-shrink: 0;">
         <img src="https://roshantamang2.com.np/image/logo.png" alt="RG Digital Store Logo" class="store-logo">
     </a>
 
