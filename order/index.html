@@ -215,8 +215,33 @@
         .product-name { font-size: 15px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 6px; }
         .product-name i { color: #0ea5e9; font-size: 13px; }
         
-        .info-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #475569; font-weight: 500; word-break: break-all; width: 100%; }
-        .info-row i { width: 14px; color: #94a3b8; flex-shrink: 0; text-align: center; }
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            font-size: 12px;
+            color: #475569;
+            font-weight: 500;
+            line-height: 1.45;
+            width: 100%;
+        }
+        .info-row i {
+            width: 14px;
+            line-height: 1.45;
+            color: #94a3b8;
+            flex-shrink: 0;
+            text-align: center;
+        }
+        .info-label {
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .info-value {
+            flex: 1;
+            min-width: 0;
+            word-break: normal;
+            overflow-wrap: anywhere;
+        }
         
         .price-tag { font-size: 15px; font-weight: 800; color: #059669; margin-top: 4px; }
 
@@ -698,18 +723,18 @@
                             </div>
                             <div class="item-details">
                                 <div class="product-name"><i class="fa-solid fa-gem"></i> ${productTitle}</div>
-                                ${orderDateStr ? `<div class="info-row"><i class="fa-solid fa-calendar-days"></i> ${orderDateStr}</div>` : ''}
-                                ${displayEmail ? `<div class="info-row"><i class="fa-solid fa-envelope"></i> ${displayEmail}</div>` : ''}
-                                ${displayUID ? `<div class="info-row"><i class="fa-solid fa-gamepad"></i> UID: <b>${displayUID}</b></div>` : ''}
-                                ${displayPlayerName && displayPlayerName !== "Unknown" ? `<div class="info-row"><i class="fa-solid fa-user-check"></i> Name: <b style="color: #0284c7;">${displayPlayerName}</b></div>` : ''}
-                                ${displayZoneId ? `<div class="info-row"><i class="fa-solid fa-server"></i> Zone ID: <b>${displayZoneId}</b></div>` : ''}
+                                ${orderDateStr ? `<div class="info-row"><i class="fa-solid fa-calendar-days"></i> <span class="info-value">${orderDateStr}</span></div>` : ''}
+                                ${displayEmail ? `<div class="info-row"><i class="fa-solid fa-envelope"></i> <span class="info-value">${displayEmail}</span></div>` : ''}
+                                ${displayUID ? `<div class="info-row"><i class="fa-solid fa-gamepad"></i> <span class="info-label">UID:</span> <b class="info-value">${displayUID}</b></div>` : ''}
+                                ${displayPlayerName && displayPlayerName !== "Unknown" ? `<div class="info-row"><i class="fa-solid fa-user-check"></i> <span class="info-label">Name:</span> <b class="info-value" style="color: #0284c7;">${displayPlayerName}</b></div>` : ''}
+                                ${displayZoneId ? `<div class="info-row"><i class="fa-solid fa-server"></i> <span class="info-label">Zone ID:</span> <b class="info-value">${displayZoneId}</b></div>` : ''}
                                 
                                 ${voucherCode ? `<div class="info-row" onclick="copyToClipboard('${voucherCode}')" style="background:transparent; padding:4px 0; margin-top:4px; margin-left:0; cursor:pointer; width:100%; display:flex; align-items:center;" title="Click to copy code"><i class="fa-solid fa-key" style="cursor:pointer; width:14px; text-align:center; margin-right:6px; color:#94a3b8;"></i> <b style="letter-spacing:0.5px; flex-grow:1; color:#047857; background:#ecfdf5; padding:6px 10px; border-radius:8px; border:1px dashed #34d399; display:inline-block;">${voucherCode}</b> <i class="fa-regular fa-copy" style="color:#059669; margin-left:8px;"></i></div>` : ''}
                                 
                                 <div class="txn-row-box">
-                                    ${transactionId ? `<div class="info-row" style="color:#059669;"><i class="fa-solid fa-receipt"></i> Txn ID: <b>${transactionId}</b></div>` : `<div class="info-row" style="color:#6b7280;"><i class="fa-solid fa-receipt"></i> Txn ID: <b>Not Provided</b></div>`}
-                                    ${clientOrderId ? `<div class="info-row"><i class="fa-solid fa-hashtag"></i> Order Id: <b>${clientOrderId}</b></div>` : ''}
-                                    ${webhookMessage ? `<div class="info-row"><i class="fa-solid fa-message"></i> SMS: <b>${webhookMessage}</b></div>` : ''}
+                                    ${transactionId ? `<div class="info-row" style="color:#059669;"><i class="fa-solid fa-receipt"></i> <span class="info-label">Txn ID:</span> <b class="info-value">${transactionId}</b></div>` : `<div class="info-row" style="color:#6b7280;"><i class="fa-solid fa-receipt"></i> <span class="info-label">Txn ID:</span> <b class="info-value">Not Provided</b></div>`}
+                                    ${clientOrderId ? `<div class="info-row"><i class="fa-solid fa-hashtag"></i> <span class="info-label">Order Id:</span> <b class="info-value">${clientOrderId}</b></div>` : ''}
+                                    ${webhookMessage ? `<div class="info-row"><i class="fa-solid fa-message"></i> <span class="info-label">SMS:</span> <b class="info-value">${webhookMessage}</b></div>` : ''}
                                 </div>
 
                                 <div class="price-tag">Rs. ${orderAmount}</div>
