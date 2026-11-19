@@ -40,21 +40,24 @@
         .header { 
             display: flex; 
             align-items: center; 
-            padding: 15px; 
+            padding: 12px; 
             background: white; 
             border-bottom: 2px solid #2563EB; 
-            justify-content: flex-start; 
-            gap: 15px; 
+            justify-content: space-between; 
+            gap: 8px; 
             position: sticky; 
             top: 0; 
             z-index: 1000; 
+            box-sizing: border-box;
+            width: 100%;
         }
         .header-right { 
             display: flex; 
             align-items: center; 
-            gap: 10px; 
+            gap: 8px; 
             position: relative; 
             margin-left: auto; 
+            flex-shrink: 0;
         }
         
         /* Initially Hidden until login */
@@ -67,35 +70,39 @@
             color: #2563EB;
             padding: 5px 10px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: bold;
             text-decoration: none;
             cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         .header-wallet:hover { background-color: #dbeafe; }
-        .header-wallet svg { width: 16px; height: 16px; fill: #2563EB; }
+        .header-wallet svg { width: 16px; height: 16px; fill: #2563EB; flex-shrink: 0; }
+        .header-wallet > span { white-space: nowrap; }
         
         /* Store Logo */
         .store-logo { 
-            height: 50px; 
+            height: 44px; 
             width: auto; 
             object-fit: contain; 
             display: block; 
             background-color: #ffffff; 
-            padding: 4px; 
+            padding: 2px; 
             border-radius: 6px; 
         }
 
         /* Initially Hidden until login */
         #header-user-img { 
             display: none;
-            width: 38px; 
-            height: 38px; 
+            width: 35px; 
+            height: 35px; 
             border-radius: 50%; 
             cursor: pointer; 
             border: 2px solid var(--primary); 
             object-fit: cover; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            flex-shrink: 0;
         }
 
         /* Profile Dropdown Menu */
@@ -384,7 +391,7 @@
 
 <!-- Header Section -->
 <div class="header">
-    <a href="https://roshantamang2.com.np" style="margin-left: 5px; display: flex; align-items: center;">
+    <a href="https://roshantamang2.com.np" style="display: flex; align-items: center; flex-shrink: 0;">
         <img src="https://roshantamang2.com.np/image/logo.png" alt="Gaule Store Logo" class="store-logo">
     </a>
 
@@ -515,6 +522,67 @@
     </a>
 </div>
 
+<!-- Instant LocalStorage Hydration (Prevents "User" / "0" flash on refresh) -->
+<script>
+    const PROFILE_CACHE_KEY = 'rg_cached_profile_v1';
+    const STATS_CACHE_KEY = 'rg_cached_stats_v1';
+    const LOGGED_OUT_KEY = 'rg_logged_out';
+
+    function applyBalanceToUI(rawBal) {
+        const balNum = Number(rawBal || 0);
+        document.getElementById("header-balance").innerText = balNum.toLocaleString();
+        document.getElementById("sub-balance").innerText = balNum.toLocaleString();
+        document.getElementById("account-balance").innerText = balNum.toFixed(2);
+    }
+
+    function applyStatsToUI(stats) {
+        if (!stats) return;
+        if (typeof stats.orders === 'number') {
+            document.getElementById("stat-orders").innerText = stats.orders.toLocaleString();
+        }
+        if (typeof stats.spent === 'number') {
+            document.getElementById("stat-spent").innerText = stats.spent.toLocaleString() + " RS";
+        }
+        if (typeof stats.weekly === 'number') {
+            document.getElementById("stat-weekly").innerText = stats.weekly.toLocaleString() + " RS";
+        }
+    }
+
+    (function hydrateFromLocalStorage() {
+        if (localStorage.getItem(LOGGED_OUT_KEY) === '1') return;
+        try {
+            const cachedProfile = JSON.parse(localStorage.getItem(PROFILE_CACHE_KEY) || 'null');
+            if (cachedProfile && cachedProfile.uid) {
+                const name = cachedProfile.name || "User";
+                const email = cachedProfile.email || "No email linked";
+                const photo = cachedProfile.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2563EB&color=fff`;
+
+                document.getElementById("header-wallet-btn").style.display = "flex";
+                document.getElementById("header-user-img").style.display = "block";
+                document.getElementById("header-user-img").src = photo;
+                document.getElementById("profile-avatar").src = photo;
+                document.getElementById("profile-name").innerText = name;
+                document.getElementById("profile-email").innerText = email;
+                document.getElementById("dropdown-name").innerText = name;
+                document.getElementById("dropdown-email").innerText = email;
+                document.getElementById("stat-pin").innerText = cachedProfile.uid.substring(0, 5).toUpperCase();
+                document.getElementById("auth-status-text").innerText = "Account Verified";
+
+                if (cachedProfile.balance !== undefined) {
+                    applyBalanceToUI(cachedProfile.balance);
+                }
+
+                const cachedStats = JSON.parse(localStorage.getItem(STATS_CACHE_KEY) || 'null');
+                if (cachedStats && cachedStats.uid === cachedProfile.uid) {
+                    applyStatsToUI(cachedStats);
+                }
+            }
+        } catch (e) {
+            // Ignore malformed localStorage entries
+        }
+    })();
+</script>
+
 <!-- Firebase & Script Integration -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -554,6 +622,9 @@
     // Handle Logout functionality
     window.logoutUser = () => {
         if (confirm("Are you sure you want to log out?")) {
+            localStorage.removeItem(PROFILE_CACHE_KEY);
+            localStorage.removeItem(STATS_CACHE_KEY);
+            localStorage.setItem(LOGGED_OUT_KEY, '1');
             signOut(auth).then(() => {
                 window.location.href = "https://roshantamang2.com.np/login/";
             }).catch((error) => {
@@ -565,32 +636,59 @@
     // Authentication State Listener
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            localStorage.removeItem(LOGGED_OUT_KEY);
+
             // Show Wallet & Profile image on login
             document.getElementById("header-wallet-btn").style.display = "flex";
             document.getElementById("header-user-img").style.display = "block";
 
-            const photoUrl = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || "User")}&background=2563EB&color=fff`;
+            const name = user.displayName || "User";
+            const email = user.email || "No email linked";
+            const photoUrl = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2563EB&color=fff`;
+
             document.getElementById("profile-avatar").src = photoUrl;
             document.getElementById("header-user-img").src = photoUrl;
-            document.getElementById("profile-name").innerText = user.displayName || "User";
-            document.getElementById("profile-email").innerText = user.email || "No email linked";
-            document.getElementById("dropdown-name").innerText = user.displayName || "User";
-            document.getElementById("dropdown-email").innerText = user.email || "No email linked";
+            document.getElementById("profile-name").innerText = name;
+            document.getElementById("profile-email").innerText = email;
+            document.getElementById("dropdown-name").innerText = name;
+            document.getElementById("dropdown-email").innerText = email;
             
             const shortPin = user.uid.substring(0, 5).toUpperCase();
             document.getElementById("stat-pin").innerText = shortPin;
             document.getElementById("auth-status-text").innerText = "Account Verified";
+
+            let existingCache = {};
+            try {
+                existingCache = JSON.parse(localStorage.getItem(PROFILE_CACHE_KEY) || '{}');
+            } catch (e) {}
+
+            localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify({
+                uid: user.uid,
+                name: name,
+                email: email,
+                photo: photoUrl,
+                balance: existingCache.uid === user.uid ? (existingCache.balance || 0) : 0
+            }));
 
             // Fetch user wallet balance from database
             const userRef = ref(db, 'users/' + user.uid);
             onValue(userRef, (snapshot) => {
                 if (snapshot.exists()) {
                     const data = snapshot.val();
-                    const bal = data.balance || 0;
+                    const bal = Number(data.balance || 0);
+                    applyBalanceToUI(bal);
 
-                    document.getElementById("header-balance").innerText = bal;
-                    document.getElementById("sub-balance").innerText = bal;
-                    document.getElementById("account-balance").innerText = parseFloat(bal).toFixed(2);
+                    try {
+                        const latestCache = JSON.parse(localStorage.getItem(PROFILE_CACHE_KEY) || '{}');
+                        localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify({
+                            ...latestCache,
+                            uid: user.uid,
+                            name: name,
+                            email: email,
+                            photo: photoUrl,
+                            balance: bal
+                        }));
+                    } catch (e) {}
                 }
             });
 
@@ -620,16 +718,28 @@
                         }
                     });
 
-                    document.getElementById("stat-orders").innerText = orderCount;
-                    document.getElementById("stat-spent").innerText = totalSpent.toLocaleString() + " RS";
-                    document.getElementById("stat-weekly").innerText = weeklySpent.toLocaleString() + " RS";
+                    applyStatsToUI({
+                        orders: orderCount,
+                        spent: totalSpent,
+                        weekly: weeklySpent
+                    });
+
+                    localStorage.setItem(STATS_CACHE_KEY, JSON.stringify({
+                        uid: user.uid,
+                        orders: orderCount,
+                        spent: totalSpent,
+                        weekly: weeklySpent
+                    }));
                 }
             });
         } else {
-            // Not Logged In -> Hide Wallet & Profile Image, then Redirect to Login Page
-            document.getElementById("header-wallet-btn").style.display = "none";
-            document.getElementById("header-user-img").style.display = "none";
-            window.location.href = "https://roshantamang2.com.np/login/";
+            // Avoid redirect loop when cache exists and Firebase is still restoring session
+            const hasCachedSession = Boolean(localStorage.getItem(PROFILE_CACHE_KEY)) && localStorage.getItem(LOGGED_OUT_KEY) !== '1';
+            if (!hasCachedSession) {
+                document.getElementById("header-wallet-btn").style.display = "none";
+                document.getElementById("header-user-img").style.display = "none";
+                window.location.href = "https://roshantamang2.com.np/login/";
+            }
         }
     });
 </script>
