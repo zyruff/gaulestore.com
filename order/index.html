@@ -362,7 +362,7 @@
         <div class="search-bar-container" id="searchBarContainer">
             <div class="search-input-wrap">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="orderSearchInput" class="search-input" placeholder="Search Product, Username, Email, UID, Name, Order Id, Txn ID..." onkeyup="renderOrders()">
+                <input type="text" id="orderSearchInput" class="search-input" placeholder="Search Product, Email, Username, UID, Name, Order Id, Txn ID..." onkeyup="renderOrders()">
                 <button type="button" class="search-clear-btn" onclick="toggleSearchbar()" title="Close Search">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -708,7 +708,7 @@
                 const voucherCode = order.voucherCode || order.redeemCode || '';
 
                 const matchesStatus = (currentStatusFilter === 'all' || orderStatus === currentStatusFilter);
-                const searchString = `${orderIdStr} ${productTitle} ${displayUsername} ${displayEmail} ${displayUID} ${displayPlayerName} ${displayZoneId} ${orderAmount} ${voucherCode} ${transactionId} ${clientOrderId} ${webhookMessage} ${orderDateStr}`.toLowerCase();
+                const searchString = `${orderIdStr} ${productTitle} ${displayEmail} ${displayUsername} ${displayUID} ${displayPlayerName} ${displayZoneId} ${orderAmount} ${voucherCode} ${transactionId} ${clientOrderId} ${webhookMessage} ${orderDateStr}`.toLowerCase();
                 const matchesSearch = searchString.includes(searchQuery);
 
                 if (matchesStatus && matchesSearch) {
@@ -727,8 +727,8 @@
                             <div class="item-details">
                                 <div class="product-name"><i class="fa-solid fa-gem"></i> ${productTitle}</div>
                                 ${orderDateStr ? `<div class="info-row"><i class="fa-solid fa-calendar-days"></i> <span class="info-value">${orderDateStr}</span></div>` : ''}
-                                ${displayUsername ? `<div class="info-row"><i class="fa-solid fa-at"></i> <span class="info-label">Username:</span> <b class="info-value" style="color: #0f172a;">${displayUsername}</b></div>` : ''}
                                 ${displayEmail ? `<div class="info-row"><i class="fa-solid fa-envelope"></i> <span class="info-value">${displayEmail}</span></div>` : ''}
+                                ${displayUsername ? `<div class="info-row"><i class="fa-solid fa-at"></i> <span class="info-label">Username:</span> <b class="info-value" style="color: #0f172a;">${displayUsername}</b></div>` : ''}
                                 ${displayUID ? `<div class="info-row"><i class="fa-solid fa-gamepad"></i> <span class="info-label">UID:</span> <b class="info-value">${displayUID}</b></div>` : ''}
                                 ${displayPlayerName && displayPlayerName !== "Unknown" ? `<div class="info-row"><i class="fa-solid fa-user-check"></i> <span class="info-label">Name:</span> <b class="info-value" style="color: #0284c7;">${displayPlayerName}</b></div>` : ''}
                                 ${displayZoneId ? `<div class="info-row"><i class="fa-solid fa-server"></i> <span class="info-label">Zone ID:</span> <b class="info-value">${displayZoneId}</b></div>` : ''}
