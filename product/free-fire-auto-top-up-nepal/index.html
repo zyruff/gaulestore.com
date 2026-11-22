@@ -16,7 +16,7 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { background-color: #ffffff; color: #2d3748; padding-bottom: 70px; }
+        body { background-color: #ffffff; color: #2d3748; padding-bottom: 85px; }
         
         /* Header Layout */
         .header { display: flex; align-items: center; padding: 12px; background: white; border-bottom: 2px solid #2563EB; justify-content: space-between; gap: 8px; position: sticky; top: 0; z-index: 1000; width: 100%; }
@@ -133,6 +133,39 @@
         .total-price { font-size: 20px; font-weight: 700; color: #ffb300; }
         .action-btn { display: flex; justify-content: center; align-items: center; gap: 8px; border: none; cursor: pointer; font-weight: 700; color: #ffffff; background-color: #ffb300; transition: background 0.2s; width: 100%; height: 48px; font-size: 15px; border-radius: 25px; margin: 0 auto; }
         .action-btn.login-needed { background-color: #dc2626; }
+
+        /* Description, Rules, Support Center & Copyright Styling */
+        .info-card-panel { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .info-desc-text { font-size: 13px; color: #4a5568; line-height: 1.6; }
+        .rules-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .rules-list li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #4a5568; line-height: 1.5; }
+        .rules-list li i { color: #2563EB; margin-top: 3px; flex-shrink: 0; }
+
+        .support-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .support-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 12px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #1a202c;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .support-btn:hover { background-color: #eff6ff; border-color: #93c5fd; }
+        .support-btn i { font-size: 17px; width: 20px; text-align: center; flex-shrink: 0; }
+        .support-btn .fa-youtube { color: #dc2626; }
+        .support-btn .fa-tiktok { color: #1a202c; }
+        .support-btn .fa-facebook { color: #2563eb; }
+        .support-btn .fa-whatsapp { color: #16a34a; }
+        .support-btn .fa-facebook-messenger { color: #0084ff; }
+        .support-btn .fa-envelope { color: #d97706; }
+
+        .footer-copyright { margin: 24px 16px 12px 16px; padding-top: 14px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #718096; line-height: 1.5; }
         
         .success-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 300; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out; }
         .success-modal.show { opacity: 1; pointer-events: auto; }
@@ -144,9 +177,26 @@
         .checkout-title { font-size: 18px; font-weight: 700; text-align: center; color: #1a202c; margin-bottom: 4px; }
         .checkout-subtitle { font-size: 12px; text-align: center; color: #718096; margin-bottom: 16px; }
         
-        .wallet-box-banner { border: 1px solid #fca5a5; background-color: #fef2f2; border-radius: 12px; padding: 12px; text-align: center; margin-bottom: 16px; }
-        .wallet-box-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #dc2626; letter-spacing: 0.5px; }
-        .wallet-box-amount { font-size: 22px; font-weight: 800; color: #dc2626; margin-top: 2px; }
+        .wallet-box-banner {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .wallet-box-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .wallet-box-row:last-child { margin-bottom: 0; }
+        .wallet-box-row span:first-child { color: #1a202c; font-weight: 600; }
+        .wallet-box-avail { color: #1a202c; font-weight: 700; }
+        .wallet-box-req-wrap { color: #1a202c; font-weight: 600; }
+        .wallet-box-req { color: #dc2626; font-weight: 700; }
 
         .payment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
         .payment-card { background-color: #fafbfc; border: 1px solid #cbd5e0; border-radius: 10px; padding: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
@@ -161,6 +211,44 @@
         .checkout-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
         .checkout-row span:first-child { color: #718096; }
         .checkout-row span:last-child { color: #1a202c; font-weight: 600; }
+
+        .insufficient-summary-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .insufficient-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .insufficient-row:last-child { margin-bottom: 0; }
+        .insufficient-row span:first-child { color: #1a202c; font-weight: 600; }
+        .insufficient-avail { color: #1a202c; font-weight: 700; }
+        .insufficient-req-wrap { color: #1a202c; font-weight: 600; }
+        .insufficient-req { color: #dc2626; font-weight: 700; }
+        .add-money-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px;
+            background-color: #2563EB;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: background 0.2s;
+        }
+        .add-money-btn:hover { background-color: #1d4ed8; }
 
         .success-checkmark { width: 72px; height: 72px; background: #2ed573; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; }
         .success-checkmark i { color: white; font-size: 32px; }
@@ -285,7 +373,7 @@
         </div>
         
         <div class="error-message" id="uid-error">
-            <i class="fa-solid fa-circle-exclamation"></i> <span>Invalid or Missing UID!</span>
+            <i class="fa-solid fa-circle-exclamation"></i> <span>Please enter your Game UID!</span>
         </div>
         
         <div class="instruction-text">
@@ -389,6 +477,73 @@
     </div>
 </div>
 
+<!-- Description Section -->
+<div class="section-box">
+    <div class="section-header-flex">
+        <div class="box-title">Description</div>
+    </div>
+    <div class="info-card-panel">
+        <p class="info-desc-text">
+            RG DIGITAL STORE provides fast and automated Free Fire Diamonds and Membership top-up in Nepal. Enter your valid Player UID, verify your in-game name, choose your desired package, and complete payment directly from your wallet balance for instant processing.
+        </p>
+    </div>
+</div>
+
+<!-- Rules Section -->
+<div class="section-box">
+    <div class="section-header-flex">
+        <div class="box-title">Rules</div>
+    </div>
+    <div class="info-card-panel">
+        <ul class="rules-list">
+            <li><i class="fa-solid fa-circle-check"></i><span>Please double-check your Free Fire Player UID before placing an order. Orders sent to a wrong UID cannot be refunded.</span></li>
+            <li><i class="fa-solid fa-circle-check"></i><span>Ensure your wallet has sufficient balance for the selected package before confirming checkout.</span></li>
+            <li><i class="fa-solid fa-circle-check"></i><span>Most top-up orders are processed automatically within seconds, though rare server delays may take a few minutes.</span></li>
+            <li><i class="fa-solid fa-circle-check"></i><span>For any order issues or support, keep your Order ID ready and contact RG DIGITAL STORE support.</span></li>
+        </ul>
+    </div>
+</div>
+
+<!-- Stay Connected & Support Center -->
+<div class="section-box">
+    <div class="section-header-flex">
+        <div class="box-title">Stay Connected & Support Center</div>
+    </div>
+    <div class="info-card-panel">
+        <div class="support-grid">
+            <a href="https://youtube.com" target="_blank" class="support-btn">
+                <i class="fa-brands fa-youtube"></i>
+                <span>YouTube</span>
+            </a>
+            <a href="https://tiktok.com" target="_blank" class="support-btn">
+                <i class="fa-brands fa-tiktok"></i>
+                <span>TikTok</span>
+            </a>
+            <a href="https://facebook.com" target="_blank" class="support-btn">
+                <i class="fa-brands fa-facebook"></i>
+                <span>Facebook</span>
+            </a>
+            <a href="https://wa.me/9779761081110" target="_blank" class="support-btn">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>WhatsApp</span>
+            </a>
+            <a href="https://m.me" target="_blank" class="support-btn">
+                <i class="fa-brands fa-facebook-messenger"></i>
+                <span>Messenger</span>
+            </a>
+            <a href="mailto:rgdigitalstore7@gmail.com" class="support-btn">
+                <i class="fa-solid fa-envelope"></i>
+                <span>Email</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- All Rights Reserved Copyright -->
+<footer class="footer-copyright">
+    &copy; 2026 RG DIGITAL STORE. All rights reserved.
+</footer>
+
 <div class="success-modal" id="checkoutModal">
     <div class="success-card checkout-card">
         <span class="checkout-close" onclick="closeCheckoutModal()">&times;</span>
@@ -396,8 +551,14 @@
         <div class="checkout-subtitle">Pay securely using your account balance</div>
         
         <div class="wallet-box-banner">
-            <div class="wallet-box-label">Available Wallet Balance</div>
-            <div class="wallet-box-amount">Rs <span id="modal-user-balance">0</span></div>
+            <div class="wallet-box-row">
+                <span>Your account balance</span>
+                <span class="wallet-box-avail">Rs. <span id="modal-user-balance">689</span></span>
+            </div>
+            <div class="wallet-box-row">
+                <span>Required to buy product</span>
+                <span class="wallet-box-req-wrap">Rs. <span class="wallet-box-req" id="modal-required-amount">100</span></span>
+            </div>
         </div>
 
         <div class="payment-grid">
@@ -475,8 +636,23 @@
             <i class="fa-solid fa-wallet" style="color: #dc2626; font-size: 28px;"></i>
         </div>
         <div class="success-title">Insufficient Balance</div>
-        <p class="success-msg">Your wallet balance is insufficient! Please top up your account balance before proceeding.</p>
-        <button class="success-close-btn" style="background-color: #dc2626;" onclick="closeInsufficientModal()">Got It</button>
+        <p class="success-msg">Your wallet balance is insufficient to purchase this package. Please add money to continue.</p>
+
+        <div class="insufficient-summary-box">
+            <div class="insufficient-row">
+                <span>Your account balance</span>
+                <span class="insufficient-avail" id="insufficient-available-balance">Rs. 689</span>
+            </div>
+            <div class="insufficient-row">
+                <span>Required to buy product</span>
+                <span class="insufficient-req-wrap">Rs. <span class="insufficient-req" id="insufficient-required-amount">100</span></span>
+            </div>
+        </div>
+
+        <a href="https://roshantamang2.com.np/load-wallet" class="add-money-btn">
+            <i class="fa-solid fa-plus"></i> ADD MONEY
+        </a>
+        <button class="success-close-btn" style="background-color: #1a202c;" onclick="closeInsufficientModal()">Got It</button>
     </div>
 </div>
 
@@ -554,7 +730,7 @@
     let selectedItemPrice = "";
     let balanceListener = null;
     let roleListener = null;
-    let currentWalletBalance = 0;
+    let currentWalletBalance = 689;
     let isUserReseller = localStorage.getItem('isResellerCached') === 'true'; 
     let verifiedPlayerName = "";
     let fetchedApiKey = "";
@@ -569,6 +745,17 @@
     const diamondsWrapper = document.getElementById('diamonds-wrapper');
     const checkTriggerBtn = document.getElementById('check-trigger-btn');
     const playerInfoBox = document.getElementById('player-info-box');
+
+    function formatNum(amount) {
+        const num = Number(amount) || 0;
+        return num.toLocaleString('en-US');
+    }
+
+    function openInsufficientModal(availableBal, requiredAmt) {
+        document.getElementById('insufficient-available-balance').innerText = 'Rs. ' + formatNum(availableBal);
+        document.getElementById('insufficient-required-amount').innerText = formatNum(requiredAmt);
+        document.getElementById('insufficientModal').classList.add('show');
+    }
 
     // युजरको role हेरेर मूल्य बदल्ने function
     function updatePricesOnUI() {
@@ -626,7 +813,7 @@
             });
         } else {
             currentUser = null;
-            currentWalletBalance = 0;
+            currentWalletBalance = 689;
             isUserReseller = false;
             localStorage.removeItem('isResellerCached');
             updatePricesOnUI();
@@ -639,7 +826,7 @@
             document.getElementById('profile-dropdown').style.display = 'none';
             document.getElementById('header-wallet-btn').style.display = 'none';
             document.getElementById('header-user-balance').innerText = '0';
-            document.getElementById('modal-user-balance').innerText = '0';
+            document.getElementById('modal-user-balance').innerText = '689';
         }
     });
 
@@ -685,10 +872,14 @@
         }, 400);
     }
 
+    function isValidUidLength(uidValue) {
+        return uidValue.length >= 8;
+    }
+
     window.checkPlayerUID = async function() {
         const uidValue = gameUidInput.value.trim();
-        if (!uidValue) {
-            triggerUidError("Please enter your Game UID first!");
+        if (!isValidUidLength(uidValue)) {
+            triggerUidError("Please enter your Game UID!");
             return;
         }
 
@@ -752,7 +943,7 @@
         }
 
         let uidValue = gameUidInput.value.trim();
-        if (uidValue === "") {
+        if (!isValidUidLength(uidValue)) {
             triggerUidError("Please enter your Game UID!");
             if(isFormValid) gameUidInput.focus();
             isFormValid = false;
@@ -760,6 +951,13 @@
 
         if(!isFormValid) return;
 
+        const itemPriceNum = parseFloat(selectedItemPrice);
+        if (currentWalletBalance < itemPriceNum) {
+            openInsufficientModal(currentWalletBalance, itemPriceNum);
+            return;
+        }
+
+        document.getElementById('modal-required-amount').innerText = formatNum(itemPriceNum);
         document.getElementById('modal-checkout-uid').innerText = uidValue;
         document.getElementById('modal-checkout-item').innerText = selectedItemName;
         document.getElementById('modal-checkout-total').innerText = 'Rs ' + selectedItemPrice;
@@ -772,7 +970,7 @@
 
         if (currentWalletBalance < itemPriceNum) {
             closeCheckoutModal();
-            document.getElementById('insufficientModal').classList.add('show');
+            openInsufficientModal(currentWalletBalance, itemPriceNum);
             return;
         }
 
@@ -860,11 +1058,12 @@
     };
 
     window.validateUIDLive = function() {
-        if (gameUidInput.value.trim() !== "") {
+        const val = gameUidInput.value.trim();
+        if (isValidUidLength(val)) {
             gameUidInput.classList.remove('error-border');
             uidError.style.display = "none";
         }
-        if (gameUidInput.value.trim() !== currentCheckedUid) {
+        if (val !== currentCheckedUid) {
             verifiedPlayerName = "";
             playerInfoBox.style.display = 'none';
             checkTriggerBtn.style.display = 'flex';
