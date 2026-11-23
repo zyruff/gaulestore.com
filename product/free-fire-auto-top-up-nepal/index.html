@@ -706,7 +706,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, push, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, push, set, onValue, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCFUQu06EvmJCtplZ8dRqVhHnB7I1yQuKw",
@@ -757,7 +757,6 @@
         document.getElementById('insufficientModal').classList.add('show');
     }
 
-    // युजरको role हेरेर मूल्य बदल्ने function
     function updatePricesOnUI() {
         const priceElements = document.querySelectorAll('.pack-price');
         priceElements.forEach(el => {
@@ -774,7 +773,6 @@
         }
     }
 
-    // पेज खुल्ने बित्तिकै cached अवस्था अनुसार मूल्य देखाउने
     updatePricesOnUI();
 
     onValue(ref(db, 'settings/apiKey'), (snapshot) => {
@@ -803,7 +801,6 @@
                 document.getElementById('modal-user-balance').innerText = currentWalletBalance;
             });
 
-            // युजरको role ("reseller" वा "user") चेक गर्ने र cache अपडेट गर्ने
             const roleRef = ref(db, `users/${user.uid}/role`);
             roleListener = onValue(roleRef, (snapshot) => {
                 const userRole = snapshot.val();
@@ -951,7 +948,7 @@
 
         if(!isFormValid) return;
 
-        const itemPriceNum = parseFloat(selectedItemPrice);
+        const itemPriceNum = Number(selectedItemPrice);
         if (currentWalletBalance < itemPriceNum) {
             openInsufficientModal(currentWalletBalance, itemPriceNum);
             return;
@@ -965,8 +962,15 @@
     };
 
     confirmPayBtn.onclick = async function() {
-        let uidValue = gameUidInput.value.trim();
-        const itemPriceNum = parseFloat(selectedItemPrice);
+        if (!currentUser) return;
+
+        const uidValue = gameUidInput.value.trim();
+        const itemPriceNum = Number(selectedItemPrice);
+
+        if (!selectedPackageId || !selectedItemName || Number.isNaN(itemPriceNum) || itemPriceNum <= 0) {
+            alert("Invalid package or price selected. Please re-select a pack.");
+            return;
+        }
 
         if (currentWalletBalance < itemPriceNum) {
             closeCheckoutModal();
@@ -975,50 +979,86 @@
         }
 
         confirmPayBtn.disabled = true;
-        confirmPayBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing Order...`;
+        confirmPayBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Saving Order...`;
+
+        const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const userOrderId = 'RG-' + randomString + Date.now().toString().slice(-4);
+        const orderRef = push(ref(db, 'orders'));
+        const orderKey = orderRef.key;
 
         try {
-            const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
-            const userOrderId = 'RG-' + randomString + Date.now().toString().slice(-4);
-            
+            // STEP 1: Transaction मार्फत सुरक्षित रूपमा wallet balance घटाउने
+            const balanceRef = ref(db, `users/${currentUser.uid}/balance`);
+            const txResult = await runTransaction(balanceRef, (currentBal) => {
+                const numericBal = Number(currentBal);
+                if (Number.isNaN(numericBal) || numericBal < itemPriceNum) {
+                    return;
+                }
+                return numericBal - itemPriceNum;
+            });
+
+            if (!txResult.committed) {
+                closeCheckoutModal();
+                openInsufficientModal(currentWalletBalance, itemPriceNum);
+                return;
+            }
+
+            // STEP 2: पहिला Firebase Database मा order save गर्ने
+            const now = new Date();
+            await set(orderRef, {
+                orderKey: orderKey,
+                date: now.toLocaleDateString(),
+                time: now.toLocaleTimeString(),
+                timestamp: Date.now(),
+                email: currentUser.email || "",
+                name: currentUser.displayName || "User",
+                userId: currentUser.uid,
+                product: selectedItemName,
+                packageId: Number(selectedPackageId),
+                amountDue: itemPriceNum,
+                uid: uidValue,
+                player_name: verifiedPlayerName || "Unknown",
+                clientOrderId: userOrderId,
+                apiOrderId: "",
+                status: "pending",
+                dispatchStatus: "sending"
+            });
+
+            // STEP 3: Database मा save भइसकेपछि बल्ल webhook / place-order API पठाउने
+            confirmPayBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending Order...`;
+
             const response = await fetch('https://gaule-store.onrender.com/api/place-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    package_id: parseInt(selectedPackageId),
+                    package_id: Number(selectedPackageId),
                     player_id: uidValue,
                     client_order_id: userOrderId,
+                    order_key: orderKey,
                     quantity: 1
                 })
             });
 
-            const result = await response.json();
+            const rawText = await response.text();
+            let result = {};
+            try {
+                result = JSON.parse(rawText);
+            } catch (_) {
+                result = { raw: rawText };
+            }
 
-            if (response.ok && (result.status === 'processing' || result.status === 'success' || result.orderid)) {
-                const newBalance = currentWalletBalance - itemPriceNum;
-                await update(ref(db, `users/${currentUser.uid}`), {
-                    balance: newBalance
-                });
+            const statusStr = String(result.status || '').toLowerCase();
+            const isOrderAccepted = response.ok && (
+                ['processing', 'success', 'pending', 'queued', 'accepted', 'completed'].includes(statusStr) ||
+                Boolean(result.orderid || result.order_id || result.data?.orderid)
+            );
 
-                const apiOrderId = result.orderid || userOrderId;
-                const now = new Date();
-                
-                const orderRef = push(ref(db, 'orders'));
-
-                set(orderRef, {
-                    date: now.toLocaleDateString(),
-                    time: now.toLocaleTimeString(),
-                    timestamp: Date.now(),
-                    email: currentUser.email,
-                    name: currentUser.displayName || "User",
-                    userId: currentUser.uid,
-                    product: selectedItemName,
-                    amountDue: selectedItemPrice,
-                    uid: uidValue,
-                    player_name: verifiedPlayerName || "Unknown",
-                    clientOrderId: userOrderId,
+            if (isOrderAccepted) {
+                const apiOrderId = result.orderid || result.order_id || result.data?.orderid || userOrderId;
+                await update(ref(db, `orders/${orderKey}`), {
                     apiOrderId: String(apiOrderId),
-                    status: "pending"
+                    dispatchStatus: "sent",
+                    dispatchedAt: Date.now()
                 });
 
                 closeCheckoutModal();
@@ -1028,11 +1068,22 @@
                 document.getElementById('receipt-status').innerText = "pending";
                 document.getElementById('successModal').classList.add('show');
             } else {
-                let errMessage = result.message || result.error || JSON.stringify(result);
-                if (typeof errMessage === 'object') errMessage = JSON.stringify(errMessage);
-                alert("Purchase Failed: " + errMessage);
+                const errMessage = result.message || result.error || rawText || "Order was not accepted by top-up server.";
+                await update(ref(db, `orders/${orderKey}`), {
+                    dispatchStatus: "failed",
+                    dispatchError: typeof errMessage === 'object' ? JSON.stringify(errMessage) : String(errMessage)
+                });
+                alert("Order saved in database, but server rejected request: " + (typeof errMessage === 'object' ? JSON.stringify(errMessage) : errMessage));
             }
         } catch (err) {
+            if (orderKey) {
+                try {
+                    await update(ref(db, `orders/${orderKey}`), {
+                        dispatchStatus: "failed",
+                        dispatchError: String(err.message || err)
+                    });
+                } catch (_) {}
+            }
             alert("Server Connection Error: " + err.message);
         } finally {
             confirmPayBtn.disabled = false;
