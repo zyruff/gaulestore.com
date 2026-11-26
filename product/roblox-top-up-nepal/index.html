@@ -27,7 +27,7 @@
         #gameSearch { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
         .header-right { display: flex; align-items: center; gap: 8px; position: relative; margin-left: auto; flex-shrink: 0; }
         
-        /* Header Wallet (नीलो स्टाइल) */
+        /* Header Wallet */
         .header-wallet {
             display: none;
             align-items: center;
@@ -190,9 +190,26 @@
         .checkout-title { font-size: 18px; font-weight: 700; text-align: center; color: #1a202c; margin-bottom: 4px; }
         .checkout-subtitle { font-size: 12px; text-align: center; color: #718096; margin-bottom: 16px; }
         
-        .wallet-box-banner { border: 1px solid #fca5a5; background-color: #fef2f2; border-radius: 12px; padding: 12px; text-align: center; margin-bottom: 16px; }
-        .wallet-box-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #dc2626; letter-spacing: 0.5px; }
-        .wallet-box-amount { font-size: 22px; font-weight: 800; color: #dc2626; margin-top: 2px; }
+        .wallet-box-banner {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .wallet-box-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .wallet-box-row:last-child { margin-bottom: 0; }
+        .wallet-box-row span:first-child { color: #1a202c; font-weight: 600; }
+        .wallet-box-avail { color: #1a202c; font-weight: 700; }
+        .wallet-box-req-wrap { color: #1a202c; font-weight: 600; }
+        .wallet-box-req { color: #dc2626; font-weight: 700; }
 
         .payment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
         .payment-card { background-color: #fafbfc; border: 1px solid #cbd5e0; border-radius: 10px; padding: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
@@ -207,6 +224,44 @@
         .checkout-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
         .checkout-row span:first-child { color: #718096; }
         .checkout-row span:last-child { color: #1a202c; font-weight: 600; }
+
+        .insufficient-summary-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .insufficient-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .insufficient-row:last-child { margin-bottom: 0; }
+        .insufficient-row span:first-child { color: #1a202c; font-weight: 600; }
+        .insufficient-avail { color: #1a202c; font-weight: 700; }
+        .insufficient-req-wrap { color: #1a202c; font-weight: 600; }
+        .insufficient-req { color: #dc2626; font-weight: 700; }
+        .add-money-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px;
+            background-color: #2563EB;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: background 0.2s;
+        }
+        .add-money-btn:hover { background-color: #1d4ed8; }
 
         .success-checkmark { width: 72px; height: 72px; background: #2ed573; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; }
         .success-checkmark i { color: white; font-size: 32px; }
@@ -265,7 +320,7 @@
             <span>Rs. <span id="header-user-balance">0</span></span>
         </a>
 
-        <div id="login-container" onclick="googleLogin()">
+        <div id="login-container" onclick="goToLogin()">
             <svg class="login-svg" viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
         <img id="profile-pic" onclick="toggleProfile()">
@@ -465,8 +520,14 @@
         <div class="checkout-subtitle">Pay securely using your account balance</div>
         
         <div class="wallet-box-banner">
-            <div class="wallet-box-label">Available Wallet Balance</div>
-            <div class="wallet-box-amount">Rs <span id="modal-user-balance">0</span></div>
+            <div class="wallet-box-row">
+                <span>Your account balance</span>
+                <span class="wallet-box-avail">Rs. <span id="modal-user-balance">0</span></span>
+            </div>
+            <div class="wallet-box-row">
+                <span>Required to buy product</span>
+                <span class="wallet-box-req-wrap">Rs. <span class="wallet-box-req" id="modal-required-amount">0</span></span>
+            </div>
         </div>
 
         <div class="payment-grid">
@@ -544,8 +605,23 @@
             <i class="fa-solid fa-wallet" style="color: #dc2626; font-size: 28px;"></i>
         </div>
         <div class="success-title">Insufficient Balance</div>
-        <p class="success-msg">Your wallet balance is insufficient! Please top up your account balance before proceeding.</p>
-        <button class="success-close-btn" style="background-color: #dc2626;" onclick="closeInsufficientModal()">Got It</button>
+        <p class="success-msg">Your wallet balance is insufficient to purchase this package. Please add money to continue.</p>
+
+        <div class="insufficient-summary-box">
+            <div class="insufficient-row">
+                <span>Your account balance</span>
+                <span class="insufficient-avail" id="insufficient-available-balance">Rs. 0</span>
+            </div>
+            <div class="insufficient-row">
+                <span>Required to buy product</span>
+                <span class="insufficient-req-wrap">Rs. <span class="insufficient-req" id="insufficient-required-amount">0</span></span>
+            </div>
+        </div>
+
+        <a href="https://roshantamang2.com.np/load-wallet" class="add-money-btn">
+            <i class="fa-solid fa-plus"></i> ADD MONEY
+        </a>
+        <button class="success-close-btn" style="background-color: #1a202c;" onclick="closeInsufficientModal()">Got It</button>
     </div>
 </div>
 
@@ -578,6 +654,10 @@
 </div>
 
 <script>
+    function goToLogin() {
+        window.location.href = "https://roshantamang2.com.np/login";
+    }
+
     function toggleMenu() {
         const menu = document.getElementById('nav-menu');
         menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
@@ -599,8 +679,8 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, push, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, push, set, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCFUQu06EvmJCtplZ8dRqVhHnB7I1yQuKw",
@@ -616,12 +696,10 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
-    const provider = new GoogleAuthProvider();
 
     let currentUser = null;
     let selectedItemName = "";
-    let selectedItemPrice = "";
-    let balanceListener = null;
+    let selectedItemPrice = 0;
     let currentWalletBalance = 0;
 
     const mainActionBtn = document.getElementById('main-action-btn');
@@ -630,6 +708,17 @@
     const uidError = document.getElementById('uid-error');
     const packError = document.getElementById('pack-error');
     const diamondsWrapper = document.getElementById('diamonds-wrapper');
+
+    function formatNum(amount) {
+        const num = Number(amount) || 0;
+        return num.toLocaleString('en-US');
+    }
+
+    function openInsufficientModal(availableBal, requiredAmt) {
+        document.getElementById('insufficient-available-balance').innerText = 'Rs. ' + formatNum(availableBal);
+        document.getElementById('insufficient-required-amount').innerText = formatNum(requiredAmt);
+        document.getElementById('insufficientModal').classList.add('show');
+    }
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
@@ -646,7 +735,7 @@
             document.getElementById('header-wallet-btn').style.display = 'flex';
 
             const userBalanceRef = ref(db, `users/${user.uid}/balance`);
-            balanceListener = onValue(userBalanceRef, (snapshot) => {
+            onValue(userBalanceRef, (snapshot) => {
                 const balance = snapshot.val();
                 currentWalletBalance = balance !== null ? Number(balance) : 0;
                 document.getElementById('header-user-balance').innerText = currentWalletBalance;
@@ -667,12 +756,6 @@
         }
     });
 
-    window.googleLogin = function() {
-        signInWithPopup(auth, provider).catch((error) => {
-            alert("Login failed: " + error.message);
-        });
-    };
-
     window.logoutUser = function() {
         auth.signOut().then(() => {
             toggleProfile();
@@ -681,9 +764,7 @@
 
     mainActionBtn.onclick = function() {
         if (!currentUser) {
-            signInWithPopup(auth, provider).catch((error) => {
-                alert("Login failed: " + error.message);
-            });
+            goToLogin();
             return;
         }
 
@@ -707,46 +788,71 @@
 
         if(!isFormValid) return;
 
+        const itemPriceNum = Number(selectedItemPrice);
+        if (currentWalletBalance < itemPriceNum) {
+            openInsufficientModal(currentWalletBalance, itemPriceNum);
+            return;
+        }
+
+        document.getElementById('modal-required-amount').innerText = formatNum(itemPriceNum);
         document.getElementById('modal-checkout-uid').innerText = uidValue;
         document.getElementById('modal-checkout-item').innerText = selectedItemName;
-        document.getElementById('modal-checkout-total').innerText = 'Rs ' + selectedItemPrice;
+        document.getElementById('modal-checkout-total').innerText = 'Rs ' + itemPriceNum;
         document.getElementById('checkoutModal').classList.add('show');
     };
 
     confirmPayBtn.onclick = async function() {
-        let uidValue = gameUidInput.value.trim();
-        const itemPriceNum = parseFloat(selectedItemPrice);
+        if (!currentUser) return;
+
+        const uidValue = gameUidInput.value.trim();
+        const itemPriceNum = Number(selectedItemPrice);
+
+        if (!selectedItemName || Number.isNaN(itemPriceNum) || itemPriceNum <= 0) {
+            alert("Invalid package or price selected. Please re-select a pack.");
+            return;
+        }
 
         if (currentWalletBalance < itemPriceNum) {
             closeCheckoutModal();
-            document.getElementById('insufficientModal').classList.add('show');
+            openInsufficientModal(currentWalletBalance, itemPriceNum);
             return;
         }
 
         confirmPayBtn.disabled = true;
         confirmPayBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing Order...`;
 
-        try {
-            const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
-            const userOrderId = 'RG-' + randomString + Date.now().toString().slice(-4);
-            const newBalance = currentWalletBalance - itemPriceNum;
+        const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const userOrderId = 'RG-' + randomString + Date.now().toString().slice(-4);
+        const orderRef = push(ref(db, 'orders'));
+        const orderKey = orderRef.key;
 
-            await update(ref(db, `users/${currentUser.uid}`), {
-                balance: newBalance
+        try {
+            const balanceRef = ref(db, `users/${currentUser.uid}/balance`);
+            const txResult = await runTransaction(balanceRef, (currentBal) => {
+                const numericBal = Number(currentBal);
+                if (Number.isNaN(numericBal) || numericBal < itemPriceNum) {
+                    return;
+                }
+                return numericBal - itemPriceNum;
             });
 
-            const now = new Date();
-            const orderRef = push(ref(db, 'orders'));
+            if (!txResult.committed) {
+                closeCheckoutModal();
+                openInsufficientModal(currentWalletBalance, itemPriceNum);
+                return;
+            }
 
+            const now = new Date();
             await set(orderRef, {
+                orderKey: orderKey,
                 date: now.toLocaleDateString(),
                 time: now.toLocaleTimeString(),
                 timestamp: Date.now(),
-                email: currentUser.email,
+                email: currentUser.email || "",
                 name: currentUser.displayName || "User",
                 userId: currentUser.uid,
                 product: selectedItemName,
-                amountDue: selectedItemPrice,
+                amountDue: itemPriceNum,
                 username: uidValue,
                 clientOrderId: userOrderId,
                 status: "pending"
@@ -774,10 +880,10 @@
         element.classList.add('selected');
         
         selectedItemName = name;
-        selectedItemPrice = price;
+        selectedItemPrice = Number(price);
 
         document.getElementById('summary-item').innerText = name;
-        document.getElementById('summary-total').innerText = 'Rs ' + price;
+        document.getElementById('summary-total').innerText = 'Rs ' + selectedItemPrice;
     };
 
     window.validateUIDLive = function() {
