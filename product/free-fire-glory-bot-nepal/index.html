@@ -778,6 +778,7 @@
                 amountDue: selectedItemPrice,
                 uid: uidValue,
                 clientOrderId: userOrderId,
+                method: selectedPaymentMethod === 'Wallet' ? 'wallet pay' : 'esewa',
                 paymentMethod: selectedPaymentMethod === 'Wallet' ? 'Wallet Balance' : 'eSewa QR',
                 transactionId: txId,
                 status: "Pending"
