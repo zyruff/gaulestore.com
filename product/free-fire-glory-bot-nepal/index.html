@@ -141,16 +141,33 @@
         .success-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(30px); transition: all 0.3s ease-in-out; position: relative; }
         .success-modal.show .success-card { transform: translateY(0); }
         
-        .checkout-card { max-width: 400px; width: 92%; text-align: left; padding: 20px; max-height: 90vh; overflow-y: auto; }
+        .checkout-card { max-width: 400px; width: 92%; text-align: left; padding: 24px; max-height: 90vh; overflow-y: auto; }
         .checkout-close { position: absolute; top: 16px; right: 16px; font-size: 20px; cursor: pointer; color: #718096; }
-        .checkout-title { font-size: 18px; font-weight: 700; text-align: center; color: #1a202c; margin-bottom: 2px; }
-        .checkout-subtitle { font-size: 11px; text-align: center; color: #718096; margin-bottom: 12px; }
+        .checkout-title { font-size: 18px; font-weight: 700; text-align: center; color: #1a202c; margin-bottom: 4px; }
+        .checkout-subtitle { font-size: 12px; text-align: center; color: #718096; margin-bottom: 14px; }
         
-        .wallet-box-banner { border: 1px solid #fca5a5; background-color: #fef2f2; border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 12px; }
-        .wallet-box-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #dc2626; letter-spacing: 0.5px; }
-        .wallet-box-amount { font-size: 20px; font-weight: 800; color: #dc2626; margin-top: 2px; }
+        .wallet-box-banner {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .wallet-box-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .wallet-box-row:last-child { margin-bottom: 0; }
+        .wallet-box-row span:first-child { color: #1a202c; font-weight: 600; }
+        .wallet-box-avail { color: #1a202c; font-weight: 700; }
+        .wallet-box-req-wrap { color: #1a202c; font-weight: 600; }
+        .wallet-box-req { color: #dc2626; font-weight: 700; }
 
-        .payment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
+        .payment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
         .payment-card { background-color: #fafbfc; border: 1px solid #cbd5e0; border-radius: 10px; padding: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; }
         .payment-card.selected { border: 2px solid #ffb300; background-color: #fffdf5; }
         .payment-info { display: flex; flex-direction: column; }
@@ -167,10 +184,49 @@
         /* Full Width Transaction Input Fix */
         #txIdInput { width: 100% !important; display: block; }
 
-        .checkout-details-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 12px; font-size: 12px; margin-bottom: 14px; }
-        .checkout-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .checkout-details-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; font-size: 13px; margin-bottom: 16px; }
+        .checkout-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .checkout-row:last-child { margin-bottom: 0; }
         .checkout-row span:first-child { color: #718096; }
         .checkout-row span:last-child { color: #1a202c; font-weight: 600; }
+
+        .insufficient-summary-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .insufficient-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .insufficient-row:last-child { margin-bottom: 0; }
+        .insufficient-row span:first-child { color: #1a202c; font-weight: 600; }
+        .insufficient-avail { color: #1a202c; font-weight: 700; }
+        .insufficient-req-wrap { color: #1a202c; font-weight: 600; }
+        .insufficient-req { color: #dc2626; font-weight: 700; }
+        .add-money-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px;
+            background-color: #2563EB;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: background 0.2s;
+        }
+        .add-money-btn:hover { background-color: #1d4ed8; }
 
         .success-checkmark { width: 72px; height: 72px; background: #2ed573; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; }
         .success-checkmark i { color: white; font-size: 32px; }
@@ -178,6 +234,7 @@
         .success-msg { font-size: 14px; color: #4a5568; line-height: 1.5; margin-bottom: 18px; }
         .success-receipt-info { background-color: #f7fafc; border: 1px dashed #cbd5e0; border-radius: 8px; padding: 12px; text-align: left; font-size: 13px; margin-bottom: 20px; }
         .receipt-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .receipt-row:last-child { margin-bottom: 0; }
         .receipt-row span:first-child { color: #718096; }
         .receipt-row span:last-child { color: #2d3748; font-weight: 600; }
         .success-close-btn { background-color: #1a202c; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; }
@@ -388,15 +445,15 @@
 <div class="success-modal" id="checkoutModal">
     <div class="success-card checkout-card">
         <span class="checkout-close" onclick="closeCheckoutModal()">&times;</span>
-        <div class="checkout-title" id="checkoutModalTitle">Scan to Pay</div>
-        <div class="checkout-subtitle" id="checkoutModalSubtitle">Please scan the QR code via eSewa</div>
+        <div class="checkout-title" id="checkoutModalTitle">Confirm Checkout</div>
+        <div class="checkout-subtitle" id="checkoutModalSubtitle">Pay securely using your account balance</div>
         
         <!-- Payment Methods Grid (Wallet & eSewa) -->
         <div class="payment-grid">
             <div class="payment-card selected" id="pay-method-wallet" onclick="selectPaymentMethod('Wallet')">
                 <i class="fa-solid fa-wallet" style="font-size: 16px; color: #ffb300;"></i>
                 <div class="payment-info">
-                    <div class="payment-name">Wallet Balance</div>
+                    <div class="payment-name" style="color: #ffb300;">Wallet Balance</div>
                     <div class="payment-sub">Instant Pay</div>
                 </div>
             </div>
@@ -410,10 +467,16 @@
             </div>
         </div>
 
-        <!-- Wallet Box Container (Shown when Wallet is selected) -->
+        <!-- Wallet Balance & Required Amount Box (Shown when Wallet is selected) -->
         <div id="walletPayContainer" class="wallet-box-banner">
-            <div class="wallet-box-label">Available Wallet Balance</div>
-            <div class="wallet-box-amount">Rs <span id="modal-user-balance">0</span></div>
+            <div class="wallet-box-row">
+                <span>Your account balance</span>
+                <span class="wallet-box-avail">Rs. <span id="modal-user-balance">0</span></span>
+            </div>
+            <div class="wallet-box-row">
+                <span>Required to buy product</span>
+                <span class="wallet-box-req-wrap">Rs. <span class="wallet-box-req" id="modal-required-amount">0</span></span>
+            </div>
         </div>
 
         <!-- QR Box Container (Shown when eSewa is selected) -->
@@ -507,8 +570,23 @@
             <i class="fa-solid fa-wallet" style="color: #dc2626; font-size: 28px;"></i>
         </div>
         <div class="success-title">Insufficient Balance</div>
-        <p class="success-msg">Your wallet balance is insufficient! You can select eSewa QR to pay directly.</p>
-        <button class="success-close-btn" style="background-color: #dc2626;" onclick="closeInsufficientModal()">Got It</button>
+        <p class="success-msg">Your wallet balance is insufficient to purchase this package. Please add money or select eSewa QR to pay directly.</p>
+
+        <div class="insufficient-summary-box">
+            <div class="insufficient-row">
+                <span>Your account balance</span>
+                <span class="insufficient-avail" id="insufficient-available-balance">Rs. 0</span>
+            </div>
+            <div class="insufficient-row">
+                <span>Required to buy product</span>
+                <span class="insufficient-req-wrap">Rs. <span class="insufficient-req" id="insufficient-required-amount">0</span></span>
+            </div>
+        </div>
+
+        <a href="https://roshantamang2.com.np/load-wallet" class="add-money-btn">
+            <i class="fa-solid fa-plus"></i> ADD MONEY
+        </a>
+        <button class="success-close-btn" style="background-color: #1a202c;" onclick="closeInsufficientModal()">Got It</button>
     </div>
 </div>
 
@@ -610,6 +688,17 @@
     const diamondsWrapper = document.getElementById('diamonds-wrapper');
     const txIdInput = document.getElementById('txIdInput');
     const txError = document.getElementById('txError');
+
+    function formatNum(amount) {
+        const num = Number(amount) || 0;
+        return num.toLocaleString('en-US');
+    }
+
+    function openInsufficientModal(availableBal, requiredAmt) {
+        document.getElementById('insufficient-available-balance').innerText = 'Rs. ' + formatNum(availableBal);
+        document.getElementById('insufficient-required-amount').innerText = formatNum(requiredAmt);
+        document.getElementById('insufficientModal').classList.add('show');
+    }
 
     auth.onAuthStateChanged((user) => {
         if (user) {
@@ -720,6 +809,9 @@
 
         if(!isFormValid) return;
 
+        const itemPriceNum = Number(selectedItemPrice);
+        document.getElementById('modal-user-balance').innerText = currentWalletBalance;
+        document.getElementById('modal-required-amount').innerText = formatNum(itemPriceNum);
         document.getElementById('modal-checkout-uid').innerText = uidValue;
         document.getElementById('modal-checkout-item').innerText = selectedItemName;
         document.getElementById('modal-checkout-total').innerText = 'Rs ' + selectedItemPrice;
@@ -736,7 +828,7 @@
         if (selectedPaymentMethod === 'Wallet') {
             if (currentWalletBalance < itemPriceNum) {
                 closeCheckoutModal();
-                document.getElementById('insufficientModal').classList.add('show');
+                openInsufficientModal(currentWalletBalance, itemPriceNum);
                 return;
             }
             txId = "Wallet Paid";
