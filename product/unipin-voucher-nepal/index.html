@@ -115,42 +115,97 @@
         .social-badges { display: flex; gap: 12px; flex-wrap: wrap; }
         .social-btn { text-decoration: none; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 0.88rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
 
-        .qr-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; pointer-events: none; transition: all 0.3s ease; padding: 20px; }
+        .qr-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; pointer-events: none; transition: all 0.3s ease; padding: 20px; }
         .qr-modal.show { opacity: 1; pointer-events: auto; }
-        .qr-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; max-width: 380px; width: 100%; text-align: center; position: relative; }
-        .close-modal { position: absolute; top: 15px; right: 15px; font-size: 20px; color: #718096; cursor: pointer; }
-        .qr-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; color: #1a202c; }
-        .qr-subtitle { font-size: 13px; color: #4a5568; margin-bottom: 16px; }
+        .qr-card { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; max-width: 400px; width: 100%; text-align: left; position: relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .close-modal { position: absolute; top: 16px; right: 16px; font-size: 20px; color: #718096; cursor: pointer; }
+        .qr-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; color: #1a202c; text-align: center; }
+        .qr-subtitle { font-size: 12px; color: #718096; margin-bottom: 16px; text-align: center; }
         
-        .wallet-info-box { background: #fffdf5; border: 1px solid #ffb300; padding: 14px; border-radius: 10px; margin-bottom: 16px; text-align: center; }
-        .wallet-info-title { font-size: 12px; font-weight: 600; color: #718096; text-transform: uppercase; margin-bottom: 4px; }
-        .wallet-info-balance { font-size: 22px; font-weight: 700; color: #ffb300; }
+        .wallet-box-banner {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .wallet-box-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .wallet-box-row:last-child { margin-bottom: 0; }
+        .wallet-box-row span:first-child { color: #1a202c; font-weight: 600; }
+        .wallet-box-avail { color: #1a202c; font-weight: 700; }
+        .wallet-box-req-wrap { color: #1a202c; font-weight: 600; }
+        .wallet-box-req { color: #dc2626; font-weight: 700; }
 
         /* Modal Checkout Payment Method Selection Style */
-        .modal-payment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
-        .modal-pay-option { display: flex; align-items: center; gap: 8px; padding: 10px; border: 1px solid #cbd5e0; border-radius: 8px; background: #fff; cursor: pointer; text-align: left; }
+        .modal-payment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+        .modal-pay-option { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid #cbd5e0; border-radius: 10px; background: #fafbfc; cursor: pointer; text-align: left; }
         .modal-pay-option.selected { border: 2px solid #ffb300 !important; background-color: #fffdf5; }
-        .modal-pay-option.disabled-option { background-color: #f7fafc; opacity: 0.6; cursor: not-allowed; border-color: #e2e8f0; }
-        .modal-pay-icon { width: 22px; height: 22px; object-fit: contain; }
-        .modal-pay-title { font-size: 12px; font-weight: 700; color: #1a202c; }
-        .modal-pay-desc { font-size: 9px; color: #718096; }
+        .modal-pay-option.disabled-option { background-color: #edf2f7; opacity: 0.55; cursor: not-allowed; border: 1px dashed #a0aec0; }
+        .modal-pay-icon { width: 24px; height: 24px; object-fit: contain; border-radius: 50%; flex-shrink: 0; }
+        .modal-pay-title { font-size: 12px; font-weight: 700; color: #ffb300; }
+        .modal-pay-desc { font-size: 10px; font-weight: 500; color: #4a5568; }
 
-        .payment-summary-box { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; text-align: left; margin-bottom: 16px; }
-        .pay-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
-        .pay-row span:first-child { color: #4a5568; }
-        .pay-row span:last-child { color: #1a202c; font-weight: 500; }
+        .payment-summary-box { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; text-align: left; margin-bottom: 20px; font-size: 13px; }
+        .pay-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .pay-row:last-child { margin-bottom: 0; }
+        .pay-row span:first-child { color: #718096; }
+        .pay-row span:last-child { color: #1a202c; font-weight: 600; }
         .pay-row .highlight-total { color: #ffb300 !important; font-weight: 700; }
-        .done-btn { background-color: #ffb300; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; }
+        .done-btn { background-color: #ffb300; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 700; font-size: 15px; border-radius: 8px; cursor: pointer; }
         .done-btn:disabled { background-color: #cbd5e0; cursor: not-allowed; }
 
         .alert-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out; }
         .alert-modal.show { opacity: 1; pointer-events: auto; }
         .alert-card { background: #ffffff; border-radius: 20px; padding: 30px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-        .alert-icon-wrap { width: 72px; height: 72px; background: rgba(229, 62, 62, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; }
-        .alert-icon-wrap i { color: #e53e3e; font-size: 32px; }
-        .alert-title { font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 8px; }
-        .alert-msg { font-size: 13px; color: #4a5568; line-height: 1.5; margin-bottom: 20px; }
-        .alert-btn { background-color: #e53e3e; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 600; border-radius: 10px; cursor: pointer; }
+        .alert-icon-wrap { width: 72px; height: 72px; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; }
+        .alert-icon-wrap i { color: #dc2626; font-size: 28px; }
+        .alert-title { font-size: 22px; font-weight: 700; color: #1a202c; margin-bottom: 8px; }
+        .alert-msg { font-size: 14px; color: #4a5568; line-height: 1.5; margin-bottom: 18px; }
+        .insufficient-summary-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .insufficient-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .insufficient-row:last-child { margin-bottom: 0; }
+        .insufficient-row span:first-child { color: #1a202c; font-weight: 600; }
+        .insufficient-avail { color: #1a202c; font-weight: 700; }
+        .insufficient-req-wrap { color: #1a202c; font-weight: 600; }
+        .insufficient-req { color: #dc2626; font-weight: 700; }
+        .add-money-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px;
+            background-color: #2563EB;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: background 0.2s;
+        }
+        .add-money-btn:hover { background-color: #1d4ed8; }
+        .alert-btn { background-color: #1a202c; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; }
 
         .success-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(26, 32, 44, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out; }
         .success-modal.show { opacity: 1; pointer-events: auto; }
@@ -496,9 +551,15 @@
         <div class="qr-title">Confirm Checkout</div>
         <div class="qr-subtitle">Pay securely using your account balance</div>
         
-        <div class="wallet-info-box">
-            <div class="wallet-info-title">Available Wallet Balance</div>
-            <div class="wallet-info-balance" id="modal-wallet-bal">Rs 0</div>
+        <div class="wallet-box-banner">
+            <div class="wallet-box-row">
+                <span>Your account balance</span>
+                <span class="wallet-box-avail">Rs. <span id="modal-wallet-bal">0</span></span>
+            </div>
+            <div class="wallet-box-row">
+                <span>Required to buy product</span>
+                <span class="wallet-box-req-wrap">Rs. <span class="wallet-box-req" id="modal-required-amount">0</span></span>
+            </div>
         </div>
 
         <!-- Payment Method Options Inside Modal (eSewa Disabled) -->
@@ -545,6 +606,21 @@
         </div>
         <div class="alert-title" id="alert-title-text">Notice</div>
         <p class="alert-msg" id="alert-msg-text">Message goes here...</p>
+
+        <div id="insufficient-details-box" class="insufficient-summary-box" style="display: none;">
+            <div class="insufficient-row">
+                <span>Your account balance</span>
+                <span class="insufficient-avail" id="insufficient-available-balance">Rs. 0</span>
+            </div>
+            <div class="insufficient-row">
+                <span>Required to buy product</span>
+                <span class="insufficient-req-wrap">Rs. <span class="insufficient-req" id="insufficient-required-amount">0</span></span>
+            </div>
+        </div>
+
+        <a id="alert-add-money-btn" href="https://roshantamang2.com.np/load-wallet" class="add-money-btn" style="display: none;">
+            <i class="fa-solid fa-plus"></i> ADD MONEY
+        </a>
         <button class="alert-btn" onclick="closeAlertModal()">Got It</button>
     </div>
 </div>
@@ -637,6 +713,11 @@
     let selectedItemPrice = "";
     let selectedStockKey = "";
     let userCurrentBalance = 0;
+
+    function formatNum(amount) {
+        const num = Number(amount) || 0;
+        return num.toLocaleString('en-US');
+    }
 
     window.toggleMenu = () => { const m = document.getElementById("nav-menu"); m.style.display = (m.style.display === "block") ? "none" : "block"; };
     window.toggleProfile = () => { const d = document.getElementById("profile-dropdown"); d.style.display = (d.style.display === "block") ? "none" : "block"; };
@@ -753,9 +834,23 @@
         }
     };
 
-    function showCustomAlert(title, message) {
+    function showCustomAlert(title, message, insufficientData = null) {
         document.getElementById('alert-title-text').innerText = title;
         document.getElementById('alert-msg-text').innerText = message;
+
+        const detailsBox = document.getElementById('insufficient-details-box');
+        const addMoneyBtn = document.getElementById('alert-add-money-btn');
+
+        if (insufficientData) {
+            document.getElementById('insufficient-available-balance').innerText = 'Rs. ' + formatNum(insufficientData.available);
+            document.getElementById('insufficient-required-amount').innerText = formatNum(insufficientData.required);
+            detailsBox.style.display = 'block';
+            addMoneyBtn.style.display = 'flex';
+        } else {
+            detailsBox.style.display = 'none';
+            addMoneyBtn.style.display = 'none';
+        }
+
         document.getElementById('alertModal').classList.add('show');
     }
 
@@ -795,10 +890,12 @@
     };
 
     function openPaymentModal(email) {
+        const requiredAmt = Number(selectedItemPrice) || 0;
         document.getElementById('modal-uid').innerText = email;
         document.getElementById('modal-item').innerText = selectedItemName;
         document.getElementById('modal-total').innerText = 'Rs ' + selectedItemPrice;
-        document.getElementById('modal-wallet-bal').innerText = 'Rs ' + userCurrentBalance;
+        document.getElementById('modal-wallet-bal').innerText = formatNum(userCurrentBalance);
+        document.getElementById('modal-required-amount').innerText = formatNum(requiredAmt);
 
         const submitBtn = document.getElementById('submit-btn');
         submitBtn.disabled = false;
@@ -817,7 +914,11 @@
 
         if (userCurrentBalance < price) {
             closePaymentModal();
-            showCustomAlert("Insufficient Balance", "Your wallet balance is insufficient! Please top up your account balance before proceeding.");
+            showCustomAlert(
+                "Insufficient Balance",
+                "Your wallet balance is insufficient to purchase this package. Please add money to continue.",
+                { available: userCurrentBalance, required: price }
+            );
             return;
         }
 
