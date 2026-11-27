@@ -429,9 +429,11 @@
             if (!order || typeof order !== 'object') return order;
             const incomingWebhookMessage = order.WebhookMessage || order.webhookMessage || order.webhook_message || order.webhookMsg || '';
             const incomingUsername = order.username || order.userName || order.user_name || order.customerUsername || order.customer_username || '';
+            const incomingMethod = order.method || '';
             return {
                 ...order,
                 username: incomingUsername,
+                method: incomingMethod,
                 WebhookMessage: incomingWebhookMessage
             };
         }
@@ -702,13 +704,14 @@
                 const orderIdStr = '#' + sequentialNumber;
 
                 const orderDateStr = formatOrderDate(order);
+                const paymentMethod = String(order.method || '').trim();
                 const transactionId = order.transactionId || order.txnId || order.transactionID || '';
                 const clientOrderId = order.clientOrderId || order.client_order_id || order.orderId || order.order_id || '';
                 const webhookMessage = order.WebhookMessage || '';
                 const voucherCode = order.voucherCode || order.redeemCode || '';
 
                 const matchesStatus = (currentStatusFilter === 'all' || orderStatus === currentStatusFilter);
-                const searchString = `${orderIdStr} ${productTitle} ${displayEmail} ${displayUsername} ${displayUID} ${displayPlayerName} ${displayZoneId} ${orderAmount} ${voucherCode} ${transactionId} ${clientOrderId} ${webhookMessage} ${orderDateStr}`.toLowerCase();
+                const searchString = `${orderIdStr} ${productTitle} ${displayEmail} ${displayUsername} ${displayUID} ${displayPlayerName} ${displayZoneId} ${paymentMethod} ${orderAmount} ${voucherCode} ${transactionId} ${clientOrderId} ${webhookMessage} ${orderDateStr}`.toLowerCase();
                 const matchesSearch = searchString.includes(searchQuery);
 
                 if (matchesStatus && matchesSearch) {
@@ -736,6 +739,7 @@
                                 ${voucherCode ? `<div class="info-row" onclick="copyToClipboard('${voucherCode}')" style="background:transparent; padding:4px 0; margin-top:4px; margin-left:0; cursor:pointer; width:100%; display:flex; align-items:center;" title="Click to copy code"><i class="fa-solid fa-key" style="cursor:pointer; width:14px; text-align:center; margin-right:6px; color:#94a3b8;"></i> <b style="letter-spacing:0.5px; flex-grow:1; color:#047857; background:#ecfdf5; padding:6px 10px; border-radius:8px; border:1px dashed #34d399; display:inline-block;">${voucherCode}</b> <i class="fa-regular fa-copy" style="color:#059669; margin-left:8px;"></i></div>` : ''}
                                 
                                 <div class="txn-row-box">
+                                    ${paymentMethod ? `<div class="info-row"><i class="fa-solid fa-wallet"></i> <span class="info-label">Method:</span> <b class="info-value" style="color: #2563EB;">${paymentMethod}</b></div>` : ''}
                                     ${transactionId ? `<div class="info-row" style="color:#059669;"><i class="fa-solid fa-receipt"></i> <span class="info-label">Txn ID:</span> <b class="info-value">${transactionId}</b></div>` : `<div class="info-row" style="color:#6b7280;"><i class="fa-solid fa-receipt"></i> <span class="info-label">Txn ID:</span> <b class="info-value">Not Provided</b></div>`}
                                     ${clientOrderId ? `<div class="info-row"><i class="fa-solid fa-hashtag"></i> <span class="info-label">Order Id:</span> <b class="info-value">${clientOrderId}</b></div>` : ''}
                                     ${webhookMessage ? `<div class="info-row"><i class="fa-solid fa-message"></i> <span class="info-label">SMS:</span> <b class="info-value">${webhookMessage}</b></div>` : ''}
